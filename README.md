@@ -1,7 +1,9 @@
 # AlpheratzDeobfuscator
-> Simple deobfuscator for shitty and skidded obfuscator "created" by Unix
+### Simple deobfuscator for shitty and skidded obfuscator "created" by Unix
 
-### Transformers
+---
+
+## Transformers
 - AntiDebug Remover
 - BadAnnotation Remover
 - Flow Remover

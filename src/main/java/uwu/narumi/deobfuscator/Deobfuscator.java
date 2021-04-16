@@ -32,7 +32,7 @@ public class Deobfuscator {
   private final File output;
   private final List<Transformer> transformers;
 
-  private Deobfuscator(Builder builder) throws Exception {
+  private Deobfuscator(Builder builder) {
     if (builder.transformers == null) {
       throw new IllegalArgumentException("Please specify transformers");
     }
@@ -100,7 +100,6 @@ public class Deobfuscator {
         transformer.transform(this);
       } catch (Exception e) {
         System.out.printf("Error occurred while transforming (%s): %s\n", transformer.name(), e);
-        e.printStackTrace();
       }
       System.out.printf("Ended %s transformer in %sms\n", transformer.name(),
           (System.currentTimeMillis() - start));
@@ -179,7 +178,7 @@ public class Deobfuscator {
       return this;
     }
 
-    public Deobfuscator build() throws Exception {
+    public Deobfuscator build() {
       return new Deobfuscator(this);
     }
   }
