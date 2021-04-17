@@ -94,14 +94,14 @@ public class Deobfuscator {
   private void transform() {
     transformers.forEach(transformer -> {
       System.out.println();
-      System.out.printf("Running %s transformer\n", transformer.name());
+      System.out.printf("Running %s\n", transformer.name());
       long start = System.currentTimeMillis();
       try {
         transformer.transform(this);
       } catch (Exception e) {
         System.out.printf("Error occurred while transforming (%s): %s\n", transformer.name(), e);
       }
-      System.out.printf("Ended %s transformer in %sms\n", transformer.name(),
+      System.out.printf("Ended %s in %sms\n", transformer.name(),
           (System.currentTimeMillis() - start));
     });
 
