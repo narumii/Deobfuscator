@@ -27,14 +27,21 @@ public class BadAnnotationRemoveTransformer implements Transformer {
     });
   }
 
+  //Unix, nie wysilaj sie bo i tak ci sie nie uda :(
   private List<AnnotationNode> filterAnnotations(List<AnnotationNode> nodes) {
     if (nodes == null) {
       return null;
     }
 
+    List<String> invalid = nodes.stream()
+        .filter(node -> !node.desc.startsWith("L"))
+        .filter(node -> !node.desc.endsWith(";"))
+        .map(node -> node.desc)
+        .collect(Collectors.toList());
+
     return nodes.stream()
-        .filter(node -> node.desc.startsWith("L"))
-        .filter(node -> node.desc.endsWith(";"))
+        .filter(
+            node -> !invalid.contains(node.desc.replace(";", "").replace("@", "").replace("L", "")))
         .collect(Collectors.toList());
   }
 

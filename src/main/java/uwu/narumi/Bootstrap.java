@@ -13,6 +13,7 @@ import uwu.narumi.deobfuscator.transformer.impl.UnHideCodeTransformer;
 
 public class Bootstrap {
 
+
   public static void main(String... args) {
     //if (args.length < 2)
     //  throw new IllegalArgumentException("Usage: java -jar program.jar input output");
