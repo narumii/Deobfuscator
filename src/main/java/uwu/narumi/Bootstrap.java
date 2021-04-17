@@ -13,10 +13,13 @@ import uwu.narumi.deobfuscator.transformer.impl.UnHideCodeTransformer;
 
 public class Bootstrap {
 
-  public static void main(String... args) throws Exception {
+  public static void main(String... args) {
+    //if (args.length < 2)
+    //  throw new IllegalArgumentException("Usage: java -jar program.jar input output");
+
     Deobfuscator.builder()
-        .input("example/input-trashcode.jar")
-        .output("example/output-trashcode.jar")
+        .input("example/input-trashcode.jar") //.input(args[0])
+        .output("example/output-trashcode.jar") //.output(args[1])
         .with(
             new AntiDebugRemoveTransformer(),
             new BadAnnotationRemoveTransformer(),
