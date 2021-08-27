@@ -26,35 +26,34 @@ public class FlowRemoveTransformer extends Transformer {
                             .filter(node -> node.name.charAt(0) > 127)
                             .filter(node -> node.getNext() != null)
                             .filter(node -> isLong(node.getNext()))
+                            .filter(node -> node.getNext().getNext() instanceof JumpInsnNode)
                             .forEach(node -> {
-                                if (node.getNext().getNext() instanceof JumpInsnNode) {
-                                    JumpInsnNode GOTO = (JumpInsnNode) node.getNext().getNext();
-                                    LabelNode labelNode = GOTO.label;
-                                    AbstractInsnNode end = labelNode;
+                                JumpInsnNode GOTO = (JumpInsnNode) node.getNext().getNext();
+                                LabelNode labelNode = GOTO.label;
+                                AbstractInsnNode end = labelNode;
 
-                                    int position = 0;
-                                    boolean failed = false;
+                                int position = 0;
+                                boolean failed = false;
 
-                                    if (labelNode.getNext().getOpcode() == LXOR) {
-                                        position = 9;
-                                    } else if (labelNode.getNext().getOpcode() == LCMP) {
-                                        position = 7;
-                                    } else if (labelNode.getNext().getOpcode() == LAND) {
-                                        position = 12;
+                                if (labelNode.getNext().getOpcode() == LXOR) {
+                                    position = 9;
+                                } else if (labelNode.getNext().getOpcode() == LCMP) {
+                                    position = 7;
+                                } else if (labelNode.getNext().getOpcode() == LAND) {
+                                    position = 12;
+                                }
+
+                                for (int i = 0; i < position; i++) {
+                                    if (end == null) {
+                                        failed = true;
+                                        break;
                                     }
 
-                                    for (int i = 0; i < position; i++) {
-                                        if (end == null) {
-                                            failed = true;
-                                            break;
-                                        }
+                                    end = end.getNext();
+                                }
 
-                                        end = end.getNext();
-                                    }
-
-                                    if (!failed) {
-                                        getInstructionsBetween(node, end).forEach(a -> methodNode.instructions.remove(a));
-                                    }
+                                if (!failed) {
+                                    getInstructionsBetween(node, end).forEach(a -> methodNode.instructions.remove(a));
                                 }
                             });
 
