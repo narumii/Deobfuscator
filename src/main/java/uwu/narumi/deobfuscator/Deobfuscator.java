@@ -1,185 +1,198 @@
 package uwu.narumi.deobfuscator;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.jar.JarOutputStream;
-import java.util.zip.ZipEntry;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
 import uwu.narumi.deobfuscator.helper.ClassHelper;
-import uwu.narumi.deobfuscator.pool.ConstantPool;
+import uwu.narumi.deobfuscator.helper.FileHelper;
 import uwu.narumi.deobfuscator.transformer.Transformer;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class Deobfuscator {
 
-  private final ConcurrentMap<String, ConstantPool> constantPools = new ConcurrentHashMap<>();
-  private final ConcurrentMap<String, ClassNode> classes = new ConcurrentHashMap<>();
-  private final ConcurrentMap<String, byte[]> files = new ConcurrentHashMap<>();
+    private static final Logger LOGGER = LogManager.getLogger(Deobfuscator.class);
 
-  private final File input;
-  private final File output;
-  private final List<Transformer> transformers;
+    private final Map<String, ClassNode> classes = new ConcurrentHashMap<>();
+    private final Map<String, byte[]> files = new ConcurrentHashMap<>();
 
-  private Deobfuscator(Builder builder) {
-    if (builder.transformers == null) {
-      throw new IllegalArgumentException("Please specify transformers");
+    private final Path input;
+    private final Path output;
+    private final List<Transformer> transformers;
+    private final int classReaderFlags;
+    private final int classWriterFlags;
+
+    private Deobfuscator(Builder builder) throws FileNotFoundException {
+        if (!builder.input.toFile().exists())
+            throw new FileNotFoundException(builder.input.toString());
+
+        if (builder.output.toFile().exists())
+            LOGGER.warn("Output file already exist, data will be overwritten");
+
+        this.input = builder.input;
+        this.output = builder.output;
+        this.transformers = builder.transformers;
+        this.classReaderFlags = builder.classReaderFlags;
+        this.classWriterFlags = builder.classWriterFlags;
+
+        System.out.println();
     }
 
-    this.input = new File(builder.input);
-    this.output = new File(builder.output);
-    this.transformers = Arrays.asList(builder.transformers);
-    this.transformers.sort(Comparator.comparingInt(Transformer::weight));
-  }
-
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  public void start() {
-    try {
-      loadJar();
-      transform();
-      saveJar();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  private void loadJar() throws IOException {
-    if (!input.exists()) {
-      throw new IOException("Input file doesn't exists.");
+    public static Builder builder() {
+        return new Builder();
     }
 
-    System.out.println("Loading input file: " + input.getAbsolutePath());
-    try (JarFile jarFile = new JarFile(input)) {
-      Enumeration<JarEntry> enumeration = jarFile.entries();
-      while (enumeration.hasMoreElements()) {
-        JarEntry entry = enumeration.nextElement();
+    public void start() {
         try {
-          byte[] bytes = jarFile.getInputStream(entry).readAllBytes();
-
-          if (ClassHelper.isClass(entry.getName(), bytes)) {
-            ClassNode classNode = new ClassNode();
-            ClassReader classReader = new ClassReader(bytes);
-            classReader.accept(classNode, ClassReader.SKIP_FRAMES);
-            classes.put(classNode.name, classNode);
-            constantPools.put(classNode.name, ClassHelper.getConstantPool(classReader));
-          } else {
-            files.put(entry.getName(), bytes);
-          }
+            loadInput();
+            transform();
+            saveOutput();
         } catch (Exception e) {
-          System.out.printf("Can't load resource (%s): %s\n", entry.getName(), e);
+            LOGGER.error("Error occurred while obfuscation");
+            LOGGER.debug("Error", e);
         }
-      }
-    } catch (Exception e) {
-      System.out.printf("Can't load input file (%s): %s\n", output, e);
     }
 
-    System.out.println("Loaded input file: " + input.getAbsolutePath());
-    System.out.println();
-  }
+    private void loadInput() {
+        LOGGER.info("Loading input file: {}", input);
 
-  private void transform() {
-    transformers.forEach(transformer -> {
-      System.out.println();
-      System.out.printf("Running %s\n", transformer.name());
-      long start = System.currentTimeMillis();
-      try {
-        transformer.transform(this);
-      } catch (Exception e) {
-        System.out.printf("Error occurred while transforming (%s): %s\n", transformer.name(), e);
-      }
-      System.out.printf("Ended %s in %sms\n", transformer.name(),
-          (System.currentTimeMillis() - start));
-    });
+        FileHelper.loadFilesFromZip(input.toString()).forEach((name, data) -> {
+            try {
+                if (ClassHelper.isClass(name, data)) {
+                    ClassNode classNode = ClassHelper.loadClass(data, classReaderFlags);
+                    classes.put(classNode.name, classNode);
+                } else {
+                    files.put(name, data);
+                }
+            } catch (Exception e) {
+                LOGGER.error("Could not load class: {}, adding as file", name);
+                LOGGER.debug("Error", e);
+                files.put(name, data);
+            }
+        });
 
-    System.out.println();
-  }
-
-  private void saveJar() {
-    System.out.println();
-
-    if (output.exists()) {
-      System.out.println("Output file exists, it will be replaced");
+        LOGGER.info("Loaded input file: {}\n", input);
     }
 
-    System.out.println("Saving output file: " + output.getAbsolutePath());
-    try (JarOutputStream stream = new JarOutputStream(new FileOutputStream(output))) {
-      stream.setLevel(9);
+    private void transform() {
+        if (transformers == null || transformers.isEmpty())
+            return;
 
-      for (Entry<String, ClassNode> entry : classes.entrySet()) {
-        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        entry.getValue().accept(classWriter);
-        stream.putNextEntry(new ZipEntry(entry.getValue().name + ".class"));
-        stream.write(classWriter.toByteArray());
-      }
-
-      for (Entry<String, byte[]> entry : files.entrySet()) {
-        stream.putNextEntry(new ZipEntry(entry.getKey()));
-        stream.write(entry.getValue());
-      }
-    } catch (Exception e) {
-      System.out.printf("Error occurred while saving file (%s): %s\n", output, e);
-    }
-    System.out.println("Saved output file: " + output.getAbsolutePath());
-  }
-
-  public Collection<ClassNode> getClasses() {
-    return classes.values();
-  }
-
-  public ConcurrentMap<String, ConstantPool> getConstantPools() {
-    return constantPools;
-  }
-
-  public ConcurrentMap<String, ClassNode> getClassesEntry() {
-    return classes;
-  }
-
-  public ConcurrentMap<String, byte[]> getFiles() {
-    return files;
-  }
-
-  public static class Builder {
-
-    private String input;
-    private String output;
-
-    private Transformer[] transformers;
-
-    private Builder() {
+        transformers.forEach(transformer -> {
+            LOGGER.info("-------------------------------------");
+            try {
+                LOGGER.info("Running {} transformer", transformer.name());
+                long start = System.currentTimeMillis();
+                transformer.transform(this);
+                LOGGER.info("Ended {} transformer in {} ms", transformer.name(), (System.currentTimeMillis() - start));
+            } catch (Exception e) {
+                LOGGER.error("Error occurred when transforming {}", transformer.name());
+                LOGGER.debug("Error", e);
+            }
+            LOGGER.info("-------------------------------------\n");
+        });
     }
 
-    public Builder input(String file) {
-      this.input = file;
-      this.output = file.replace(".jar", "-deobf.jar");
-      return this;
+    private void saveOutput() {
+        LOGGER.info("Saving output file: {}", output);
+
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(output.toFile()))) {
+            zipOutputStream.setLevel(9);
+
+            classes.forEach((ignored, classNode) -> {
+                try {
+                    zipOutputStream.putNextEntry(new ZipEntry(classNode.name + ".class"));
+                    zipOutputStream.write(ClassHelper.classToBytes(classNode, classWriterFlags));
+                } catch (Exception e) {
+                    LOGGER.error("Could not save class: {}", classNode.name);
+                    LOGGER.debug("Error", e);
+                }
+
+                classes.remove(ignored);
+            });
+
+            files.forEach((name, data) -> {
+                try {
+                    zipOutputStream.putNextEntry(new ZipEntry(name));
+                    zipOutputStream.write(data);
+                } catch (Exception e) {
+                    LOGGER.error("Could not save file: {}", name);
+                    LOGGER.debug("Error", e);
+                }
+
+                files.remove(name);
+            });
+        } catch (Exception e) {
+            LOGGER.error("Could not save output file: {}", output);
+            LOGGER.debug("Error", e);
+        }
+
+        LOGGER.info("Saved output file: {}\n", output);
     }
 
-    public Builder output(String file) {
-      this.output = file;
-      return this;
+    public Map<String, ClassNode> getClasses() {
+        return classes;
     }
 
-    public Builder with(Transformer... transformers) {
-      this.transformers = transformers;
-      return this;
+    public Collection<ClassNode> classes() {
+        return classes.values();
     }
 
-    public Deobfuscator build() {
-      return new Deobfuscator(this);
+    public Map<String, byte[]> getFiles() {
+        return files;
     }
-  }
+
+    public static class Builder {
+
+        private Path input = Path.of("input.jar");
+        private Path output = Path.of("output.jar");
+
+        private List<Transformer> transformers;
+
+        private int classReaderFlags = ClassReader.EXPAND_FRAMES;
+        private int classWriterFlags = ClassWriter.COMPUTE_MAXS;
+
+        private Builder() {
+        }
+
+        public Builder input(Path input) {
+            this.input = input;
+            return this;
+        }
+
+        public Builder output(Path output) {
+            this.output = output;
+            return this;
+        }
+
+        public Builder transformers(Transformer... transformers) {
+            this.transformers = Arrays.asList(transformers);
+            return this;
+        }
+
+        public Builder classReaderFlags(int classReaderFlags) {
+            this.classReaderFlags = classReaderFlags;
+            return this;
+        }
+
+        public Builder classWriterFlags(int classWriterFlags) {
+            this.classWriterFlags = classWriterFlags;
+            return this;
+        }
+
+        public Deobfuscator build() throws FileNotFoundException {
+            return new Deobfuscator(this);
+        }
+    }
 }

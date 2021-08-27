@@ -1,14 +1,18 @@
 package uwu.narumi.deobfuscator.transformer;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.Opcodes;
 import uwu.narumi.deobfuscator.Deobfuscator;
-import uwu.narumi.deobfuscator.exception.DeobfuscationException;
+import uwu.narumi.deobfuscator.helper.ASMHelper;
 
-public interface Transformer extends Opcodes {
+public abstract class Transformer extends ASMHelper implements Opcodes {
 
-  void transform(Deobfuscator deobfuscator) throws DeobfuscationException;
+    protected static final Logger LOGGER = LogManager.getLogger(Transformer.class);
 
-  int weight();
+    public abstract void transform(Deobfuscator deobfuscator) throws Exception;
 
-  String name();
+    public String name() {
+        return this.getClass().getSimpleName();
+    }
 }
