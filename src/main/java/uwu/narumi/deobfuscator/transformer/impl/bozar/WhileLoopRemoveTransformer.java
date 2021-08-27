@@ -32,7 +32,7 @@ public class WhileLoopRemoveTransformer extends Transformer {
                                 while (!(end instanceof JumpInsnNode && ((JumpInsnNode) end).label.equals(labelNode)))
                                     end = end.getNext();
 
-                                getInstructionsBetween(node, end).forEach(a -> methodNode.instructions.remove(a));
+                                getInstructionsBetween(node, end).forEach(methodNode.instructions::remove);
                             } catch (Exception ignored) {
                             }
                         })
