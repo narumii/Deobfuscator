@@ -9,7 +9,6 @@ public class LocalVariableRemoveTransformer extends Transformer {
     public void transform(Deobfuscator deobfuscator) throws Exception {
         deobfuscator.classes().stream()
                 .flatMap(classNode -> classNode.methods.stream())
-                .filter(methodNode -> methodNode.localVariables != null)
                 .forEach(methodNode -> methodNode.localVariables = null);
     }
 }

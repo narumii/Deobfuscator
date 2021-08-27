@@ -3,7 +3,6 @@ package uwu.narumi.deobfuscator.transformer.impl.bozar;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
-import org.objectweb.asm.tree.LabelNode;
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 
@@ -29,19 +28,13 @@ public class FlowRemoveTransformer extends Transformer {
                             .filter(node -> node.getNext().getNext() instanceof JumpInsnNode)
                             .forEach(node -> {
                                 JumpInsnNode GOTO = (JumpInsnNode) node.getNext().getNext();
-                                LabelNode labelNode = GOTO.label;
-                                AbstractInsnNode end = labelNode;
+                                AbstractInsnNode end = GOTO.label;
 
-                                int position = 0;
                                 boolean failed = false;
-
-                                if (labelNode.getNext().getOpcode() == LXOR) {
-                                    position = 9;
-                                } else if (labelNode.getNext().getOpcode() == LCMP) {
-                                    position = 7;
-                                } else if (labelNode.getNext().getOpcode() == LAND) {
-                                    position = 12;
-                                }
+                                int position = end.getNext().getOpcode() == LXOR ? 9
+                                        : end.getNext().getOpcode() == LCMP ? 7
+                                        : end.getNext().getOpcode() == LAND ? 12
+                                        : 0;
 
                                 for (int i = 0; i < position; i++) {
                                     if (end == null) {
@@ -53,7 +46,7 @@ public class FlowRemoveTransformer extends Transformer {
                                 }
 
                                 if (!failed) {
-                                    getInstructionsBetween(node, end).forEach(a -> methodNode.instructions.remove(a));
+                                    getInstructionsBetween(node, end).forEach(methodNode.instructions::remove);
                                 }
                             });
 

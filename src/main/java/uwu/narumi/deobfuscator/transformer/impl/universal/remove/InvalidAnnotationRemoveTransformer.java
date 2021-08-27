@@ -35,7 +35,7 @@ public class InvalidAnnotationRemoveTransformer extends Transformer {
         return nodes.stream()
                 .filter(node -> node.desc.startsWith("L"))
                 .filter(node -> node.desc.endsWith(";"))
-                .filter(node -> node.desc.length() > 1)
+                .filter(node -> node.desc.length() >= 3)
                 .filter(node -> !node.desc.contains("\n"))
                 .filter(node -> !node.desc.contains(" "))
                 .filter(node -> !node.desc.contains("\u0000"))

@@ -13,7 +13,7 @@ public class NopRemoveTransformer extends Transformer {
                 .flatMap(classNode -> classNode.methods.stream())
                 .forEach(methodNode -> Arrays.stream(methodNode.instructions.toArray())
                         .filter(node -> node.getOpcode() == NOP)
-                        .forEach(node -> methodNode.instructions.remove(node))
+                        .forEach(methodNode.instructions::remove)
                 );
     }
 }

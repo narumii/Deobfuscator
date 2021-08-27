@@ -149,10 +149,6 @@ public class ASMHelper implements Opcodes {
         return (access & opcode) != 0;
     }
 
-    public static boolean startWithUTF(String string) {
-        return string.toCharArray()[0] > 127 || string.toCharArray()[0] == '\u0000';
-    }
-
     public static Optional<MethodNode> findMethod(ClassNode classNode, Predicate<MethodNode> predicate) {
         return classNode.methods == null ? Optional.empty() : classNode.methods.stream()
                 .filter(predicate)

@@ -21,7 +21,7 @@ public class CleanTransformer extends Transformer {
                         .filter(node -> node.getNext().getNext().getNext().getNext().getOpcode() == -1)
                         .filter(node -> node.getNext().getNext().getNext().getNext().getNext().getOpcode() == ICONST_M1)
                         .forEach(node -> getInstructionsBetween(node,
-                                node.getNext().getNext().getNext().getNext().getNext()).forEach(a -> methodNode.instructions.remove(a)))
+                                node.getNext().getNext().getNext().getNext().getNext()).forEach(methodNode.instructions::remove))
                 );
     }
 }

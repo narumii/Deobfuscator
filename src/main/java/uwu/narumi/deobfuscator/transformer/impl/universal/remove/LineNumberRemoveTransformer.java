@@ -14,7 +14,7 @@ public class LineNumberRemoveTransformer extends Transformer {
                 .flatMap(classNode -> classNode.methods.stream())
                 .forEach(methodNode -> Arrays.stream(methodNode.instructions.toArray())
                         .filter(node -> node instanceof LineNumberNode)
-                        .forEach(node -> methodNode.instructions.remove(node))
+                        .forEach(methodNode.instructions::remove)
                 );
     }
 }
