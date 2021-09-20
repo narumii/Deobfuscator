@@ -1,6 +1,7 @@
 package uwu.narumi.deobfuscator.helper;
 
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
 import java.util.ArrayList;
@@ -15,6 +16,10 @@ public class ASMHelper implements Opcodes {
 
     public static boolean isString(AbstractInsnNode node) {
         return node instanceof LdcInsnNode && ((LdcInsnNode) node).cst instanceof String;
+    }
+
+    public static boolean isType(AbstractInsnNode node) {
+        return node instanceof LdcInsnNode && ((LdcInsnNode) node).cst instanceof Type;
     }
 
     public static boolean isInteger(AbstractInsnNode node) {
@@ -48,6 +53,10 @@ public class ASMHelper implements Opcodes {
 
     public static String getString(AbstractInsnNode node) {
         return (String) ((LdcInsnNode) node).cst;
+    }
+
+    public static Type getType(AbstractInsnNode node) {
+        return (Type) ((LdcInsnNode) node).cst;
     }
 
     public static int getInteger(AbstractInsnNode node) {
@@ -160,14 +169,33 @@ public class ASMHelper implements Opcodes {
     }
 
     public static List<AbstractInsnNode> getInstructionsBetween(AbstractInsnNode start, AbstractInsnNode end) {
+        return getInstructionsBetween(start, end, true, true);
+    }
+
+    public static List<AbstractInsnNode> getInstructionsBetween(AbstractInsnNode start, AbstractInsnNode end, boolean includeStart, boolean includeEnd) {
         List<AbstractInsnNode> instructions = new ArrayList<>();
 
-        while (!start.equals(end)) {
+        if (includeStart)
             instructions.add(start);
-            start = start.getNext();
+
+        while ((start = start.getNext()) != end) {
+            instructions.add(start);
         }
-        instructions.add(end);
+
+        if (includeEnd)
+            instructions.add(end);
 
         return instructions;
+    }
+
+    /*
+    WTF i dad djud?
+     */
+    public static boolean isSingleIf(JumpInsnNode node) {
+        return (node.getOpcode() >= IFEQ && node.getOpcode() <= IFLE) || (node.getOpcode() == IFNULL || node.getOpcode() == IFNONNULL);
+    }
+
+    public static boolean isDoubleIf(JumpInsnNode node) {
+        return node.getOpcode() >= IF_ICMPEQ && node.getOpcode() <= IF_ICMPLE;
     }
 }

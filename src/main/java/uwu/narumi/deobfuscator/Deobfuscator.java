@@ -153,6 +153,14 @@ public class Deobfuscator {
         return files;
     }
 
+    public int getClassReaderFlags() {
+        return classReaderFlags;
+    }
+
+    public int getClassWriterFlags() {
+        return classWriterFlags;
+    }
+
     public static class Builder {
 
         private Path input = Path.of("input.jar");

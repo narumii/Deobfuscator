@@ -1,11 +1,7 @@
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
 import uwu.narumi.deobfuscator.Deobfuscator;
-import uwu.narumi.deobfuscator.transformer.impl.bozar.CleanTransformer;
-import uwu.narumi.deobfuscator.transformer.impl.bozar.FlowRemoveTransformer;
-import uwu.narumi.deobfuscator.transformer.impl.bozar.TypeLdcRemoveTransformer;
-import uwu.narumi.deobfuscator.transformer.impl.bozar.WhileLoopRemoveTransformer;
-import uwu.narumi.deobfuscator.transformer.impl.universal.other.UnHideTransformer;
-import uwu.narumi.deobfuscator.transformer.impl.universal.remove.*;
+import uwu.narumi.deobfuscator.transformer.impl.sb27.*;
 
 import java.nio.file.Path;
 
@@ -13,26 +9,29 @@ public class Loader {
 
     public static void main(String... args) throws Exception {
         Deobfuscator.builder()
-                .input(Path.of("example/Ayakashi.jar"))
-                .output(Path.of("example/Ayakashi-deobf.jar"))
+                .input(Path.of("example/Evaluator-obf.jar"))
+                .output(Path.of("example/Evaluator-deobf.jar"))
                 .transformers(
-                        new ImageCrasherRemoveTransformer(),
-                        new InvalidAnnotationRemoveTransformer(),
+                        new SuperblaubeereNumberTransformer(),
+                        new SuperblaubeereNumberPoolTransformer(),
+                        new SuperblaubeereFlowTransformer(),
+                        new SuperblaubeereSourceInfoStringTransformer(),
+                        new SuperblaubeereStringTransformer(),
+                        new SuperblaubeereStringPoolTransformer(),
+                        new SuperblaubeereInvokeDynamicTransformer(),
 
-                        new NopRemoveTransformer(),
-                        new LineNumberRemoveTransformer(),
-                        new LocalVariableRemoveTransformer(),
-                        new TrashPopRemoveTransformer(),
+                        new SuperblaubeerePackagerTransformer(),
 
-                        new TypeLdcRemoveTransformer(),
-                        new FlowRemoveTransformer(),
-                        new WhileLoopRemoveTransformer(),
-                        new CleanTransformer(),
-
-                        new SignatureRemoveTransformer(),
-                        new UnHideTransformer()
+                        new SuperblaubeereNumberTransformer(),
+                        new SuperblaubeereNumberPoolTransformer(),
+                        new SuperblaubeereFlowTransformer(),
+                        new SuperblaubeereSourceInfoStringTransformer(),
+                        new SuperblaubeereStringTransformer(),
+                        new SuperblaubeereStringPoolTransformer(),
+                        new SuperblaubeereInvokeDynamicTransformer()
                 )
                 .classReaderFlags(ClassReader.SKIP_FRAMES)
+                .classWriterFlags(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES)
                 .build()
                 .start();
 
