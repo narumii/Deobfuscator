@@ -1,5 +1,6 @@
 package uwu.narumi.deobfuscator.helper;
 
+import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
@@ -148,6 +149,19 @@ public class ASMHelper implements Opcodes {
             return new LdcInsnNode(number);
         }
     }
+
+    public static void visitNumber(MethodVisitor methodVisitor, int number) {
+        if (number >= -1 && number <= 5) {
+            methodVisitor.visitInsn(number + 3);
+        } else if (number >= -128 && number <= 127) {
+            methodVisitor.visitIntInsn(BIPUSH, number);
+        } else if (number >= -32768 && number <= 32767) {
+            methodVisitor.visitIntInsn(SIPUSH, number);
+        } else {
+            methodVisitor.visitLdcInsn(number);
+        }
+    }
+
 
     public static boolean isNumberOperator(AbstractInsnNode node) {
         return node != null && (node.getOpcode() >= IADD && node.getOpcode() <= LXOR)

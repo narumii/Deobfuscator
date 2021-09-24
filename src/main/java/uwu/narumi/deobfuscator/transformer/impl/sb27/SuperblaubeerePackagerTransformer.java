@@ -63,13 +63,18 @@ public class SuperblaubeerePackagerTransformer extends Transformer {
 
         if (decryptKey != null) {
             deobfuscator.getFiles().forEach((name, bytes) -> {
-                bytes = decrypt(bytes, decryptKey);
-                if (!ClassHelper.isClass("ignored.class", bytes))
-                    return;
+                try {
+                    bytes = decrypt(bytes, decryptKey);
+                    if (!ClassHelper.isClass("ignored.class", bytes))
+                        return;
 
-                ClassNode classNode = ClassHelper.loadClass(bytes, deobfuscator.getClassReaderFlags());
-                deobfuscator.getClasses().put(classNode.name, classNode);
-                deobfuscator.getFiles().remove(name);
+                    ClassNode classNode = ClassHelper.loadClass(bytes, deobfuscator.getClassReaderFlags());
+                    deobfuscator.getClasses().put(classNode.name, classNode);
+                    deobfuscator.getFiles().remove(name);
+                } catch (Exception e) {
+                    LOGGER.error("Could not load class: {}", name);
+                    LOGGER.debug("Error", e);
+                }
             });
         }
     }

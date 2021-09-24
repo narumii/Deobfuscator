@@ -16,7 +16,16 @@
 
     <asm.version>9.2</asm.version>
     <log4j.version>2.14.1</log4j.version>
+    <slf4j.version>1.7.30</slf4j.version>
+    <kafedjud.version>1.7.3</kafedjud.version>
   </properties>
+
+  <repositories>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
+  </repositories>
 
   <dependencies>
     <dependency>
@@ -59,6 +68,18 @@
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
       <version>${log4j.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.Col-E</groupId>
+      <artifactId>CAFED00D</artifactId>
+      <version>${kafedjud.version}</version>
     </dependency>
   </dependencies>
 
