@@ -14,7 +14,7 @@
 - [Radon](https://github.com/ItzSomebody/radon)
 - [Caesium](https://github.com/sim0n/Caesium)
 - [Mosey](https://github.com/Hippo/Mosey)
-- [Radon Rename oh fuck sorry i mean QProtect](https://mdma.dev/)
+- [Radon Rename oh fuck sorry i mean qProtect](https://mdma.dev/)
 - [Binsecure](https://binclub.dev/purchasing/) | [Source](https://github.com/Crystallinqq/binscure)
 
 ### Bruh things to add/fix
