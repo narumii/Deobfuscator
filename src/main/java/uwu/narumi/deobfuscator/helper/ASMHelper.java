@@ -192,7 +192,7 @@ public class ASMHelper implements Opcodes {
         if (includeStart)
             instructions.add(start);
 
-        while ((start = start.getNext()) != end) {
+        while ((start = start.getNext()) != null && start != end) {
             instructions.add(start);
         }
 

@@ -25,6 +25,7 @@ public class Deobfuscator {
     private static final Logger LOGGER = LogManager.getLogger(Deobfuscator.class);
 
     private final Map<String, ClassNode> classes = new ConcurrentHashMap<>();
+    private final Map<String, ClassNode> originalClasses = new ConcurrentHashMap<>();
     private final Map<String, byte[]> files = new ConcurrentHashMap<>();
 
     private final Path input;
@@ -72,6 +73,7 @@ public class Deobfuscator {
                 if (ClassHelper.isClass(name, data)) {
                     ClassNode classNode = ClassHelper.loadClass(data, classReaderFlags);
                     classes.put(classNode.name, classNode);
+                    originalClasses.put(classNode.name, ClassHelper.copy(classNode)); //yes
                 } else {
                     files.put(name, data);
                 }
@@ -115,8 +117,17 @@ public class Deobfuscator {
                     zipOutputStream.putNextEntry(new ZipEntry(classNode.name + ".class"));
                     zipOutputStream.write(ClassHelper.classToBytes(classNode, classWriterFlags));
                 } catch (Exception e) {
-                    LOGGER.error("Could not save class: {}", classNode.name);
+                    LOGGER.error("Could not save class, saving original class instead of deobfuscated: {}", classNode.name);
                     LOGGER.debug("Error", e);
+
+                    try {
+                        zipOutputStream.putNextEntry(new ZipEntry(classNode.name + ".class"));
+                        zipOutputStream.write(ClassHelper.classToBytes(originalClasses.get(classNode.name), classWriterFlags));
+                        originalClasses.remove(classNode.name);
+                    } catch (Exception e2) {
+                        LOGGER.error("Could not save original class: {}", classNode.name);
+                        LOGGER.debug("Error", e2);
+                    }
                 }
 
                 classes.remove(ignored);
@@ -143,6 +154,10 @@ public class Deobfuscator {
 
     public Map<String, ClassNode> getClasses() {
         return classes;
+    }
+
+    public Map<String, ClassNode> getOriginalClasses() {
+        return originalClasses;
     }
 
     public Collection<ClassNode> classes() {

@@ -40,7 +40,7 @@ public class Clazz {
             return method.invoke(reference, arguments);
         } catch (NoSuchMethodException ignored) {
             LOGGER.debug("Method {}{} not found in class {}", methodName, methodType.toMethodDescriptorString(), clazz.getName());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             LOGGER.error("Can't invoke method [name: {}, desc: {}]", methodName, methodType.toMethodDescriptorString());
             LOGGER.debug("ERROR", e);
         }

@@ -17,14 +17,29 @@ import java.util.concurrent.atomic.AtomicInteger;
 /*
     TODO: Fix my shitty code also boilerplate and this is hardcoded as fuck
     TODO: Make it less hardcoded xd
+    TODO: Use StackAnalyzer etc bruh
  */
 public class OldBinsecureStringTransformer extends Transformer {
 
+    private final String decryptClassName;
+    private final String mapClassName;
+    private final String decryptMethodName;
+
+    public OldBinsecureStringTransformer() {
+        this("a0", "ac", "0");
+    }
+
+    public OldBinsecureStringTransformer(String decryptClassName, String mapClassName, String decryptMethodName) {
+        this.decryptClassName = decryptClassName;
+        this.mapClassName = mapClassName;
+        this.decryptMethodName = decryptMethodName;
+    }
+
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
-        ClassNode decryptClass = deobfuscator.getClasses().get("a0");
-        ClassNode mapClass = deobfuscator.getClasses().get("ac");
-        if (decryptClass == null || mapClass == null)
+        ClassNode mapClass = deobfuscator.getOriginalClasses().get(mapClassName);
+        ClassNode decryptClass = deobfuscator.getOriginalClasses().get(decryptClassName);
+        if (mapClass == null || decryptClass == null)
             return;
 
         SandBox sandBox = SandBox.of(mapClass, decryptClass);
@@ -52,30 +67,31 @@ public class OldBinsecureStringTransformer extends Transformer {
             if (clazz == null)
                 return;
 
+            Clazz finalClazz = clazz;
             try {
-                clazz = new Clazz(clazz.getClazz().newInstance().getClass());
-                Clazz finalClazz = clazz;
-                classNode.methods.forEach(methodNode -> {
-                    String name = methodNode.name;
-                    if (methodNode.name.startsWith("<"))
-                        name = name.substring(1, name.length() - 1);
-
-                    String[] output = (String[]) finalClazz.invoke(name, "()[Ljava/lang/String;", null, new Object[0]);
-                    AtomicInteger index = new AtomicInteger();
-
-                    Arrays.stream(methodNode.instructions.toArray())
-                            .filter(ASMHelper::isString)
-                            .filter(node -> node.getNext().getOpcode() == INVOKESTATIC)
-                            .filter(node -> ((MethodInsnNode) node.getNext()).owner.equals("a0"))
-                            .filter(node -> ((MethodInsnNode) node.getNext()).name.equals("0"))
-                            .forEach(node -> {
-                                methodNode.instructions.remove(node.getNext());
-                                methodNode.instructions.set(node, new LdcInsnNode(output[index.getAndIncrement()]));
-                            });
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
+                finalClazz = new Clazz(clazz.getClazz().newInstance().getClass());
+            } catch (Exception ignored) {
             }
+
+            Clazz finalClazz1 = finalClazz;
+            classNode.methods.forEach(methodNode -> {
+                String name = methodNode.name;
+                if (methodNode.name.startsWith("<"))
+                    name = name.substring(1, name.length() - 1);
+
+                String[] output = (String[]) finalClazz1.invoke(name, "()[Ljava/lang/String;", null, new Object[0]);
+                AtomicInteger index = new AtomicInteger();
+
+                Arrays.stream(methodNode.instructions.toArray())
+                        .filter(ASMHelper::isString)
+                        .filter(node -> node.getNext().getOpcode() == INVOKESTATIC)
+                        .filter(node -> ((MethodInsnNode) node.getNext()).owner.equals(decryptClassName))
+                        .filter(node -> ((MethodInsnNode) node.getNext()).name.equals(decryptMethodName))
+                        .forEach(node -> {
+                            methodNode.instructions.remove(node.getNext());
+                            methodNode.instructions.set(node, new LdcInsnNode(output[index.getAndIncrement()]));
+                        });
+            });
         });
     }
 
@@ -127,7 +143,7 @@ public class OldBinsecureStringTransformer extends Transformer {
             methodVisitor.visitVarInsn(ALOAD, 0);
             methodVisitor.visitVarInsn(ILOAD, 1);
             methodVisitor.visitInsn(AALOAD);
-            methodVisitor.visitMethodInsn(INVOKESTATIC, "a0", "0", "(Ljava/lang/String;)Ljava/lang/String;", false);
+            methodVisitor.visitMethodInsn(INVOKESTATIC, decryptClassName, decryptMethodName, "(Ljava/lang/String;)Ljava/lang/String;", false);
             methodVisitor.visitInsn(AASTORE);
             methodVisitor.visitIincInsn(1, 1);
             methodVisitor.visitJumpInsn(GOTO, label0);
@@ -207,7 +223,7 @@ public class OldBinsecureStringTransformer extends Transformer {
         methodVisitor.visitVarInsn(ALOAD, 1);
         methodVisitor.visitVarInsn(ILOAD, 2);
         methodVisitor.visitInsn(AALOAD);
-        methodVisitor.visitMethodInsn(INVOKESTATIC, "a0", "0", "(Ljava/lang/String;)Ljava/lang/String;", false);
+        methodVisitor.visitMethodInsn(INVOKESTATIC, decryptClassName, decryptMethodName, "(Ljava/lang/String;)Ljava/lang/String;", false);
         methodVisitor.visitInsn(AASTORE);
         methodVisitor.visitIincInsn(2, 1);
         methodVisitor.visitJumpInsn(GOTO, label0);

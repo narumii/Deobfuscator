@@ -8,12 +8,14 @@
 ### Supported Obfuscators
 - [Bozar](https://github.com/vimasig/Bozar) `Ugly deobfuscation i probably will recode it`
 - [superblaubeere27 / JObf](https://github.com/superblaubeere27/obfuscator)
-- [Binsecure 0.4](https://binclub.dev/binscure/) `without flow and indy/indirection`
+- [Binsecure 0.4](https://binclub.dev/binscure/) `idk i don't create indy transformer because it isn't working for me idk`
 
 ### In Future Supported Obfuscators (maybe)
 - [Radon](https://github.com/ItzSomebody/radon)
 - [Caesium](https://github.com/sim0n/Caesium)
-- [Binsecure](https://binclub.dev/purchasing/) `Because it's might going to be opensource`
+- [Mosey](https://github.com/Hippo/Mosey)
+- [Radon Rename oh fuck sorry i mean QProtect](https://mdma.dev/)
+- [Binsecure](https://binclub.dev/purchasing/) | [Source](https://github.com/Crystallinqq/binscure)
 
 ### Bruh things to add/fix
 - SuperblaubeereInvokeDynamicTransformer: `Interface method checking for runable deobf`
