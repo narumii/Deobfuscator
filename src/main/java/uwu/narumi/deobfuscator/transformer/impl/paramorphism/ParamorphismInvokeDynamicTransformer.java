@@ -67,17 +67,25 @@ public class ParamorphismInvokeDynamicTransformer extends Transformer {
                         if (!lookups.containsKey(hash))
                             return;
 
+                        /*
+                        Interface check for runnable deobf? maybe
+                         */
                         String[] info = lookups.get(hash)[position];
                         methodNode.instructions.set(node,
                                 new MethodInsnNode(
                                         type,
-                                        info[0],
+                                        info[0].replace('.', '/'),
                                         info[1],
                                         node.desc,
                                         false
                                 ));
                     });
         }));
+
+        lookups.clear();
+        deobfuscator.getClasses().remove(bootstrapClassName);
+        deobfuscator.getClasses().remove(bootstrapClassName.substring(0, bootstrapClassName.indexOf('⛔') + 1));
+        deobfuscator.getClasses().remove(bootstrapClassName.substring(0, bootstrapClassName.lastIndexOf('/') + 1) + "Dispatcher️");
     }
 
     private void decode(byte[] byArray) {

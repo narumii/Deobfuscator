@@ -57,6 +57,7 @@ public class ParamorphismStringTransformer extends Transformer {
                     visitSpoofMethod(execution, strings);
                     sandBox.put(execution);
 
+                    strings.clear();
                     //deobfuscator.getClasses().put(execution.name, execution);
                 });
 
@@ -99,6 +100,10 @@ public class ParamorphismStringTransformer extends Transformer {
                         }
                     });
                 });
+
+        deobfuscator.getClasses().keySet().removeIf(classesToLoad::contains);
+        toLoad.clear();
+        classesToLoad.clear();
     }
 
     private void visitConstructor(ClassNode classNode) {

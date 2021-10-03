@@ -119,6 +119,7 @@ public class Deobfuscator {
                 try {
                     zipOutputStream.putNextEntry(new ZipEntry(classNode.name + ".class"));
                     zipOutputStream.write(ClassHelper.classToBytes(classNode, classWriterFlags));
+                    originalClasses.remove(classNode.name);
                 } catch (Exception e) {
                     LOGGER.error("Could not save class, saving original class instead of deobfuscated: {}", classNode.name);
                     LOGGER.debug("Error", e);

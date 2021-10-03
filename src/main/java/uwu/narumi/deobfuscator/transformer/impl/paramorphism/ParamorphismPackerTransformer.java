@@ -13,6 +13,7 @@ public class ParamorphismPackerTransformer extends Transformer {
 
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
+        deobfuscator.classes().removeIf(classNode -> classNode.name.endsWith("PackedClassLoader") && classNode.superName.equals("java/lang/ClassLoader"));
         deobfuscator.getFiles().forEach((name, bytes) -> {
             try {
                 ByteArrayInputStream var4 = new ByteArrayInputStream(bytes);
@@ -42,6 +43,7 @@ public class ParamorphismPackerTransformer extends Transformer {
                 if (ClassHelper.isClass("ignored.class", var10)) {
                     ClassNode classNode = ClassHelper.loadClass(var10, deobfuscator.getClassReaderFlags());
                     deobfuscator.getClasses().put(classNode.name, classNode);
+                    deobfuscator.getOriginalClasses().put(classNode.name, classNode);
                     deobfuscator.getFiles().remove(name);
                 }
             } catch (Exception e) {
