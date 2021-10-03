@@ -38,11 +38,16 @@ public class Clazz {
                 method.trySetAccessible();
 
             return method.invoke(reference, arguments);
-        } catch (NoSuchMethodException ignored) {
+        } catch (NoSuchMethodError | NoSuchMethodException ignored) {
             LOGGER.debug("Method {}{} not found in class {}", methodName, methodType.toMethodDescriptorString(), clazz.getName());
         } catch (Throwable e) {
-            LOGGER.error("Can't invoke method [name: {}, desc: {}]", methodName, methodType.toMethodDescriptorString());
-            LOGGER.debug("ERROR", e);
+            if (e.getCause() instanceof NoSuchMethodError | e.getCause() instanceof NoSuchMethodException) {
+                LOGGER.debug("Method {}{} not found in class {}", methodName, methodType.toMethodDescriptorString(), clazz.getName());
+            } else {
+                e.printStackTrace();
+                LOGGER.error("Can't invoke method [name: {}, desc: {}]", methodName, methodType.toMethodDescriptorString());
+                LOGGER.debug("ERROR", e);
+            }
         }
 
         return null;

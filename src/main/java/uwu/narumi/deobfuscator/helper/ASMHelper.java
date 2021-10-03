@@ -162,6 +162,13 @@ public class ASMHelper implements Opcodes {
         }
     }
 
+    public static void visitNumber(MethodVisitor methodVisitor, long number) {
+        if (number >= 0 && number <= 1) {
+            methodVisitor.visitInsn((int) (number + 9));
+        } else {
+            methodVisitor.visitLdcInsn(number);
+        }
+    }
 
     public static boolean isNumberOperator(AbstractInsnNode node) {
         return node != null && (node.getOpcode() >= IADD && node.getOpcode() <= LXOR)

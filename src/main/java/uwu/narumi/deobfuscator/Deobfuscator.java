@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
+import uwu.narumi.deobfuscator.exception.TransformerException;
 import uwu.narumi.deobfuscator.helper.ClassHelper;
 import uwu.narumi.deobfuscator.helper.FileHelper;
 import uwu.narumi.deobfuscator.transformer.Transformer;
@@ -98,6 +99,8 @@ public class Deobfuscator {
                 long start = System.currentTimeMillis();
                 transformer.transform(this);
                 LOGGER.info("Ended {} transformer in {} ms", transformer.name(), (System.currentTimeMillis() - start));
+            } catch (TransformerException e) {
+                LOGGER.error("! {}: {}", transformer.name(), e.getMessage());
             } catch (Exception e) {
                 LOGGER.error("Error occurred when transforming {}", transformer.name());
                 LOGGER.debug("Error", e);
