@@ -1,12 +1,13 @@
 package uwu.narumi.deobfuscator.transformer.impl.binsecure.old;
 
-import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LookupSwitchInsnNode;
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /*
     Working in 80% i think
@@ -18,41 +19,15 @@ public class OldBinsecureFlowTransformer extends Transformer {
 
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
-        filterTBCE(deobfuscator);
         firstPhase(deobfuscator);
         secondPhase(deobfuscator);
         thirdPhase(deobfuscator);
         clean(deobfuscator);
-        filterTBCE(deobfuscator);
-    }
-
-    private void filterTBCE(Deobfuscator deobfuscator) {
-        deobfuscator.classes().stream()
-                .flatMap(classNode -> classNode.methods.stream())
-                .forEach(methodNode -> {
-                    methodNode.tryCatchBlocks.removeIf(tbce -> tbce.type == null || tbce.type.isBlank() || tbce.type.isEmpty());
-                    methodNode.tryCatchBlocks.removeIf(tbce -> tbce.start.equals(tbce.end) || tbce.start.equals(tbce.handler) || tbce.end.equals(tbce.handler));
-
-                    List<TryCatchBlockNode> toRemove = new ArrayList<>();
-                    methodNode.tryCatchBlocks.forEach(tbce -> {
-                        LabelNode start = tbce.start;
-                        LabelNode handler = tbce.handler;
-                        LabelNode end = tbce.end;
-
-                        if (methodNode.instructions.indexOf(start) == -1 || methodNode.instructions.indexOf(handler) == -1 || methodNode.instructions.indexOf(end) == -1)
-                            toRemove.add(tbce);
-                        else if (end.getNext() != null && end.getNext().getNext() != null && end.getNext().getOpcode() == ACONST_NULL && end.getNext().getNext().getOpcode() == ATHROW)
-                            toRemove.add(tbce);
-                        else if (methodNode.instructions.indexOf(start) >= methodNode.instructions.indexOf(handler) || methodNode.instructions.indexOf(start) >= methodNode.instructions.indexOf(end) || methodNode.instructions.indexOf(handler) <= methodNode.instructions.indexOf(end))
-                            toRemove.add(tbce);
-                    });
-
-                    methodNode.tryCatchBlocks.removeAll(toRemove);
-                });
     }
 
     private void firstPhase(Deobfuscator deobfuscator) {
-        deobfuscator.classes().stream().flatMap(classNode -> classNode.methods.stream())
+        deobfuscator.classes().stream()
+                .flatMap(classNode -> classNode.methods.stream())
                 .forEach(methodNode -> {
                     boolean modified;
                     do {
@@ -128,88 +103,90 @@ public class OldBinsecureFlowTransformer extends Transformer {
     }
 
     private void thirdPhase(Deobfuscator deobfuscator) {
-        //flatmap
-        deobfuscator.classes().forEach(classNode -> classNode.methods.forEach(methodNode -> {
-            for (AbstractInsnNode node : methodNode.instructions.toArray()) {
-                if (!(node instanceof LookupSwitchInsnNode && isInteger(node.getPrevious())))
-                    continue;
+        deobfuscator.classes().stream()
+                .flatMap(classNode -> classNode.methods.stream())
+                .forEach(methodNode -> {
+                    for (AbstractInsnNode node : methodNode.instructions.toArray()) {
+                        if (!(node instanceof LookupSwitchInsnNode && isInteger(node.getPrevious())))
+                            continue;
 
-                int key = getInteger(node.getPrevious());
-                LookupSwitchInsnNode switchNode = (LookupSwitchInsnNode) node;
-                LabelNode originalCodeBlockStart = switchNode.keys.contains(key) ? switchNode.labels.get(switchNode.keys.indexOf(key)) : switchNode.dflt;
+                        int key = getInteger(node.getPrevious());
+                        LookupSwitchInsnNode switchNode = (LookupSwitchInsnNode) node;
+                        LabelNode originalCodeBlockStart = switchNode.keys.contains(key) ? switchNode.labels.get(switchNode.keys.indexOf(key)) : switchNode.dflt;
 
-                switchNode.labels.stream()
-                        .filter(labelNode -> !labelNode.equals(originalCodeBlockStart))
-                        .filter(labelNode -> methodNode.instructions.indexOf(labelNode) < methodNode.instructions.indexOf(switchNode))
-                        .forEach(labelNode -> {
-                            AbstractInsnNode codeBlockEnd = labelNode;
+                        switchNode.labels.stream()
+                                .filter(labelNode -> !labelNode.equals(originalCodeBlockStart))
+                                .filter(labelNode -> methodNode.instructions.indexOf(labelNode) < methodNode.instructions.indexOf(switchNode))
+                                .forEach(labelNode -> {
+                                    AbstractInsnNode codeBlockEnd = labelNode;
 
-                            {
-                                while (codeBlockEnd.equals(labelNode) || !(codeBlockEnd instanceof LabelNode)) {
-                                    if (codeBlockEnd.getNext() == null) {
-                                        break;
+                                    {
+                                        while (codeBlockEnd.equals(labelNode) || !(codeBlockEnd instanceof LabelNode)) {
+                                            if (codeBlockEnd.getNext() == null) {
+                                                break;
+                                            }
+
+                                            codeBlockEnd = codeBlockEnd.getNext();
+                                        }
                                     }
 
-                                    codeBlockEnd = codeBlockEnd.getNext();
-                                }
-                            }
+                                    boolean canExtract = codeBlockEnd instanceof LabelNode || (codeBlockEnd.getOpcode() == ATHROW && codeBlockEnd.getPrevious().getOpcode() == ACONST_NULL);
+                                    if (!canExtract)
+                                        return;
 
-                            boolean canExtract = codeBlockEnd instanceof LabelNode || (codeBlockEnd.getOpcode() == ATHROW && codeBlockEnd.getPrevious().getOpcode() == ACONST_NULL);
-                            if (!canExtract)
-                                return;
+                                    int codeStart = methodNode.instructions.indexOf(labelNode) + 1;
+                                    int codeEnd = methodNode.instructions.indexOf(codeBlockEnd);
 
-                            int codeStart = methodNode.instructions.indexOf(labelNode) + 1;
-                            int codeEnd = methodNode.instructions.indexOf(codeBlockEnd);
+                                    if (codeBlockEnd instanceof LabelNode)
+                                        codeEnd--;
 
-                            if (codeBlockEnd instanceof LabelNode)
-                                codeEnd--;
-
-                            AbstractInsnNode[] nodes = methodNode.instructions.toArray();
-                            for (int i = codeStart; i < codeEnd; i++) {
-                                methodNode.instructions.remove(nodes[i]);
-                            }
-                        });
-
-                {
-                    if (!switchNode.dflt.equals(originalCodeBlockStart) && methodNode.instructions.indexOf(switchNode.dflt) < methodNode.instructions.indexOf(switchNode)) {
-                        LabelNode codeBlockStart = switchNode.dflt;
-                        AbstractInsnNode codeBlockEnd = codeBlockStart;
+                                    AbstractInsnNode[] nodes = methodNode.instructions.toArray();
+                                    for (int i = codeStart; i < codeEnd; i++) {
+                                        methodNode.instructions.remove(nodes[i]);
+                                    }
+                                });
 
                         {
-                            while (codeBlockEnd.equals(codeBlockStart) || !(codeBlockEnd instanceof LabelNode)) {
-                                if (codeBlockEnd.getNext() == null) {
-                                    break;
+                            if (!switchNode.dflt.equals(originalCodeBlockStart) && methodNode.instructions.indexOf(switchNode.dflt) < methodNode.instructions.indexOf(switchNode)) {
+                                LabelNode codeBlockStart = switchNode.dflt;
+                                AbstractInsnNode codeBlockEnd = codeBlockStart;
+
+                                {
+                                    while (codeBlockEnd.equals(codeBlockStart) || !(codeBlockEnd instanceof LabelNode)) {
+                                        if (codeBlockEnd.getNext() == null) {
+                                            break;
+                                        }
+
+                                        codeBlockEnd = codeBlockEnd.getNext();
+                                    }
                                 }
 
-                                codeBlockEnd = codeBlockEnd.getNext();
+                                boolean canExtract = codeBlockEnd instanceof LabelNode || (codeBlockEnd.getOpcode() == ATHROW && codeBlockEnd.getPrevious().getOpcode() == ACONST_NULL);
+                                if (!canExtract)
+                                    return;
+
+                                int codeStart = methodNode.instructions.indexOf(codeBlockStart) + 1;
+                                int codeEnd = methodNode.instructions.indexOf(codeBlockEnd);
+
+                                if (codeBlockEnd instanceof LabelNode)
+                                    codeEnd--;
+
+                                AbstractInsnNode[] nodes = methodNode.instructions.toArray();
+                                for (int i = codeStart; i < codeEnd; i++) {
+                                    methodNode.instructions.remove(nodes[i]);
+                                }
                             }
                         }
 
-                        boolean canExtract = codeBlockEnd instanceof LabelNode || (codeBlockEnd.getOpcode() == ATHROW && codeBlockEnd.getPrevious().getOpcode() == ACONST_NULL);
-                        if (!canExtract)
-                            return;
-
-                        int codeStart = methodNode.instructions.indexOf(codeBlockStart) + 1;
-                        int codeEnd = methodNode.instructions.indexOf(codeBlockEnd);
-
-                        if (codeBlockEnd instanceof LabelNode)
-                            codeEnd--;
-
-                        AbstractInsnNode[] nodes = methodNode.instructions.toArray();
-                        for (int i = codeStart; i < codeEnd; i++) {
-                            methodNode.instructions.remove(nodes[i]);
-                        }
+                        methodNode.instructions.remove(node.getPrevious());
+                        methodNode.instructions.remove(node);
                     }
-                }
-
-                methodNode.instructions.remove(node.getPrevious());
-                methodNode.instructions.remove(node);
-            }
-        }));
+                });
     }
 
     private void clean(Deobfuscator deobfuscator) {
-        deobfuscator.classes().stream().flatMap(classNode -> classNode.methods.stream())
+        deobfuscator.classes().stream()
+                .flatMap(classNode -> classNode.methods.stream())
                 .forEach(methodNode -> {
                     boolean modified;
                     do {

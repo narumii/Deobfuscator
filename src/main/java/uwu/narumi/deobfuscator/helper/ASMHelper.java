@@ -24,6 +24,9 @@ public class ASMHelper implements Opcodes {
     }
 
     public static boolean isInteger(AbstractInsnNode node) {
+        if (node == null)
+            return false;
+
         int opcode = node.getOpcode();
         return ((opcode >= ICONST_M1 && opcode <= ICONST_5)
                 || opcode == BIPUSH
