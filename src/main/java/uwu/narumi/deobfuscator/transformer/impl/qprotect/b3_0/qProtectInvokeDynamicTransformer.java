@@ -1,13 +1,11 @@
 package uwu.narumi.deobfuscator.transformer.impl.qprotect.b3_0;
 
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /*
     This transformer works on versions: 3.0-b1 and b31
@@ -23,27 +21,7 @@ public class qProtectInvokeDynamicTransformer extends Transformer {
                         .map(InvokeDynamicInsnNode.class::cast)
                         .filter(node -> node.bsm.getDesc().equals("(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))
                         .filter(node -> node.bsmArgs.length == 10)
-                        .forEach(node -> {
-                            MethodInsnNode methodInsnNode = decrypt(node.bsmArgs);
-                            AtomicBoolean canReplace = new AtomicBoolean(true);
-
-                            /*
-                            b31 has some shit method invoke idk xd
-                             */
-                            if (methodInsnNode.desc.equals("()V") && methodInsnNode.getOpcode() == INVOKESTATIC) {
-                                ClassNode classNode = deobfuscator.getClasses().get(methodInsnNode.owner);
-                                if (classNode != null) {
-                                    findMethod(classNode, method -> method.name.equals(methodInsnNode.name) && method.desc.equals(methodInsnNode.desc))
-                                            .ifPresent(method -> {
-                                                canReplace.set(Arrays.stream(method.instructions.toArray()).noneMatch(insn -> isString(insn) && getString(insn).equals("Protected by qProtect")));
-                                                methodNode.instructions.remove(node);
-                                            });
-                                }
-                            }
-
-                            if (canReplace.get())
-                                methodNode.instructions.set(node, methodInsnNode);
-                        }));
+                        .forEach(node -> methodNode.instructions.set(node, decrypt(node.bsmArgs))));
     }
 
     private MethodInsnNode decrypt(Object[] args) {

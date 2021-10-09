@@ -2,6 +2,7 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.transformer.impl.qprotect.b31.qProtectStringTransformer;
+import uwu.narumi.deobfuscator.transformer.impl.qprotect.b31.qProtectTrashInvokeTransformer;
 import uwu.narumi.deobfuscator.transformer.impl.qprotect.b3_0.qProtectFlowTransformer;
 import uwu.narumi.deobfuscator.transformer.impl.qprotect.b3_0.qProtectInvokeDynamicTransformer;
 import uwu.narumi.deobfuscator.transformer.impl.universal.other.TryCatchFixTransformer;
@@ -20,7 +21,8 @@ public class Loader {
                         new qProtectFlowTransformer(),
                         new TryCatchFixTransformer(),
                         new qProtectInvokeDynamicTransformer(),
-                        new qProtectStringTransformer()
+                        new qProtectStringTransformer(),
+                        new qProtectTrashInvokeTransformer()
                 )
                 .classReaderFlags(ClassReader.SKIP_FRAMES)
                 .classWriterFlags(ClassWriter.COMPUTE_MAXS)
