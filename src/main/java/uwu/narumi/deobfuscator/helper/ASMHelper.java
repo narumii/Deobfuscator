@@ -6,6 +6,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -53,6 +54,10 @@ public class ASMHelper implements Opcodes {
         int opcode = node.getOpcode();
         return (opcode >= DCONST_0 && opcode <= DCONST_1)
                 || (node instanceof LdcInsnNode && ((LdcInsnNode) node).cst instanceof Double);
+    }
+
+    public static boolean isNumber(AbstractInsnNode node) {
+        return isInteger(node) || isLong(node) || isFloat(node) || isDouble(node);
     }
 
     public static String getString(AbstractInsnNode node) {
@@ -117,6 +122,20 @@ public class ASMHelper implements Opcodes {
         throw new IllegalArgumentException();
     }
 
+    public static Number getNumber(AbstractInsnNode node) {
+        if (isInteger(node)) {
+            return getInteger(node);
+        } else if (isLong(node)) {
+            return getLong(node);
+        } else if (isDouble(node)) {
+            return getDouble(node);
+        } else if (isFloat(node)) {
+            return getFloat(node);
+        }
+
+        throw new IllegalArgumentException();
+    }
+
     public static AbstractInsnNode getNumber(int number) {
         if (number >= -1 && number <= 5) {
             return new InsnNode(number + 3);
@@ -151,6 +170,20 @@ public class ASMHelper implements Opcodes {
         } else {
             return new LdcInsnNode(number);
         }
+    }
+
+    public static AbstractInsnNode getNumber(Number number) {
+        if (number instanceof Integer || number instanceof Byte || number instanceof Short) {
+            return getNumber(number.intValue());
+        } else if (number instanceof Long) {
+            return getNumber(number.longValue());
+        } else if (number instanceof Float) {
+            return getNumber(number.floatValue());
+        } else if (number instanceof Double) {
+            return getNumber(number.doubleValue());
+        }
+
+        throw new IllegalArgumentException();
     }
 
     public static void visitNumber(MethodVisitor methodVisitor, int number) {
@@ -188,6 +221,12 @@ public class ASMHelper implements Opcodes {
                 .findFirst();
     }
 
+    public static Optional<FieldNode> findField(ClassNode classNode, Predicate<FieldNode> predicate) {
+        return classNode.methods == null ? Optional.empty() : classNode.fields.stream()
+                .filter(predicate)
+                .findFirst();
+    }
+
     public static Optional<MethodNode> findClInit(ClassNode classNode) {
         return findMethod(classNode, methodNode -> methodNode.name.equals("<clinit>"));
     }
@@ -219,15 +258,30 @@ public class ASMHelper implements Opcodes {
         return (node.getOpcode() >= IFEQ && node.getOpcode() <= IFLE) || (node.getOpcode() == IFNULL || node.getOpcode() == IFNONNULL);
     }
 
-    public static boolean check(AbstractInsnNode insn, int opcode) {
-	return insn != null && insn.getOpcode() == opcode;
-    }
-
-    public static boolean check(AbstractInsnNode insn, Class<?> other) {
-	return insn != null && insn.getClass().equals(other);
-    }
-
     public static boolean isDoubleIf(JumpInsnNode node) {
         return node.getOpcode() >= IF_ICMPEQ && node.getOpcode() <= IF_ICMPLE;
+    }
+
+    public static boolean check(AbstractInsnNode node, int opcode) {
+        return node != null && node.getOpcode() == opcode;
+    }
+
+    public static boolean check(AbstractInsnNode node, Class<?> clazz) {
+        return node != null && node.getClass().equals(clazz);
+    }
+
+    public static boolean check(AbstractInsnNode node, AbstractInsnNode other) {
+        return node != null && node.equals(other);
+    }
+
+    public static boolean check(AbstractInsnNode node, Predicate<AbstractInsnNode> predicate) {
+        return node != null && predicate.test(node);
+    }
+
+    //Idk xd
+    public static boolean check(AbstractInsnNode node, Predicate<AbstractInsnNode>... predicates) {
+        return node != null && Arrays.stream(predicates)
+                .filter(predicate -> predicate.test(node))
+                .count() == predicates.length;
     }
 }

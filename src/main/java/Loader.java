@@ -1,12 +1,13 @@
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import uwu.narumi.deobfuscator.Deobfuscator;
-import uwu.narumi.deobfuscator.transformer.impl.qprotect.b31.qProtectStringTransformer;
-import uwu.narumi.deobfuscator.transformer.impl.qprotect.b31.qProtectTrashInvokeTransformer;
-import uwu.narumi.deobfuscator.transformer.impl.qprotect.b3_0.qProtectFlowTransformer;
-import uwu.narumi.deobfuscator.transformer.impl.qprotect.b3_0.qProtectInvokeDynamicTransformer;
+import uwu.narumi.deobfuscator.transformer.impl.caesium.*;
 import uwu.narumi.deobfuscator.transformer.impl.universal.other.TryCatchFixTransformer;
 import uwu.narumi.deobfuscator.transformer.impl.universal.other.UniversalNumberTransformer;
+import uwu.narumi.deobfuscator.transformer.impl.universal.remove.ImageCrasherRemoveTransformer;
+import uwu.narumi.deobfuscator.transformer.impl.universal.remove.InvalidAnnotationRemoveTransformer;
+import uwu.narumi.deobfuscator.transformer.impl.universal.remove.NopRemoveTransformer;
+import uwu.narumi.deobfuscator.transformer.impl.universal.remove.TrashPopRemoveTransformer;
 
 import java.nio.file.Path;
 
@@ -14,15 +15,23 @@ public class Loader {
 
     public static void main(String... args) throws Exception {
         Deobfuscator.builder()
-                .input(Path.of("example/qprotect/b31/Evaluator-obf.jar"))
-                .output(Path.of("example/qprotect/b31/Evaluator-deobf.jar"))
-                .transformers(
+                .input(Path.of("example/caesium/Evaluator-normal.jar"))
+                .output(Path.of("example/caesium/Evaluator-normal-deobf.jar"))
+                .transformers( //Oh fuck this is big
+                        new ImageCrasherRemoveTransformer(),
+                        new InvalidAnnotationRemoveTransformer(),
+                        new TrashPopRemoveTransformer(),
+                        new NopRemoveTransformer(),
                         new UniversalNumberTransformer(),
-                        new qProtectFlowTransformer(),
+                        new CaesiumNumberTransformer(),
+                        new CaesiumInvokeDynamicTransformer(),
+                        new CaesiumFlowTransformer(),
                         new TryCatchFixTransformer(),
-                        new qProtectInvokeDynamicTransformer(),
-                        new qProtectStringTransformer(),
-                        new qProtectTrashInvokeTransformer()
+                        new CaesiumNumberTransformer(),
+                        new CaesiumNumberPoolTransformer(),
+                        new UniversalNumberTransformer(),
+                        new CaesiumStringTransformer(),
+                        new CaesiumCleanTransformer()
                 )
                 .classReaderFlags(ClassReader.SKIP_FRAMES)
                 .classWriterFlags(ClassWriter.COMPUTE_MAXS)
