@@ -219,6 +219,14 @@ public class ASMHelper implements Opcodes {
         return (node.getOpcode() >= IFEQ && node.getOpcode() <= IFLE) || (node.getOpcode() == IFNULL || node.getOpcode() == IFNONNULL);
     }
 
+    public static boolean check(AbstractInsnNode insn, int opcode) {
+	return insn != null && insn.getOpcode() == opcode;
+    }
+
+    public static boolean check(AbstractInsnNode insn, Class<?> other) {
+	return insn != null && insn.getClass().equals(other);
+    }
+
     public static boolean isDoubleIf(JumpInsnNode node) {
         return node.getOpcode() >= IF_ICMPEQ && node.getOpcode() <= IF_ICMPLE;
     }
