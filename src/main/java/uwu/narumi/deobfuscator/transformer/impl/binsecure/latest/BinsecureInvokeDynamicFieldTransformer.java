@@ -43,7 +43,6 @@ public class BinsecureInvokeDynamicFieldTransformer extends Transformer {
                     if (opcode == -1)
                         return;
 
-                    System.out.println(newDesc);
                     methodNode.instructions.set(node, new FieldInsnNode(opcode, owner, name, newDesc));
                 })));
     }
