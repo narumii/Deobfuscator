@@ -12,12 +12,12 @@
 - [Paramorphism 2.1.2_9](https://paramorphism.dev/) `not worth your money` 
 - [Radon v4 aka qProtect (b3.0 & b31)](https://mdma.dev/) `Yes i don't have latest version`
 - [Caesium](https://github.com/sim0n/Caesium)
+- [Binsecure](https://binclub.dev/purchasing/) `Missing DynamicVariable and crashers`
 
 ### In Future Supported Obfuscators (maybe)
 - [Radon](https://github.com/ItzSomebody/radon)
 - [Mosey](https://github.com/Hippo/Mosey)
 - [Radon Rename oh fuck sorry i mean qProtect](https://mdma.dev/)
-- [Binsecure](https://binclub.dev/purchasing/) | [Source](https://github.com/Crystallinqq/binscure)
 - [Scuti](https://github.com/netindev/scuti)
 
 ---

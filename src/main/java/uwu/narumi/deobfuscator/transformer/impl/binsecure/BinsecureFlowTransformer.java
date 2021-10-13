@@ -1,4 +1,4 @@
-package uwu.narumi.deobfuscator.transformer.impl.binsecure.old;
+package uwu.narumi.deobfuscator.transformer.impl.binsecure;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
@@ -13,9 +13,9 @@ import java.util.Arrays;
     Working in 80% i think
     TODO: Better switch remove
     TODO: Fucking method flow ofbustation bruh
-    KURWA JA PIERDOLE W KONCU TEN SCIEK ZROBILEM AAHISAUHDWIAGUIDGAWUIFWGLAUIOF YGWQUIYDCUIOWYLDFWCUIAYCTDIOWEYCDWIOEYNFCWUEYF CHUJ Z TYM ZE DZIALA PO PIJAKU ~01.10.2021
+    TODO: While loop remove
  */
-public class OldBinsecureFlowTransformer extends Transformer {
+public class BinsecureFlowTransformer extends Transformer {
 
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {

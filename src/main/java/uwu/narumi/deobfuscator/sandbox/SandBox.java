@@ -45,7 +45,7 @@ public class SandBox extends ClassLoader {
 
     private Clazz buildClass(ClassNode classNode) {
         if (classes.containsKey(classNode.name.replace('/', '.')))
-            return null;
+            return classes.get(classNode.name.replace('/', '.'));
 
         byte[] bytes = ClassHelper.classToBytes(ClassHelper.copy(classNode), ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
         Clazz clazz = new Clazz(defineClass(classNode.name.replace('/', '.'), bytes, 0, bytes.length, this.getClass().getProtectionDomain()));

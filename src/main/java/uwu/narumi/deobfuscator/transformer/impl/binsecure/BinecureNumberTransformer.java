@@ -1,18 +1,20 @@
-package uwu.narumi.deobfuscator.transformer.impl.binsecure.old;
+package uwu.narumi.deobfuscator.transformer.impl.binsecure;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.helper.MathHelper;
 import uwu.narumi.deobfuscator.transformer.Transformer;
+import uwu.narumi.deobfuscator.transformer.impl.universal.other.UniversalNumberTransformer;
 
-/*
-   TODO: Create UniversalNumberTransformer and put into that class sb27/binsecure removers lo
- */
-public class OldBinecureNumberTransformer extends Transformer {
+public class BinecureNumberTransformer extends Transformer {
+
+    private static final UniversalNumberTransformer transformer = new UniversalNumberTransformer();
 
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
+        transformer.transform(deobfuscator);
+
         deobfuscator.classes().stream()
                 .flatMap(classNode -> classNode.methods.stream())
                 .forEach(methodNode -> {
@@ -107,5 +109,7 @@ public class OldBinecureNumberTransformer extends Transformer {
                         }
                     } while (modified);
                 });
+
+        transformer.transform(deobfuscator);
     }
 }

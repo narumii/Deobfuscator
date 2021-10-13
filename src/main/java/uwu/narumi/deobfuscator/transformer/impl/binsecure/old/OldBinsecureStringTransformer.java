@@ -14,11 +14,14 @@ import uwu.narumi.deobfuscator.transformer.Transformer;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/*
-    TODO: Fix my shitty code also boilerplate and this is hardcoded as fuck
-    TODO: Make it less hardcoded xd
-    TODO: Use StackAnalyzer etc bruh
+/**
+ * TODO: Fix my shitty code also boilerplate and this is hardcoded as fuck
+ * TODO: Make it less hardcoded xd
+ * TODO: Use StackAnalyzer etc bruh
+ *
+ * @see uwu.narumi.deobfuscator.transformer.impl.binsecure.latest.BinsecureStringTransformer
  */
+@Deprecated
 public class OldBinsecureStringTransformer extends Transformer {
 
     private final String decryptClassName;

@@ -52,6 +52,9 @@ public final class ClassHelper {
     }
 
     public static ClassNode copy(ClassNode classNode) {
+        if (classNode == null)
+            return null;
+
         ClassNode copy = new ClassNode();
         copy.visit(classNode.version, classNode.access, classNode.name, null, classNode.superName, classNode.interfaces.toArray(new String[0]));
         classNode.accept(copy);

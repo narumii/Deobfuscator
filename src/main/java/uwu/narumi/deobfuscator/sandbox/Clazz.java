@@ -53,6 +53,9 @@ public class Clazz {
         return null;
     }
 
+    /*
+        Lookup maybe? xd
+     */
     public Object get(String fieldName, Object reference) {
         try {
             Field field = clazz.getDeclaredField(fieldName);
