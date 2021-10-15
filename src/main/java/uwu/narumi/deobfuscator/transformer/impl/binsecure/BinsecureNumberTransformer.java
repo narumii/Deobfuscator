@@ -7,7 +7,7 @@ import uwu.narumi.deobfuscator.helper.MathHelper;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 import uwu.narumi.deobfuscator.transformer.impl.universal.other.UniversalNumberTransformer;
 
-public class BinecureNumberTransformer extends Transformer {
+public class BinsecureNumberTransformer extends Transformer {
 
     private static final UniversalNumberTransformer transformer = new UniversalNumberTransformer();
 

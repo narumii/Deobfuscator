@@ -8,6 +8,8 @@ import org.objectweb.asm.tree.ClassNode;
 import uwu.narumi.deobfuscator.exception.TransformerException;
 import uwu.narumi.deobfuscator.helper.ClassHelper;
 import uwu.narumi.deobfuscator.helper.FileHelper;
+import uwu.narumi.deobfuscator.sandbox.SandBox;
+import uwu.narumi.deobfuscator.sandbox.SandBoxSecurityManager;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 
 import java.io.FileNotFoundException;
@@ -48,6 +50,8 @@ public class Deobfuscator {
         this.classReaderFlags = builder.classReaderFlags;
         this.classWriterFlags = builder.classWriterFlags;
 
+        SandBox.getInstance(); //YES
+        System.setSecurityManager(new SandBoxSecurityManager());
         System.out.println();
     }
 
@@ -178,6 +182,14 @@ public class Deobfuscator {
 
     public int getClassWriterFlags() {
         return classWriterFlags;
+    }
+
+    public Path getInput() {
+        return input;
+    }
+
+    public Path getOutput() {
+        return output;
     }
 
     public static class Builder {

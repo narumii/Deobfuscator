@@ -42,7 +42,8 @@ public class BinsecureStringTransformer extends Transformer {
         int key = getKey(decryptClass);
 
         decryptClass.methods.removeIf(methodNode -> !methodNode.name.startsWith("<"));
-        SandBox sandBox = SandBox.of(mapClass, decryptClass);
+        SandBox sandBox = SandBox.getInstance();
+        sandBox.put(mapClass, decryptClass);
 
         String fieldName = decryptClass.fields.stream().filter(node -> node.desc.equals("[I")).map(node -> node.name).findFirst().orElse("aiooi1iojionlknzjsdnfdas");
         int[] keys = (int[]) sandBox.get(decryptClass).get(fieldName, null);
@@ -76,7 +77,7 @@ public class BinsecureStringTransformer extends Transformer {
     }
 
     /*
-        I think this method is better but is slower it can deobfuscate fucked shit like
+        I think this method is better but its slower but it can deobfuscate fucked shit like
 
         LDC "encrypted string"
         LABELNODE

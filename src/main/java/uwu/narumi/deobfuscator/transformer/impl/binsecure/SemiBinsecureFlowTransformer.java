@@ -15,7 +15,7 @@ import java.util.Arrays;
     TODO: Fucking method flow ofbustation bruh
     TODO: While loop remove
  */
-public class BinsecureFlowTransformer extends Transformer {
+public class SemiBinsecureFlowTransformer extends Transformer {
 
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
