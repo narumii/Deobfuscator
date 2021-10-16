@@ -1,5 +1,7 @@
 package uwu.narumi.deobfuscator.sandbox;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
@@ -10,6 +12,8 @@ import java.security.Permission;
     Shit SecurityManager that protect your computer from SandBox exploits
  */
 public class SandBoxSecurityManager extends SecurityManager {
+
+    private static final Logger LOGGER = LogManager.getLogger(SandBoxSecurityManager.class);
 
     static {
         //Yes it works SOMEHOW
@@ -23,8 +27,8 @@ public class SandBoxSecurityManager extends SecurityManager {
             modifiers.setInt(unsafe, unsafe.getModifiers() & ~Modifier.FINAL);
             unsafe.set(null, null);
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Can't block Unsafe");
+            LOGGER.error("Can't disable unsafe");
+            LOGGER.debug("Error", e);
         }
     }
 

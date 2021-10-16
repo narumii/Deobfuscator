@@ -36,6 +36,7 @@ public class Deobfuscator {
     private final List<Transformer> transformers;
     private final int classReaderFlags;
     private final int classWriterFlags;
+    private final boolean consoleDebug;
 
     private Deobfuscator(Builder builder) throws FileNotFoundException {
         if (!builder.input.toFile().exists())
@@ -49,6 +50,7 @@ public class Deobfuscator {
         this.transformers = builder.transformers;
         this.classReaderFlags = builder.classReaderFlags;
         this.classWriterFlags = builder.classWriterFlags;
+        this.consoleDebug = builder.consoleDebug;
 
         SandBox.getInstance(); //YES
         System.setSecurityManager(new SandBoxSecurityManager());
@@ -67,6 +69,9 @@ public class Deobfuscator {
         } catch (Exception e) {
             LOGGER.error("Error occurred while obfuscation");
             LOGGER.debug("Error", e);
+
+            if (consoleDebug)
+                e.printStackTrace();
         }
     }
 
@@ -86,6 +91,9 @@ public class Deobfuscator {
                 LOGGER.error("Could not load class: {}, adding as file", name);
                 LOGGER.debug("Error", e);
                 files.put(name, data);
+
+                if (consoleDebug)
+                    e.printStackTrace();
             }
         });
 
@@ -105,9 +113,15 @@ public class Deobfuscator {
                 LOGGER.info("Ended {} transformer in {} ms", transformer.name(), (System.currentTimeMillis() - start));
             } catch (TransformerException e) {
                 LOGGER.error("! {}: {}", transformer.name(), e.getMessage());
+
+                if (consoleDebug)
+                    e.printStackTrace();
             } catch (Exception e) {
                 LOGGER.error("Error occurred when transforming {}", transformer.name());
                 LOGGER.debug("Error", e);
+
+                if (consoleDebug)
+                    e.printStackTrace();
             }
             LOGGER.info("-------------------------------------\n");
         });
@@ -121,23 +135,30 @@ public class Deobfuscator {
 
             classes.forEach((ignored, classNode) -> {
                 try {
+                    byte[] data = ClassHelper.classToBytes(classNode, classWriterFlags);
                     zipOutputStream.putNextEntry(new ZipEntry(classNode.name + ".class"));
-                    zipOutputStream.write(ClassHelper.classToBytes(classNode, classWriterFlags));
-                    originalClasses.remove(classNode.name);
+                    zipOutputStream.write(data);
                 } catch (Exception e) {
                     LOGGER.error("Could not save class, saving original class instead of deobfuscated: {}", classNode.name);
                     LOGGER.debug("Error", e);
 
+                    if (consoleDebug)
+                        e.printStackTrace();
                     try {
+                        byte[] data = ClassHelper.classToBytes(originalClasses.get(classNode.name), classWriterFlags);
+
                         zipOutputStream.putNextEntry(new ZipEntry(classNode.name + ".class"));
-                        zipOutputStream.write(ClassHelper.classToBytes(originalClasses.get(classNode.name), classWriterFlags));
-                        originalClasses.remove(classNode.name);
+                        zipOutputStream.write(data);
                     } catch (Exception e2) {
                         LOGGER.error("Could not save original class: {}", classNode.name);
                         LOGGER.debug("Error", e2);
+
+                        if (consoleDebug)
+                            e2.printStackTrace();
                     }
                 }
 
+                originalClasses.remove(classNode.name);
                 classes.remove(ignored);
             });
 
@@ -148,6 +169,9 @@ public class Deobfuscator {
                 } catch (Exception e) {
                     LOGGER.error("Could not save file: {}", name);
                     LOGGER.debug("Error", e);
+
+                    if (consoleDebug)
+                        e.printStackTrace();
                 }
 
                 files.remove(name);
@@ -155,6 +179,9 @@ public class Deobfuscator {
         } catch (Exception e) {
             LOGGER.error("Could not save output file: {}", output);
             LOGGER.debug("Error", e);
+            if (consoleDebug)
+                e.printStackTrace();
+
         }
 
         LOGGER.info("Saved output file: {}\n", output);
@@ -202,6 +229,8 @@ public class Deobfuscator {
         private int classReaderFlags = ClassReader.EXPAND_FRAMES;
         private int classWriterFlags = ClassWriter.COMPUTE_MAXS;
 
+        private boolean consoleDebug;
+
         private Builder() {
         }
 
@@ -227,6 +256,11 @@ public class Deobfuscator {
 
         public Builder classWriterFlags(int classWriterFlags) {
             this.classWriterFlags = classWriterFlags;
+            return this;
+        }
+
+        public Builder consoleDebug() {
+            this.consoleDebug = true;
             return this;
         }
 

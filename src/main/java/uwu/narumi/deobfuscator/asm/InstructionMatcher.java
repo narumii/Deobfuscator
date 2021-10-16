@@ -1,37 +1,92 @@
 package uwu.narumi.deobfuscator.asm;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
-
-import java.util.function.Predicate;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.*;
 
 public class InstructionMatcher {
 
-    protected final AbstractInsnNode start;
-    protected final Predicate<AbstractInsnNode>[] predicates;
-    protected AbstractInsnNode current;
+    private final int[] opcodes;
+    private int[] replacement;
 
-    public InstructionMatcher(AbstractInsnNode start, Predicate<AbstractInsnNode>... predicates) {
-        this.start = start;
-        this.current = start;
-        this.predicates = predicates;
+    private InstructionMatcher(int... opcodes) {
+        if (opcodes == null || opcodes.length <= 0)
+            throw new IllegalArgumentException();
+
+        this.opcodes = opcodes;
     }
 
-    public boolean matches() {
-        int passed = 0;
-        for (Predicate<AbstractInsnNode> predicate : predicates) {
+    public static InstructionMatcher of(int... opcodes) {
+        return new InstructionMatcher(opcodes);
+    }
+
+    public InstructionMatcher replacement(int... opcodes) {
+        this.replacement = opcodes;
+        return this;
+    }
+
+    public boolean match(AbstractInsnNode start) {
+        int success = 0;
+        AbstractInsnNode current = start;
+
+        for (int i = 0; i < opcodes.length; i++) {
             if (current == null)
                 break;
 
-            if (predicate.test(current))
-                passed++;
+            //Idk
+            if (current instanceof LabelNode || current instanceof LineNumberNode || current.getOpcode() == Opcodes.NOP) {
+                i--;
+            } else if (opcodes[i] != current.getOpcode())
+                break;
+            else if (opcodes[i] == current.getOpcode())
+                ++success;
 
             current = current.getNext();
         }
 
-        return passed == predicates.length;
+        return success == opcodes.length;
     }
 
-    public AbstractInsnNode getCurrent() {
-        return current;
+    public AbstractInsnNode matchAndGetLast(AbstractInsnNode start) {
+        int success = 0;
+        AbstractInsnNode current = start;
+
+        for (int i = 0; i < opcodes.length; i++) {
+            if (current == null)
+                break;
+
+            //Idk
+            if (current instanceof LabelNode || current instanceof LineNumberNode || current.getOpcode() == Opcodes.NOP) {
+                i--;
+            } else if (opcodes[i] != current.getOpcode())
+                break;
+            else if (opcodes[i] == current.getOpcode())
+                ++success;
+
+            current = current.getNext();
+        }
+
+        return success == opcodes.length ? current : null;
+    }
+
+
+    public boolean matchAndReplace(MethodNode methodNode, AbstractInsnNode start) {
+        AbstractInsnNode last = matchAndGetLast(start);
+        if (last != null) {
+            if (replacement != null && replacement.length > 0) {
+                for (int opcode : replacement) {
+                    methodNode.instructions.insertBefore(start, new InsnNode(opcode));
+                }
+            }
+
+            AbstractInsnNode[] nodes = methodNode.instructions.toArray();
+            int startIndex = methodNode.instructions.indexOf(start);
+            int endIndex = methodNode.instructions.indexOf(last);
+            for (int i = startIndex; i < endIndex; i++) {
+                methodNode.instructions.remove(nodes[i]);
+            }
+            return true;
+        }
+
+        return false;
     }
 }

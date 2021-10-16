@@ -286,6 +286,31 @@ public class ASMHelper implements Opcodes {
                 .count() == predicates.length;
     }
 
+    public static boolean isMethod(AbstractInsnNode node, String owner) {
+        return node instanceof MethodInsnNode
+                && ((MethodInsnNode) node).name.equals(owner);
+    }
+
+    public static boolean isMethod(AbstractInsnNode node, String owner, String name) {
+        return node instanceof MethodInsnNode
+                && ((MethodInsnNode) node).owner.equals(owner)
+                && ((MethodInsnNode) node).name.equals(name);
+    }
+
+    public static boolean isMethod(AbstractInsnNode node, String owner, String name, String desc) {
+        return node instanceof MethodInsnNode
+                && ((MethodInsnNode) node).owner.equals(owner)
+                && ((MethodInsnNode) node).name.equals(name)
+                && ((MethodInsnNode) node).desc.equals(desc);
+    }
+
+    public static boolean isMethod(AbstractInsnNode node, String owner, String name, String desc, int opcode) {
+        return node instanceof MethodInsnNode && node.getOpcode() == opcode
+                && ((MethodInsnNode) node).owner.equals(owner)
+                && ((MethodInsnNode) node).name.equals(name)
+                && ((MethodInsnNode) node).desc.equals(desc);
+    }
+
     public static Map<AbstractInsnNode, Frame<SourceValue>> analyzeSource(ClassNode classNode, MethodNode methodNode) {
         try {
             Map<AbstractInsnNode, Frame<SourceValue>> frames = new HashMap<>();
