@@ -17,7 +17,6 @@
 
 ### In Future Supported Obfuscators (maybe)
 - [Radon](https://github.com/ItzSomebody/radon)
-- [Mosey](https://github.com/Hippo/Mosey)
 - [Radon Rename oh fuck sorry i mean qProtect](https://mdma.dev/)
 - [Scuti](https://github.com/netindev/scuti)
 
