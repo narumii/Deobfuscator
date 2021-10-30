@@ -6,9 +6,7 @@ import uwu.narumi.deobfuscator.exception.TransformerException;
 import uwu.narumi.deobfuscator.helper.ASMHelper;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
