@@ -45,7 +45,8 @@ public class OldBinsecureStringTransformer extends Transformer {
         if (mapClass == null || decryptClass == null)
             return;
 
-        SandBox sandBox = SandBox.of(mapClass, decryptClass);
+        SandBox sandBox = SandBox.getInstance();
+        sandBox.put(mapClass, decryptClass);
 
         deobfuscator.classes().forEach(classNode -> {
             ClassNode execution = new ClassNode();

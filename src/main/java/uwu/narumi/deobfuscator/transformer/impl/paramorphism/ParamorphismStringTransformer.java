@@ -34,7 +34,8 @@ public class ParamorphismStringTransformer extends Transformer {
 
             toLoad.add(classNode);
         }
-        SandBox sandBox = SandBox.of(toLoad.toArray(new ClassNode[0]));
+        SandBox sandBox = SandBox.getInstance();
+        sandBox.put(toLoad.toArray(new ClassNode[0]));
 
         deobfuscator.classes().stream()
                 .filter(classNode -> !classesToLoad.contains(classNode.name))

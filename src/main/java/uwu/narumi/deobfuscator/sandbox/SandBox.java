@@ -14,14 +14,20 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SandBox extends ClassLoader {
 
     private static final Map<String, Clazz> classes = new ConcurrentHashMap<>();
+    private static SandBox INSTANCE;
 
-    private SandBox(ClassNode... classNodes) {
-        super(Loader.getClassLoader());
-        buildClasses(classNodes);
+    private SandBox() {
+        super("SandBoxClassLoader", Loader.getClassLoader());
+
+        if (INSTANCE != null)
+            throw new IllegalArgumentException();
     }
 
-    public static SandBox of(ClassNode... classNodes) {
-        return new SandBox(classNodes);
+    public synchronized static SandBox getInstance() {
+        if (INSTANCE == null)
+            INSTANCE = new SandBox();
+
+        return INSTANCE;
     }
 
     public SandBox put(ClassNode... classNodes) {

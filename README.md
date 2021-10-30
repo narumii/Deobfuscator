@@ -1,4 +1,6 @@
-### Just for fun
+<p align="center">
+     <a href="https://discord.gg/keyDrkPJDa"><img src="https://discordapp.com/api/guilds/900083350314811432/widget.png?style=banner2"/></a>
+</p>
 
 ---
 
@@ -12,13 +14,20 @@
 - [Paramorphism 2.1.2_9](https://paramorphism.dev/) `not worth your money` 
 - [Radon v4 aka qProtect (b3.0 & b31)](https://mdma.dev/) `Yes i don't have latest version`
 - [Caesium](https://github.com/sim0n/Caesium)
-- [Binsecure](https://binclub.dev/purchasing/) `Missing DynamicVariable and crashers`
+- [Binsecure](https://binclub.dev/purchasing/) `MBA & Flow needs recode`
+- [Mosey](https://github.com/Hippo/Mosey) `You need to fix asm (JumpRange) also ConfusingSwitch doesn't work (in mosey)`
 
 ### In Future Supported Obfuscators (maybe)
 - [Radon](https://github.com/ItzSomebody/radon)
-- [Mosey](https://github.com/Hippo/Mosey)
 - [Radon Rename oh fuck sorry i mean qProtect](https://mdma.dev/)
 - [Scuti](https://github.com/netindev/scuti)
+
+---
+
+### SandBox doesn't work
+> Just add `-noverify` to jvm arguments if still doesn't work then open issue
+
+![](https://i.imgur.com/UFxiUPZ.png)
 
 ---
 

@@ -15,13 +15,15 @@ import java.util.Arrays;
     TODO: Fucking method flow ofbustation bruh
     TODO: While loop remove
  */
-public class BinsecureFlowTransformer extends Transformer {
+public class SemiBinsecureFlowTransformer extends Transformer {
 
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
         firstPhase(deobfuscator);
         secondPhase(deobfuscator);
         thirdPhase(deobfuscator);
+        fourthPhase(deobfuscator);
+        fifthPhase(deobfuscator);
         clean(deobfuscator);
     }
 
@@ -184,6 +186,37 @@ public class BinsecureFlowTransformer extends Transformer {
                 });
     }
 
+    private void fourthPhase(Deobfuscator deobfuscator) {
+        deobfuscator.classes().stream()
+                .flatMap(classNode -> classNode.methods.stream())
+                .forEach(methodNode -> {
+                    Arrays.stream(methodNode.instructions.toArray())
+                            .filter(node -> node.getOpcode() == ACONST_NULL)
+                            .filter(node -> check(node.getNext(), GETSTATIC))
+                            .filter(node -> check(node.getNext().getNext(), JumpInsnNode.class))
+                            .forEach(node -> {
+                                methodNode.instructions.remove(node.getNext().getNext());
+                                methodNode.instructions.remove(node.getNext());
+                            });
+                });
+    }
+
+    private void fifthPhase(Deobfuscator deobfuscator) {
+        deobfuscator.classes().stream()
+                .flatMap(classNode -> classNode.methods.stream())
+                .forEach(methodNode -> {
+                    Arrays.stream(methodNode.instructions.toArray())
+                            .filter(node -> node.getOpcode() == DUP)
+                            .filter(node -> check(node.getNext(), IFNULL))
+                            .filter(node -> check(node.getNext().getNext(), ATHROW))
+                            .forEach(node -> {
+                                methodNode.instructions.remove(node.getNext().getNext());
+                                methodNode.instructions.remove(node.getNext());
+                                methodNode.instructions.remove(node);
+                            });
+                });
+    }
+
     private void clean(Deobfuscator deobfuscator) {
         deobfuscator.classes().stream()
                 .flatMap(classNode -> classNode.methods.stream())
@@ -199,6 +232,16 @@ public class BinsecureFlowTransformer extends Transformer {
                                 methodNode.instructions.remove(node.getNext());
                                 methodNode.instructions.remove(node);
                                 modified = true;
+                            } else if (node.getOpcode() == ACONST_NULL) {
+                                if (check(node.getNext(), LabelNode.class) && check(node.getNext().getNext(), POP)) {
+                                    methodNode.instructions.remove(node.getNext().getNext());
+                                    methodNode.instructions.remove(node);
+                                    modified = true;
+                                } else if (check(node.getNext(), POP)) {
+                                    methodNode.instructions.remove(node.getNext());
+                                    methodNode.instructions.remove(node);
+                                    modified = true;
+                                }
                             }
                         }
                     } while (modified);

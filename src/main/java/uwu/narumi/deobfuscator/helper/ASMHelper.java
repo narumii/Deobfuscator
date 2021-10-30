@@ -4,11 +4,12 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.analysis.Analyzer;
+import org.objectweb.asm.tree.analysis.Frame;
+import org.objectweb.asm.tree.analysis.SourceInterpreter;
+import org.objectweb.asm.tree.analysis.SourceValue;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -283,5 +284,43 @@ public class ASMHelper implements Opcodes {
         return node != null && Arrays.stream(predicates)
                 .filter(predicate -> predicate.test(node))
                 .count() == predicates.length;
+    }
+
+    public static boolean isMethod(AbstractInsnNode node, String owner) {
+        return node instanceof MethodInsnNode
+                && ((MethodInsnNode) node).name.equals(owner);
+    }
+
+    public static boolean isMethod(AbstractInsnNode node, String owner, String name) {
+        return node instanceof MethodInsnNode
+                && ((MethodInsnNode) node).owner.equals(owner)
+                && ((MethodInsnNode) node).name.equals(name);
+    }
+
+    public static boolean isMethod(AbstractInsnNode node, String owner, String name, String desc) {
+        return node instanceof MethodInsnNode
+                && ((MethodInsnNode) node).owner.equals(owner)
+                && ((MethodInsnNode) node).name.equals(name)
+                && ((MethodInsnNode) node).desc.equals(desc);
+    }
+
+    public static boolean isMethod(AbstractInsnNode node, String owner, String name, String desc, int opcode) {
+        return node instanceof MethodInsnNode && node.getOpcode() == opcode
+                && ((MethodInsnNode) node).owner.equals(owner)
+                && ((MethodInsnNode) node).name.equals(name)
+                && ((MethodInsnNode) node).desc.equals(desc);
+    }
+
+    public static Map<AbstractInsnNode, Frame<SourceValue>> analyzeSource(ClassNode classNode, MethodNode methodNode) {
+        try {
+            Map<AbstractInsnNode, Frame<SourceValue>> frames = new HashMap<>();
+            Frame<SourceValue>[] framesArray = new Analyzer<>(new SourceInterpreter()).analyze(classNode.name, methodNode);
+            for (int i = 0; i < framesArray.length; i++) {
+                frames.put(methodNode.instructions.get(i), framesArray[i]);
+            }
+            return frames;
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

@@ -24,13 +24,17 @@ public final class ClassHelper {
     }
 
     public static ClassNode loadClass(byte[] bytes, int readerMode) throws InvalidClassException {
+        return loadClass(bytes, readerMode, true);
+    }
+
+    public static ClassNode loadClass(byte[] bytes, int readerMode, boolean fix) throws InvalidClassException {
         ClassNode classNode;
         try {
             classNode = new ClassNode();
             ClassReader classReader = new ClassReader(bytes);
             classReader.accept(classNode, readerMode);
         } catch (Exception e) {
-            classNode = loadClass(fixClass(bytes), readerMode);
+            classNode = fix ? loadClass(fixClass(bytes), readerMode, false) : null;
         }
 
         return classNode;
