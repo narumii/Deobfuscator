@@ -14,8 +14,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ScutiInvokeDynamicTransformer extends Transformer {
 
-    private int removedMethods = 0;
-
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
         deobfuscator.classes()
@@ -42,17 +40,6 @@ public class ScutiInvokeDynamicTransformer extends Transformer {
                                 methodNode.instructions.set(node, new MethodInsnNode(opcode, owner, name, desc, false));
                             }));
                 }));
-
-        deobfuscator.classes().forEach(classNode -> {
-            for (MethodNode methodNode : classNode.methods) {
-                System.out.println(methodNode.desc + " " + methodNode.access);
-                if (methodNode.name.length() > 50 && methodNode.access == 4170 && methodNode.desc.equals("(Ljava/lang/String;)Ljava/lang/String;")) {
-                    classNode.methods.remove(methodNode);
-                    removedMethods++;
-                }
-            }
-        });
-        LOGGER.info("Removed Decryption Functions: " + removedMethods);
     }
 
     private int getKey(MethodNode node) {
