@@ -1,19 +1,19 @@
 package uwu.narumi.deobfuscator.transformer.impl.mosey;
 
-import org.objectweb.asm.tree.*;
-import org.objectweb.asm.tree.analysis.Frame;
-import org.objectweb.asm.tree.analysis.SourceValue;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 import uwu.narumi.deobfuscator.Deobfuscator;
-import uwu.narumi.deobfuscator.helper.ASMHelper;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
-    TODO: Analyzer decrypt like in Binsecre
-    @see uwu.narumi.deobfuscator.transformer.impl.binsecure.latest.BinsecureStringTransformer
+ * TODO: Analyzer decrypt like in Binsecre
+ *
+ * @see uwu.narumi.deobfuscator.transformer.impl.binsecure.latest.BinsecureStringTransformer
  */
 public class MoseyStringTransformer extends Transformer {
 
@@ -59,10 +59,10 @@ public class MoseyStringTransformer extends Transformer {
     }
 
     private String decrypt(String string, int firstKey, int secondKey) {
-            char[] chars = string.toCharArray();
-            for (int i = 0; i < chars.length; ++i) {
-                chars[i] = (char)(chars[i] ^ ~(firstKey ^ secondKey));
-            }
-            return new String(chars);
+        char[] chars = string.toCharArray();
+        for (int i = 0; i < chars.length; ++i) {
+            chars[i] = (char) (chars[i] ^ ~(firstKey ^ secondKey));
+        }
+        return new String(chars);
     }
 }

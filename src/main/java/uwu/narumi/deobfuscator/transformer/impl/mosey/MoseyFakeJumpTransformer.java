@@ -2,10 +2,7 @@ package uwu.narumi.deobfuscator.transformer.impl.mosey;
 
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 import uwu.narumi.deobfuscator.Deobfuscator;
-import uwu.narumi.deobfuscator.helper.ASMHelper;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 
 import java.util.Arrays;
@@ -20,7 +17,7 @@ public class MoseyFakeJumpTransformer extends Transformer {
                         .forEach(node -> {
                             LabelNode labelNode = ((JumpInsnNode) node).label;
                             switch (node.getOpcode()) {
-                                case IFNULL : {
+                                case IFNULL: {
                                     methodNode.instructions.remove(node.getPrevious());
                                     methodNode.instructions.set(node, new JumpInsnNode(GOTO, labelNode));
                                     break;
@@ -75,7 +72,7 @@ public class MoseyFakeJumpTransformer extends Transformer {
                                         methodNode.instructions.remove(labelNode.getNext().getNext());
                                         methodNode.instructions.remove(labelNode.getNext());
                                     }
-                                  break;
+                                    break;
                                 }
                             }
                         }));
