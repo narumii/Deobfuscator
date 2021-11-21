@@ -14,8 +14,8 @@ public class Loader {
 
     public static void main(String... args) throws Exception {
         Deobfuscator.builder()
-                .input(Path.of("example/V1_KIT-obf_4_2.jar"))
-                .output(Path.of("example/V1_KIT-obf_4_2-deobf.jar"))
+                .input(Path.of("xdr"))
+                .output(Path.of("xdr"))
                 .transformers(
                         new UniversalNumberTransformer(),
                         new StaticArrayIntegerPoolTransformer(),
