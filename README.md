@@ -15,7 +15,7 @@
 - [Radon v4 aka qProtect (b3.0 & b31)](https://mdma.dev/) `Yes i don't have latest version`
 - [Caesium](https://github.com/sim0n/Caesium)
 - [Binsecure](https://binclub.dev/purchasing/) `MBA & Flow needs recode`
-- [Mosey](https://github.com/Hippo/Mosey) `You need to fix asm (JumpRange) also ConfusingSwitch doesn't work (in mosey)`
+- [Monsey](https://github.com/Hippo/Mosey) `You need to fix asm (JumpRange) also ConfusingSwitch doesn't work (in monsey)`
 
 ### In Future Supported Obfuscators (maybe)
 - [Radon](https://github.com/ItzSomebody/radon)

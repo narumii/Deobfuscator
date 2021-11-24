@@ -1,4 +1,4 @@
-package uwu.narumi.deobfuscator.transformer.impl.mosey;
+package uwu.narumi.deobfuscator.transformer.impl.monsey;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.LabelNode;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MoseyFakeTryCatchTransformer extends Transformer {
+public class MonseyFakeTryCatchTransformer extends Transformer {
 
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {

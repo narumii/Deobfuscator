@@ -1,6 +1,8 @@
 package uwu.narumi.deobfuscator.transformer.impl.scuti;
 
-import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.InvokeDynamicInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.exception.TransformerException;
 import uwu.narumi.deobfuscator.helper.ASMHelper;
@@ -18,28 +20,30 @@ public class ScutiInvokeDynamicTransformer extends Transformer {
     public void transform(Deobfuscator deobfuscator) throws Exception {
         deobfuscator.classes()
                 .forEach(classNode -> classNode.methods.stream()
-                .filter(methodNode -> methodNode.name.length() > 50)
-                .filter(methodNode -> methodNode.desc.equals("(Ljava/lang/String;)Ljava/lang/String;"))
-                .filter(methodNode -> methodNode.access == ACC_PRIVATE + ACC_STATIC + ACC_BRIDGE + ACC_SYNTHETIC)
-                .findFirst()
-                .ifPresent(decrypt -> {
-                    AtomicInteger key = new AtomicInteger(getKey(decrypt));
+                        .filter(methodNode -> methodNode.name.length() > 50)
+                        .filter(methodNode -> methodNode.desc.equals("(Ljava/lang/String;)Ljava/lang/String;"))
+                        .filter(methodNode -> methodNode.access == ACC_PRIVATE + ACC_STATIC + ACC_BRIDGE + ACC_SYNTHETIC)
+                        .findFirst()
+                        .ifPresent(decrypt -> {
+                            AtomicInteger key = new AtomicInteger(getKey(decrypt));
 
-                    classNode.methods.forEach(methodNode -> Arrays.stream(methodNode.instructions.toArray()).sequential()
-                            .filter(node -> node instanceof InvokeDynamicInsnNode)
-                            .map(InvokeDynamicInsnNode.class::cast)
-                            .filter(node -> node.bsm.getDesc().equals("(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;)Ljava/lang/invoke/CallSite;"))
-                            .filter(node -> node.bsmArgs.length == 4)
-                            .filter(node -> node.name.length() > 50)
-                            .forEach(node -> {
-                                String owner = decrypt((String) node.bsmArgs[0], key.get()).replace('.', '/');
-                                String name = decrypt((String) node.bsmArgs[1], key.get());
-                                String desc = decrypt((String) node.bsmArgs[2], key.get());
-                                int opcode = (int) node.bsmArgs[3] == 0 ? INVOKESTATIC : INVOKEVIRTUAL;
+                            classNode.methods.forEach(methodNode -> Arrays.stream(methodNode.instructions.toArray()).sequential()
+                                    .filter(node -> node instanceof InvokeDynamicInsnNode)
+                                    .map(InvokeDynamicInsnNode.class::cast)
+                                    .filter(node -> node.bsm.getDesc().equals("(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;)Ljava/lang/invoke/CallSite;"))
+                                    .filter(node -> node.bsmArgs.length == 4)
+                                    .filter(node -> node.name.length() > 50)
+                                    .forEach(node -> {
+                                        String owner = decrypt((String) node.bsmArgs[0], key.get()).replace('.', '/');
+                                        String name = decrypt((String) node.bsmArgs[1], key.get());
+                                        String desc = decrypt((String) node.bsmArgs[2], key.get());
+                                        int opcode = (int) node.bsmArgs[3] == 0 ? INVOKESTATIC : INVOKEVIRTUAL;
 
-                                methodNode.instructions.set(node, new MethodInsnNode(opcode, owner, name, desc, false));
-                            }));
-                }));
+                                        methodNode.instructions.set(node, new MethodInsnNode(opcode, owner, name, desc, false));
+                                    }));
+
+                            classNode.methods.remove(decrypt);
+                        }));
     }
 
     private int getKey(MethodNode node) {

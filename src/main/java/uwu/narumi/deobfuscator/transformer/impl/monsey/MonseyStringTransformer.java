@@ -1,4 +1,4 @@
-package uwu.narumi.deobfuscator.transformer.impl.mosey;
+package uwu.narumi.deobfuscator.transformer.impl.monsey;
 
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.LdcInsnNode;
@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * @see uwu.narumi.deobfuscator.transformer.impl.binsecure.latest.BinsecureStringTransformer
  */
-public class MoseyStringTransformer extends Transformer {
+public class MonseyStringTransformer extends Transformer {
 
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
