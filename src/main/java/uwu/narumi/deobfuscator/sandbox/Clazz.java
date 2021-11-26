@@ -20,18 +20,18 @@ public class Clazz {
         this.clazz = clazz;
     }
 
-    public Object invoke(String methodName, String methodDesc, Object reference, Object[] arguments) {
+    public Object invoke(String methodName, String methodDesc, Object reference, Object... arguments) {
         return invoke(methodName, MethodType.fromMethodDescriptorString(methodDesc, Clazz.class.getClassLoader()), reference, arguments);
     }
 
-    public Object invoke(String methodName, Class<?> returnType, Class<?>[] parameters, Object reference, Object[] arguments) {
+    public Object invoke(String methodName, Class<?> returnType, Class<?>[] parameters, Object reference, Object... arguments) {
         return invoke(methodName, MethodType.methodType(returnType, parameters), reference, arguments);
     }
 
     /*
     Should we use Lookup for this?
      */
-    public Object invoke(String methodName, MethodType methodType, Object reference, Object[] arguments) {
+    public Object invoke(String methodName, MethodType methodType, Object reference, Object... arguments) {
         try {
             Method method = clazz.getDeclaredMethod(methodName, methodType.parameterArray());
             if (!method.isAccessible())

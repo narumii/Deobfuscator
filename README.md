@@ -11,15 +11,14 @@
 - [Bozar](https://github.com/vimasig/Bozar) `Ugly deobfuscation i probably will recode it`
 - [superblaubeere27 / JObf](https://github.com/superblaubeere27/obfuscator)
 - [Binsecure 0.4](https://binclub.dev/binscure/) `idk i don't create indy transformer because it isn't working for me idk`
-- [Paramorphism 2.1.2_9](https://paramorphism.dev/) `not worth your money` 
-- [Radon v4 aka qProtect (b3.0 & b31)](https://mdma.dev/) `Yes i don't have latest version`
+- [Paramorphism 2.1.2_9](https://paramorphism.dev/) `not worth your money`
 - [Caesium](https://github.com/sim0n/Caesium)
 - [Binsecure](https://binclub.dev/purchasing/) `MBA & Flow needs recode`
 - [Monsey](https://github.com/Hippo/Mosey) `You need to fix asm (JumpRange) also ConfusingSwitch doesn't work (in monsey)`
+- [(Skid)qProtect (Latest, b3.0, b31)](https://mdma.dev/) `Shit obf`
 
 ### In Future Supported Obfuscators (maybe)
 - [Radon](https://github.com/ItzSomebody/radon)
-- [Radon Rename oh fuck sorry i mean qProtect](https://mdma.dev/)
 - [Scuti](https://github.com/netindev/scuti)
 
 ---

@@ -83,7 +83,7 @@ public class ParamorphismStringTransformer extends Transformer {
                             name = name.substring(1, name.length() - 1);
 
                         try {
-                            Object output = finalClazz1.invoke(name, "()[Ljava/lang/String;", null, new Object[0]);
+                            Object output = finalClazz1.invoke(name, "()[Ljava/lang/String;", null);
                             AtomicInteger index = new AtomicInteger();
 
                             if (!(output instanceof String[])) {

@@ -84,6 +84,17 @@ public class BinsecureNumberTransformer extends Transformer {
                                         methodNode.instructions.set(node, getNumber(product));
                                         modified = true;
                                     }
+                                } else if (isLong(node.getPrevious().getPrevious()) && isInteger(node.getPrevious())) {
+                                    long first = getLong(node.getPrevious().getPrevious());
+                                    long second = getInteger(node.getPrevious());
+
+                                    Long product = MathHelper.doMath(node.getOpcode(), first, second);
+                                    if (product != null) {
+                                        methodNode.instructions.remove(node.getPrevious().getPrevious());
+                                        methodNode.instructions.remove(node.getPrevious());
+                                        methodNode.instructions.set(node, getNumber(product));
+                                        modified = true;
+                                    }
                                 }
                             } else if (node instanceof MethodInsnNode
                                     && ((MethodInsnNode) node).name.equals("intBitsToFloat")

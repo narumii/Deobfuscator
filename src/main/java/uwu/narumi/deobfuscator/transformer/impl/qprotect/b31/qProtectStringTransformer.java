@@ -6,6 +6,7 @@ import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
 
 /*
     This transformer works only on version: b31
@@ -14,40 +15,49 @@ public class qProtectStringTransformer extends Transformer {
 
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
-        deobfuscator.classes().stream()
-                .flatMap(classNode -> classNode.methods.stream())
-                .forEach(methodNode -> Arrays.stream(methodNode.instructions.toArray())
-                        .filter(node -> node instanceof MethodInsnNode)
-                        .filter(node -> node.getOpcode() == INVOKESTATIC)
-                        .map(MethodInsnNode.class::cast)
-                        .filter(node -> node.desc.equals("(Ljava/lang/String;Ljava/lang/String;IIII)Ljava/lang/String;"))
+        deobfuscator.classes().forEach(classNode -> {
+            AtomicReference<MethodInsnNode> methodInsn = new AtomicReference<>();
 
-                        .filter(node -> isInteger(node.getPrevious()))
-                        .filter(node -> isInteger(node.getPrevious().getPrevious()))
-                        .filter(node -> isInteger(node.getPrevious().getPrevious().getPrevious()))
-                        .filter(node -> isInteger(node.getPrevious().getPrevious().getPrevious().getPrevious()))
-                        .filter(node -> isString(node.getPrevious().getPrevious().getPrevious().getPrevious().getPrevious()))
-                        .filter(node -> isString(node.getPrevious().getPrevious().getPrevious().getPrevious().getPrevious().getPrevious()))
+            classNode.methods.stream()
+                    .forEach(methodNode -> Arrays.stream(methodNode.instructions.toArray())
+                            .filter(node -> node instanceof MethodInsnNode)
+                            .filter(node -> node.getOpcode() == INVOKESTATIC)
+                            .map(MethodInsnNode.class::cast)
+                            .filter(node -> node.desc.equals("(Ljava/lang/String;Ljava/lang/String;IIII)Ljava/lang/String;"))
 
-                        .forEach(node -> {
-                            String first = getString(node.getPrevious().getPrevious().getPrevious().getPrevious().getPrevious().getPrevious());
-                            String second = getString(node.getPrevious().getPrevious().getPrevious().getPrevious().getPrevious());
-                            int third = getInteger(node.getPrevious().getPrevious().getPrevious().getPrevious());
-                            int fourth = getInteger(node.getPrevious().getPrevious().getPrevious());
-                            int fifth = getInteger(node.getPrevious().getPrevious());
-                            int sixth = getInteger(node.getPrevious());
+                            .filter(node -> isInteger(node.getPrevious()))
+                            .filter(node -> isInteger(node.getPrevious().getPrevious()))
+                            .filter(node -> isInteger(node.getPrevious().getPrevious().getPrevious()))
+                            .filter(node -> isInteger(node.getPrevious().getPrevious().getPrevious().getPrevious()))
+                            .filter(node -> isString(node.getPrevious().getPrevious().getPrevious().getPrevious().getPrevious()))
+                            .filter(node -> isString(node.getPrevious().getPrevious().getPrevious().getPrevious().getPrevious().getPrevious()))
 
-                            String decode = decrypt(first, second, third, fourth, fifth, sixth);
+                            .forEach(node -> {
+                                String first = getString(node.getPrevious().getPrevious().getPrevious().getPrevious().getPrevious().getPrevious());
+                                String second = getString(node.getPrevious().getPrevious().getPrevious().getPrevious().getPrevious());
+                                int third = getInteger(node.getPrevious().getPrevious().getPrevious().getPrevious());
+                                int fourth = getInteger(node.getPrevious().getPrevious().getPrevious());
+                                int fifth = getInteger(node.getPrevious().getPrevious());
+                                int sixth = getInteger(node.getPrevious());
 
-                            methodNode.instructions.remove(node.getPrevious().getPrevious().getPrevious().getPrevious().getPrevious().getPrevious());
-                            methodNode.instructions.remove(node.getPrevious().getPrevious().getPrevious().getPrevious().getPrevious());
-                            methodNode.instructions.remove(node.getPrevious().getPrevious().getPrevious().getPrevious());
-                            methodNode.instructions.remove(node.getPrevious().getPrevious().getPrevious());
-                            methodNode.instructions.remove(node.getPrevious().getPrevious());
-                            methodNode.instructions.remove(node.getPrevious());
+                                String decode = decrypt(first, second, third, fourth, fifth, sixth);
 
-                            methodNode.instructions.set(node, new LdcInsnNode(decode));
-                        }));
+                                if (methodInsn.get() == null)
+                                    methodInsn.set(node);
+
+                                methodNode.instructions.remove(node.getPrevious().getPrevious().getPrevious().getPrevious().getPrevious().getPrevious());
+                                methodNode.instructions.remove(node.getPrevious().getPrevious().getPrevious().getPrevious().getPrevious());
+                                methodNode.instructions.remove(node.getPrevious().getPrevious().getPrevious().getPrevious());
+                                methodNode.instructions.remove(node.getPrevious().getPrevious().getPrevious());
+                                methodNode.instructions.remove(node.getPrevious().getPrevious());
+                                methodNode.instructions.remove(node.getPrevious());
+
+                                methodNode.instructions.set(node, new LdcInsnNode(decode));
+                            }));
+
+            if (methodInsn.get() != null)
+                deobfuscator.getClasses().get(methodInsn.get().owner).methods.removeIf(methodNode -> methodNode.name.equals(methodInsn.get().name) && methodNode.desc.equals(methodInsn.get().desc));
+        });
     }
 
 
