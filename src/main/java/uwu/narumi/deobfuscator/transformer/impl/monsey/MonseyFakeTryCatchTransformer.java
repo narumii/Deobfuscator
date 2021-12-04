@@ -36,11 +36,12 @@ public class MonseyFakeTryCatchTransformer extends Transformer {
 
                     Arrays.stream(methodNode.instructions.toArray())
                             .filter(node -> node.getOpcode() == GOTO)
+                            .filter(node -> node.getNext() != null)
                             .forEach(node -> {
                                 if (node.getNext().getOpcode() == ATHROW) {
                                     methodNode.instructions.remove(node.getNext());
                                     methodNode.instructions.remove(node);
-                                } else if (node.getNext() instanceof LabelNode && node.getNext().getNext().getOpcode() == ATHROW) {
+                                } else if (node.getNext() instanceof LabelNode && node.getNext().getNext() != null && node.getNext().getNext().getOpcode() == ATHROW) {
                                     methodNode.instructions.remove(node.getNext().getNext());
                                     methodNode.instructions.remove(node);
                                 }

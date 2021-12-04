@@ -8,18 +8,18 @@
 ---
 
 ### Supported Obfuscators
-- [Bozar](https://github.com/vimasig/Bozar) `Ugly deobfuscation i probably will recode it`
-- [superblaubeere27 / JObf](https://github.com/superblaubeere27/obfuscator)
-- [Binsecure 0.4](https://binclub.dev/binscure/) `idk i don't create indy transformer because it isn't working for me idk`
+- [superblaubeere27 / JObf / sb27](https://github.com/superblaubeere27/obfuscator)
 - [Paramorphism 2.1.2_9](https://paramorphism.dev/) `not worth your money`
 - [Caesium](https://github.com/sim0n/Caesium)
-- [Binsecure](https://binclub.dev/purchasing/) `MBA & Flow needs recode`
+- [Binsecure 0.4/Latest](https://binclub.dev/purchasing/) `MBA & Flow needs recode`
 - [Monsey](https://github.com/Hippo/Mosey) `You need to fix asm (JumpRange) also ConfusingSwitch doesn't work (in monsey)`
 - [(Skid)qProtect (Latest, b3.0, b31)](https://mdma.dev/) `Shit obf`
+- [Scuti](https://github.com/netindev/scuti)
 
 ### In Future Supported Obfuscators (maybe)
 - [Radon](https://github.com/ItzSomebody/radon)
-- [Scuti](https://github.com/netindev/scuti)
+- [Skidfuscator](https://github.com/terminalsin/skidfuscator-java-obfuscator)
+- [Bozar](https://github.com/vimasig/Bozar)
 
 ---
 

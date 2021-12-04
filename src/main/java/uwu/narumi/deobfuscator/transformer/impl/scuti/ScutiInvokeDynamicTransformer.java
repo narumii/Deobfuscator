@@ -42,7 +42,7 @@ public class ScutiInvokeDynamicTransformer extends Transformer {
                                         methodNode.instructions.set(node, new MethodInsnNode(opcode, owner, name, desc, false));
                                     }));
 
-                            classNode.methods.remove(decrypt);
+                            //classNode.methods.remove(decrypt);
                         }));
     }
 

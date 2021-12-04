@@ -28,7 +28,8 @@ public class qProtectFieldFlowTransformer extends Transformer {
                                 && ((FieldInsnNode) node).desc.equals("Z"))
                                 && node.getNext() instanceof JumpInsnNode
                                 && node.getNext().getNext().getOpcode() == ACONST_NULL
-                                && node.getNext().getNext().getNext().getOpcode() == ATHROW) {
+                            //&& node.getNext().getNext().getNext().getOpcode() == ATHROW
+                        ) {
 
                             fields.add(((FieldInsnNode) node).name);
                             methodNode.instructions.set(node.getNext(), new JumpInsnNode(GOTO, ((JumpInsnNode) node.getNext()).label));
@@ -42,7 +43,8 @@ public class qProtectFieldFlowTransformer extends Transformer {
                                 && ((FieldInsnNode) node.getNext()).desc.equals("I"))
                                 && node.getNext().getNext() instanceof JumpInsnNode
                                 && node.getNext().getNext().getNext().getOpcode() == ACONST_NULL
-                                && node.getNext().getNext().getNext().getNext().getOpcode() == ATHROW) {
+                            //&& node.getNext().getNext().getNext().getNext().getOpcode() == ATHROW
+                        ) {
 
                             fields.add(((FieldInsnNode) node).name);
                             fields.add(((FieldInsnNode) node.getNext()).name);
