@@ -21,6 +21,7 @@ public class SuperblaubeereSourceInfoStringTransformer extends Transformer {
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
         deobfuscator.classes().stream()
+                .filter(classNode -> classNode.sourceFile != null)
                 .filter(classNode -> classNode.sourceFile.contains("ä"))
                 .filter(classNode -> classNode.sourceFile.contains("ü"))
                 .filter(classNode -> classNode.sourceFile.contains("ö"))
@@ -33,7 +34,6 @@ public class SuperblaubeereSourceInfoStringTransformer extends Transformer {
                             .filter(methodNode -> methodNode.desc.equals("()V"))
                             .forEach(methodNode -> Arrays.stream(methodNode.instructions.toArray())
                                     .filter(node -> node.getOpcode() == PUTSTATIC)
-                                    .filter(node -> node.getNext().getOpcode() == RETURN)
                                     .filter(node -> node.getPrevious().getOpcode() == INVOKEVIRTUAL)
                                     .filter(node -> isString(node.getPrevious().getPrevious()))
                                     .filter(node -> getString(node.getPrevious().getPrevious()).equals("ö"))

@@ -9,7 +9,6 @@ import uwu.narumi.deobfuscator.exception.TransformerException;
 import uwu.narumi.deobfuscator.helper.ClassHelper;
 import uwu.narumi.deobfuscator.helper.FileHelper;
 import uwu.narumi.deobfuscator.sandbox.SandBox;
-import uwu.narumi.deobfuscator.sandbox.SandBoxSecurityManager;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 
 import java.io.FileNotFoundException;
@@ -53,7 +52,8 @@ public class Deobfuscator {
         this.consoleDebug = builder.consoleDebug;
 
         SandBox.getInstance(); //YES
-        System.setSecurityManager(new SandBoxSecurityManager());
+        //System.setSecurityManager(new SandBoxSecurityManager()); //disabled due to deobfuscation errors
+        LOGGER.error("SecurityManager is disabled due to deobfuscation errors, transformers that using SandBox can be exploited");
         System.out.println();
     }
 
@@ -64,7 +64,7 @@ public class Deobfuscator {
     public void start() {
         try {
             loadInput();
-            transform();
+            transform(transformers);
             saveOutput();
         } catch (Exception e) {
             LOGGER.error("Error occurred while obfuscation");
@@ -100,7 +100,7 @@ public class Deobfuscator {
         LOGGER.info("Loaded input file: {}\n", input);
     }
 
-    private void transform() {
+    public void transform(List<Transformer> transformers) {
         if (transformers == null || transformers.isEmpty())
             return;
 

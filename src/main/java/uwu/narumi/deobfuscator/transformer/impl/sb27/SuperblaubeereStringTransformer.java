@@ -47,6 +47,9 @@ public class SuperblaubeereStringTransformer extends Transformer {
                                 break;
                         }
 
+                        if (string == null)
+                            return;
+
                         methodNode.instructions.remove(node.getPrevious().getPrevious());
                         methodNode.instructions.remove(node.getPrevious());
                         methodNode.instructions.set(node, new LdcInsnNode(string));
@@ -110,7 +113,7 @@ public class SuperblaubeereStringTransformer extends Transformer {
         } catch (Exception e) {
             LOGGER.debug("Can't decrypt Blowfish string. [string: {}, key: {}] | {}", obj, key, e);
         }
-        return obj;
+        return null;
     }
 
     private String decryptDes(String obj, String key) {
@@ -124,7 +127,7 @@ public class SuperblaubeereStringTransformer extends Transformer {
         } catch (Exception e) {
             LOGGER.debug("Can't decrypt DES string. [string: {}, key: {}] | {}", obj, key, e);
         }
-        return obj;
+        return null;
     }
 
     private String decryptXor(String obj, String key) {
