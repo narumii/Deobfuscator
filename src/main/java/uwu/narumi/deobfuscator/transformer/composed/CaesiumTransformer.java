@@ -30,6 +30,7 @@ public class CaesiumTransformer extends ComposedTransformer {
                 new CaesiumNumberTransformer(),
                 new CaesiumNumberPoolTransformer(),
                 new UniversalNumberTransformer(),
+                new CaesiumInvokeDynamicTransformer(),
                 new CaesiumStringTransformer(),
                 new CaesiumCleanTransformer()
         );

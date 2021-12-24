@@ -1,6 +1,9 @@
 package uwu.narumi.deobfuscator.transformer.impl.caesium;
 
+import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.analysis.Frame;
+import org.objectweb.asm.tree.analysis.SourceValue;
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 
@@ -15,17 +18,37 @@ public class CaesiumNumberPoolTransformer extends Transformer {
         deobfuscator.classes().forEach(classNode -> {
             Map<String, Number> numbers = new HashMap<>();
 
-            findClInit(classNode).ifPresent(methodNode -> Arrays.stream(methodNode.instructions.toArray())
-                    .filter(node -> node instanceof FieldInsnNode)
-                    .filter(node -> node.getOpcode() == PUTSTATIC)
-                    .map(FieldInsnNode.class::cast)
-                    .filter(node -> node.desc.equals("I") || node.desc.equals("J") || node.desc.equals("D") || node.desc.equals("F"))
-                    .forEach(node -> {
-                        numbers.put(node.owner + "\u0000" + node.name + "\u0000" + node.desc, getNumber(node.getPrevious()));
+            findClInit(classNode).ifPresent(methodNode -> {
+                Map<AbstractInsnNode, Frame<SourceValue>> frames = analyzeSource(classNode, methodNode);
 
-                        methodNode.instructions.remove(node.getPrevious());
-                        methodNode.instructions.remove(node);
-                    }));
+                Arrays.stream(methodNode.instructions.toArray())
+                        .filter(node -> node instanceof FieldInsnNode)
+                        .filter(node -> node.getOpcode() == PUTSTATIC)
+                        .map(FieldInsnNode.class::cast)
+                        .filter(node -> node.desc.equals("I") || node.desc.equals("J") || node.desc.equals("D") || node.desc.equals("F"))
+                        .forEach(node -> {
+                            AbstractInsnNode numberNode = null;
+                            if (isNumber(node.getPrevious())) {
+                                numberNode = node.getPrevious();
+                            } else if (frames != null) {
+                                Frame<SourceValue> frame = frames.get(node);
+                                SourceValue value = frame.getStack(frame.getStackSize() - 1);
+                                if (value == null || value.insns == null || value.insns.isEmpty())
+                                    return;
+
+                                AbstractInsnNode stackInsn = value.insns.iterator().next();
+                                if (isNumber(stackInsn))
+                                    numberNode = stackInsn;
+                            }
+
+                            if (numberNode != null) {
+                                numbers.put(node.owner + "\u0000" + node.name + "\u0000" + node.desc, getNumber(numberNode));
+
+                                methodNode.instructions.remove(numberNode);
+                                methodNode.instructions.remove(node);
+                            }
+                        });
+            });
 
             classNode.methods.forEach(methodNode -> Arrays.stream(methodNode.instructions.toArray())
                     .filter(node -> node instanceof FieldInsnNode)
