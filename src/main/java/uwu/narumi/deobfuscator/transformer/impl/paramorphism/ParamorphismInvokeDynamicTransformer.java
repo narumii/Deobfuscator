@@ -15,77 +15,74 @@ import java.util.Map;
 
 public class ParamorphismInvokeDynamicTransformer extends Transformer {
 
-    private final String bootstrapClassName; //class that contains "lookups" field and has string in constructor
+    //private final String bootstrapClassName; //class that contains "lookups" field and has string in constructor
     private final Map<Integer, String[][]> lookups = new HashMap<>();
 
-    public ParamorphismInvokeDynamicTransformer(String bootstrapClassName) {
+    /*public ParamorphismInvokeDynamicTransformer(String bootstrapClassName) {
         this.bootstrapClassName = bootstrapClassName;
-    }
+    }*/
 
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
-        ClassNode bootstrapClass = deobfuscator.getOriginalClasses().get(bootstrapClassName);
+        //ClassNode bootstrapClass = deobfuscator.getOriginalClasses().get(bootstrapClassName);
+        ClassNode bootstrapClass = searchForBootstrapClass(deobfuscator);
 
-        if (bootstrapClass == null)
-            throw new TransformerException("Class not found");
+        //if (bootstrapClass == null)
+        //    throw new TransformerException("Class not found");
 
         StringBuilder key = new StringBuilder();
-        findMethod(bootstrapClass, methodNode -> methodNode.name.equals("<init>")).ifPresent(methodNode -> {
-            Arrays.stream(methodNode.instructions.toArray())
-                    .filter(ASMHelper::isString)
-                    .map(ASMHelper::getString)
-                    .forEach(key::append);
-        });
+        findMethod(bootstrapClass, methodNode -> methodNode.name.equals("<init>")).ifPresent(methodNode -> Arrays.stream(methodNode.instructions.toArray())
+                .filter(ASMHelper::isString)
+                .map(ASMHelper::getString)
+                .forEach(key::append));
 
         if (key.toString().isBlank())
             throw new TransformerException("Base64 String not found");
 
         decode(Base64.getDecoder().decode(key.toString()));
 
-        deobfuscator.classes().forEach(classNode -> classNode.methods.forEach(methodNode -> {
-            Arrays.stream(methodNode.instructions.toArray())
-                    .filter(node -> node instanceof InvokeDynamicInsnNode)
-                    .map(InvokeDynamicInsnNode.class::cast)
-                    .filter(node -> node.name.equals("call"))
-                    .forEach(node -> {
-                        int hash = classNode.name.replace('/', '.').hashCode() * 31 + methodNode.name.hashCode();
-                        int position = (int) ((long) node.bsmArgs[0] & 4294967295L);
-                        int type = (int) node.bsmArgs[1];
+        deobfuscator.classes().forEach(classNode -> classNode.methods.forEach(methodNode -> Arrays.stream(methodNode.instructions.toArray())
+                .filter(node -> node instanceof InvokeDynamicInsnNode)
+                .map(InvokeDynamicInsnNode.class::cast)
+                .filter(node -> node.name.equals("call"))
+                .forEach(node -> {
+                    int hash = classNode.name.replace('/', '.').hashCode() * 31 + methodNode.name.hashCode();
+                    int position = (int) ((long) node.bsmArgs[0] & 4294967295L);
+                    int type = (int) node.bsmArgs[1];
 
-                        switch (type) {
-                            case 1:
-                                type = INVOKESTATIC;
-                                break;
-                            case 2:
-                                type = INVOKEVIRTUAL;
-                                break;
-                            case 3:
-                                type = INVOKESPECIAL;
-                                break;
-                        }
+                    switch (type) {
+                        case 1:
+                            type = INVOKESTATIC;
+                            break;
+                        case 2:
+                            type = INVOKEVIRTUAL;
+                            break;
+                        case 3:
+                            type = INVOKESPECIAL;
+                            break;
+                    }
 
-                        if (!lookups.containsKey(hash))
-                            return;
+                    if (!lookups.containsKey(hash))
+                        return;
 
-                        /*
-                        Interface check for runnable deobf? maybe
-                         */
-                        String[] info = lookups.get(hash)[position];
-                        methodNode.instructions.set(node,
-                                new MethodInsnNode(
-                                        type,
-                                        info[0].replace('.', '/'),
-                                        info[1],
-                                        node.desc,
-                                        false
-                                ));
-                    });
-        }));
+                    /*
+                    Interface check for runnable deobf? maybe
+                     */
+                    String[] info = lookups.get(hash)[position];
+                    methodNode.instructions.set(node,
+                            new MethodInsnNode(
+                                    type,
+                                    info[0].replace('.', '/'),
+                                    info[1],
+                                    node.desc,
+                                    false
+                            ));
+                })));
 
         lookups.clear();
-        deobfuscator.getClasses().remove(bootstrapClassName);
-        deobfuscator.getClasses().remove(bootstrapClassName.substring(0, bootstrapClassName.indexOf('⛔') + 1));
-        deobfuscator.getClasses().remove(bootstrapClassName.substring(0, bootstrapClassName.lastIndexOf('/') + 1) + "Dispatcher️");
+        deobfuscator.getClasses().remove(bootstrapClass.name);
+        deobfuscator.getClasses().remove(bootstrapClass.name.substring(0, bootstrapClass.name.indexOf('⛔') + 1));
+        deobfuscator.getClasses().remove(bootstrapClass.name.substring(0, bootstrapClass.name.lastIndexOf('/') + 1) + "Dispatcher️");
     }
 
     private void decode(byte[] byArray) {
@@ -114,5 +111,12 @@ public class ParamorphismInvokeDynamicTransformer extends Transformer {
                 stringArrayArray[j] = new String[]{string, string2};
             }
         }
+    }
+
+    private ClassNode searchForBootstrapClass(Deobfuscator deobfuscator) {
+        return deobfuscator.classes().stream()
+                .filter(classNode -> classNode.name.endsWith("⛔$0"))
+                .findFirst()
+                .orElseThrow();
     }
 }

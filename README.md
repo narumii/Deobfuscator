@@ -15,6 +15,7 @@
 - [Monsey](https://github.com/Hippo/Mosey) `You need to fix asm (JumpRange) also ConfusingSwitch doesn't work (in monsey)`
 - [(Skid)qProtect (Latest, b3.0, b31)](https://mdma.dev/) `Shit obf`
 - [Scuti](https://github.com/netindev/scuti)
+- [CheatBreaker](https://github.com/CheatBreaker/Obf)
 
 ### In Future Supported Obfuscators (maybe)
 - [Radon](https://github.com/ItzSomebody/radon)

@@ -9,23 +9,23 @@ import java.util.List;
 
 public class ParamorphismTransformer extends ComposedTransformer {
 
-    private final String invokeDynamicClass;
+    /*private final String invokeDynamicClass;
     private final String[] stringObfuscationClasses;
 
     public ParamorphismTransformer(String invokeDynamicClass, String... stringObfuscationClasses) {
         this.invokeDynamicClass = invokeDynamicClass;
         this.stringObfuscationClasses = stringObfuscationClasses;
-    }
+    }*/
 
     @Override
     public List<Transformer> transformers() {
         return Arrays.asList(
                 new ParamorphismPackerTransformer(),
                 new ParamorphismStringTransformer(
-                        stringObfuscationClasses
+                        //stringObfuscationClasses
                 ),
                 new ParamorphismInvokeDynamicTransformer(
-                        invokeDynamicClass
+                        // invokeDynamicClass
                 ),
                 new ParamorphismFlowTransformer(),
                 new ParamorphismKurwaNaChujTaKlasaRemoveTransformer()

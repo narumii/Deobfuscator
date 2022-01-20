@@ -38,6 +38,9 @@ public class ASMHelper implements Opcodes {
     }
 
     public static boolean isLong(AbstractInsnNode node) {
+        if (node == null)
+            return false;
+
         int opcode = node.getOpcode();
         return (opcode == LCONST_0
                 || opcode == LCONST_1
@@ -322,5 +325,12 @@ public class ASMHelper implements Opcodes {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static MethodNode copyMethod(MethodNode methodNode) {
+        MethodNode copyMethod = new MethodNode(methodNode.access, methodNode.name, methodNode.desc, methodNode.signature, methodNode.exceptions.toArray(new String[0]));
+        methodNode.accept(copyMethod);
+
+        return copyMethod;
     }
 }

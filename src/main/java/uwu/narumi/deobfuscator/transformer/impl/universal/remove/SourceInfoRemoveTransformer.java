@@ -10,6 +10,7 @@ public class SourceInfoRemoveTransformer extends Transformer {
         deobfuscator.classes().forEach(classNode -> {
             classNode.sourceFile = null;
             classNode.sourceDebug = null;
+            classNode.outerClass = null;
         });
     }
 }

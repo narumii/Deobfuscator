@@ -9,11 +9,10 @@ import uwu.narumi.deobfuscator.transformer.impl.universal.other.UniversalNumberT
 
 public class BinsecureNumberTransformer extends Transformer {
 
-    private static final UniversalNumberTransformer transformer = new UniversalNumberTransformer();
 
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
-        transformer.transform(deobfuscator);
+        new UniversalNumberTransformer().transform(deobfuscator);
 
         deobfuscator.classes().stream()
                 .flatMap(classNode -> classNode.methods.stream())
@@ -23,7 +22,7 @@ public class BinsecureNumberTransformer extends Transformer {
                         modified = false;
 
                         for (AbstractInsnNode node : methodNode.instructions.toArray()) {
-                            if (isLong(node) && node.getNext().getOpcode() == L2I && isInteger(node.getNext().getNext())) {
+                            if (isLong(node) && node.getNext().getOpcode() == L2I) {
                                 methodNode.instructions.remove(node.getNext());
                                 methodNode.instructions.set(node, getNumber((int) getLong(node)));
                                 modified = true;
@@ -121,6 +120,6 @@ public class BinsecureNumberTransformer extends Transformer {
                     } while (modified);
                 });
 
-        transformer.transform(deobfuscator);
+        new UniversalNumberTransformer().transform(deobfuscator);
     }
 }

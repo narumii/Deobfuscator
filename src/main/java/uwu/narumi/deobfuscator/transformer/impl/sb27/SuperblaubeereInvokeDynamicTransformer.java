@@ -56,6 +56,7 @@ public class SuperblaubeereInvokeDynamicTransformer extends Transformer {
                     .filter(node -> node instanceof InvokeDynamicInsnNode)
                     .map(InvokeDynamicInsnNode.class::cast)
                     .filter(node -> MathHelper.INTEGER_PATTERN.matcher(node.name).matches())
+                    .filter(node -> callInfos.containsKey(Integer.parseInt(node.name)))
                     .forEach(node -> {
                         String[] parts = callInfos.get(Integer.parseInt(node.name)).split(":");
 

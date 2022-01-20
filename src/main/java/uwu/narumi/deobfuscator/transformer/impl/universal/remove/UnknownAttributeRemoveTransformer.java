@@ -9,21 +9,9 @@ public class UnknownAttributeRemoveTransformer extends Transformer {
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
         deobfuscator.classes().forEach(classNode -> {
-            if (classNode.attrs != null) {
-                classNode.attrs.removeIf(Attribute::isUnknown);
-            }
-
-            classNode.methods.forEach(methodNode -> {
-                if (methodNode.attrs != null) {
-                    methodNode.attrs.removeIf(Attribute::isUnknown);
-                }
-            });
-
-            classNode.fields.forEach(fieldNode -> {
-                if (fieldNode.attrs != null) {
-                    fieldNode.attrs.removeIf(Attribute::isUnknown);
-                }
-            });
+            classNode.attrs.removeIf(Attribute::isUnknown);
+            classNode.methods.forEach(methodNode -> methodNode.attrs.removeIf(Attribute::isUnknown));
+            classNode.fields.forEach(fieldNode -> fieldNode.attrs.removeIf(Attribute::isUnknown));
         });
     }
 }

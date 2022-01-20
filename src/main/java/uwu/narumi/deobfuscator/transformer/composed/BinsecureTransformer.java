@@ -13,13 +13,13 @@ import java.util.List;
 
 public class BinsecureTransformer extends ComposedTransformer {
 
-    private final String stringKeysClassName;
-    private final String stringMapClassName;
+    //private final String stringKeysClassName;
+    //private final String stringMapClassName;
     private final boolean useStackAnalyzer;
 
-    public BinsecureTransformer(String stringKeysClassName, String stringMapClassName, boolean useStackAnalyzer) {
-        this.stringKeysClassName = stringKeysClassName;
-        this.stringMapClassName = stringMapClassName;
+    public BinsecureTransformer(/*String stringKeysClassName, String stringMapClassName, */boolean useStackAnalyzer) {
+        //this.stringKeysClassName = stringKeysClassName;
+        //this.stringMapClassName = stringMapClassName;
         this.useStackAnalyzer = useStackAnalyzer;
     }
 
@@ -30,7 +30,7 @@ public class BinsecureTransformer extends ComposedTransformer {
                 new BinsecureNumberTransformer(),
                 new BinsecureInvokeDynamicFieldTransformer(),
                 new BinsecureInvokeDynamicCallTransformer(),
-                new BinsecureStringTransformer(stringKeysClassName, stringMapClassName, useStackAnalyzer),
+                new BinsecureStringTransformer(/*stringKeysClassName, stringMapClassName,*/ useStackAnalyzer),
                 new SemiBinsecureFlowTransformer(),
                 new BinsecureNumberTransformer(),
                 new BinsecureCrasherRemoveTransformer(),

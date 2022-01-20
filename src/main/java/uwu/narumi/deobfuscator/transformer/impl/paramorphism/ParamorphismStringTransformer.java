@@ -5,42 +5,48 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import uwu.narumi.deobfuscator.Deobfuscator;
-import uwu.narumi.deobfuscator.exception.TransformerException;
 import uwu.narumi.deobfuscator.sandbox.Clazz;
 import uwu.narumi.deobfuscator.sandbox.SandBox;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /*
     I think we can do this without execution
  */
 public class ParamorphismStringTransformer extends Transformer {
 
-    private final Set<String> classesToLoad;
+    //private final Set<String> classesToLoad;
 
-    public ParamorphismStringTransformer(String... classesToLoad) {
+    /*public ParamorphismStringTransformer(String... classesToLoad) {
         this.classesToLoad = new HashSet<>(Arrays.asList(classesToLoad));
-    }
+    }*/
 
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
-        List<ClassNode> toLoad = new ArrayList<>();
+        /*List<ClassNode> toLoad = new ArrayList<>();
         for (String className : classesToLoad) {
             ClassNode classNode = deobfuscator.getOriginalClasses().get(className);
             if (classNode == null)
                 throw new TransformerException("Class not found: " + className);
 
             toLoad.add(classNode);
-        }
+        }*/
+        ClassNode dispatcher = searchForDispatcherClass(deobfuscator);
+        List<ClassNode> toLoad = searchForStringClasses(deobfuscator);
+        if (toLoad.isEmpty() || dispatcher == null)
+            return;
+
+        Set<String> names = toLoad.stream().map(classNode -> classNode.name).collect(Collectors.toSet());
+
         SandBox sandBox = SandBox.getInstance();
+        sandBox.put(dispatcher);
         sandBox.put(toLoad.toArray(new ClassNode[0]));
 
-        System.out.println(sandBox.get("/s/Dispatcher").getClazz().getName());
-
         deobfuscator.classes().stream()
-                .filter(classNode -> !classesToLoad.contains(classNode.name))
+                .filter(classNode -> !names.contains(classNode.name))
                 .forEach(classNode -> {
                     ClassNode execution = new ClassNode();
                     execution.visit(classNode.version, ACC_PUBLIC, classNode.name, null, "java/lang/Object", null);
@@ -64,9 +70,8 @@ public class ParamorphismStringTransformer extends Transformer {
                     //deobfuscator.getClasses().put(execution.name, execution);
                 });
 
-
         deobfuscator.classes().stream()
-                .filter(classNode -> !classesToLoad.contains(classNode.name))
+                .filter(classNode -> !names.contains(classNode.name))
                 .forEach(classNode -> {
                     Clazz clazz = sandBox.get(classNode.name);
                     if (clazz == null)
@@ -75,7 +80,8 @@ public class ParamorphismStringTransformer extends Transformer {
                     Clazz finalClazz = clazz;
                     try {
                         finalClazz = new Clazz(clazz.getClazz().newInstance().getClass());
-                    } catch (Exception ignored) {
+                    } catch (Throwable ignored) {
+                        //ignored.printStackTrace();
                     }
 
                     Clazz finalClazz1 = finalClazz;
@@ -104,9 +110,9 @@ public class ParamorphismStringTransformer extends Transformer {
                     });
                 });
 
-        deobfuscator.getClasses().keySet().removeIf(classesToLoad::contains);
+        deobfuscator.getClasses().keySet().removeIf(names::contains);
         toLoad.clear();
-        classesToLoad.clear();
+        names.clear();
     }
 
     private void visitConstructor(ClassNode classNode) {
@@ -208,5 +214,18 @@ public class ParamorphismStringTransformer extends Transformer {
         methodVisitor.visitInsn(RETURN);
 
         methodVisitor.visitEnd();
+    }
+
+    private ClassNode searchForDispatcherClass(Deobfuscator deobfuscator) {
+        return deobfuscator.classes().stream()
+                .filter(classNode -> classNode.name.endsWith("Dispatcher"))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    private List<ClassNode> searchForStringClasses(Deobfuscator deobfuscator) {
+        return deobfuscator.classes().stream()
+                .filter(classNode -> classNode.methods.stream().anyMatch(methodNode -> methodNode.name.equals("$") && methodNode.desc.equals("([BLjava/util/Map;)V")))
+                .collect(Collectors.toList());
     }
 }

@@ -1,8 +1,6 @@
 package uwu.narumi.deobfuscator.transformer.impl.universal.other;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.*;
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.helper.MathHelper;
 import uwu.narumi.deobfuscator.transformer.Transformer;
@@ -11,12 +9,10 @@ public class UniversalNumberTransformer extends Transformer {
 
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
-        deobfuscator.classes().stream()
-                .flatMap(classNode -> classNode.methods.stream())
-                .forEach(this::transform);
+        deobfuscator.classes().forEach(classNode -> classNode.methods.forEach(methodNode -> transform(classNode, methodNode)));
     }
 
-    public void transform(MethodNode methodNode) {
+    public void transform(ClassNode classNode, MethodNode methodNode) {
         boolean modified;
         do {
             modified = false;
@@ -68,8 +64,34 @@ public class UniversalNumberTransformer extends Transformer {
                             modified = true;
                         }
                     }
+                } else if (isLong(node) && isLong(node.getNext()) && node.getNext().getNext().getOpcode() == LCMP) {
+                    int result = Long.compare(getLong(node), getLong(node.getNext()));
+
+                    methodNode.instructions.remove(node.getNext().getNext());
+                    methodNode.instructions.remove(node.getNext());
+
+                    methodNode.instructions.set(node, getNumber(result));
+                } else if (
+                        node instanceof FieldInsnNode && ((FieldInsnNode) node).desc.equals("J") && node.getOpcode() == GETSTATIC
+                                && isLong(node.getNext()) && node.getNext().getNext().getOpcode() == LCMP) {
+
+                    int result = Long.compare(getFieldValue(classNode, ((FieldInsnNode) node).name), getLong(node.getNext()));
+
+                    methodNode.instructions.remove(node.getNext().getNext());
+                    methodNode.instructions.remove(node.getNext());
+
+                    methodNode.instructions.set(node, getNumber(result));
                 }
             }
         } while (modified);
+    }
+
+    private long getFieldValue(ClassNode classNode, String name) {
+        return classNode.fields.stream()
+                .filter(fieldNode -> fieldNode.name.equals(name))
+                .filter(fieldNode -> fieldNode.value != null)
+                .map(fieldNode -> (long) fieldNode.value)
+                .findFirst()
+                .orElse(0L);
     }
 }

@@ -72,10 +72,13 @@ public class SuperblaubeereFlowTransformer extends Transformer {
                             Boolean result = resolveJump(jump);
                             if (result != null) {
                                 if (result) {
-                                    //TODO
-                                } else {
+                                    if (isDoubleIf(jump)) {
+                                        methodNode.instructions.remove(node.getPrevious().getPrevious());
+                                    }
 
-                                    //TODO: Some sort of checks lol
+                                    methodNode.instructions.remove(node.getPrevious());
+                                    methodNode.instructions.remove(node);
+                                } else {
                                     if (isDoubleIf(jump)) {
                                         methodNode.instructions.remove(node.getPrevious().getPrevious());
                                         methodNode.instructions.remove(node.getPrevious());
@@ -83,17 +86,21 @@ public class SuperblaubeereFlowTransformer extends Transformer {
                                         methodNode.instructions.remove(node.getPrevious());
                                     }
 
-                                    if (jump.getNext().getOpcode() == ACONST_NULL) {
-                                        methodNode.instructions.remove(node.getNext().getNext());
-                                        methodNode.instructions.remove(node.getNext());
-                                    } else if (jump.getNext().getOpcode() == RETURN) {
-                                        methodNode.instructions.remove(node.getNext());
-                                    } else if (jump.getNext().getNext().getOpcode() >= IRETURN && jump.getNext().getNext().getOpcode() <= ARETURN) {
-                                        methodNode.instructions.remove(node.getNext().getNext());
-                                        methodNode.instructions.remove(node.getNext());
-                                    }
+                                    if (methodNode.instructions.indexOf(jump) > methodNode.instructions.indexOf(jump.label)) {
+                                        methodNode.instructions.remove(jump);
+                                    } else {
+                                        if (jump.getNext().getOpcode() == ACONST_NULL) {
+                                            methodNode.instructions.remove(node.getNext().getNext());
+                                            methodNode.instructions.remove(node.getNext());
+                                        } else if (jump.getNext().getOpcode() == RETURN) {
+                                            methodNode.instructions.remove(node.getNext());
+                                        } else if (jump.getNext().getNext().getOpcode() >= IRETURN && jump.getNext().getNext().getOpcode() <= ARETURN) {
+                                            methodNode.instructions.remove(node.getNext().getNext());
+                                            methodNode.instructions.remove(node.getNext());
+                                        }
 
-                                    methodNode.instructions.set(node, new JumpInsnNode(GOTO, labelNode));
+                                        methodNode.instructions.set(node, new JumpInsnNode(GOTO, labelNode));
+                                    }
                                     modified = true;
                                 }
                             }
