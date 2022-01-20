@@ -8,7 +8,7 @@ import uwu.narumi.deobfuscator.transformer.Transformer;
 
 import java.util.*;
 
-//I think i've seen this shit before, but where?
+//I think i've seen this shit before, but where? (also idk if it's original qprotect)
 public class qProtectNumberPoolTransformer extends Transformer {
 
     @Override
