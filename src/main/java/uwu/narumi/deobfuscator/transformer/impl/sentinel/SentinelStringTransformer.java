@@ -4,7 +4,6 @@ import org.objectweb.asm.tree.*;
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 
 /**
@@ -59,7 +58,7 @@ public class SentinelStringTransformer extends Transformer {
 
     }
 
-    public String decrypt(java.lang.String string) {
+    public String decrypt(String string) {
         char[] cArray = new char[string.length()];
         int n = 0;
         while (n < string.length()) {
@@ -67,6 +66,6 @@ public class SentinelStringTransformer extends Transformer {
             cArray[n] = (char) (c / 2);
             ++n;
         }
-        return new java.lang.String(cArray);
+        return new String(cArray);
     }
 }
