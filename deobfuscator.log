@@ -1,0 +1,82 @@
+[16:48:15] [main/WARN] - Output file already exist, data will be overwritten
+[16:48:15] [main/ERROR] - SecurityManager is disabled due to deobfuscation errors, transformers that using SandBox can be exploited
+[16:48:15] [main/INFO] - Loading input file: ..\jd-gui-1.6.6.manipulated.jar
+[16:48:15] [main/ERROR] - Could not load class: org/fife/ui/rsyntaxtextarea/modes/GroovyTokenMaker.class, adding as file
+[16:48:15] [main/DEBUG] - Error
+me.coley.cafedude.InvalidClassException: me.coley.cafedude.InvalidClassException: Unknown constant-pool tag: 30
+	at me.coley.cafedude.io.ClassFileReader.read(ClassFileReader.java:110) ~[CAFED00D-1.7.3.jar:?]
+	at uwu.narumi.deobfuscator.helper.ClassHelper.fixClass(ClassHelper.java:45) ~[classes/:?]
+	at uwu.narumi.deobfuscator.helper.ClassHelper.loadClass(ClassHelper.java:37) ~[classes/:?]
+	at uwu.narumi.deobfuscator.helper.ClassHelper.loadClass(ClassHelper.java:27) ~[classes/:?]
+	at uwu.narumi.deobfuscator.Deobfuscator.lambda$loadInput$0(Deobfuscator.java:84) ~[classes/:?]
+	at java.util.HashMap.forEach(HashMap.java:1337) [?:?]
+	at uwu.narumi.deobfuscator.Deobfuscator.loadInput(Deobfuscator.java:81) [classes/:?]
+	at uwu.narumi.deobfuscator.Deobfuscator.start(Deobfuscator.java:66) [classes/:?]
+	at Loader.main(Loader.java:23) [classes/:?]
+Caused by: me.coley.cafedude.InvalidClassException: Unknown constant-pool tag: 30
+	at me.coley.cafedude.io.ClassFileReader.readPoolEntry(ClassFileReader.java:160) ~[CAFED00D-1.7.3.jar:?]
+	at me.coley.cafedude.io.ClassFileReader.read(ClassFileReader.java:78) ~[CAFED00D-1.7.3.jar:?]
+	... 8 more
+[16:48:15] [main/ERROR] - Could not load class: org/fife/ui/rsyntaxtextarea/modes/JavaTokenMaker.class, adding as file
+[16:48:15] [main/DEBUG] - Error
+me.coley.cafedude.InvalidClassException: me.coley.cafedude.InvalidClassException: Unknown constant-pool tag: 42
+	at me.coley.cafedude.io.ClassFileReader.read(ClassFileReader.java:110) ~[CAFED00D-1.7.3.jar:?]
+	at uwu.narumi.deobfuscator.helper.ClassHelper.fixClass(ClassHelper.java:45) ~[classes/:?]
+	at uwu.narumi.deobfuscator.helper.ClassHelper.loadClass(ClassHelper.java:37) ~[classes/:?]
+	at uwu.narumi.deobfuscator.helper.ClassHelper.loadClass(ClassHelper.java:27) ~[classes/:?]
+	at uwu.narumi.deobfuscator.Deobfuscator.lambda$loadInput$0(Deobfuscator.java:84) ~[classes/:?]
+	at java.util.HashMap.forEach(HashMap.java:1337) [?:?]
+	at uwu.narumi.deobfuscator.Deobfuscator.loadInput(Deobfuscator.java:81) [classes/:?]
+	at uwu.narumi.deobfuscator.Deobfuscator.start(Deobfuscator.java:66) [classes/:?]
+	at Loader.main(Loader.java:23) [classes/:?]
+Caused by: me.coley.cafedude.InvalidClassException: Unknown constant-pool tag: 42
+	at me.coley.cafedude.io.ClassFileReader.readPoolEntry(ClassFileReader.java:160) ~[CAFED00D-1.7.3.jar:?]
+	at me.coley.cafedude.io.ClassFileReader.read(ClassFileReader.java:78) ~[CAFED00D-1.7.3.jar:?]
+	... 8 more
+[16:48:15] [main/ERROR] - Could not load class: org/fife/ui/rsyntaxtextarea/modes/PHPTokenMaker.class, adding as file
+[16:48:15] [main/DEBUG] - Error
+me.coley.cafedude.InvalidClassException: me.coley.cafedude.InvalidClassException: Unknown constant-pool tag: 110
+	at me.coley.cafedude.io.ClassFileReader.read(ClassFileReader.java:110) ~[CAFED00D-1.7.3.jar:?]
+	at uwu.narumi.deobfuscator.helper.ClassHelper.fixClass(ClassHelper.java:45) ~[classes/:?]
+	at uwu.narumi.deobfuscator.helper.ClassHelper.loadClass(ClassHelper.java:37) ~[classes/:?]
+	at uwu.narumi.deobfuscator.helper.ClassHelper.loadClass(ClassHelper.java:27) ~[classes/:?]
+	at uwu.narumi.deobfuscator.Deobfuscator.lambda$loadInput$0(Deobfuscator.java:84) ~[classes/:?]
+	at java.util.HashMap.forEach(HashMap.java:1337) [?:?]
+	at uwu.narumi.deobfuscator.Deobfuscator.loadInput(Deobfuscator.java:81) [classes/:?]
+	at uwu.narumi.deobfuscator.Deobfuscator.start(Deobfuscator.java:66) [classes/:?]
+	at Loader.main(Loader.java:23) [classes/:?]
+Caused by: me.coley.cafedude.InvalidClassException: Unknown constant-pool tag: 110
+	at me.coley.cafedude.io.ClassFileReader.readPoolEntry(ClassFileReader.java:160) ~[CAFED00D-1.7.3.jar:?]
+	at me.coley.cafedude.io.ClassFileReader.read(ClassFileReader.java:78) ~[CAFED00D-1.7.3.jar:?]
+	... 8 more
+[16:48:16] [main/ERROR] - Could not load class: org/fife/ui/rsyntaxtextarea/modes/JSPTokenMaker.class, adding as file
+[16:48:16] [main/DEBUG] - Error
+me.coley.cafedude.InvalidClassException: me.coley.cafedude.InvalidClassException: java.io.UTFDataFormatException: malformed input: partial character at end
+	at me.coley.cafedude.io.ClassFileReader.read(ClassFileReader.java:110) ~[CAFED00D-1.7.3.jar:?]
+	at uwu.narumi.deobfuscator.helper.ClassHelper.fixClass(ClassHelper.java:45) ~[classes/:?]
+	at uwu.narumi.deobfuscator.helper.ClassHelper.loadClass(ClassHelper.java:37) ~[classes/:?]
+	at uwu.narumi.deobfuscator.helper.ClassHelper.loadClass(ClassHelper.java:27) ~[classes/:?]
+	at uwu.narumi.deobfuscator.Deobfuscator.lambda$loadInput$0(Deobfuscator.java:84) ~[classes/:?]
+	at java.util.HashMap.forEach(HashMap.java:1337) [?:?]
+	at uwu.narumi.deobfuscator.Deobfuscator.loadInput(Deobfuscator.java:81) [classes/:?]
+	at uwu.narumi.deobfuscator.Deobfuscator.start(Deobfuscator.java:66) [classes/:?]
+	at Loader.main(Loader.java:23) [classes/:?]
+Caused by: me.coley.cafedude.InvalidClassException: java.io.UTFDataFormatException: malformed input: partial character at end
+	at me.coley.cafedude.io.ClassFileReader.read(ClassFileReader.java:106) ~[CAFED00D-1.7.3.jar:?]
+	... 8 more
+Caused by: java.io.UTFDataFormatException: malformed input: partial character at end
+	at java.io.DataInputStream.readUTF(DataInputStream.java:635) ~[?:?]
+	at java.io.DataInputStream.readUTF(DataInputStream.java:569) ~[?:?]
+	at me.coley.cafedude.io.ClassFileReader.readPoolEntry(ClassFileReader.java:126) ~[CAFED00D-1.7.3.jar:?]
+	at me.coley.cafedude.io.ClassFileReader.read(ClassFileReader.java:78) ~[CAFED00D-1.7.3.jar:?]
+	... 8 more
+[16:48:16] [main/INFO] - Loaded input file: ..\jd-gui-1.6.6.manipulated.jar
+
+[16:48:16] [main/INFO] - -------------------------------------
+[16:48:16] [main/INFO] - Running SentinelStringTransformer transformer
+[16:48:16] [main/INFO] - Ended SentinelStringTransformer transformer in 78 ms
+[16:48:16] [main/INFO] - -------------------------------------
+
+[16:48:16] [main/INFO] - Saving output file: ..\jd-gui-1.6.6.manipulated-deobf.jar
+[16:48:16] [main/INFO] - Saved output file: ..\jd-gui-1.6.6.manipulated-deobf.jar
+
