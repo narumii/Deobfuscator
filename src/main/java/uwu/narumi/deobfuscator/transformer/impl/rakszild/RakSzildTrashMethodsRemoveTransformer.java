@@ -7,7 +7,7 @@ import uwu.narumi.deobfuscator.transformer.Transformer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrashMethodsRemoveTransformer extends Transformer {
+public class RakSzildTrashMethodsRemoveTransformer extends Transformer {
 
     /*
     Moj stary po piwie zrobilby lepszy transformer "trash methods"

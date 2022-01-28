@@ -8,20 +8,20 @@ import uwu.narumi.deobfuscator.transformer.Transformer;
 
 import java.util.*;
 
-public class StaticArrayLongPoolTransformer extends Transformer {
+public class HP888StaticArrayIntegerPoolTransformer extends Transformer {
 
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
         deobfuscator.classes().forEach(classNode -> {
             List<MethodNode> toRemove = new ArrayList<>();
-            Map<Integer, Long> numbers = new HashMap<>();
+            Map<Integer, Integer> numbers = new HashMap<>();
 
             findClInit(classNode).ifPresent(methodNode -> Arrays.stream(methodNode.instructions.toArray())
                     .filter(node -> node.getOpcode() == PUTSTATIC)
                     //.filter(node -> node.getNext().getOpcode() == GETSTATIC)
                     //.filter(node -> node.getPrevious().getOpcode() == NEWARRAY)
                     .map(FieldInsnNode.class::cast)
-                    .filter(node -> node.desc.equals("[J"))
+                    .filter(node -> node.desc.equals("[I"))
                     .findFirst().ifPresent(node -> classNode.fields.stream().filter(field -> field.desc.equals(node.desc)).filter(field -> field.name.equals(node.name)).findFirst().ifPresent(field -> {
                         field.value = REMOVEABLE;
 
@@ -29,12 +29,12 @@ public class StaticArrayLongPoolTransformer extends Transformer {
                         Arrays.stream(methodNode.instructions.toArray())
                                 .filter(insn -> insn.getOpcode() == GETSTATIC)
                                 .filter(insn -> isInteger(insn.getNext()))
-                                .filter(insn -> isLong(insn.getNext().getNext()))
-                                .filter(insn -> insn.getNext().getNext().getNext().getOpcode() == LASTORE)
+                                .filter(insn -> isInteger(insn.getNext().getNext()))
+                                .filter(insn -> insn.getNext().getNext().getNext().getOpcode() == IASTORE)
                                 .map(FieldInsnNode.class::cast)
                                 .filter(insn -> insn.name.equals(field.name) && insn.desc.equals(field.desc))
                                 .forEach(insn -> {
-                                    numbers.put(getInteger(insn.getNext()), getLong(insn.getNext().getNext()));
+                                    numbers.put(getInteger(insn.getNext()), getInteger(insn.getNext().getNext()));
 
                                     methodNode.instructions.remove(insn.getNext().getNext().getNext());
                                     methodNode.instructions.remove(insn.getNext().getNext());
@@ -49,7 +49,7 @@ public class StaticArrayLongPoolTransformer extends Transformer {
             classNode.methods.forEach(methodNode -> Arrays.stream(methodNode.instructions.toArray())
                     .filter(node -> node.getOpcode() == GETSTATIC)
                     .filter(node -> isInteger(node.getNext()))
-                    .filter(node -> node.getNext().getNext().getOpcode() == LALOAD)
+                    .filter(node -> node.getNext().getNext().getOpcode() == IALOAD)
                     .map(FieldInsnNode.class::cast)
                     .forEach(node -> classNode.fields.stream()
                             .filter(field -> field.value instanceof Removeable)
@@ -71,7 +71,7 @@ public class StaticArrayLongPoolTransformer extends Transformer {
                     .forEach(node -> clinit.instructions.remove(node)));
 
             classNode.methods.removeAll(toRemove);
-            classNode.fields.removeIf(fieldNode -> fieldNode.desc.equals("[J") && fieldNode.value instanceof Removeable);
+            classNode.fields.removeIf(fieldNode -> fieldNode.desc.equals("[I") && fieldNode.value instanceof Removeable);
             toRemove.clear();
             numbers.clear();
         });

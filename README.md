@@ -8,6 +8,7 @@
 ---
 
 ### Supported Obfuscators
+
 - [superblaubeere27 / JObf / sb27](https://github.com/superblaubeere27/obfuscator)
 - [Paramorphism 2.1.2_9](https://paramorphism.dev/) `not worth your money`
 - [Caesium](https://github.com/sim0n/Caesium)
@@ -18,6 +19,7 @@
 - [CheatBreaker](https://github.com/CheatBreaker/Obf)
 
 ### In Future Supported Obfuscators (maybe)
+
 - [Radon](https://github.com/ItzSomebody/radon)
 - [Skidfuscator](https://github.com/terminalsin/skidfuscator-java-obfuscator)
 - [Bozar](https://github.com/vimasig/Bozar)
@@ -25,6 +27,7 @@
 ---
 
 ### SandBox doesn't work
+
 > Just add `-noverify` to jvm arguments if still doesn't work then open issue
 
 ![](https://i.imgur.com/UFxiUPZ.png)

@@ -3,7 +3,7 @@ package uwu.narumi.deobfuscator.transformer.composed;
 import uwu.narumi.deobfuscator.transformer.ComposedTransformer;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 import uwu.narumi.deobfuscator.transformer.impl.binsecure.BinsecureNumberTransformer;
-import uwu.narumi.deobfuscator.transformer.impl.binsecure.SemiBinsecureFlowTransformer;
+import uwu.narumi.deobfuscator.transformer.impl.binsecure.BinsecureSemiFlowTransformer;
 import uwu.narumi.deobfuscator.transformer.impl.binsecure.latest.*;
 import uwu.narumi.deobfuscator.transformer.impl.monsey.MonseyFakeTryCatchTransformer;
 import uwu.narumi.deobfuscator.transformer.impl.universal.remove.TryCatchRemoveTransformer;
@@ -26,12 +26,12 @@ public class BinsecureTransformer extends ComposedTransformer {
     @Override
     public List<Transformer> transformers() {
         return Arrays.asList(
-                new SemiBinsecureMbaTransformer(),
+                new BinsecureSemiMbaTransformer(),
                 new BinsecureNumberTransformer(),
                 new BinsecureInvokeDynamicFieldTransformer(),
                 new BinsecureInvokeDynamicCallTransformer(),
                 new BinsecureStringTransformer(/*stringKeysClassName, stringMapClassName,*/ useStackAnalyzer),
-                new SemiBinsecureFlowTransformer(),
+                new BinsecureSemiFlowTransformer(),
                 new BinsecureNumberTransformer(),
                 new BinsecureCrasherRemoveTransformer(),
                 new MonseyFakeTryCatchTransformer(),

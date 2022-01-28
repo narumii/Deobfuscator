@@ -22,17 +22,17 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @see uwu.narumi.deobfuscator.transformer.impl.binsecure.latest.BinsecureStringTransformer
  */
 @Deprecated
-public class OldBinsecureStringTransformer extends Transformer {
+public class BinsecureOldStringTransformer extends Transformer {
 
     private final String decryptClassName;
     private final String mapClassName;
     private final String decryptMethodName;
 
-    public OldBinsecureStringTransformer() {
+    public BinsecureOldStringTransformer() {
         this("a0", "ac", "0");
     }
 
-    public OldBinsecureStringTransformer(String decryptClassName, String mapClassName, String decryptMethodName) {
+    public BinsecureOldStringTransformer(String decryptClassName, String mapClassName, String decryptMethodName) {
         this.decryptClassName = decryptClassName;
         this.mapClassName = mapClassName;
         this.decryptMethodName = decryptMethodName;

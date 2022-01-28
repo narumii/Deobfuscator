@@ -12,7 +12,7 @@ import uwu.narumi.deobfuscator.transformer.Transformer;
     TODO: Find a better way to fix this shit
     TODO: hwfuihwuifhwauihdawoid
  */
-public class SemiBinsecureMbaTransformer extends Transformer implements InstructionOpcodes {
+public class BinsecureSemiMbaTransformer extends Transformer implements InstructionOpcodes {
 
     private static final InstructionMatcher[] arithmeticSubstitutionInstructionMatchers = {
             //-------------------------------------- Fixes

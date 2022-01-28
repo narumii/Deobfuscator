@@ -1,4 +1,4 @@
-package uwu.narumi.deobfuscator.transformer.impl.sb27;
+package uwu.narumi.deobfuscator.transformer.impl.radon;
 
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
@@ -12,7 +12,7 @@ import java.util.*;
 /*
     TODO: Cast/Size checks etc
  */
-public class SuperblaubeereStringPoolTransformer extends Transformer {
+public class RadonStringPoolTransformer extends Transformer {
 
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
@@ -30,23 +30,20 @@ public class SuperblaubeereStringPoolTransformer extends Transformer {
                             //.filter(node -> node.getPrevious().getOpcode() == ANEWARRAY)
                             .map(FieldInsnNode.class::cast)
                             .filter(node -> node.desc.equals("[Ljava/lang/String;"))
-                            .findFirst().ifPresent(node -> classNode.fields.stream().filter(field -> field.desc.equals(node.desc)).filter(field -> field.name.equals(node.name)).findFirst().ifPresent(field -> {
+                            .findFirst().flatMap(node -> classNode.fields.stream().filter(field -> field.desc.equals(node.desc)).filter(field -> field.name.equals(node.name)).findFirst()).ifPresent(field -> {
                                 int size = strings.size();
                                 //TODO: Optimize this as fuck
                                 Arrays.stream(methodNode.instructions.toArray())
-                                        .filter(insn -> insn.getOpcode() == GETSTATIC)
-                                        .filter(insn -> isInteger(insn.getNext()))
-                                        .filter(insn -> isString(insn.getNext().getNext()))
-                                        .filter(insn -> insn.getNext().getNext().getNext().getOpcode() == AASTORE)
-                                        .map(FieldInsnNode.class::cast)
-                                        .filter(insn -> insn.name.equals(field.name) && insn.desc.equals(field.desc))
-                                        .forEach(insn -> strings.put(getInteger(insn.getNext()), getString(insn.getNext().getNext())));
+                                        .filter(insn -> insn.getOpcode() == AASTORE)
+                                        .filter(insn -> isString(insn.getPrevious()))
+                                        .filter(insn -> isInteger(insn.getPrevious().getPrevious()))
+                                        .forEach(insn -> strings.put(getInteger(insn.getPrevious().getPrevious()), getString(insn.getPrevious())));
 
                                 if (strings.size() != size) {
                                     toRemove.add(methodNode);
                                     field.value = REMOVEABLE;
                                 }
-                            })));
+                            }));
 
 
             classNode.methods.forEach(methodNode -> Arrays.stream(methodNode.instructions.toArray())

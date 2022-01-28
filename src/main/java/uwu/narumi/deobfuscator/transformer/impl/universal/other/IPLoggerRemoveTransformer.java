@@ -1,4 +1,4 @@
-package uwu.narumi.deobfuscator.transformer.impl.impotentgard;
+package uwu.narumi.deobfuscator.transformer.impl.universal.other;
 
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.transformer.Transformer;

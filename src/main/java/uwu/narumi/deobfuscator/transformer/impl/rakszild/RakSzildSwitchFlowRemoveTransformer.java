@@ -6,7 +6,7 @@ import uwu.narumi.deobfuscator.transformer.Transformer;
 
 import java.util.Arrays;
 
-public class SwitchFlowRemoveTransformer extends Transformer {
+public class RakSzildSwitchFlowRemoveTransformer extends Transformer {
 
     /*
     Gdy myslisz ze twoj flow obf jest dobry ale wystarczy wyjebac 2 instrukcje aby znikl XD

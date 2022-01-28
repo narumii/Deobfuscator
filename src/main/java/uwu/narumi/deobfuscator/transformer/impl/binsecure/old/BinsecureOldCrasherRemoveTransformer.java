@@ -7,7 +7,7 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 
-public class OldBinsecureCrasherRemoveTransformer extends Transformer {
+public class BinsecureOldCrasherRemoveTransformer extends Transformer {
 
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
