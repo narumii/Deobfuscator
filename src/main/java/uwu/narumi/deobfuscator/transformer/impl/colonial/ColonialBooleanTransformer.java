@@ -18,7 +18,7 @@ public class ColonialBooleanTransformer extends Transformer {
     public void transform(Deobfuscator deobfuscator) throws Exception {
         deobfuscator.classes()
                 .forEach(classNode ->
-                        classNode.methods.stream().forEach(methodNode ->
+                        classNode.methods.forEach(methodNode ->
                                 Arrays.stream(methodNode.instructions.toArray())
                                         .filter(insnNode -> insnNode instanceof InsnNode)
                                         .forEach(insnNode -> {
@@ -62,6 +62,8 @@ public class ColonialBooleanTransformer extends Transformer {
                                                     }
                                                     break;
                                                 }
+                                                default:
+                                                    break;
                                             }
                                         })));
     }
