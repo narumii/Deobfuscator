@@ -289,13 +289,6 @@ public class ASMHelper implements Opcodes {
         return node != null && predicate.test(node);
     }
 
-    //Idk xd
-    public static boolean check(AbstractInsnNode node, Predicate<AbstractInsnNode>... predicates) {
-        return node != null && Arrays.stream(predicates)
-                .filter(predicate -> predicate.test(node))
-                .count() == predicates.length;
-    }
-
     public static boolean isMethod(AbstractInsnNode node, String owner) {
         return node instanceof MethodInsnNode
                 && ((MethodInsnNode) node).name.equals(owner);
@@ -332,6 +325,16 @@ public class ASMHelper implements Opcodes {
         } catch (Exception e) {
             return null;
         }
+    }
+    // yes
+    public static void massRemove(AbstractInsnNode[] nodes, MethodNode methodNode) {
+    	if(nodes != null && methodNode != null && nodes.length != 0 && methodNode.instructions != null && methodNode.instructions.size() != 0) {
+	    	for(AbstractInsnNode node : nodes) {
+	    		if(node != null) {
+	    			methodNode.instructions.remove(node);
+	    		}
+			}
+    	}
     }
 
     public static MethodNode copyMethod(MethodNode methodNode) {
