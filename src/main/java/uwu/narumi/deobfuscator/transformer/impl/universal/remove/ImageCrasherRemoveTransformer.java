@@ -8,6 +8,6 @@ public class ImageCrasherRemoveTransformer extends Transformer {
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
         deobfuscator.getClasses().entrySet().removeIf(entry -> entry.getKey().contains("<html>"));
-        deobfuscator.getClasses().entrySet().removeIf(entry -> entry.getKey().contains("<html>"));
+        deobfuscator.getFiles().entrySet().removeIf(entry -> entry.getKey().contains("<html>"));
     }
 }
