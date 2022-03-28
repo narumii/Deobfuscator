@@ -1,4 +1,4 @@
-package uwu.narumi.deobfuscator.transformer.impl.colonial.R2;
+package uwu.narumi.deobfuscator.transformer.impl.colonial.r2;
 
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.transformer.Transformer;
