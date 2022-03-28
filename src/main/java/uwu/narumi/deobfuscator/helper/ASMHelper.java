@@ -321,6 +321,12 @@ public class ASMHelper implements Opcodes {
                 && ((MethodInsnNode) node).desc.equals(desc);
     }
 
+    public static boolean isMethodStartWith(AbstractInsnNode node, String owner, String startWith) {
+        return node instanceof MethodInsnNode
+                && ((MethodInsnNode) node).owner.equals(owner)
+                && ((MethodInsnNode) node).name.startsWith(startWith);
+    }
+
     public static Map<AbstractInsnNode, Frame<SourceValue>> analyzeSource(ClassNode classNode, MethodNode methodNode) {
         try {
             Map<AbstractInsnNode, Frame<SourceValue>> frames = new HashMap<>();
