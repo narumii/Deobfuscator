@@ -1,4 +1,4 @@
-package uwu.narumi.deobfuscator.transformer.impl.colonial;
+package uwu.narumi.deobfuscator.transformer.impl.colonial.old;
 
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
