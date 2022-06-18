@@ -29,5 +29,6 @@ public class RefreshTransformer extends Transformer {
 
         deobfuscator.getClasses().clear();
         deobfuscator.getClasses().putAll(newClasses);
+        newClasses.clear(); //idk
     }
 }
