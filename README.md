@@ -4,25 +4,43 @@
 
 ---
 
-> Java version: AdoptJDK 11
+### How to use
+This deobfuscator does not provide any **gui** or **configuration file** because it's meant to run through an **IDE**.\
+To configure deobfuscator for your preferences you need to edit **Loader** class.
+
 ---
 
 ### Supported Obfuscators
 
 - [superblaubeere27 / JObf / sb27](https://github.com/superblaubeere27/obfuscator)
-- [Paramorphism 2.1.2_9](https://paramorphism.dev/) `not worth your money`
+- [Paramorphism 2.1.2_9](https://paramorphism.dev/)
 - [Caesium](https://github.com/sim0n/Caesium)
-- [Binsecure 0.4/Latest](https://binclub.dev/purchasing/) `MBA & Flow needs recode`
-- [Monsey](https://github.com/Hippo/Mosey) `You need to fix asm (JumpRange) also ConfusingSwitch doesn't work (in monsey)`
-- [(Skid)qProtect (Latest, b3.0, b31)](https://mdma.dev/) `Shit obf`
+- [Monsey](https://github.com/Hippo/Mosey)
+- [(Skid)q~~Protect~~ (Not Latest)](https://mdma.dev/)
 - [Scuti](https://github.com/netindev/scuti)
 - [CheatBreaker](https://github.com/CheatBreaker/Obf)
+- [Bozar](https://github.com/vimasig/Bozar)
+- **RakSzild**: Some stupid polish obfuscator used in HackShield
+- **HP888**: Some stupid polish obfuscator v2 used in EyfenCord/SafeMC
+
+### Partially Supported Obfuscators
+- [Binsecure 0.4/Latest](https://binclub.dev/purchasing/)
+- [(Skid)q~~Protect~~](https://mdma.dev/)
+- [Radon](https://github.com/ItzSomebody/radon)
+- Colonial
+- Sentinel
 
 ### In Future Supported Obfuscators (maybe)
-
-- [Radon](https://github.com/ItzSomebody/radon)
 - [Skidfuscator](https://github.com/terminalsin/skidfuscator-java-obfuscator)
-- [Bozar](https://github.com/vimasig/Bozar)
+- [Branchlock](https://branchlock.net/)
+
+---
+
+### Transformers
+> If you know nothing bout deobfuscation use **precomposed** ones\
+> Most of transformers are done without frames so they might not work sometimes
+- [Precomposed transformers for some obfuscators](https://github.com/narumii/Deobfuscator/tree/master/src/main/java/uwu/narumi/deobfuscator/transformer/composed)
+- [All available transformers](https://github.com/narumii/Deobfuscator/tree/master/src/main/java/uwu/narumi/deobfuscator/transformer/impl)
 
 ---
 
@@ -30,7 +48,7 @@
 
 > Just add `-noverify` to jvm arguments if still doesn't work then open issue
 
-![](https://i.imgur.com/UFxiUPZ.png)
+![](https://i.imgur.com/PBCQ6iO.png)
 
 ---
 

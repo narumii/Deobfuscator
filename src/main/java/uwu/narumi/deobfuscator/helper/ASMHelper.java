@@ -61,7 +61,7 @@ public class ASMHelper implements Opcodes {
     }
 
     public static boolean isNumber(AbstractInsnNode node) {
-        return isInteger(node) || isLong(node) || isFloat(node) || isDouble(node);
+        return node != null && (isInteger(node) || isLong(node) || isFloat(node) || isDouble(node));
     }
 
     public static String getString(AbstractInsnNode node) {
