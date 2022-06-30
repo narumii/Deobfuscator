@@ -29,31 +29,35 @@ public class SuperblaubeereStringTransformer extends Transformer {
                     .filter(node -> node.desc.equals("(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"))
                     //TODO: Maybe some cache system?
                     .forEach(node -> findMethod(classNode, method -> method.name.equals(node.name) && method.desc.equals(node.desc)).ifPresent(method -> {
-                        String string = getString(node.getPrevious().getPrevious());
-                        String key = getString(node.getPrevious());
+                        try {
+                            String string = getString(node.getPrevious().getPrevious());
+                            String key = getString(node.getPrevious());
 
-                        switch (getStringObfType(method)) {
-                            case AES:
-                                string = decryptAes(string, key);
-                                break;
-                            case DES:
-                                string = decryptDes(string, key);
-                                break;
-                            case BLOWFISH:
-                                string = decryptBlowfish(string, key);
-                                break;
-                            case XOR:
-                                string = decryptXor(string, key);
-                                break;
+                            switch (getStringObfType(method)) {
+                                case AES:
+                                    string = decryptAes(string, key);
+                                    break;
+                                case DES:
+                                    string = decryptDes(string, key);
+                                    break;
+                                case BLOWFISH:
+                                    string = decryptBlowfish(string, key);
+                                    break;
+                                case XOR:
+                                    string = decryptXor(string, key);
+                                    break;
+                            }
+
+                            if (string == null)
+                                return;
+
+                            methodNode.instructions.remove(node.getPrevious().getPrevious());
+                            methodNode.instructions.remove(node.getPrevious());
+                            methodNode.instructions.set(node, new LdcInsnNode(string));
+                            toRemove.add(method);
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-
-                        if (string == null)
-                            return;
-
-                        methodNode.instructions.remove(node.getPrevious().getPrevious());
-                        methodNode.instructions.remove(node.getPrevious());
-                        methodNode.instructions.set(node, new LdcInsnNode(string));
-                        toRemove.add(method);
                     })));
 
             classNode.methods.removeAll(toRemove);
@@ -131,7 +135,9 @@ public class SuperblaubeereStringTransformer extends Transformer {
     }
 
     private String decryptXor(String obj, String key) {
-        obj = new String(Base64.getDecoder().decode(obj.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+        try {
+            obj = new String(Base64.getDecoder().decode(obj.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+        } catch (Exception e) { } //I know i know stupid but idc
         StringBuilder sb = new StringBuilder();
         char[] keyChars = key.toCharArray();
         int i = 0;
