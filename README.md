@@ -5,8 +5,13 @@
 ---
 
 ### How to use
+- Learn **FUCKING JAVA**
+- Gain some knowledge of obfuscation/bytecode/re *(Optional)*
+
 This deobfuscator does not provide any **gui** or **configuration file** because it's meant to run through an **IDE**.\
 To configure deobfuscator for your preferences you need to edit **Loader** class.
+
+- https://github.com/narumii/Deobfuscator#transformers
 
 ---
 
