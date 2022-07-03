@@ -1,6 +1,6 @@
 package uwu.narumi.deobfuscator.helper;
 
-import me.coley.cafedude.ClassFile;
+import me.coley.cafedude.classfile.ClassFile;
 import me.coley.cafedude.InvalidClassException;
 import me.coley.cafedude.io.ClassFileReader;
 import me.coley.cafedude.io.ClassFileWriter;
