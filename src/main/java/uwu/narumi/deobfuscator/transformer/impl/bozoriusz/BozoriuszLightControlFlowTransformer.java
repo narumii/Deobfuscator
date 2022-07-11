@@ -11,14 +11,14 @@ public class BozoriuszLightControlFlowTransformer extends Transformer {
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
         deobfuscator.classes().forEach(classNode -> {
-            classNode.fields.removeIf(field -> field.name.equals("Ꮸ") && field.desc.equals("J"));
+            classNode.fields.removeIf(field -> (field.name.equals("Ꮸ") || field.name.matches("[Il]{50,}")) && field.desc.equals("J"));
             classNode.methods.forEach(methodNode -> {
 
                 //Light type 2
                 Arrays.stream(methodNode.instructions.toArray())
                         .filter(node -> node instanceof FieldInsnNode)
                         .map(FieldInsnNode.class::cast)
-                        .filter(node -> node.name.equals("Ꮸ"))
+                        .filter(node -> node.name.equals("Ꮸ") || node.name.matches("[Il]{50,}"))
                         .filter(node -> node.desc.equals("J"))
                         .filter(node -> node.owner.contains(classNode.name))
                         .filter(node -> isNumber(node.getNext()))
@@ -49,7 +49,7 @@ public class BozoriuszLightControlFlowTransformer extends Transformer {
                 Arrays.stream(methodNode.instructions.toArray())
                         .filter(node -> node instanceof FieldInsnNode)
                         .map(FieldInsnNode.class::cast)
-                        .filter(node -> node.name.equals("Ꮸ"))
+                        .filter(node -> node.name.equals("Ꮸ") || node.name.matches("[Il]{50,}"))
                         .filter(node -> node.desc.equals("J"))
                         .filter(node -> node.owner.contains(classNode.name))
                         .filter(node -> node.getNext().getOpcode() == GOTO)

@@ -20,13 +20,13 @@ public class BozoriuszHeavyControlFlowTransformer extends Transformer {
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
         deobfuscator.classes().forEach(classNode -> {
-            classNode.fields.removeIf(field -> field.name.equals("Ꮹ") && field.desc.equals("J"));
+            classNode.fields.removeIf(field -> (field.name.equals("Ꮹ") || field.name.matches("[Il]{50,}")) && field.desc.equals("J"));
             classNode.methods.forEach(methodNode -> {
                 if (!fuckingASMDogShit) {
                     Arrays.stream(methodNode.instructions.toArray())
                             .filter(node -> node instanceof FieldInsnNode)
                             .map(FieldInsnNode.class::cast)
-                            .filter(node -> node.name.equals("Ꮹ"))
+                            .filter(node -> node.name.equals("Ꮹ") || node.name.matches("[Il]{50,}"))
                             .filter(node -> node.desc.equals("J"))
                             .filter(node -> node.owner.contains(classNode.name))
                             .filter(node -> node.getNext().getOpcode() == L2I)
@@ -47,7 +47,7 @@ public class BozoriuszHeavyControlFlowTransformer extends Transformer {
                     Arrays.stream(methodNode.instructions.toArray())
                             .filter(node -> node instanceof FieldInsnNode)
                             .map(FieldInsnNode.class::cast)
-                            .filter(node -> node.name.equals("Ꮹ"))
+                            .filter(node -> node.name.equals("Ꮹ") || node.name.matches("[Il]{50,}"))
                             .filter(node -> node.desc.equals("J"))
                             .filter(node -> node.owner.contains(classNode.name))
                             .filter(node -> node.getNext() instanceof LabelNode)
@@ -78,7 +78,7 @@ public class BozoriuszHeavyControlFlowTransformer extends Transformer {
                     Arrays.stream(methodNode.instructions.toArray())
                             .filter(node -> node instanceof FieldInsnNode)
                             .map(FieldInsnNode.class::cast)
-                            .filter(node -> node.name.equals("Ꮹ"))
+                            .filter(node -> node.name.equals("Ꮹ") || node.name.matches("[Il]{50,}"))
                             .filter(node -> node.desc.equals("J"))
                             .filter(node -> node.owner.contains(classNode.name))
                             .filter(node -> isNumber(node.getNext()))
