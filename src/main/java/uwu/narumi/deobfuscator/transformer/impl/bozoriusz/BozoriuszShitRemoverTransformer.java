@@ -1,7 +1,6 @@
 package uwu.narumi.deobfuscator.transformer.impl.bozoriusz;
 
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.ClassNode;
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 
