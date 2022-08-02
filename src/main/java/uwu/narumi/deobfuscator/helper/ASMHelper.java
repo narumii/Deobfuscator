@@ -161,7 +161,7 @@ public class ASMHelper implements Opcodes {
     }
 
     public static AbstractInsnNode getNumber(float number) {
-        if (number >= 0 && number <= 2) {
+        if (number == 0 || number == 1 || number == 2) {
             return new InsnNode((int) (number + 11));
         } else {
             return new LdcInsnNode(number);
@@ -169,7 +169,7 @@ public class ASMHelper implements Opcodes {
     }
 
     public static AbstractInsnNode getNumber(double number) {
-        if (number >= 0 && number <= 1) {
+        if (number == 0 || number == 1) {
             return new InsnNode((int) (number + 14));
         } else {
             return new LdcInsnNode(number);
