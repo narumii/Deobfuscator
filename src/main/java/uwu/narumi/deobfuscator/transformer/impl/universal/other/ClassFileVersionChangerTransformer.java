@@ -3,15 +3,16 @@ package uwu.narumi.deobfuscator.transformer.impl.universal.other;
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 
-/**
- * Changes class major version
- * 
- * @see <a href="https://javaalmanac.io/bytecode/versions/">Cheatsheet</a>
- * @author HeyaGlitz#6299
- */
 public class ClassFileVersionChangerTransformer extends Transformer {
 	private final int version;
 
+	/**
+	 * Changes class major version
+	 * 
+	 * @see <a href="https://javaalmanac.io/bytecode/versions/">Cheatsheet</a>
+	 * @param Version The version you're targeting
+	 * @author HeyaGlitz#6299
+	 */
 	public ClassFileVersionChangerTransformer(int version) {
 		this.version = version;
 	}
