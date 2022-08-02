@@ -5,7 +5,7 @@ import uwu.narumi.deobfuscator.transformer.Transformer;
 import uwu.narumi.deobfuscator.transformer.impl.qprotect.latest.qProtectNumberTransformer;
 import uwu.narumi.deobfuscator.transformer.impl.qprotect.v1_7_2.qProtectNumberPoolTransformer;
 import uwu.narumi.deobfuscator.transformer.impl.universal.other.UnHideTransformer;
-import uwu.narumi.deobfuscator.transformer.impl.universal.remove.LocalVariableRemoveTransformer;
+import uwu.narumi.deobfuscator.transformer.impl.universal.remove.MethodLocalsAndParametersRemoveTransformer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +17,7 @@ public class qProtectTransformer extends ComposedTransformer {
         return Arrays.asList(
                 new qProtectNumberTransformer(),
                 new qProtectNumberPoolTransformer(),
-                new LocalVariableRemoveTransformer(),
+                new MethodLocalsAndParametersRemoveTransformer(),
                 new UnHideTransformer()
         );
     }

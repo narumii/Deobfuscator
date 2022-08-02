@@ -2,8 +2,10 @@ package uwu.narumi.deobfuscator.transformer.composed;
 
 import uwu.narumi.deobfuscator.transformer.ComposedTransformer;
 import uwu.narumi.deobfuscator.transformer.Transformer;
-import uwu.narumi.deobfuscator.transformer.impl.caesium.*;
-import uwu.narumi.deobfuscator.transformer.impl.universal.other.TryCatchFixTransformer;
+import uwu.narumi.deobfuscator.transformer.impl.caesium.CaesiumInvokeDynamicTransformer;
+import uwu.narumi.deobfuscator.transformer.impl.caesium.CaesiumNumberPoolTransformer;
+import uwu.narumi.deobfuscator.transformer.impl.caesium.CaesiumNumberTransformer;
+import uwu.narumi.deobfuscator.transformer.impl.caesium.CaesiumStringTransformer;
 import uwu.narumi.deobfuscator.transformer.impl.universal.other.UniversalNumberTransformer;
 import uwu.narumi.deobfuscator.transformer.impl.universal.remove.ImageCrasherRemoveTransformer;
 import uwu.narumi.deobfuscator.transformer.impl.universal.remove.InvalidAnnotationRemoveTransformer;
@@ -24,15 +26,12 @@ public class CaesiumTransformer extends ComposedTransformer {
                 new NopRemoveTransformer(),
                 new UniversalNumberTransformer(),
                 new CaesiumNumberTransformer(),
+                new CaesiumNumberPoolTransformer(),
                 new CaesiumInvokeDynamicTransformer(),
-                new CaesiumFlowTransformer(),
-                new TryCatchFixTransformer(),
                 new CaesiumNumberTransformer(),
                 new CaesiumNumberPoolTransformer(),
                 new UniversalNumberTransformer(),
-                new CaesiumInvokeDynamicTransformer(),
-                new CaesiumStringTransformer(),
-                new CaesiumCleanTransformer()
+                new CaesiumStringTransformer()
         );
     }
 }

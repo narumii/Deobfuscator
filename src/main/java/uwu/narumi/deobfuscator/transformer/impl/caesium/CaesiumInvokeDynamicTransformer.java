@@ -1,86 +1,69 @@
 package uwu.narumi.deobfuscator.transformer.impl.caesium;
 
-import org.objectweb.asm.Handle;
 import org.objectweb.asm.tree.*;
 import uwu.narumi.deobfuscator.Deobfuscator;
-import uwu.narumi.deobfuscator.helper.MathHelper;
+import uwu.narumi.deobfuscator.exception.TransformerException;
+import uwu.narumi.deobfuscator.helper.ASMHelper;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.*;
 
 public class CaesiumInvokeDynamicTransformer extends Transformer {
 
-    private final List<MethodNode> methodsToRemove = new ArrayList<>();
-    private final List<FieldInsnNode> fieldsToRemove = new ArrayList<>();
+    private static final String BSM_DESC_START = "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;";
+    private static final String BSM_DESC_END = ")Ljava/lang/Object;";
+
+    private final Map<ClassNode, List<MethodNode>> toRemove = new HashMap<>();
 
     @Override
     public void transform(Deobfuscator deobfuscator) throws Exception {
-        deobfuscator.classes().forEach(classNode -> {
-            classNode.methods.forEach(methodNode -> Arrays.stream(methodNode.instructions.toArray())
-                    .filter(node -> node instanceof InvokeDynamicInsnNode)
-                    .map(InvokeDynamicInsnNode.class::cast)
-                    .filter(node -> MathHelper.INTEGER_PATTERN.matcher(node.name).matches())
-                    .filter(node -> node.bsmArgs.length >= 4)
-                    .forEach(node -> {
-                        Object key = getKey(classNode, node.bsm);
+        deobfuscator.classes().forEach(classNode -> classNode.methods.forEach(methodNode -> Arrays.stream(methodNode.instructions.toArray())
+                .filter(node -> node instanceof InvokeDynamicInsnNode)
+                .map(InvokeDynamicInsnNode.class::cast)
+                .filter(node -> node.bsm.getDesc().startsWith(BSM_DESC_START))
+                .filter(node -> node.bsm.getDesc().endsWith(BSM_DESC_END))
+                .filter(node -> node.bsmArgs.length >= 4)
+                .forEach(node -> {
+                    ClassNode handleClass = deobfuscator.getClasses().get(node.bsm.getOwner());
+                    if (handleClass == null)
+                        return;
 
-                        methodNode.instructions.set(node,
-                                key == null ? secondDecrypt(node.bsmArgs[0], node.bsmArgs[1], node.bsmArgs[2], node.bsmArgs[3])
-                                        : firstDecrypt((int) key, node.bsmArgs[0], node.bsmArgs[1], node.bsmArgs[2], node.bsmArgs[3]));
-                    }));
+                    MethodNode bootstrap = handleClass.methods.stream()
+                            .filter(method -> method.name.equals(node.bsm.getName()))
+                            .filter(method -> method.desc.equals(node.bsm.getDesc()))
+                            .findAny()
+                            .orElse(null);
+                    if (bootstrap == null)
+                        return;
 
-            /*
-                <clinit> needs to be cleared
-             */
-            classNode.methods.removeAll(methodsToRemove);
-            fieldsToRemove.forEach(fieldInsnNode ->
-                    classNode.fields.removeIf(fieldNode -> fieldNode.name.equals(fieldInsnNode.name) && fieldNode.desc.equals(fieldInsnNode.desc)));
+                    AbstractInsnNode replacement;
+                    try {
+                        int key = getKey(bootstrap);
+                        replacement = firstDecrypt(key, node.bsmArgs[0], node.bsmArgs[1], node.bsmArgs[2], node.bsmArgs[3]);
+                    } catch (UnsupportedOperationException ignored) {
+                        replacement = secondDecrypt(node.bsmArgs[0], node.bsmArgs[1], node.bsmArgs[2], node.bsmArgs[3]);
+                    } catch (Exception e) {
+                        throw new TransformerException(e);
+                    }
 
-            methodsToRemove.clear();
-            fieldsToRemove.clear();
-        });
+                    methodNode.instructions.set(node, replacement);
+                    toRemove.computeIfAbsent(handleClass, ignored -> new ArrayList<>()).add(bootstrap);
+                })));
+
+        toRemove.forEach(((classNode, methodNodes) -> classNode.methods.removeAll(methodNodes)));
+        toRemove.clear();
     }
 
-    /*
-    Ugly as fuck
-     */
-    private Object getKey(ClassNode classNode, Handle handle) {
-        AtomicReference<FieldInsnNode> fieldInsnNode = new AtomicReference<>();
-        AtomicInteger key = new AtomicInteger();
+    private Integer getKey(MethodNode methodNode) {
+        return getInteger(Arrays.stream(methodNode.instructions.toArray())
+                .filter(ASMHelper::isInteger)
+                .filter(node -> node.getNext().getOpcode() == IXOR)
+                .filter(node -> isInteger(node.getNext().getNext()))
+                .filter(node -> getInteger(node.getNext().getNext()) == 0xFF)
+                .filter(node -> node.getNext().getNext().getNext().getOpcode() == IAND)
+                .findFirst()
+                .orElseThrow(UnsupportedOperationException::new));
 
-        findMethod(classNode, methodNode -> methodNode.name.equals(handle.getName()) && methodNode.desc.equals(handle.getDesc()))
-                .ifPresent(methodNode -> {
-                    methodsToRemove.add(methodNode);
-
-                    fieldInsnNode.set(Arrays.stream(methodNode.instructions.toArray())
-                            .filter(node -> node.getOpcode() == GETSTATIC)
-                            .map(FieldInsnNode.class::cast)
-                            .filter(node -> node.desc.equals("I"))
-                            .filter(node -> check(node.getNext(), IXOR))
-                            .findFirst()
-                            .orElse(null));
-                });
-
-        if (fieldInsnNode.get() != null) {
-            fieldsToRemove.add(fieldInsnNode.get());
-
-            findClInit(classNode).ifPresent(methodNode -> Arrays.stream(methodNode.instructions.toArray())
-                    .filter(node -> node instanceof FieldInsnNode)
-                    .map(FieldInsnNode.class::cast)
-                    .filter(node -> node.name.equals(fieldInsnNode.get().name))
-                    .filter(node -> node.desc.equals("I"))
-                    .filter(node -> isInteger(node.getPrevious()))
-                    .forEach(node -> key.set(getInteger(node.getPrevious()))));
-
-            return key.get();
-        } else {
-            return null;
-        }
     }
 
     private MethodInsnNode firstDecrypt(int key, Object var3, Object var4, Object var5, Object var6) {

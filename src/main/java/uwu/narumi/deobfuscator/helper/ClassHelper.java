@@ -1,7 +1,7 @@
 package uwu.narumi.deobfuscator.helper;
 
-import me.coley.cafedude.classfile.ClassFile;
 import me.coley.cafedude.InvalidClassException;
+import me.coley.cafedude.classfile.ClassFile;
 import me.coley.cafedude.io.ClassFileReader;
 import me.coley.cafedude.io.ClassFileWriter;
 import org.objectweb.asm.ClassReader;
@@ -72,9 +72,7 @@ public final class ClassHelper {
             copy.methods.add(copyMethod);
         });
 
-        classNode.fields.forEach(fieldNode -> {
-            copy.fields.add(new FieldNode(fieldNode.access, fieldNode.name, fieldNode.desc, null, fieldNode.value));
-        });
+        classNode.fields.forEach(fieldNode -> copy.fields.add(new FieldNode(fieldNode.access, fieldNode.name, fieldNode.desc, null, fieldNode.value)));
 
         return copy;
     }

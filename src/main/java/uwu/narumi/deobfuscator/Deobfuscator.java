@@ -10,14 +10,12 @@ import uwu.narumi.deobfuscator.helper.ClassHelper;
 import uwu.narumi.deobfuscator.helper.FileHelper;
 import uwu.narumi.deobfuscator.sandbox.SandBox;
 import uwu.narumi.deobfuscator.transformer.Transformer;
+import uwu.narumi.deobfuscator.transformer.composed.CleanTransformer;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -30,9 +28,10 @@ public class Deobfuscator {
     private final Map<String, ClassNode> originalClasses = new ConcurrentHashMap<>();
     private final Map<String, byte[]> files = new ConcurrentHashMap<>();
 
+    private final List<Transformer> transformers = new ArrayList<>();
+
     private final Path input;
     private final Path output;
-    private final List<Transformer> transformers;
     private final int classReaderFlags;
     private final int classWriterFlags;
     private final boolean consoleDebug;
@@ -46,10 +45,12 @@ public class Deobfuscator {
 
         this.input = builder.input;
         this.output = builder.output;
-        this.transformers = builder.transformers;
+        this.transformers.addAll(builder.transformers);
         this.classReaderFlags = builder.classReaderFlags;
         this.classWriterFlags = builder.classWriterFlags;
         this.consoleDebug = builder.consoleDebug;
+        if (builder.normalize)
+            this.transformers.add(new CleanTransformer());
 
         SandBox.getInstance(); //YES
         //System.setSecurityManager(new SandBoxSecurityManager()); //disabled due to deobfuscation errors
@@ -230,6 +231,7 @@ public class Deobfuscator {
         private int classWriterFlags = ClassWriter.COMPUTE_MAXS;
 
         private boolean consoleDebug;
+        private boolean normalize;
 
         private Builder() {
         }
@@ -261,6 +263,11 @@ public class Deobfuscator {
 
         public Builder consoleDebug() {
             this.consoleDebug = true;
+            return this;
+        }
+
+        public Builder normalize() {
+            this.normalize = true;
             return this;
         }
 
