@@ -58,3 +58,7 @@ To configure deobfuscator for your preferences you need to edit **Loader** class
 ---
 
 > Deobfuscator only makes code readable for humans also if some decompilators can't decompile class try another and if no one works just create issue that includes: `[sample jar with obfuscation, deobfuscator transformers, deobfuscator log file]` and optional obfuscator name
+
+---
+
+> Built on: [Java 11 (Adoptium)](https://adoptium.net/temurin/releases/?version=11)
