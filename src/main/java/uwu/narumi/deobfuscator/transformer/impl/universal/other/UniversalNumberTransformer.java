@@ -112,6 +112,17 @@ public class UniversalNumberTransformer extends Transformer {
                     methodNode.instructions.remove(node.getNext());
 
                     methodNode.instructions.set(node, getNumber(result));
+                } else if (isString(node) && isInteger(node.getNext()) && isMethod(node.getNext().getNext(), "java/lang/Integer", "parseInt", "(Ljava/lang/String;I)I")) {
+                    int value = Integer.parseInt((String) ((LdcInsnNode) node).cst, ((IntInsnNode) node.getNext()).operand);
+                    methodNode.instructions.remove(node.getNext().getNext());
+                    methodNode.instructions.remove(node.getNext());
+                    methodNode.instructions.set(node, new LdcInsnNode(value));
+                    modified = true;
+                } else if (isString(node) && isMethod(node.getNext(), "java/lang/String", "hashCode", "()I")) {
+                    int val = ((LdcInsnNode) node).cst.hashCode();
+                    methodNode.instructions.remove(node.getNext());
+                    methodNode.instructions.set(node, new LdcInsnNode(val));
+                    modified = true;
                 }
             }
         } while (modified);
