@@ -1,5 +1,5 @@
 <p align="center">
-     <a href="https://discord.gg/keyDrkPJDa"><img src="https://discordapp.com/api/guilds/900083350314811432/widget.png?style=banner2"/></a>
+     <a href="https://discord.gg/tRU27KtPAZ"><img src="https://discordapp.com/api/guilds/900083350314811432/widget.png?style=banner2"/></a>
 </p>
 
 ---
