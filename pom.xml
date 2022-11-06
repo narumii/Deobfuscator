@@ -14,10 +14,10 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
 
-        <asm.version>9.3</asm.version>
-        <log4j.version>2.17.2</log4j.version>
-        <slf4j.version>1.7.36</slf4j.version>
-        <kafedjud.version>1.10.1</kafedjud.version>
+        <asm.version>9.4</asm.version>
+        <log4j.version>2.19.0</log4j.version>
+        <slf4j.version>2.0.3</slf4j.version>
+        <kafedjud.version>1.10.2</kafedjud.version>
     </properties>
 
     <repositories>
