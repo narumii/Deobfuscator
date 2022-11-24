@@ -1,7 +1,8 @@
 package uwu.narumi.deobfuscator.sandbox;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
@@ -13,7 +14,7 @@ import java.security.Permission;
  */
 public class SandBoxSecurityManager extends SecurityManager {
 
-    private static final Logger LOGGER = LogManager.getLogger(SandBoxSecurityManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SandBoxSecurityManager.class);
 
     static {
         //Yes it works SOMEHOW

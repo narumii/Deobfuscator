@@ -1,10 +1,10 @@
 package uwu.narumi.deobfuscator;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uwu.narumi.deobfuscator.exception.TransformerException;
 import uwu.narumi.deobfuscator.helper.ClassHelper;
 import uwu.narumi.deobfuscator.helper.FileHelper;
@@ -22,7 +22,7 @@ import java.util.zip.ZipOutputStream;
 
 public class Deobfuscator {
 
-    private static final Logger LOGGER = LogManager.getLogger(Deobfuscator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Deobfuscator.class);
 
     private final Map<String, ClassNode> classes = new ConcurrentHashMap<>();
     private final Map<String, ClassNode> originalClasses = new ConcurrentHashMap<>();
