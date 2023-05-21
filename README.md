@@ -32,12 +32,12 @@ To configure deobfuscator for your preferences you need to edit **Loader** class
 - [Binsecure 0.4/Latest](https://binclub.dev/purchasing/)
 - [(Skid)q~~Protect~~](https://mdma.dev/)
 - [Radon](https://github.com/ItzSomebody/radon)
+- [Branchlock](https://branchlock.net/)
 - Colonial
 - Sentinel
 
 ### In Future Supported Obfuscators (maybe)
 - [Skidfuscator](https://github.com/terminalsin/skidfuscator-java-obfuscator)
-- [Branchlock](https://branchlock.net/)
 
 ---
 
