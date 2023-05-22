@@ -3,12 +3,9 @@ package uwu.narumi.deobfuscator.transformer.composed;
 import uwu.narumi.deobfuscator.transformer.ComposedTransformer;
 import uwu.narumi.deobfuscator.transformer.Transformer;
 import uwu.narumi.deobfuscator.transformer.impl.branchlock.BranchLockCompatibilityStringTransformer;
-import uwu.narumi.deobfuscator.transformer.impl.branchlock.BranchLockNumberTransformer;
-import uwu.narumi.deobfuscator.transformer.impl.branchlock.BranchLockReferenceTransformer;
 import uwu.narumi.deobfuscator.transformer.impl.universal.other.StackOperationTransformer;
 import uwu.narumi.deobfuscator.transformer.impl.universal.other.UnHideTransformer;
 import uwu.narumi.deobfuscator.transformer.impl.universal.other.UniversalNumberTransformer;
-import uwu.narumi.deobfuscator.transformer.impl.universal.remove.LocalVariableRemoveTransformer;
 import uwu.narumi.deobfuscator.transformer.impl.universal.remove.SignatureRemoveTransformer;
 import uwu.narumi.deobfuscator.transformer.impl.universal.remove.UnknownAttributeRemoveTransformer;
 
@@ -20,7 +17,7 @@ public class BranchLockTransformer extends ComposedTransformer {
 
     @Override
     public List<Transformer> transformers() {
-        File file = new File("string_lookup.txt");
+        File file = new File("branchlock_string_lookup.txt");
         if (file.exists()) file.delete();
         return Arrays.asList(
                 new SignatureRemoveTransformer(),
