@@ -21,7 +21,7 @@ To configure deobfuscator for your preferences you need to edit **Loader** class
 - [Paramorphism 2.1.2_9](https://paramorphism.dev/)
 - [Caesium](https://github.com/sim0n/Caesium)
 - [Monsey](https://github.com/Hippo/Mosey)
-- [(Skid)q~~Protect~~ (Not Latest)](https://mdma.dev/)
+- [**Skid** qProtect (Not Latest)](https://mdma.dev/)
 - [Scuti](https://github.com/netindev/scuti)
 - [CheatBreaker](https://github.com/CheatBreaker/Obf)
 - [Bozar](https://github.com/vimasig/Bozar)
@@ -33,11 +33,12 @@ To configure deobfuscator for your preferences you need to edit **Loader** class
 - [(Skid)q~~Protect~~](https://mdma.dev/)
 - [Radon](https://github.com/ItzSomebody/radon)
 - [Branchlock](https://branchlock.net/)
+- [Skidfuscator](https://github.com/terminalsin/skidfuscator-java-obfuscator)
 - Colonial
 - Sentinel
 
 ### In Future Supported Obfuscators (maybe)
-- [Skidfuscator](https://github.com/terminalsin/skidfuscator-java-obfuscator)
+- [(In the works) qProtect 1.9.6] (https://mdma.dev/)
 
 ---
 
@@ -57,7 +58,7 @@ To configure deobfuscator for your preferences you need to edit **Loader** class
 
 ---
 
-> Deobfuscator only makes code readable for humans also if some decompilators can't decompile class try another and if no one works just create issue that includes: `[sample jar with obfuscation, deobfuscator transformers, deobfuscator log file]` and optional obfuscator name
+> Deobfuscator only makes code readable for humans (don't expect the decompiled jar to run) also if some decompilators can't decompile class try another and if no one works just create issue that includes: `[sample jar with obfuscation, deobfuscator transformers, deobfuscator log file]` and optional obfuscator name.
 
 ---
 
