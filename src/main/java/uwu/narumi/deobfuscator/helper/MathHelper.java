@@ -20,7 +20,7 @@ public class MathHelper implements Opcodes {
             case IMUL:
                 return first * second;
             case IDIV:
-                return first / opcode;
+                return first / second;
             case IREM:
                 return first % second;
             case ISHL:
@@ -51,7 +51,7 @@ public class MathHelper implements Opcodes {
             case LMUL:
                 return first * second;
             case LDIV:
-                return first / opcode;
+                return first / second;
             case LREM:
                 return first % second;
             case LSHL:
