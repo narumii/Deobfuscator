@@ -51,7 +51,7 @@ public class MathHelper implements Opcodes {
             case LMUL:
                 return first * second;
             case LDIV:
-                return first / opcode;
+                return first / second;
             case LREM:
                 return first % second;
             case LSHL:
