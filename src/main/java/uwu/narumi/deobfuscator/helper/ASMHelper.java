@@ -232,8 +232,16 @@ public class ASMHelper implements Opcodes {
                 .findFirst();
     }
 
+    public static Optional<FieldNode> findField(ClassNode classNode, FieldInsnNode fieldInsnNode) {
+        if (!fieldInsnNode.owner.equals(classNode.name)) return Optional.empty();
+        return classNode.fields == null ? Optional.empty() : classNode.fields.stream()
+                .filter(field -> field.desc.equals(fieldInsnNode.desc))
+                .filter(field -> field.name.equals(fieldInsnNode.name))
+                .findFirst();
+    }
+
     public static Optional<FieldNode> findField(ClassNode classNode, Predicate<FieldNode> predicate) {
-        return classNode.methods == null ? Optional.empty() : classNode.fields.stream()
+        return classNode.fields == null ? Optional.empty() : classNode.fields.stream()
                 .filter(predicate)
                 .findFirst();
     }
