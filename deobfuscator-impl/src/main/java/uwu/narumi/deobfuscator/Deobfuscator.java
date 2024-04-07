@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.execution.SandBox;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
@@ -93,26 +94,17 @@ public class Deobfuscator {
         (name, bytes) -> {
           try {
             if (ClassHelper.isClass(bytes)) {
-              ClassHelper.loadClass(bytes, classReaderFlags)
-                  .ifPresentOrElse(
-                      classWrapper -> {
-                        if (context.getClasses().containsKey(classWrapper.name())) return;
-
-                        context.getClasses().put(classWrapper.name(), classWrapper);
-                        context.getOriginalClasses().put(classWrapper.name(), classWrapper.clone());
-                      },
-                      () -> {
-                        if (!context.getFiles().containsKey(name))
-                          context.getFiles().put(name, bytes);
-                      });
+              ClassWrapper classWrapper = ClassHelper.loadClass(bytes, classReaderFlags, true);
+              context.getClasses().putIfAbsent(classWrapper.name(), classWrapper);
+              context.getOriginalClasses().putIfAbsent(classWrapper.name(), classWrapper.clone());
             } else if (!context.getFiles().containsKey(name)) {
               context.getFiles().put(name, bytes);
             }
           } catch (Exception e) {
             LOGGER.error("Could not load class: {}, adding as file", name);
             LOGGER.debug("Error", e);
-            context.getFiles().put(name, bytes);
 
+            context.getFiles().putIfAbsent(name, bytes);
             if (consoleDebug) e.printStackTrace();
           }
         });
@@ -224,7 +216,7 @@ public class Deobfuscator {
     private final Set<Path> libraries = new HashSet<>();
     private Path input = Path.of("input.jar");
     private Path output = Path.of("output.jar");
-    private List<Transformer> transformers;
+    private List<Transformer> transformers = List.of();
 
     private int classReaderFlags = ClassReader.EXPAND_FRAMES;
     private int classWriterFlags = ClassWriter.COMPUTE_MAXS;

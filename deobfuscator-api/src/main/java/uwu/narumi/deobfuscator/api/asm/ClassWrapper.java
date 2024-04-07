@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
@@ -14,12 +15,22 @@ public class ClassWrapper implements Cloneable {
 
   protected static final Logger LOGGER = LogManager.getLogger(ClassWrapper.class);
 
-  private ClassNode classNode;
-  private FieldCache fieldCache;
+  private final ClassNode classNode;
+  private final FieldCache fieldCache;
+  private final ConstantPool constantPool;
 
-  public ClassWrapper(ClassNode classNode) {
-    this.classNode = classNode;
+  public ClassWrapper(ClassReader classReader, int readerMode) throws Exception {
+    this.classNode = new ClassNode();
+    this.constantPool = new ConstantPool(classReader);
     this.fieldCache = new FieldCache();
+
+    classReader.accept(this.classNode, readerMode);
+  }
+
+  private ClassWrapper(ClassNode classNode, FieldCache fieldCache, ConstantPool constantPool) {
+    this.classNode = classNode;
+    this.fieldCache = fieldCache;
+    this.constantPool = constantPool;
   }
 
   public Optional<MethodNode> findMethod(String name, String desc) {
@@ -115,10 +126,12 @@ public class ClassWrapper implements Cloneable {
     return fieldCache;
   }
 
+  public ConstantPool getConstantPool() {
+    return constantPool;
+  }
+
   @Override
   public ClassWrapper clone() {
-    ClassWrapper classWrapper = new ClassWrapper(ClassHelper.copy(classNode));
-    classWrapper.fieldCache = this.fieldCache.clone();
-    return classWrapper;
+    return new ClassWrapper(ClassHelper.copy(classNode), fieldCache.clone(), constantPool.clone());
   }
 }

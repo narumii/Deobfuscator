@@ -1,7 +1,6 @@
 package uwu.narumi.deobfuscator.api.helper;
 
 import java.util.ArrayList;
-import java.util.Optional;
 import me.coley.cafedude.InvalidClassException;
 import me.coley.cafedude.classfile.ClassFile;
 import me.coley.cafedude.io.ClassFileReader;
@@ -27,25 +26,12 @@ public final class ClassHelper {
             .equals("CAFEBABE");
   }
 
-  public static Optional<ClassWrapper> loadClass(byte[] bytes, int readerMode)
-      throws InvalidClassException {
-    return loadClass(bytes, readerMode, true);
+  public static ClassWrapper loadClass(byte[] bytes, int readerMode) throws Exception {
+    return loadClass(bytes, readerMode, false);
   }
 
-  public static Optional<ClassWrapper> loadClass(byte[] bytes, int readerMode, boolean fix)
-      throws InvalidClassException {
-    Optional<ClassWrapper> classWrapper;
-    try {
-      ClassNode classNode = new ClassNode();
-      ClassReader classReader = new ClassReader(bytes);
-      classReader.accept(classNode, readerMode);
-
-      classWrapper = Optional.of(new ClassWrapper(classNode));
-    } catch (Exception e) {
-      classWrapper = fix ? loadClass(fixClass(bytes), readerMode, false) : Optional.empty();
-    }
-
-    return classWrapper;
+  public static ClassWrapper loadClass(byte[] bytes, int readerMode, boolean fix) throws Exception {
+    return new ClassWrapper(new ClassReader(fix ? fixClass(bytes) : bytes), readerMode);
   }
 
   public static byte[] fixClass(byte[] bytes) throws InvalidClassException {

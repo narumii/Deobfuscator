@@ -3,7 +3,6 @@ package uwu.narumi.deobfuscator.api.library;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import me.coley.cafedude.InvalidClassException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
@@ -24,17 +23,19 @@ public class Library {
         path,
         (name, bytes) -> {
           if (!ClassHelper.isClass(name, bytes)) {
-            files.computeIfAbsent(name, ignored -> bytes);
+            files.putIfAbsent(name, bytes);
             return;
           }
 
           try {
-            ClassHelper.loadClass(
-                    bytes, ClassReader.SKIP_CODE | ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG)
-                .ifPresent(
-                    classWrapper ->
-                        classFiles.computeIfAbsent(classWrapper.name(), ignored -> bytes));
-          } catch (InvalidClassException ignored) {
+            classFiles.putIfAbsent(
+                ClassHelper.loadClass(
+                        bytes,
+                        ClassReader.SKIP_CODE | ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG)
+                    .name(),
+                bytes);
+          } catch (Exception e) {
+            LOGGER.error("Could not load {} class from {} library", name, path, e);
           }
         });
 
