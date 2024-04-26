@@ -23,7 +23,7 @@
 
     <asm.version>9.6</asm.version>
     <log4j.version>2.22.1</log4j.version>
-    <slf4j.version>2.0.9</slf4j.version>
+    <slf4j.version>2.0.13</slf4j.version>
     <kafedjud.version>1.10.2</kafedjud.version>
     <ssvm.version>4030675074</ssvm.version>
     <jlinker.version>1.0.7</jlinker.version>
