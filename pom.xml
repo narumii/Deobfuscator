@@ -22,7 +22,7 @@
     <maven.compiler.target>17</maven.compiler.target>
 
     <asm.version>9.6</asm.version>
-    <log4j.version>2.22.1</log4j.version>
+    <log4j.version>2.23.1</log4j.version>
     <slf4j.version>2.0.13</slf4j.version>
     <kafedjud.version>1.10.2</kafedjud.version>
     <ssvm.version>4030675074</ssvm.version>
