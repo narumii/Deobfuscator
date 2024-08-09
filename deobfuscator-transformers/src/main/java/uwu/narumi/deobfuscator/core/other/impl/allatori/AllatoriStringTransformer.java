@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AllatoriString extends Transformer {
+public class AllatoriStringTransformer extends Transformer {
 
     private HashMap<String, DecryptionMethod> decryptors = new HashMap<>();
 
@@ -23,7 +23,7 @@ public class AllatoriString extends Transformer {
 
     private boolean strong;
 
-    public AllatoriString(boolean strong) {
+    public AllatoriStringTransformer(boolean strong) {
         this.strong = strong;
     }
 
