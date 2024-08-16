@@ -1,6 +1,5 @@
 package uwu.narumi.deobfuscator.core.other.impl.clean;
 
-import org.objectweb.asm.NamedOpcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
@@ -17,13 +16,12 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class DeadCodeCleanTransformer extends Transformer {
   @Override
   public void transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
-      removeDeadCode(context, classWrapper, methodNode);
+      removeDeadCode(classWrapper, methodNode);
 
       try {
         new UnUsedLabelCleanTransformer().transform(classWrapper, context);
@@ -69,12 +67,13 @@ public class DeadCodeCleanTransformer extends Transformer {
     }
   }
 
-  private static boolean removeDeadCode(Context context, ClassWrapper classWrapper, MethodNode methodNode) {
+  private static void removeDeadCode(ClassWrapper classWrapper, MethodNode methodNode) {
     Analyzer<?> analyzer = new Analyzer<>(new BasicInterpreter());
     try {
       analyzer.analyze(classWrapper.name(), methodNode);
     } catch (AnalyzerException e) {
-      throw new RuntimeException(e);
+      // Ignore
+      return;
     }
     Frame<?>[] frames = analyzer.getFrames();
     AbstractInsnNode[] insns = methodNode.instructions.toArray();
@@ -85,7 +84,6 @@ public class DeadCodeCleanTransformer extends Transformer {
         insns[i] = null;
       }
     }
-    return false;
   }
 
   private boolean isLabelUsedOnlyByInstructions(MethodNode methodNode, LabelNode labelNode) {
