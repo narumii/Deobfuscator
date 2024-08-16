@@ -21,7 +21,7 @@ import java.util.Set;
 public class StackWalker implements Opcodes {
   /**
    * Get the only one possible producer of a {@link SourceValue} that is passed to a method.
-   * The main advantage of this method is that it also follows DUP instructions and variable
+   * The main advantage of this method is that it also follows jumps, DUP instructions and variable
    * references to get to the real producer that will be actually useful in another transformers.
    *
    * <p>
