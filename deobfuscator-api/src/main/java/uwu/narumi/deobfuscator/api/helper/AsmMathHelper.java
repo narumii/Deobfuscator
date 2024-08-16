@@ -5,7 +5,29 @@ import static org.objectweb.asm.Opcodes.*;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.impl.MethodMatch;
 
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
+
 public final class AsmMathHelper {
+  private static final Map<Integer, Predicate<Integer>> ONE_VALUE_CONDITION_PREDICATES = Map.of(
+      IFEQ, value -> value == 0,
+      IFNE, value -> value != 0,
+      IFLT, value -> value < 0,
+      IFGE, value -> value >= 0,
+      IFGT, value -> value > 0,
+      IFLE, value -> value <= 0
+  );
+
+  private static final Map<Integer, BiPredicate<Integer, Integer>> TWO_VALUES_VALUE_CONDITION_PREDICATES = Map.of(
+      IF_ICMPEQ, Objects::equals,
+      IF_ICMPNE, (first, second) -> !Objects.equals(first, second),
+      IF_ICMPLT, (first, second) -> first < second,
+      IF_ICMPGE, (first, second) -> first >= second,
+      IF_ICMPGT, (first, second) -> first > second,
+      IF_ICMPLE, (first, second) -> first <= second
+  );
 
   public static final Match STRING_LENGTH =
       MethodMatch.invokeVirtual()
@@ -227,28 +249,20 @@ public final class AsmMathHelper {
     };
   }
 
+  public static boolean isOneValueCondition(int opcode) {
+    return ONE_VALUE_CONDITION_PREDICATES.containsKey(opcode);
+  }
+
   public static boolean condition(int value, int opcode) {
-    return switch (opcode) {
-      case IFEQ -> value == 0;
-      case IFNE -> value != 0;
-      case IFLT -> value < 0;
-      case IFGE -> value >= 0;
-      case IFGT -> value > 0;
-      case IFLE -> value <= 0;
-      default -> throw new IllegalArgumentException();
-    };
+    return ONE_VALUE_CONDITION_PREDICATES.get(opcode).test(value);
+  }
+
+  public static boolean isTwoValuesCondition(int opcode) {
+    return TWO_VALUES_VALUE_CONDITION_PREDICATES.containsKey(opcode);
   }
 
   public static boolean condition(int first, int second, int opcode) {
-    return switch (opcode) {
-      case IF_ICMPEQ -> first == second;
-      case IF_ICMPNE -> first != second;
-      case IF_ICMPLT -> first < second;
-      case IF_ICMPGE -> first >= second;
-      case IF_ICMPGT -> first > second;
-      case IF_ICMPLE -> first <= second;
-      default -> throw new IllegalArgumentException();
-    };
+    return TWO_VALUES_VALUE_CONDITION_PREDICATES.get(opcode).test(first, second);
   }
 
   public static int lcmp(long first, long second) {
