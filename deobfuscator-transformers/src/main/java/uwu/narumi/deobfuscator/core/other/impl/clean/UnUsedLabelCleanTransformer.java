@@ -36,10 +36,12 @@ public class UnUsedLabelCleanTransformer extends Transformer {
                       node -> {
                         if (node instanceof JumpInsnNode) {
                           labelNodes.add(((JumpInsnNode) node).label);
-                        } else if (node instanceof LookupSwitchInsnNode) {
-                          labelNodes.addAll(((LookupSwitchInsnNode) node).labels);
-                        } else if (node instanceof TableSwitchInsnNode) {
-                          labelNodes.addAll(((TableSwitchInsnNode) node).labels);
+                        } else if (node instanceof LookupSwitchInsnNode lookupSwitchInsnNode) {
+                          labelNodes.addAll(lookupSwitchInsnNode.labels);
+                          labelNodes.add(lookupSwitchInsnNode.dflt);
+                        } else if (node instanceof TableSwitchInsnNode tableSwitchInsnNode) {
+                          labelNodes.addAll(tableSwitchInsnNode.labels);
+                          labelNodes.add(tableSwitchInsnNode.dflt);
                         } else if (node instanceof LineNumberNode) {
                           labelNodes.add(((LineNumberNode) node).start);
                         }

@@ -1,8 +1,11 @@
 package uwu.narumi.deobfuscator.core.other.impl.pool;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
@@ -97,6 +100,8 @@ public class InlineStaticFieldTransformer extends Transformer {
               }
             });
 
+    List<FieldRef> toRemove = new ArrayList<>();
+
     LOGGER.info("Collected {} numbers from {} classes", index.get(), context.classes().size());
     context.classes(scope).stream()
         .flatMap(classWrapper -> classWrapper.methods().stream())
@@ -128,8 +133,19 @@ public class InlineStaticFieldTransformer extends Transformer {
                             methodNode.instructions.set(node, getNumber(character));
                           }
 
+                          FieldRef fieldRef = new FieldRef(node.owner, node.name, node.desc);
+                          if (!toRemove.contains(fieldRef)) {
+                            toRemove.add(fieldRef);
+                          }
+
                           inline.incrementAndGet();
                         }));
+
+    // Cleanup
+    toRemove.forEach(fieldRef -> {
+      ClassWrapper owner = context.get(fieldRef.owner).get();
+      owner.fields().removeIf(fieldNode -> fieldNode.name.equals(fieldRef.name) && fieldNode.desc.equals(fieldRef.desc));
+    });
 
     //        values.clear();
     LOGGER.info("Inlined {} numbers in {} classes", inline.get(), context.classes().size());
@@ -142,7 +158,7 @@ public class InlineStaticFieldTransformer extends Transformer {
             node ->
                 node.previous().isConstant()
                     || (node.previous().previous().isConstant()
-                        && node.previous().getOpcode() == INVOKESTATIC))
+                    && node.previous().getOpcode() == INVOKESTATIC))
         .map(FieldInsnNode.class::cast)
         .filter(node -> DESCRIPTORS.contains(node.desc))
         .filter(node -> context.getClasses().containsKey(node.owner))
@@ -177,5 +193,8 @@ public class InlineStaticFieldTransformer extends Transformer {
     } else if (valueNode.isNull()) {
       owner.getFieldCache().set(fieldNode, NULL);
     }
+  }
+
+  private record FieldRef(String owner, String name, String desc) {
   }
 }
