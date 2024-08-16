@@ -69,8 +69,6 @@ public class UniversalFlowTransformer extends Transformer {
     Map<AbstractInsnNode, Frame<SourceValue>> frames = analyzeSource(classWrapper.getClassNode(), methodNode);
     if (frames == null) return;
 
-    List<AbstractInsnNode> toRemove = new ArrayList<>();
-
     // Simplify 'jump' instructions
     for (AbstractInsnNode insn : methodNode.instructions) {
       if (AsmMathHelper.isOneValueCondition(insn.getOpcode())) {
@@ -96,7 +94,7 @@ public class UniversalFlowTransformer extends Transformer {
           processRedundantIfStatement(methodNode, jumpInsn, ifResult);
 
           // Cleanup value
-          value.get().removeWithVarInit(methodNode, toRemove);
+          value.get().remove(methodNode);
         }
       } else if (AsmMathHelper.isTwoValuesCondition(insn.getOpcode())) {
         // Two-value if statements
@@ -123,14 +121,11 @@ public class UniversalFlowTransformer extends Transformer {
           processRedundantIfStatement(methodNode, jumpInsn, ifResult);
 
           // Cleanup values
-          value1.get().removeWithVarInit(methodNode, toRemove);
-          value2.get().removeWithVarInit(methodNode, toRemove);
+          value1.get().remove(methodNode);
+          value2.get().remove(methodNode);
         }
       }
     }
-
-    // Cleanup
-    toRemove.forEach(methodNode.instructions::remove);
   }
 
   private void processRedundantIfStatement(MethodNode methodNode, JumpInsnNode ifStatement, boolean ifResult) {
