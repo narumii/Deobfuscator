@@ -7,6 +7,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
+/**
+ * A {@link SourceValue} that holds the original source value on which we can operate very easily.
+ * See javadoc of {@link #originalSource} for more details.
+ *
+ * @author EpicPlayerA10
+ */
 public class OriginalSourceValue extends SourceValue {
 
   /**
