@@ -9,6 +9,8 @@ import org.objectweb.asm.tree.analysis.Analyzer;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.SourceInterpreter;
 import org.objectweb.asm.tree.analysis.SourceValue;
+import org.objectweb.asm.tree.analysis.OriginalSourceInterpreter;
+import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.context.Context;
 
 /**
@@ -144,6 +146,22 @@ public class AsmHelper implements Opcodes {
       Map<AbstractInsnNode, Frame<SourceValue>> frames = new HashMap<>();
       Frame<SourceValue>[] framesArray =
           new Analyzer<>(new SourceInterpreter()).analyze(classNode.name, methodNode);
+      for (int i = 0; i < framesArray.length; i++) {
+        frames.put(methodNode.instructions.get(i), framesArray[i]);
+      }
+      return frames;
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  public static Map<AbstractInsnNode, Frame<OriginalSourceValue>> analyzeOriginalSource(
+      ClassNode classNode, MethodNode methodNode
+  ) {
+    try {
+      Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = new HashMap<>();
+      Frame<OriginalSourceValue>[] framesArray =
+          new Analyzer<>(new OriginalSourceInterpreter()).analyze(classNode.name, methodNode);
       for (int i = 0; i < framesArray.length; i++) {
         frames.put(methodNode.instructions.get(i), framesArray[i]);
       }
