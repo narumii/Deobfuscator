@@ -44,7 +44,7 @@ public abstract class Transformer extends AsmHelper implements Opcodes {
    * @param transformerSupplier The transformer supplier with all its configuration ready to go. Required to recreate
    *                            transformer multiple times with the same configuration. You must pass here new instance.
    *                            You can't reuse the existing instance.
-   * @param scope You can choose the class to scope the transformer or set it to null to transform all classes
+   * @param scope You can choose the class transform or set it to null to transform all classes
    * @param context The context
    */
   public static boolean transform(Supplier<Transformer> transformerSupplier, @Nullable ClassWrapper scope, Context context) {
