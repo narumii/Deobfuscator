@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 // TODO: Add some light jump emulation, basically rewrite loop to index loop
 // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 // TODO: Fucking variables?????
-// TODO: All narumii's problems will be solved by StackWalker. Rewrite it using StackWalker
+// TODO: All narumii's problems will be solved by OriginalSourceInterpreter. Rewrite it using OriginalSourceInterpreter
 public class UniversalNumberTransformer extends Transformer {
 
     private final Set<TriFunction<ClassWrapper, MethodNode, AbstractInsnNode, Boolean>> functions = new LinkedHashSet<>();

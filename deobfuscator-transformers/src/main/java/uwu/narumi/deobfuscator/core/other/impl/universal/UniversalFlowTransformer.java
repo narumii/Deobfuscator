@@ -6,17 +6,13 @@ import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Frame;
-import org.objectweb.asm.tree.analysis.SourceValue;
+import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
-import uwu.narumi.deobfuscator.api.helper.StackWalker;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class UniversalFlowTransformer extends Transformer {
 
@@ -30,21 +26,24 @@ public class UniversalFlowTransformer extends Transformer {
 
   // TODO: Incomplete. Move to UniversalNumberTransformer during its rewrite.
   private void simplifyCompareInstructions(ClassWrapper classWrapper, MethodNode methodNode) {
-    Map<AbstractInsnNode, Frame<SourceValue>> frames = analyzeSource(classWrapper.getClassNode(), methodNode);
+    Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = analyzeOriginalSource(classWrapper.getClassNode(), methodNode);
     if (frames == null) return;
 
     // Simplify 'compare' instructions
     for (AbstractInsnNode insn : methodNode.instructions) {
       if (insn.getOpcode() == LCMP) {
-        Frame<SourceValue> frame = frames.get(insn);
+        Frame<OriginalSourceValue> frame = frames.get(insn);
         if (frame == null) continue;
 
         // Get instructions from stack that are passed to LCMP
-        Optional<StackWalker.StackValue> valueInsn1 = StackWalker.getOnlyOnePossibleProducer(frames, frame.getStack(frame.getStackSize() - 2));
-        Optional<StackWalker.StackValue> valueInsn2 = StackWalker.getOnlyOnePossibleProducer(frames, frame.getStack(frame.getStackSize() - 1));
-        if (valueInsn1.isEmpty() || valueInsn2.isEmpty()) continue;
+        OriginalSourceValue value1SourceValue = frame.getStack(frame.getStackSize() - 2);
+        OriginalSourceValue value2SourceValue = frame.getStack(frame.getStackSize() - 1);
+        if (!value1SourceValue.originalSource.isOneWayProduced() || !value2SourceValue.originalSource.isOneWayProduced()) continue;
 
-        if (valueInsn1.get().value() instanceof LdcInsnNode ldcValue1 && valueInsn2.get().value() instanceof LdcInsnNode ldcValue2) {
+        AbstractInsnNode value1Insn = value1SourceValue.originalSource.getProducer();
+        AbstractInsnNode value2Insn = value2SourceValue.originalSource.getProducer();
+
+        if (value1Insn instanceof LdcInsnNode ldcValue1 && value2Insn instanceof LdcInsnNode ldcValue2) {
           long value1 = (long) ldcValue1.cst;
           long value2 = (long) ldcValue2.cst;
           if (value1 > value2) {
@@ -57,8 +56,8 @@ public class UniversalFlowTransformer extends Transformer {
             // Result: 0
             methodNode.instructions.set(insn, new InsnNode(ICONST_0));
           }
-          valueInsn1.get().remove(methodNode);
-          valueInsn2.get().remove(methodNode);
+          methodNode.instructions.remove(value1SourceValue.getProducer());
+          methodNode.instructions.remove(value2SourceValue.getProducer());
         }
       }
     }
@@ -66,7 +65,7 @@ public class UniversalFlowTransformer extends Transformer {
 
   // TODO: Add LOOKUPSWITCH and TABLESWITCH
   private void simplifyJumpInstructions(ClassWrapper classWrapper, MethodNode methodNode) {
-    Map<AbstractInsnNode, Frame<SourceValue>> frames = analyzeSource(classWrapper.getClassNode(), methodNode);
+    Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = analyzeOriginalSource(classWrapper.getClassNode(), methodNode);
     if (frames == null) return;
 
     // Simplify 'jump' instructions
@@ -74,19 +73,21 @@ public class UniversalFlowTransformer extends Transformer {
       if (AsmMathHelper.isOneValueCondition(insn.getOpcode())) {
         // One-value if statement
 
-        Frame<SourceValue> frame = frames.get(insn);
+        Frame<OriginalSourceValue> frame = frames.get(insn);
         if (frame == null) continue;
 
         JumpInsnNode jumpInsn = (JumpInsnNode) insn;
 
         // Get instruction from stack that is passed to if statement
-        Optional<StackWalker.StackValue> value = StackWalker.getOnlyOnePossibleProducer(frames, frame.getStack(frame.getStackSize() - 1));
-        if (value.isEmpty()) continue;
+        OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - 1);
+        if (!sourceValue.originalSource.isOneWayProduced()) continue;
+
+        AbstractInsnNode valueInsn = sourceValue.originalSource.getProducer();
 
         // Process if statement
-        if (value.get().value().isInteger()) {
+        if (valueInsn.isInteger()) {
           boolean ifResult = AsmMathHelper.condition(
-              value.get().value().asInteger(), // Value
+              valueInsn.asInteger(), // Value
               jumpInsn.getOpcode() // Opcode
           );
 
@@ -94,26 +95,29 @@ public class UniversalFlowTransformer extends Transformer {
           processRedundantIfStatement(methodNode, jumpInsn, ifResult);
 
           // Cleanup value
-          value.get().remove(methodNode);
+          methodNode.instructions.remove(sourceValue.getProducer());
         }
       } else if (AsmMathHelper.isTwoValuesCondition(insn.getOpcode())) {
         // Two-value if statements
 
-        Frame<SourceValue> frame = frames.get(insn);
+        Frame<OriginalSourceValue> frame = frames.get(insn);
         if (frame == null) continue;
 
         JumpInsnNode jumpInsn = (JumpInsnNode) insn;
 
         // Get instructions from stack that are passed to if statement
-        Optional<StackWalker.StackValue> value1 = StackWalker.getOnlyOnePossibleProducer(frames, frame.getStack(frame.getStackSize() - 2));
-        Optional<StackWalker.StackValue> value2 = StackWalker.getOnlyOnePossibleProducer(frames, frame.getStack(frame.getStackSize() - 1));
-        if (value1.isEmpty() || value2.isEmpty()) continue;
+        OriginalSourceValue sourceValue1 = frame.getStack(frame.getStackSize() - 2);
+        OriginalSourceValue sourceValue2 = frame.getStack(frame.getStackSize() - 1);
+        if (!sourceValue1.originalSource.isOneWayProduced() || !sourceValue2.originalSource.isOneWayProduced()) continue;
+
+        AbstractInsnNode valueInsn1 = sourceValue1.originalSource.getProducer();
+        AbstractInsnNode valueInsn2 = sourceValue2.originalSource.getProducer();
 
         // Process if statement
-        if (value1.get().value().isInteger() && value2.get().value().isInteger()) {
+        if (valueInsn1.isInteger() && valueInsn2.isInteger()) {
           boolean ifResult = AsmMathHelper.condition(
-              value1.get().value().asInteger(), // First value
-              value2.get().value().asInteger(), // Second value
+              valueInsn1.asInteger(), // First value
+              valueInsn2.asInteger(), // Second value
               jumpInsn.getOpcode() // Opcode
           );
 
@@ -121,8 +125,8 @@ public class UniversalFlowTransformer extends Transformer {
           processRedundantIfStatement(methodNode, jumpInsn, ifResult);
 
           // Cleanup values
-          value1.get().remove(methodNode);
-          value2.get().remove(methodNode);
+          methodNode.instructions.remove(sourceValue1.getProducer());
+          methodNode.instructions.remove(sourceValue2.getProducer());
         }
       }
     }
