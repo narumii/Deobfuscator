@@ -7,14 +7,21 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 public class NopCleanTransformer extends Transformer {
 
+  private boolean changed = false;
+
   @Override
-  public void transform(ClassWrapper scope, Context context) throws Exception {
+  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).stream()
         .flatMap(classWrapper -> classWrapper.methods().stream())
         .forEach(
             methodNode ->
                 Arrays.stream(methodNode.instructions.toArray())
                     .filter(node -> node.getOpcode() == NOP)
-                    .forEach(methodNode.instructions::remove));
+                    .forEach(node -> {
+                      methodNode.instructions.remove(node);
+                      changed = true;
+                    }));
+
+    return changed;
   }
 }

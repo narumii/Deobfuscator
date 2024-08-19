@@ -81,15 +81,20 @@ public class AccessRepairTransformer extends Transformer {
     ACC_SYNTHETIC
   };
 
+  private boolean changed = false;
+
   @Override
-  public void transform(ClassWrapper scope, Context context) throws Exception {
+  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
     context
         .classes(scope)
         .forEach(
             classWrapper -> {
               int classAccess = classWrapper.getClassNode().access;
               for (int access : CLASS) {
-                if (isAccess(classAccess, access)) classAccess &= ~access;
+                if (isAccess(classAccess, access)) {
+                  classAccess &= ~access;
+                  changed = true;
+                }
               }
               classWrapper.getClassNode().access = classAccess;
 
@@ -98,15 +103,20 @@ public class AccessRepairTransformer extends Transformer {
                   .forEach(
                       methodNode -> {
                         for (int access : METHOD) {
-                          if (isAccess(methodNode.access, access)) methodNode.access &= ~access;
+                          if (isAccess(methodNode.access, access)) {
+                            methodNode.access &= ~access;
+                            changed = true;
+                          }
                         }
 
                         if (methodNode.parameters != null)
                           methodNode.parameters.forEach(
                               parameterNode -> {
                                 for (int access : PARAMETER) {
-                                  if (isAccess(parameterNode.access, access))
+                                  if (isAccess(parameterNode.access, access)) {
                                     parameterNode.access &= ~access;
+                                    changed = true;
+                                  }
                                 }
                               });
                       });
@@ -116,11 +126,16 @@ public class AccessRepairTransformer extends Transformer {
                   .forEach(
                       fieldNode -> {
                         for (int access : FIELD) {
-                          if (isAccess(fieldNode.access, access)) fieldNode.access &= ~access;
+                          if (isAccess(fieldNode.access, access)) {
+                            fieldNode.access &= ~access;
+                            changed = true;
+                          }
                         }
                       });
 
               // TODO: Module maybe?
             });
+
+    return changed;
   }
 }

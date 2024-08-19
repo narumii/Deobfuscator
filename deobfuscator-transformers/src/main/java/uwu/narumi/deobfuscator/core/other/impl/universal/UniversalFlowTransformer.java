@@ -16,12 +16,16 @@ import java.util.Map;
 
 public class UniversalFlowTransformer extends Transformer {
 
+  private boolean changed = false;
+
   @Override
-  public void transform(ClassWrapper scope, Context context) throws Exception {
+  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
       simplifyCompareInstructions(classWrapper, methodNode);
       simplifyJumpInstructions(classWrapper, methodNode);
     }));
+
+    return changed;
   }
 
   // TODO: Incomplete. Move to UniversalNumberTransformer during its rewrite.
@@ -58,6 +62,8 @@ public class UniversalFlowTransformer extends Transformer {
           }
           methodNode.instructions.remove(value1SourceValue.getProducer());
           methodNode.instructions.remove(value2SourceValue.getProducer());
+
+          changed = true;
         }
       }
     }
@@ -96,6 +102,8 @@ public class UniversalFlowTransformer extends Transformer {
 
           // Cleanup value
           methodNode.instructions.remove(sourceValue.getProducer());
+
+          changed = true;
         }
       } else if (AsmMathHelper.isTwoValuesCondition(insn.getOpcode())) {
         // Two-value if statements
@@ -127,6 +135,8 @@ public class UniversalFlowTransformer extends Transformer {
           // Cleanup values
           methodNode.instructions.remove(sourceValue1.getProducer());
           methodNode.instructions.remove(sourceValue2.getProducer());
+
+          changed = true;
         }
       }
     }

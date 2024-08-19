@@ -18,20 +18,24 @@ import java.util.Arrays;
 import java.util.List;
 
 public class DeadCodeCleanTransformer extends Transformer {
+
+  private boolean changed = false;
+
   @Override
-  public void transform(ClassWrapper scope, Context context) throws Exception {
+  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
       removeDeadCode(classWrapper, methodNode);
 
       try {
-        new UnUsedLabelCleanTransformer().transform(classWrapper, context);
+        changed |= new UnUsedLabelCleanTransformer().transform(classWrapper, context);
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
 
-
       removeUselessGotoJumps(methodNode);
     }));
+
+    return changed;
   }
 
   // Remove useless GOTO jumps
@@ -61,13 +65,14 @@ public class DeadCodeCleanTransformer extends Transformer {
             // Remove the goto and the label
             methodNode.instructions.remove(labelNode);
             methodNode.instructions.remove(jumpInsn);
+            changed = true;
           }
         }
       }
     }
   }
 
-  private static void removeDeadCode(ClassWrapper classWrapper, MethodNode methodNode) {
+  private void removeDeadCode(ClassWrapper classWrapper, MethodNode methodNode) {
     Analyzer<?> analyzer = new Analyzer<>(new BasicInterpreter());
     try {
       analyzer.analyze(classWrapper.name(), methodNode);
@@ -82,6 +87,7 @@ public class DeadCodeCleanTransformer extends Transformer {
       if (frames[i] == null && insn.getType() != AbstractInsnNode.LABEL) {
         methodNode.instructions.remove(insn);
         insns[i] = null;
+        changed = true;
       }
     }
   }

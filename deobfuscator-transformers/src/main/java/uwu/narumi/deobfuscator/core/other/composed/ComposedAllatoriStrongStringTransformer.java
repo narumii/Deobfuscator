@@ -10,10 +10,10 @@ import java.util.List;
 
 public class ComposedAllatoriStrongStringTransformer extends ComposedTransformer {
 
-    @Override
-    public List<Transformer> transformers() {
-        return Arrays.asList(
-                new UniversalNumberTransformer(),
-                new AllatoriStringTransformer(true));
+    public ComposedAllatoriStrongStringTransformer() {
+        super(
+            UniversalNumberTransformer::new,
+            () -> new AllatoriStringTransformer(true)
+        );
     }
 }

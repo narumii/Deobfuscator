@@ -17,26 +17,26 @@ import java.util.Map;
  * Inlines constant local variables
  */
 public class InlineLocalVariablesTransformer extends Transformer {
-  @Override
-  public void transform(ClassWrapper scope, Context context) throws Exception {
-    context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
-      boolean changed;
-      do {
-        changed = inlineLocalVariables(classWrapper, methodNode);
-      } while (changed);
-    }));
+  public InlineLocalVariablesTransformer() {
+    this.rerunOnChange = true;
   }
 
-  /**
-   * @return Is changed
-   */
-  private boolean inlineLocalVariables(ClassWrapper classWrapper, MethodNode methodNode) {
+  private boolean changed = false;
+
+  @Override
+  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
+    context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
+      inlineLocalVariables(classWrapper, methodNode);
+    }));
+
+    return changed;
+  }
+
+  private void inlineLocalVariables(ClassWrapper classWrapper, MethodNode methodNode) {
     Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = analyzeOriginalSource(classWrapper.getClassNode(), methodNode);
-    if (frames == null) return false;
+    if (frames == null) return;
 
     List<AbstractInsnNode> toRemoveInsns = new ArrayList<>();
-
-    boolean changed = false;
 
     // Inline static local variables
     for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
@@ -73,7 +73,5 @@ public class InlineLocalVariablesTransformer extends Transformer {
 
     // Cleanup
     toRemoveInsns.forEach(methodNode.instructions::remove);
-
-    return changed;
   }
 }

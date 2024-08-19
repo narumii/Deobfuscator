@@ -7,7 +7,7 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 public class SignatureCleanTransformer extends Transformer {
 
   @Override
-  public void transform(ClassWrapper scope, Context context) throws Exception {
+  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
     context
         .classes(scope)
         .forEach(
@@ -16,5 +16,8 @@ public class SignatureCleanTransformer extends Transformer {
               classWrapper.methods().forEach(methodNode -> methodNode.signature = null);
               classWrapper.fields().forEach(fieldNode -> fieldNode.signature = null);
             });
+
+    // There is always a change
+    return true;
   }
 }

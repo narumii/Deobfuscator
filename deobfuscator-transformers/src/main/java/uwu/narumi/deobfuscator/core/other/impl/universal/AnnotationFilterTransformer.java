@@ -19,37 +19,39 @@ public class AnnotationFilterTransformer extends Transformer {
               || annotationNode.desc.contains("\u0000")
               || annotationNode.desc.contains(" ");
 
+  private boolean changed = false;
+
   @Override
-  public void transform(ClassWrapper scope, Context context) throws Exception {
+  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
     context
         .classes(scope)
         .forEach(
             classWrapper -> {
               if (classWrapper.getClassNode().invisibleAnnotations != null)
-                classWrapper
+                changed |= classWrapper
                     .getClassNode()
                     .invisibleAnnotations
                     .removeIf(ANNOTATION_NODE_PREDICATE);
 
               if (classWrapper.getClassNode().visibleAnnotations != null)
-                classWrapper.getClassNode().visibleAnnotations.removeIf(ANNOTATION_NODE_PREDICATE);
+                changed |= classWrapper.getClassNode().visibleAnnotations.removeIf(ANNOTATION_NODE_PREDICATE);
 
               classWrapper
                   .methods()
                   .forEach(
                       methodNode -> {
                         if (methodNode.invisibleAnnotations != null)
-                          methodNode.invisibleAnnotations.removeIf(ANNOTATION_NODE_PREDICATE);
+                          changed |= methodNode.invisibleAnnotations.removeIf(ANNOTATION_NODE_PREDICATE);
 
                         if (methodNode.visibleAnnotations != null)
-                          methodNode.visibleAnnotations.removeIf(ANNOTATION_NODE_PREDICATE);
+                          changed |= methodNode.visibleAnnotations.removeIf(ANNOTATION_NODE_PREDICATE);
 
                         if (methodNode.invisibleParameterAnnotations != null)
                           for (List<AnnotationNode> invisibleParameterAnnotation :
                               methodNode.invisibleParameterAnnotations) {
                             if (invisibleParameterAnnotation == null) continue;
 
-                            invisibleParameterAnnotation.removeIf(ANNOTATION_NODE_PREDICATE);
+                            changed |= invisibleParameterAnnotation.removeIf(ANNOTATION_NODE_PREDICATE);
                           }
 
                         if (methodNode.visibleParameterAnnotations != null)
@@ -57,7 +59,7 @@ public class AnnotationFilterTransformer extends Transformer {
                               methodNode.visibleParameterAnnotations) {
                             if (visibleParameterAnnotation == null) continue;
 
-                            visibleParameterAnnotation.removeIf(ANNOTATION_NODE_PREDICATE);
+                            changed |= visibleParameterAnnotation.removeIf(ANNOTATION_NODE_PREDICATE);
                           }
                       });
 
@@ -66,11 +68,13 @@ public class AnnotationFilterTransformer extends Transformer {
                   .forEach(
                       fieldNode -> {
                         if (fieldNode.invisibleAnnotations != null)
-                          fieldNode.invisibleAnnotations.removeIf(ANNOTATION_NODE_PREDICATE);
+                          changed |= fieldNode.invisibleAnnotations.removeIf(ANNOTATION_NODE_PREDICATE);
 
                         if (fieldNode.visibleAnnotations != null)
-                          fieldNode.visibleAnnotations.removeIf(ANNOTATION_NODE_PREDICATE);
+                          changed |= fieldNode.visibleAnnotations.removeIf(ANNOTATION_NODE_PREDICATE);
                       });
             });
+
+    return changed;
   }
 }

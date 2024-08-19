@@ -25,7 +25,7 @@ public class UniversalNumberTransformer extends Transformer {
     private final AtomicInteger resolved = new AtomicInteger();
 
     @Override
-    public void transform(ClassWrapper scope, Context context) throws Exception {
+    protected boolean transform(ClassWrapper scope, Context context) throws Exception {
         context.classes(scope).forEach(classWrapper -> {
             for (MethodNode methodNode : classWrapper.methods()) {
                 boolean modified;
@@ -307,6 +307,8 @@ public class UniversalNumberTransformer extends Transformer {
         });
 
         LOGGER.info("Simplified {} number operations in {} classes", resolved.get(), context.classes().size());
+
+        return resolved.get() > 0;
     }
 
     public void registerFunction(TriFunction<ClassWrapper, MethodNode, AbstractInsnNode, Boolean> function) {
