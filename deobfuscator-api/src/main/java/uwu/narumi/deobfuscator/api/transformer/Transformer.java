@@ -28,7 +28,7 @@ public abstract class Transformer extends AsmHelper implements Opcodes {
   /**
    * Do the transformation
    *
-   * @param scope You can choose the class to scope the transformer or set it to null to transform all classes
+   * @param scope You can choose the class transform or set it to null to transform all classes
    * @param context The context
    * @return If the transformation changed something
    */
