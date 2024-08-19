@@ -41,7 +41,7 @@ public abstract class Transformer extends AsmHelper implements Opcodes {
   /**
    * Run the transformer
    *
-   * @param transformerSupplier The transformer supplier with all configuration ready to go. Required to recreate
+   * @param transformerSupplier The transformer supplier with all its configuration ready to go. Required to recreate
    *                            transformer multiple times with the same configuration. You must pass here new instance.
    *                            You can't reuse the existing instance.
    * @param scope You can choose the class to scope the transformer or set it to null to transform all classes
