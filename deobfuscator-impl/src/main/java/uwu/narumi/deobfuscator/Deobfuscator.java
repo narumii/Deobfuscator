@@ -113,11 +113,11 @@ public class Deobfuscator {
     LOGGER.info("Loaded input file: {}\n", input);
   }
 
-  public void transform(List<Supplier<Transformer>> transformersSuppliers) {
-    if (transformersSuppliers == null || transformersSuppliers.isEmpty()) return;
+  public void transform(List<Supplier<Transformer>> transformers) {
+    if (transformers == null || transformers.isEmpty()) return;
 
     // Run all transformers!
-    transformersSuppliers.forEach(transformerSupplier -> Transformer.transform(transformerSupplier, null, this.context));
+    transformers.forEach(transformerSupplier -> Transformer.transform(transformerSupplier, null, this.context));
   }
 
   private void saveOutput() {
