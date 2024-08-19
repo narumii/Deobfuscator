@@ -46,6 +46,7 @@ public abstract class Transformer extends AsmHelper implements Opcodes {
    *                            You can't reuse the existing instance.
    * @param scope You can choose the class transform or set it to null to transform all classes
    * @param context The context
+   * @return If the transformation changed something
    */
   public static boolean transform(Supplier<Transformer> transformerSupplier, @Nullable ClassWrapper scope, Context context) {
     return transform(transformerSupplier, scope, context, null);
