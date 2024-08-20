@@ -109,6 +109,10 @@ public class ConstantPool implements Cloneable {
     return values[index];
   }
 
+  public int getSize() {
+    return cpInfoOffsets.length;
+  }
+
   // Im actually gonna shoot myself
   private String readUtf(
       ClassReader classReader, final int utfOffset, final int utfLength, final char[] charBuffer) {
