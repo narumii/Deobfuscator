@@ -1,12 +1,8 @@
 package uwu.narumi.deobfuscator.core.other.composed;
 
 import uwu.narumi.deobfuscator.api.transformer.ComposedTransformer;
-import uwu.narumi.deobfuscator.api.transformer.Transformer;
 import uwu.narumi.deobfuscator.core.other.impl.allatori.AllatoriStringTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class ComposedAllatoriStrongStringTransformer extends ComposedTransformer {
 

@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 /**
- * Transformer that gives instructions along with their current {@link Frame}s
+ * Transformer that will iterate instructions along with their current {@link Frame}s
  */
 public abstract class FramedInstructionsTransformer extends Transformer {
   private boolean changed = false;
