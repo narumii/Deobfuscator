@@ -1,9 +1,7 @@
 package uwu.narumi.deobfuscator.core.other.impl.universal;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
-import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
@@ -21,52 +19,10 @@ public class UniversalFlowTransformer extends Transformer {
   @Override
   protected boolean transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
-      simplifyCompareInstructions(classWrapper, methodNode);
       simplifyJumpInstructions(classWrapper, methodNode);
     }));
 
     return changed;
-  }
-
-  // TODO: Incomplete. Move to UniversalNumberTransformer during its rewrite.
-  private void simplifyCompareInstructions(ClassWrapper classWrapper, MethodNode methodNode) {
-    Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = analyzeOriginalSource(classWrapper.getClassNode(), methodNode);
-    if (frames == null) return;
-
-    // Simplify 'compare' instructions
-    for (AbstractInsnNode insn : methodNode.instructions) {
-      if (insn.getOpcode() == LCMP) {
-        Frame<OriginalSourceValue> frame = frames.get(insn);
-        if (frame == null) continue;
-
-        // Get instructions from stack that are passed to LCMP
-        OriginalSourceValue value1SourceValue = frame.getStack(frame.getStackSize() - 2);
-        OriginalSourceValue value2SourceValue = frame.getStack(frame.getStackSize() - 1);
-        if (!value1SourceValue.originalSource.isOneWayProduced() || !value2SourceValue.originalSource.isOneWayProduced()) continue;
-
-        AbstractInsnNode value1Insn = value1SourceValue.originalSource.getProducer();
-        AbstractInsnNode value2Insn = value2SourceValue.originalSource.getProducer();
-
-        if (value1Insn instanceof LdcInsnNode ldcValue1 && value2Insn instanceof LdcInsnNode ldcValue2) {
-          long value1 = (long) ldcValue1.cst;
-          long value2 = (long) ldcValue2.cst;
-          if (value1 > value2) {
-            // Result: 1
-            methodNode.instructions.set(insn, new InsnNode(ICONST_1));
-          } else if (value1 < value2) {
-            // Result: -1
-            methodNode.instructions.set(insn, new InsnNode(ICONST_M1));
-          } else {
-            // Result: 0
-            methodNode.instructions.set(insn, new InsnNode(ICONST_0));
-          }
-          methodNode.instructions.remove(value1SourceValue.getProducer());
-          methodNode.instructions.remove(value2SourceValue.getProducer());
-
-          changed = true;
-        }
-      }
-    }
   }
 
   // TODO: Add LOOKUPSWITCH and TABLESWITCH
@@ -75,7 +31,7 @@ public class UniversalFlowTransformer extends Transformer {
     if (frames == null) return;
 
     // Simplify 'jump' instructions
-    for (AbstractInsnNode insn : methodNode.instructions) {
+    for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
       if (AsmMathHelper.isOneValueCondition(insn.getOpcode())) {
         // One-value if statement
 
