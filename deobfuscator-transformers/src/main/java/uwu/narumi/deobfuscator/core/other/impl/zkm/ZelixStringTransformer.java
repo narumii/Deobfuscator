@@ -25,7 +25,7 @@ public class ZelixStringTransformer extends Transformer {
 
     /* Written by https://github.com/Lampadina17 | OG 19/07/2024, Rewritten 09/08/2024 */
     @Override
-    public void transform(ClassWrapper scope, Context context) throws Exception {
+    protected boolean transform(ClassWrapper scope, Context context) throws Exception {
         context.classes(scope).forEach(classWrapper -> {
             /* Extract key type 1 from hardcoded xor encryption */
             classWrapper.methods().stream()
@@ -176,6 +176,8 @@ public class ZelixStringTransformer extends Transformer {
                     });
         });
         LOGGER.info("Decrypted {} strings in {} classes", resolved.get(), context.classes().size());
+
+        return resolved.get() > 0;
     }
 
     /* Convert arraylist to array and shift values, when a bug transform into a feature (Key type 2) */

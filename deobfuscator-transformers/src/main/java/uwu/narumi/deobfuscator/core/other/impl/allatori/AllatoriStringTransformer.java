@@ -30,7 +30,7 @@ public class AllatoriStringTransformer extends Transformer {
     /* Written by https://github.com/Lampadina17 | 06/08/2024 */
     /* use UniversalNumberTransformer before this transformer to decrypt keys */
     @Override
-    public void transform(ClassWrapper scope, Context context) throws Exception {
+    protected boolean transform(ClassWrapper scope, Context context) throws Exception {
         context.classes(scope).forEach(classWrapper -> {
             classWrapper.methods().forEach(methodNode -> {
 
@@ -102,6 +102,8 @@ public class AllatoriStringTransformer extends Transformer {
             });
         });
         LOGGER.info("Decrypted {} strings in {} classes", resolved.get(), context.classes().size());
+
+        return resolved.get() > 0;
     }
 
     public class DecryptionMethod {

@@ -7,7 +7,7 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 public class ClassDebugInfoCleanTransformer extends Transformer {
 
   @Override
-  public void transform(ClassWrapper scope, Context context) throws Exception {
+  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
     context
         .classes(scope)
         .forEach(
@@ -15,5 +15,8 @@ public class ClassDebugInfoCleanTransformer extends Transformer {
               classWrapper.getClassNode().sourceDebug = null;
               classWrapper.getClassNode().sourceFile = null;
             });
+
+    // There is always a change
+    return true;
   }
 }

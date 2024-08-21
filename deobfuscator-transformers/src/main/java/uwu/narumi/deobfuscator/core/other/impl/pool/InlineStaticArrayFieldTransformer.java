@@ -165,7 +165,7 @@ public class InlineStaticArrayFieldTransformer extends Transformer {
   }
 
   @Override
-  public void transform(ClassWrapper scope, Context context) throws Exception {
+  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
     context
         .classes(scope)
         .forEach(
@@ -233,6 +233,8 @@ public class InlineStaticArrayFieldTransformer extends Transformer {
             });
 
     LOGGER.info("Inlined {} objects in {} classes", inline.get(), context.classes().size());
+
+    return inline.get() > 0;
   }
 
   private void extractData(ClassWrapper classWrapper, MethodNode methodNode, Context context) {

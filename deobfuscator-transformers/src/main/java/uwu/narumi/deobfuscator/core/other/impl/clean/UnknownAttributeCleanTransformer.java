@@ -7,19 +7,23 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 public class UnknownAttributeCleanTransformer extends Transformer {
 
+  private boolean changed = false;
+
   @Override
-  public void transform(ClassWrapper scope, Context context) throws Exception {
+  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
     context
         .classes(scope)
         .forEach(
             classWrapper -> {
-              classWrapper.getClassNode().attrs.removeIf(Attribute::isUnknown);
+              changed |= classWrapper.getClassNode().attrs.removeIf(Attribute::isUnknown);
               classWrapper
                   .methods()
-                  .forEach(methodNode -> methodNode.attrs.removeIf(Attribute::isUnknown));
+                  .forEach(methodNode -> changed |= methodNode.attrs.removeIf(Attribute::isUnknown));
               classWrapper
                   .fields()
-                  .forEach(fieldNode -> fieldNode.attrs.removeIf(Attribute::isUnknown));
+                  .forEach(fieldNode -> changed |= fieldNode.attrs.removeIf(Attribute::isUnknown));
             });
+
+    return changed;
   }
 }

@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.xml.transform.TransformerException;
@@ -28,7 +29,7 @@ public class Deobfuscator {
 
   private final Context context = new Context();
 
-  private final List<Transformer> transformers = new ArrayList<>();
+  private final List<Supplier<Transformer>> transformers = new ArrayList<>();
   private final Path input;
   private final Path output;
   private final int classReaderFlags;
@@ -112,32 +113,11 @@ public class Deobfuscator {
     LOGGER.info("Loaded input file: {}\n", input);
   }
 
-  public void transform(List<Transformer> transformers) {
+  public void transform(List<Supplier<Transformer>> transformers) {
     if (transformers == null || transformers.isEmpty()) return;
 
-    transformers.forEach(
-        transformer -> {
-          LOGGER.info("-------------------------------------");
-          try {
-            LOGGER.info("Running {} transformer", transformer.name());
-            long start = System.currentTimeMillis();
-            transformer.transform(null, context);
-            LOGGER.info(
-                "Ended {} transformer in {} ms",
-                transformer.name(),
-                (System.currentTimeMillis() - start));
-          } catch (TransformerException e) {
-            LOGGER.error("! {}: {}", transformer.name(), e.getMessage());
-
-            if (consoleDebug) e.printStackTrace();
-          } catch (Exception e) {
-            LOGGER.error("Error occurred when transforming {}", transformer.name());
-            LOGGER.debug("Error", e);
-
-            if (consoleDebug) e.printStackTrace();
-          }
-          LOGGER.info("-------------------------------------\n");
-        });
+    // Run all transformers!
+    transformers.forEach(transformerSupplier -> Transformer.transform(transformerSupplier, null, this.context));
   }
 
   private void saveOutput() {
@@ -216,7 +196,7 @@ public class Deobfuscator {
     private final Set<Path> libraries = new HashSet<>();
     private Path input = Path.of("input.jar");
     private Path output = Path.of("output.jar");
-    private List<Transformer> transformers = List.of();
+    private List<Supplier<Transformer>> transformers = List.of();
 
     private int classReaderFlags = ClassReader.EXPAND_FRAMES;
     private int classWriterFlags = ClassWriter.COMPUTE_MAXS;
@@ -252,7 +232,8 @@ public class Deobfuscator {
       return this;
     }
 
-    public Builder transformers(Transformer... transformers) {
+    @SafeVarargs
+    public final Builder transformers(Supplier<Transformer>... transformers) {
       this.transformers = Arrays.asList(transformers);
       return this;
     }

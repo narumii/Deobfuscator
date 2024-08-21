@@ -7,7 +7,7 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 public class StackOperationResolveTransformer extends Transformer {
 
   @Override
-  public void transform(ClassWrapper scope, Context context) throws Exception {
+  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
     throw new UnsupportedOperationException("TODO");
   }
 }

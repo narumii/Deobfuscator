@@ -8,13 +8,15 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 // TODO: Will probably shit itself
 public class TryCatchRepairTransformer extends Transformer {
 
+  private boolean changed = false;
+
   @Override
-  public void transform(ClassWrapper scope, Context context) throws Exception {
+  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).stream()
         .flatMap(classWrapper -> classWrapper.methods().stream())
         .forEach(
             methodNode -> {
-              methodNode.tryCatchBlocks.removeIf(
+              this.changed |= methodNode.tryCatchBlocks.removeIf(
                   tbce -> {
                     if (tbce.start.equals(tbce.end)
                         || tbce.start.equals(tbce.handler)
@@ -40,10 +42,12 @@ public class TryCatchRepairTransformer extends Transformer {
                               <= methodNode.instructions.indexOf(end);
                   });
 
-              methodNode.exceptions.removeIf(
+              this.changed |= methodNode.exceptions.removeIf(
                   exception ->
                       methodNode.tryCatchBlocks.stream()
                           .noneMatch(tbce -> tbce.type.equals(exception)));
             });
+
+    return changed;
   }
 }

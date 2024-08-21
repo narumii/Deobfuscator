@@ -72,7 +72,7 @@ public class InlineStaticFieldTransformer extends Transformer {
   }
 
   @Override
-  public void transform(ClassWrapper scope, Context context) throws Exception {
+  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
     context
         .classes(scope)
         .forEach(
@@ -149,6 +149,8 @@ public class InlineStaticFieldTransformer extends Transformer {
 
     //        values.clear();
     LOGGER.info("Inlined {} numbers in {} classes", inline.get(), context.classes().size());
+
+    return inline.get() > 0;
   }
 
   private void extractNumbers(MethodNode methodNode, Context context) {
