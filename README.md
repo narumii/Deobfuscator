@@ -4,7 +4,6 @@
 > - Porting old transformers to new code base
 > - Testing InstructionMatcher
 > - Implementing/Improving transformers
-> - Variable inlining (UniversalNumberTransformer)
 > - Safety checks on putstatic in FieldInlineTransformers (overriding values)
 > - Feedback on how the new api presents itself (mainly InstructionMatcher)
 >   <br>
