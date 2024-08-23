@@ -55,7 +55,7 @@ public abstract class TestDeobfuscationBase {
 
   @TestFactory
   @DisplayName("Test deobfuscation")
-  public Stream<DynamicTest> testRegistered() {
+  public Stream<DynamicTest> testDeobfuscation() {
     this.registeredTests.clear();
     this.registerAll();
     return this.registeredTests.stream().map(RegisteredTest::buildTest);
