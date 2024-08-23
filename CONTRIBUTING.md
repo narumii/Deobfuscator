@@ -1,6 +1,6 @@
 # Contributing
 
-## How to run deobfuscator
+## ✅ How to run deobfuscator
 1. Navigate to class [`Bootstrap.java`](./deobfuscator-impl/src/test/java/Bootstrap.java)
 2. In this class edit the deobfuscator configuration
     - `input` - Your input jar file
@@ -9,7 +9,7 @@
 
 ![tak](./assets/run-deobfuscator.gif)
 
-## Project structure
+## 🪜 Project structure
 The project is structured as follows:
 - [`deobfuscator-api`](./deobfuscator-api) - The API for the deobfuscator.
 - [`deobfuscator-impl`](./deobfuscator-impl) - The main deobfuscator runner.
@@ -23,7 +23,7 @@ The project is structured as follows:
 - [`TestDeobfuscation.java`](./deobfuscator-impl/src/test/java/uwu/narumii/deobfuscator/TestDeobfuscation.java) - Class where each test sample is registered.
 - [`Bootstrap.java`](./deobfuscator-impl/src/test/java/Bootstrap.java) - Class where you can run deobfuscator manually.
 
-## Transformers
+## 🪄 Transformers
 ### What are transformers?
 Whole deobfuscation process is based on transformers. Transformers are smaller classes that are responsible for deobfuscating specific obfuscation techniques. In simple words - transformers are transforming obfuscated code into a more readable form.
 
@@ -34,7 +34,7 @@ Whole deobfuscation process is based on transformers. Transformers are smaller c
     - `ComposedTransformer` - Transformer that consists of multiple transformers.
 3. You can start coding!
 
-## Testing
+## 🧪 Testing
 ### How these test work?
 1. The registered samples are transformed using corresponding transformers.
 2. The output gets decompiled using Vineflower.
