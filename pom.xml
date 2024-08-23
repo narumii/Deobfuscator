@@ -10,7 +10,7 @@
   <version>2.0-SNAPSHOT</version>
 
   <modules>
-    <!-- Code for deobfuscation -->
+    <!-- Code for test deobfuscation -->
     <module>testData/src/java</module>
 
     <module>deobfuscator-api</module>
