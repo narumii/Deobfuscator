@@ -11,7 +11,6 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
 
   @Override
   protected void registerAll() {
-    // Register your tests here
     register("Inlining local variables", InputType.JAVA_CODE, List.of(InlineLocalVariablesTransformer::new), "TestInlineLocalVariables");
     register("Simple flow obfuscation", InputType.JAVA_CODE, List.of(ComposedGeneralFlowTransformer::new), "TestSimpleFlowObfuscation");
 

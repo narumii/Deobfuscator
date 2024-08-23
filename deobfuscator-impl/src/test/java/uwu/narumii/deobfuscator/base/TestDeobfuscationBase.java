@@ -27,15 +27,18 @@ public abstract class TestDeobfuscationBase {
 
   private final List<RegisteredTest> registeredTests = new ArrayList<>();
 
+  /**
+   * Register your tests here
+   */
   protected abstract void registerAll();
 
   /**
    * Register input files for testing
    *
    * @param testName Test name
-   * @param inputType Input type
+   * @param inputType Input type. See enum options.
    * @param transformers Transformers to use
-   * @param sources Sources to use
+   * @param sources You can choose one class or multiple classes for testing
    */
   protected void register(String testName, InputType inputType, List<Supplier<Transformer>> transformers, String... sources) {
     // Register
