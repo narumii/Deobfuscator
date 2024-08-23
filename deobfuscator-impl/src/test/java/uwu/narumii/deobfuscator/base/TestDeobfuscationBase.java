@@ -23,7 +23,9 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public abstract class TestDeobfuscationBase {
-  private static final Path COMPILED_CLASSES_PATH = Path.of("..", "testData", "compiled");
+  public static final Path TEST_DATA_PATH = Path.of("..", "testData");
+  public static final Path COMPILED_CLASSES_PATH = Path.of(TEST_DATA_PATH.toString(), "compiled");
+  public static final Path RESULTS_CLASSES_PATH = Path.of(TEST_DATA_PATH.toString(), "results");
 
   private final List<RegisteredTest> registeredTests = new ArrayList<>();
 
@@ -92,7 +94,7 @@ public abstract class TestDeobfuscationBase {
         );
       } else {
         for (String sourceName : sources) {
-          Path path = Path.of("..", "testData", "compiled", inputType.directory(), sourceName + ".class");
+          Path path = Path.of(COMPILED_CLASSES_PATH.toString(), inputType.directory(), sourceName + ".class");
 
           if (!path.toFile().exists()) {
             throw new IllegalArgumentException("File not found: " + path.toAbsolutePath().normalize());

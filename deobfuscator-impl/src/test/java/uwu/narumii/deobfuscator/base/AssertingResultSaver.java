@@ -45,10 +45,10 @@ public class AssertingResultSaver implements IResultSaver {
   public void saveClassFile(String path, String qualifiedName, String entryName, String content, int[] mapping) {
     Path saveTo;
     if (this.inputType == TestDeobfuscationBase.InputType.CUSTOM_JAR) {
-      saveTo = Path.of("..", "testData", "results", inputType.directory(), this.inputJar, qualifiedName + ".dec");
+      saveTo = Path.of(TestDeobfuscationBase.RESULTS_CLASSES_PATH.toString(), inputType.directory(), this.inputJar, qualifiedName + ".dec");
     } else {
       String sourceName = sourcePathToSourceName.get(path);
-      saveTo = Path.of("..", "testData", "results", inputType.directory(), sourceName + ".dec");
+      saveTo = Path.of(TestDeobfuscationBase.RESULTS_CLASSES_PATH.toString(), inputType.directory(), sourceName + ".dec");
     }
 
     File fileSaveTo = saveTo.toFile();
