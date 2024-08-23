@@ -26,12 +26,12 @@ public final class ClassHelper {
             .equals("CAFEBABE");
   }
 
-  public static ClassWrapper loadClass(byte[] bytes, int readerMode) throws Exception {
-    return loadClass(bytes, readerMode, false);
+  public static ClassWrapper loadClass(String path, byte[] bytes, int readerMode, int classWriterFlags) throws Exception {
+    return loadClass(path, bytes, readerMode, classWriterFlags, false);
   }
 
-  public static ClassWrapper loadClass(byte[] bytes, int readerMode, boolean fix) throws Exception {
-    return new ClassWrapper(new ClassReader(fix ? fixClass(bytes) : bytes), readerMode);
+  public static ClassWrapper loadClass(String path, byte[] bytes, int readerMode, int classWriterFlags, boolean fix) throws Exception {
+    return new ClassWrapper(path, new ClassReader(fix ? fixClass(bytes) : bytes), readerMode, classWriterFlags);
   }
 
   public static byte[] fixClass(byte[] bytes) throws InvalidClassException {

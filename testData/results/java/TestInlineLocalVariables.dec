@@ -1,0 +1,28 @@
+public class TestInlineLocalVariables {
+    public static void test(int a) {
+        System.out.println(a);
+        if (System.currentTimeMillis() == 123L) {
+            a = 3;
+        }
+
+        System.out.println(a);
+    }
+
+    public static void test2() {
+        System.out.println(1);
+        System.out.println(2);
+        System.out.println(3);
+        System.out.println(4);
+    }
+
+    public static boolean test3() {
+        boolean testVar;
+        try {
+            testVar = System.currentTimeMillis() == 123L;
+        } finally {
+            System.out.println("123");
+        }
+
+        return testVar;
+    }
+}
