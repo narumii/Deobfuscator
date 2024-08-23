@@ -43,7 +43,7 @@ Whole deobfuscation process is based on transformers. Transformers are smaller c
 ### How to create your own tests?
 You can create your own tests for transformers. There are a few ways to do it:
 - If the obfuscation is simple enough, you can write your own sample in [`testData/src/java`](./testData/src/java)
-- If the obfuscation is more complex, you can throw your obfuscated classes into [`testData/compiled/custom-classes`](./testData/compiled/custom-classes) and test transformers on them.
+- If the obfuscation is more complex, you can throw your raw obfuscated classes (`.class` files) into [`testData/compiled/custom-classes`](./testData/compiled/custom-classes) and test transformers on them.
 - You can also throw your obfuscated jars into [`testData/compiled/custom-jars`](./testData/compiled/custom-jars) and test transformers on them.
 
 You also need to register each sample in class [TestDeobfuscation.java](./deobfuscator-impl/src/test/java/uwu/narumii/deobfuscator/TestDeobfuscation.java)
