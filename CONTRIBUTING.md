@@ -30,8 +30,8 @@ Whole deobfuscation process is based on transformers. Transformers are smaller c
 ### How to create your own transformer?
 1. Create a new class in [`deobfuscator-transformers`](./deobfuscator-transformers) module.
 2. Pick `Transformer`-like class you would like to implement:
-    - `Transformer` - Basic transformer that transforms classes.
-    - `ComposedTransformer` - Transformer that consists of multiple transformers.
+   - `Transformer` - Basic transformer that transforms classes.
+   - `ComposedTransformer` - Transformer that consists of multiple transformers.
 3. You can start coding!
 
 ## 🧪 Testing
