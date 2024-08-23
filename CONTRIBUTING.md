@@ -20,7 +20,7 @@ The project is structured as follows:
   - `compiled/custom-classes` - Compiled classes to test transformers. You can throw here classes from your obfuscated jars.
   - `compiled/custom-jars` - Jars to test transformers. You can throw here your obfuscated jars.
   - `results` - Expected results that are auto-generated decompiled java code
-- `deobfuscator-impl/src/test/java/uwu/narumii/deobfuscator/TestDeobfuscation` - Class where each test sample is registered.
+- `deobfuscator-impl/src/test/java/uwu/narumii/deobfuscator/TestDeobfuscation.java` - Class where each test sample is registered.
 
 ## Transformers
 ### What are transformers?
@@ -45,5 +45,5 @@ You can create your own tests for transformers. There are a few ways to do it:
 - If the obfuscation is more complex, you can throw your obfuscated classes into `testData/compiled/custom-classes` and test transformers on them.
 - You can also throw your obfuscated jars into `testData/compiled/custom-jars` and test transformers on them.
 
-You need to register each sample in class `deobfuscator-impl/src/test/java/uwu/narumii/deobfuscator/TestDeobfuscation`
+You need to register each sample in class `deobfuscator-impl/src/test/java/uwu/narumii/deobfuscator/TestDeobfuscation.java`
 
