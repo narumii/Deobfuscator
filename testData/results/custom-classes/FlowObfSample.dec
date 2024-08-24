@@ -36,7 +36,7 @@ public class IIIIIIIIlIlIIIIlIIlIIIIIIIIlIlIllllIIIlIIIlIIllIllllIIIIllIIIIllIIl
                                 while (true) {
                                     switch ((int)var10000) {
                                         case -436830004:
-                                            var10000 = -1954010857659540341L / -6629812863376820009L;
+                                            var10000 = 0L;
                                             break;
                                         case -253412202:
                                         default:
@@ -68,41 +68,23 @@ public class IIIIIIIIlIlIIIIlIIlIIIIIIIIlIlIllllIIIlIIIlIIllIllllIIIIllIIIIllIIl
             switch ((int)var10001) {
                 case -1254534848:
                     byte var5 = -1;
-                    var10001 = 3160L ^ -6562666170258138906L;
-
-                    while (var5 + 339277883 == -955364710) {
-                        var10001 = 4731025713025254453L;
-                    }
+                    var10001 = -6562666170258139970L;
                     break;
                 case -253412202:
                 default:
                     super();
                     return;
                 case 485227004:
-                    byte var4 = 1;
-                    var10001 = 30229L ^ 8779745570450285121L;
-
-                    while (var4 + 196385358 == -2142502514) {
-                        var10001 = -7589003880365981361L;
-                    }
+                    boolean var4 = true;
+                    var10001 = 8779745570450297940L;
                     break;
                 case 1712111765:
-                    byte var3 = 1;
-                    var10001 = 3676L ^ -8855161723369165997L;
-
-                    while (var3 + 1605293253 == -99680712) {
-                        var10001 = -7404679446939395966L;
-                    }
+                    boolean var3 = true;
+                    var10001 = -8855161723369167601L;
             }
 
-            byte var6 = 1;
-            long var10002 = 18355L ^ 8016067872500683785L;
-
-            while (var6 + 700223148 == -1264305114) {
-                var10002 = -6312428108923342948L;
-            }
-
-            var10001 /= var10002;
+            boolean var6 = true;
+            var10001 /= 8016067872500700090L;
         }
     }
 }
