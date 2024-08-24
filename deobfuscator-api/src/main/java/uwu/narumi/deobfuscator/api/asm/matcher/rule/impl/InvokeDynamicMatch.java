@@ -1,10 +1,8 @@
 package uwu.narumi.deobfuscator.api.asm.matcher.rule.impl;
 
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
 
 public class InvokeDynamicMatch implements Match {
@@ -18,7 +16,7 @@ public class InvokeDynamicMatch implements Match {
 
   private Predicate<Object[]> bsmArgsPredicate;
 
-  private BiFunction<MethodNode, AbstractInsnNode, Boolean> action;
+  private Transformation transformation;
 
   private InvokeDynamicMatch() {}
 
@@ -26,14 +24,14 @@ public class InvokeDynamicMatch implements Match {
     return new InvokeDynamicMatch();
   }
 
-  public Match invokeAction(BiFunction<MethodNode, AbstractInsnNode, Boolean> function) {
-    this.action = function;
+  public Match defineTransformation(Transformation transformation) {
+    this.transformation = transformation;
     return this;
   }
 
   @Override
-  public boolean invoke(MethodNode methodNode, AbstractInsnNode node) {
-    return action.apply(methodNode, node);
+  public Transformation transformation() {
+    return this.transformation;
   }
 
   @Override

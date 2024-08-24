@@ -2,6 +2,8 @@ package uwu.narumi.deobfuscator.api.asm.matcher.rule;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.analysis.Frame;
+import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 
 @FunctionalInterface
 public interface Match {
@@ -24,7 +26,20 @@ public interface Match {
     return (node) -> !test(node);
   }
 
-  default boolean invoke(MethodNode methodNode, AbstractInsnNode node) {
-    return false;
+  default Transformation transformation() {
+    return ((methodNode, insn, frame) -> false);
+  }
+
+  @FunctionalInterface
+  interface Transformation {
+    /**
+     * Executes given action
+     *
+     * @param methodNode Method node
+     * @param insn Instruction
+     * @param frame Current frame. Useful when you need to get some values from the stack.
+     * @return If changed
+     */
+    boolean transform(MethodNode methodNode, AbstractInsnNode insn, Frame<OriginalSourceValue> frame);
   }
 }

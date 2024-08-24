@@ -1,11 +1,10 @@
 package uwu.narumi.deobfuscator.api.asm.matcher.rule.impl;
 
 import java.util.Arrays;
-import java.util.function.BiFunction;
+
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
 
 public class MethodMatch implements Match {
@@ -15,7 +14,7 @@ public class MethodMatch implements Match {
   private String[] name;
   private String desc;
 
-  private BiFunction<MethodNode, AbstractInsnNode, Boolean> action;
+  private Transformation transformation;
 
   private MethodMatch(int opcode) {
     this.opcode = opcode;
@@ -45,14 +44,14 @@ public class MethodMatch implements Match {
     return new MethodMatch(Opcodes.INVOKEINTERFACE);
   }
 
-  public Match invokeAction(BiFunction<MethodNode, AbstractInsnNode, Boolean> function) {
-    this.action = function;
+  public Match defineTransformation(Transformation transformation) {
+    this.transformation = transformation;
     return this;
   }
 
   @Override
-  public boolean invoke(MethodNode methodNode, AbstractInsnNode node) {
-    return action.apply(methodNode, node);
+  public Transformation transformation() {
+    return this.transformation;
   }
 
   @Override
