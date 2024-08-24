@@ -9,6 +9,7 @@ import uwu.narumi.deobfuscator.api.context.Context;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -57,14 +58,14 @@ public abstract class FramedInstructionsTransformer extends Transformer {
     getClassesStream(context.classes(scope).stream()).forEach(classWrapper -> getMethodsStream(classWrapper.methods().stream())
         .forEach(methodNode -> {
           // Skip if no instructions
-          if (getInstructionsStream(Arrays.stream(methodNode.instructions.toArray())).findAny().isEmpty()) return;
+          if (getInstructionsStream(Arrays.stream(methodNode.instructions.toArray()).filter(Objects::nonNull)).findAny().isEmpty()) return;
 
           // Get frames of the method
           Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = analyzeOriginalSource(classWrapper.getClassNode(), methodNode);
           if (frames == null) return;
 
           // Iterate over instructions
-          getInstructionsStream(Arrays.stream(methodNode.instructions.toArray())).forEach(insn -> {
+          getInstructionsStream(Arrays.stream(methodNode.instructions.toArray())).filter(Objects::nonNull).forEach(insn -> {
             // Get current frame
             Frame<OriginalSourceValue> frame = frames.get(insn);
             if (frame == null) return;

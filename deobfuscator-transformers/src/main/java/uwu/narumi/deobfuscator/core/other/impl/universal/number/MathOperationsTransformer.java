@@ -9,6 +9,7 @@ import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
 import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -19,7 +20,8 @@ public class MathOperationsTransformer extends FramedInstructionsTransformer {
   @Override
   protected Stream<AbstractInsnNode> getInstructionsStream(Stream<AbstractInsnNode> stream) {
     return stream
-        .filter(insn -> AsmMathHelper.isMathOperation(insn.getOpcode()));
+            .filter(Objects::nonNull)
+            .filter(insn -> AsmMathHelper.isMathOperation(insn.getOpcode()));
   }
 
   @Override
