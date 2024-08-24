@@ -19,7 +19,7 @@ The project is structured as follows:
   - [`src/java`](./testData/src/java) - You can write your java code to test transformers
   - [`compiled/custom-classes`](./testData/compiled/custom-classes) - Compiled classes to test transformers. You can throw here classes from your obfuscated jars.
   - [`compiled/custom-jars`](./testData/compiled/custom-jars) - Jars to test transformers. You can throw here your obfuscated jars.
-  - [`deobfuscated`](./testData/deobfuscated) - Raw classes after deobfuscation process. Useful when debugging.
+  - `deobfuscated` - Raw classes after deobfuscation process. Useful when debugging.
   - [`results`](./testData/results) - Expected results that are auto-generated decompiled java code.
 - [`TestDeobfuscation.java`](./deobfuscator-impl/src/test/java/uwu/narumii/deobfuscator/TestDeobfuscation.java) - Class where each test sample is registered.
 - [`Bootstrap.java`](./deobfuscator-impl/src/test/java/Bootstrap.java) - Class where you can run deobfuscator manually.
