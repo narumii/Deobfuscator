@@ -26,7 +26,7 @@ The project is structured as follows:
 
 ## 🧰 Recommended tools
 - [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) - IDE for Java development
-- [Recaf](https://github.com/Col-E/Recaf) - Most modern java bytecode editor. Use it to analyze obfuscated classes.
+- [Recaf](https://github.com/Col-E/Recaf) - Modern java bytecode editor. Use it to analyze obfuscated classes.
 
 ## 🪄 Transformers
 ### What are transformers?
