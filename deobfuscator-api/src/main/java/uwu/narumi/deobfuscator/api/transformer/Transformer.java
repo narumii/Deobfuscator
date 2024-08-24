@@ -4,6 +4,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.analysis.Analyzer;
+import org.objectweb.asm.tree.analysis.AnalyzerException;
+import org.objectweb.asm.tree.analysis.BasicValue;
+import org.objectweb.asm.tree.analysis.BasicVerifier;
+import org.objectweb.asm.tree.analysis.SimpleVerifier;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.exception.TransformerException;
@@ -79,6 +85,16 @@ public abstract class Transformer extends AsmHelper implements Opcodes {
       }
 
       LOGGER.info("Ended {} transformer in {} ms", transformer.name(), (System.currentTimeMillis() - start));
+
+      // Bytecode verification
+      /*if (oldInstance == null && changed) {
+        // Verify if code is valid
+        try {
+          verifyBytecode(scope, context);
+        } catch (RuntimeException e) {
+          LOGGER.error("Transformer {} produced invalid bytecode", transformer.name(), e);
+        }
+      }*/
     } catch (TransformerException e) {
       LOGGER.error("! {}: {}", transformer.name(), e.getMessage());
     } catch (Exception e) {
@@ -87,5 +103,21 @@ public abstract class Transformer extends AsmHelper implements Opcodes {
     LOGGER.info("-------------------------------------\n");
 
     return changed;
+  }
+
+  /**
+   * Verifies if the bytecode is valid
+   */
+  private static void verifyBytecode(@Nullable ClassWrapper scope, Context context) throws IllegalStateException {
+    for (ClassWrapper classWrapper : context.classes(scope)) {
+      for (MethodNode methodNode : classWrapper.methods()) {
+        Analyzer<BasicValue> analyzer = new Analyzer<>(new BasicVerifier());
+        try {
+          analyzer.analyzeAndComputeMaxs(classWrapper.name(), methodNode);
+        } catch (AnalyzerException e) {
+          throw new IllegalStateException("Invalid bytecode in " + classWrapper.name() + "#" + methodNode.name + methodNode.desc, e);
+        }
+      }
+    }
   }
 }

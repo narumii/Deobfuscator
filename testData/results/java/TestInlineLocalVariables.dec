@@ -25,4 +25,13 @@ public class TestInlineLocalVariables {
 
         return testVar;
     }
+
+    public static void test4() {
+        long c = 123123123123123123L;
+        double d = 123123.123123;
+        float e = 123123.125F;
+        String f = "test";
+        System.out.println("" + 5 + true + c);
+        System.out.println(d + (double)e + f);
+    }
 }

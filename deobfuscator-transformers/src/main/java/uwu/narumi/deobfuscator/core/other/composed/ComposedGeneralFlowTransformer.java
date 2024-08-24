@@ -3,6 +3,7 @@ package uwu.narumi.deobfuscator.core.other.composed;
 import uwu.narumi.deobfuscator.api.transformer.ComposedTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.PeepholeCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.LineNumberCleanTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.DeadCodeCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.UnUsedLabelCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineLocalVariablesTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
@@ -14,6 +15,7 @@ public class ComposedGeneralFlowTransformer extends ComposedTransformer {
   public ComposedGeneralFlowTransformer() {
     super(
         // Preparation
+        DeadCodeCleanTransformer::new,
         LineNumberCleanTransformer::new,
         UnUsedLabelCleanTransformer::new,
         () -> new InlineStaticFieldTransformer(true, true),

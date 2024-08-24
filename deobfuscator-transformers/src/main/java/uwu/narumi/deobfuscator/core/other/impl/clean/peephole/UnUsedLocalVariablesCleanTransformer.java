@@ -22,17 +22,17 @@ public class UnUsedLocalVariablesCleanTransformer extends Transformer {
 
       // Find all local variables in use
       for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-        if (insn instanceof VarInsnNode varInsnNode && insn.getOpcode() >= ILOAD && insn.getOpcode() <= SALOAD) {
+        if (insn instanceof VarInsnNode varInsnNode && insn.getOpcode() >= ILOAD && insn.getOpcode() <= ALOAD) {
           localVariablesInUse.add(varInsnNode.var);
         }
       }
 
       // Remove all local variables that are not in use
       for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-        if (insn instanceof VarInsnNode varInsnNode && insn.getOpcode() >= ISTORE && insn.getOpcode() <= SASTORE) {
+        if (insn instanceof VarInsnNode varInsnNode && insn.getOpcode() >= ISTORE && insn.getOpcode() <= ASTORE) {
           if (!localVariablesInUse.contains(varInsnNode.var)) {
             // Pop the value from the stack
-            methodNode.instructions.set(insn, new InsnNode(POP));
+            methodNode.instructions.set(insn, insn.toPop());
 
             removedVars.incrementAndGet();
           }

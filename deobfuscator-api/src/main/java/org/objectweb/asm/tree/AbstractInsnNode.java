@@ -474,6 +474,15 @@ public abstract class AbstractInsnNode {
     return current;
   }
 
+  public InsnNode toPop() {
+    if (this.getOpcode() == LSTORE || this.getOpcode() == DSTORE) {
+      // Long and double values take up two stack values. Need to use pop2
+      return new InsnNode(POP2);
+    } else {
+     return new InsnNode(POP);
+    }
+  }
+
   public <T extends AbstractInsnNode> T getPreviousAs() {
     return (T) getPrevious();
   }
