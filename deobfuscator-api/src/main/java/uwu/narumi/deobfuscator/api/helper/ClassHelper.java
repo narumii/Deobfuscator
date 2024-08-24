@@ -26,12 +26,21 @@ public final class ClassHelper {
             .equals("CAFEBABE");
   }
 
-  public static ClassWrapper loadClass(String path, byte[] bytes, int readerMode, int classWriterFlags) throws Exception {
-    return loadClass(path, bytes, readerMode, classWriterFlags, false);
+  public static ClassWrapper loadClass(String path, byte[] bytes, int classReaderFlags, int classWriterFlags) throws Exception {
+    return loadClass(path, bytes, classReaderFlags, classWriterFlags, false);
   }
 
-  public static ClassWrapper loadClass(String path, byte[] bytes, int readerMode, int classWriterFlags, boolean fix) throws Exception {
-    return new ClassWrapper(path, new ClassReader(fix ? fixClass(bytes) : bytes), readerMode, classWriterFlags);
+  /**
+   * Load class from bytes
+   *
+   * @param path Relative path of a class in a jar
+   * @param bytes Class bytes
+   * @param classReaderFlags {@link ClassReader} flags
+   * @param classWriterFlags {@link ClassWriter} flags
+   * @param fix Fix class using CAFED00D
+   */
+  public static ClassWrapper loadClass(String path, byte[] bytes, int classReaderFlags, int classWriterFlags, boolean fix) throws Exception {
+    return new ClassWrapper(path, new ClassReader(fix ? fixClass(bytes) : bytes), classReaderFlags, classWriterFlags);
   }
 
   public static byte[] fixClass(byte[] bytes) throws InvalidClassException {

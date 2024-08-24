@@ -3,6 +3,8 @@ import org.bukkit.event.Listener;
 
 public class IIIIIIIIlIlIIIIlIIlIIIIIIIIlIlIllllIIIlIIIlIIllIllllIIIIllIIIIllIIllllIIIIllllIIIIIIIllIllIIIlllIlIIllIlIIllIlIIIIIlIIIIIllllIlIIllIllllIIlIIIIIIlIllIlIIIIlIlIIlIIlllIIIIlIIlIIllIlIIIlIlIlIIIIllIlllll
     implements Listener {
+    static long llllIIIIlllIlllIlIllIIlllIlIIlIIlllIlllIlllIIIllIlIIIIlIIIllIlIIlIIlIllIIlIlIIIIIIllIlIlIlIlIIllIlIllIlIIIllllllIlIIllIIllIlIlIIlIllIllIIIlIIlllIIIIIIIlIIIIIIIllIlIIIIIIlIIlIlIIlllIIIlllllIIIIlIIIlIlI;
+
     public static int lIIIIlllIlIIllIIIlllllIlllIIllIllIIlIIllIIIllIIlIllllIIIIllIIlIIIIlIllIIlllIllIllllIIIlllIllIllIlllIlllllIIlIIIlllllIIIlIlIllllIllllIllllIIlIIllIlIIllIIllIIlIllIIllllIlllIIIIlIIllIIIIIIIIllllIlIllllIl(
         int var0
     ) {
@@ -67,7 +69,6 @@ public class IIIIIIIIlIlIIIIlIIlIIIIIIIIlIlIllllIIIlIIIlIIllIllllIIIIllIIIIllIIl
         while (true) {
             switch ((int)var10001) {
                 case -1254534848:
-                    byte var5 = -1;
                     var10001 = -6562666170258139970L;
                     break;
                 case -253412202:
@@ -75,15 +76,12 @@ public class IIIIIIIIlIlIIIIlIIlIIIIIIIIlIlIllllIIIlIIIlIIllIllllIIIIllIIIIllIIl
                     super();
                     return;
                 case 485227004:
-                    boolean var4 = true;
                     var10001 = 8779745570450297940L;
                     break;
                 case 1712111765:
-                    boolean var3 = true;
                     var10001 = -8855161723369167601L;
             }
 
-            boolean var6 = true;
             var10001 /= 8016067872500700090L;
         }
     }

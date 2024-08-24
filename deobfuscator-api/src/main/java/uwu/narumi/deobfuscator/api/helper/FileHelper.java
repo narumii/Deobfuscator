@@ -1,5 +1,8 @@
 package uwu.narumi.deobfuscator.api.helper;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.BiConsumer;
 import java.util.jar.JarFile;
@@ -30,6 +33,25 @@ public final class FileHelper {
     } catch (Exception e) {
       LOGGER.error("Could not load file: {}", path);
       LOGGER.debug("Error", e);
+    }
+  }
+
+  public static void deleteDirectory(File file) {
+    if (!file.exists()) {
+      return;
+    }
+    if (file.isDirectory()) {
+      File[] files = file.listFiles();
+      if (files != null) {
+        for (File f : files) {
+          deleteDirectory(f);
+        }
+      }
+    }
+    try {
+      Files.delete(file.toPath());
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 }

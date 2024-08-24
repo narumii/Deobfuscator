@@ -1,4 +1,4 @@
-package uwu.narumi.deobfuscator.core.other.impl.clean;
+package uwu.narumi.deobfuscator.core.other.impl.clean.peephole;
 
 import java.util.Arrays;
 import java.util.HashSet;

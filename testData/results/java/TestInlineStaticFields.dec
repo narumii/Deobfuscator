@@ -1,0 +1,15 @@
+public class TestInlineStaticFields {
+    public static int TEST1 = 123;
+    public static String TEST2 = "placki";
+    public static boolean TEST3 = true;
+
+    public static void test() {
+        byte var10001 = 123;
+        String var10003 = "placki";
+        boolean var10005 = true;
+    }
+
+    public static void modifyStatic() {
+        TEST1 = 321;
+    }
+}

@@ -36,8 +36,6 @@ public class InlineLocalVariablesTransformer extends Transformer {
     Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = analyzeOriginalSource(classWrapper.getClassNode(), methodNode);
     if (frames == null) return;
 
-    List<AbstractInsnNode> toRemoveInsns = new ArrayList<>();
-
     // Inline static local variables
     for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
       if (insn.getOpcode() == ILOAD) {
@@ -59,19 +57,9 @@ public class InlineLocalVariablesTransformer extends Transformer {
           AbstractInsnNode clone = valueInsn.clone(null);
           methodNode.instructions.set(insn, clone);
 
-          if (!toRemoveInsns.contains(storeVarSourceValue.getProducer())) {
-            toRemoveInsns.add(storeVarSourceValue.getProducer());
-          }
-          if (!toRemoveInsns.contains(valueSourceValue.getProducer())) {
-            toRemoveInsns.add(valueSourceValue.getProducer());
-          }
-
           changed = true;
         }
       }
     }
-
-    // Cleanup
-    toRemoveInsns.forEach(methodNode.instructions::remove);
   }
 }

@@ -100,8 +100,6 @@ public class InlineStaticFieldTransformer extends Transformer {
               }
             });
 
-    List<FieldRef> toRemove = new ArrayList<>();
-
     LOGGER.info("Collected {} numbers from {} classes", index.get(), context.classes().size());
     context.classes(scope).stream()
         .flatMap(classWrapper -> classWrapper.methods().stream())
@@ -133,19 +131,8 @@ public class InlineStaticFieldTransformer extends Transformer {
                             methodNode.instructions.set(node, getNumber(character));
                           }
 
-                          FieldRef fieldRef = new FieldRef(node.owner, node.name, node.desc);
-                          if (!toRemove.contains(fieldRef)) {
-                            toRemove.add(fieldRef);
-                          }
-
                           inline.incrementAndGet();
                         }));
-
-    // Cleanup
-    toRemove.forEach(fieldRef -> {
-      ClassWrapper owner = context.get(fieldRef.owner).get();
-      owner.fields().removeIf(fieldNode -> fieldNode.name.equals(fieldRef.name) && fieldNode.desc.equals(fieldRef.desc));
-    });
 
     //        values.clear();
     LOGGER.info("Inlined {} numbers in {} classes", inline.get(), context.classes().size());

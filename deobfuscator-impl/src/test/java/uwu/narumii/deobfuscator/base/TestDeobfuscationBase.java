@@ -2,18 +2,25 @@ package uwu.narumii.deobfuscator.base;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.util.FileUtils;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.java.decompiler.api.Decompiler;
+import org.jetbrains.java.decompiler.main.extern.IContextSource;
 import org.jetbrains.java.decompiler.main.extern.IFernflowerPreferences;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.Timeout;
 import org.opentest4j.TestAbortedException;
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.helper.FileHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,9 +29,11 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+@Timeout(60)
 public abstract class TestDeobfuscationBase {
   public static final Path TEST_DATA_PATH = Path.of("..", "testData");
   public static final Path COMPILED_CLASSES_PATH = Path.of(TEST_DATA_PATH.toString(), "compiled");
+  public static final Path DEOBFUSCATED_CLASSES_PATH = Path.of(TEST_DATA_PATH.toString(), "deobfuscated");
   public static final Path RESULTS_CLASSES_PATH = Path.of(TEST_DATA_PATH.toString(), "results");
 
   private final List<RegisteredTest> registeredTests = new ArrayList<>();
@@ -57,6 +66,8 @@ public abstract class TestDeobfuscationBase {
   @DisplayName("Test deobfuscation")
   public Stream<DynamicTest> testDeobfuscation() {
     this.registeredTests.clear();
+    FileHelper.deleteDirectory(DEOBFUSCATED_CLASSES_PATH.toFile());
+
     this.registerAll();
     return this.registeredTests.stream().map(RegisteredTest::buildTest);
   }
@@ -77,40 +88,46 @@ public abstract class TestDeobfuscationBase {
       Deobfuscator.Builder deobfuscatorBuilder = Deobfuscator.builder()
           .transformers(this.transformers.toArray(new Supplier[0]));
 
-      String inputJar = null;
+      File deobfuscatedJar = null;
+      String jarSource = null;
 
       // Get sources paths
-      Map<String, String> sourcePathToSourceName = new HashMap<>();
       if (this.inputType == InputType.CUSTOM_JAR) {
         if (sources.length > 1) {
           throw new IllegalArgumentException("Cannot use multiple sources with a jar input");
         }
 
-        inputJar = sources[0];
+        jarSource = sources[0];
+
+        Path relativePath = Path.of(this.inputType.directory(), sources[0] + ".jar");
 
         // Add jar input
-        deobfuscatorBuilder.input(
-            Path.of(COMPILED_CLASSES_PATH.toString(), inputType.directory(), sources[0] + ".jar")
-        );
+        Path inputJarPath = Path.of(COMPILED_CLASSES_PATH.toString(), relativePath.toString());
+        deobfuscatorBuilder.inputJar(inputJarPath);
+
+        deobfuscatedJar = Path.of(DEOBFUSCATED_CLASSES_PATH.toString(), relativePath.toString()).toFile();
       } else {
         for (String sourceName : sources) {
-          Path path = Path.of(COMPILED_CLASSES_PATH.toString(), inputType.directory(), sourceName + ".class");
+          Path relativePath = Path.of(this.inputType.directory(), sourceName + ".class");
+          Path compiledClassPath = Path.of(COMPILED_CLASSES_PATH.toString(), relativePath.toString());
 
-          if (!path.toFile().exists()) {
-            throw new IllegalArgumentException("File not found: " + path.toAbsolutePath().normalize());
+          if (!compiledClassPath.toFile().exists()) {
+            throw new IllegalArgumentException("File not found: " + compiledClassPath.toAbsolutePath().normalize());
           }
 
           // Add class
-          deobfuscatorBuilder.clazz(path);
-          sourcePathToSourceName.put(path.toString(), sourceName);
+          deobfuscatorBuilder.clazz(compiledClassPath, sourceName);
         }
       }
+
+      Path outputDir = Path.of(DEOBFUSCATED_CLASSES_PATH.toString(), this.inputType.directory());
 
       Deobfuscator deobfuscator;
       try {
         // Build deobfuscator
         deobfuscator = deobfuscatorBuilder
-            .output(null)
+            .outputJar(null)
+            .outputDir(outputDir)
             .build();
       } catch (FileNotFoundException e) {
         throw new RuntimeException(e);
@@ -119,12 +136,23 @@ public abstract class TestDeobfuscationBase {
       // Run deobfuscator!
       deobfuscator.start();
 
+      // Init context sources
+      List<IContextSource> contextSources = new ArrayList<>();
+      if (this.inputType != InputType.CUSTOM_JAR) {
+        for (String sourceName : sources) {
+          Path relativePath = Path.of(this.inputType.directory(), sourceName + ".class");
+          Path deobfuscatedClassPath = Path.of(DEOBFUSCATED_CLASSES_PATH.toString(), relativePath.toString());
+
+          contextSources.add(new SingleClassContextSource(deobfuscatedClassPath.toFile(), sourceName));
+        }
+      }
+
       // Assert output
-      this.assertOutput(deobfuscator, sourcePathToSourceName, inputJar);
+      this.assertOutput(contextSources, deobfuscatedJar, jarSource);
     }
 
-    private void assertOutput(Deobfuscator deobfuscator, Map<String, String> sourcePathToSourceName, String inputJar) {
-      AssertingResultSaver assertingResultSaver = new AssertingResultSaver(this.inputType, sourcePathToSourceName, inputJar);
+    private void assertOutput(List<IContextSource> contextSources, @Nullable File inputJar, @Nullable String jarSource) {
+      AssertingResultSaver assertingResultSaver = new AssertingResultSaver(this.inputType, jarSource);
 
       // Decompile classes
       Decompiler.Builder decompilerBuilder = Decompiler.builder()
@@ -132,8 +160,12 @@ public abstract class TestDeobfuscationBase {
           .output(assertingResultSaver); // Assert output
 
       // Add sources
-      for (ClassWrapper classWrapper : deobfuscator.getContext().classes()) {
-        decompilerBuilder.inputs(new ClassWrapperContextSource(classWrapper, deobfuscator.getContext()));
+      if (this.inputType == InputType.CUSTOM_JAR) {
+        decompilerBuilder.inputs(inputJar);
+      } else {
+        for (IContextSource contextSource : contextSources) {
+          decompilerBuilder.inputs(contextSource);
+        }
       }
 
       // Decompile

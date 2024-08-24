@@ -30,4 +30,19 @@ public class TestSimpleFlowObfuscation {
       throw new RuntimeException();
     }
   }
+
+  public void compareTest() {
+    int a = 123;
+
+    if (a == 100) {
+      System.out.println("a is 100");
+    } else {
+      System.out.println("a is not 100");
+    }
+
+    // TODO: Simplify also this
+    while (a * 321 == 100) {
+      a += 1;
+    }
+  }
 }

@@ -1,0 +1,17 @@
+public class TestUniversalNumberTransformer {
+    public void testNumbers1() {
+        int a = 3;
+        int b = 19;
+        double c = 1.5159303447561417E10;
+        float d = 9977.5625F;
+        System.out.println(1.5159313447123917E10);
+    }
+
+    public void divideByZero() {
+        int a = 2;
+        if (a == 0) {
+            int b = 9 / 0;
+            System.out.println(b);
+        }
+    }
+}

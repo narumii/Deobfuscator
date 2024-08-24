@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.jar.Manifest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,15 +16,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class AssertingResultSaver implements IResultSaver {
 
   private final TestDeobfuscationBase.InputType inputType;
-  private final Map<String, String> sourcePathToSourceName;
-  private final String inputJar;
+  private final String jarSource;
 
   private boolean savedContent = false;
 
-  public AssertingResultSaver(TestDeobfuscationBase.InputType inputType, Map<String, String> sourcePathToSourceName, String inputJar) {
+  public AssertingResultSaver(TestDeobfuscationBase.InputType inputType, String jarSource) {
     this.inputType = inputType;
-    this.sourcePathToSourceName = sourcePathToSourceName;
-    this.inputJar = inputJar;
+    this.jarSource = jarSource;
   }
 
   @Override
@@ -45,10 +42,9 @@ public class AssertingResultSaver implements IResultSaver {
   public void saveClassFile(String path, String qualifiedName, String entryName, String content, int[] mapping) {
     Path saveTo;
     if (this.inputType == TestDeobfuscationBase.InputType.CUSTOM_JAR) {
-      saveTo = Path.of(TestDeobfuscationBase.RESULTS_CLASSES_PATH.toString(), inputType.directory(), this.inputJar, qualifiedName + ".dec");
+      saveTo = Path.of(TestDeobfuscationBase.RESULTS_CLASSES_PATH.toString(), inputType.directory(), this.jarSource, entryName + ".dec");
     } else {
-      String sourceName = sourcePathToSourceName.get(path);
-      saveTo = Path.of(TestDeobfuscationBase.RESULTS_CLASSES_PATH.toString(), inputType.directory(), sourceName + ".dec");
+      saveTo = Path.of(TestDeobfuscationBase.RESULTS_CLASSES_PATH.toString(), inputType.directory(), entryName + ".dec");
     }
 
     File fileSaveTo = saveTo.toFile();

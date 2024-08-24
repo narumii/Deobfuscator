@@ -36,7 +36,15 @@ public class MathOperationsTransformer extends FramedInstructionsTransformer {
       Number value1 = value1Insn.asNumber();
       Number value2 = value2Insn.asNumber();
 
-      methodNode.instructions.set(insn, AsmHelper.getNumber(AsmMathHelper.mathOperation(value1, value2, insn.getOpcode())));
+      Number result;
+      try {
+        result = AsmMathHelper.mathOperation(value1, value2, insn.getOpcode());
+      } catch (ArithmeticException e) {
+        // Skip division by zero
+        return false;
+      }
+
+      methodNode.instructions.set(insn, AsmHelper.getNumber(result));
       methodNode.instructions.remove(value1SourceValue.getProducer());
       methodNode.instructions.remove(value2SourceValue.getProducer());
 
