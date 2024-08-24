@@ -1,8 +1,13 @@
 package uwu.narumi.deobfuscator;
 
 import dev.xdark.ssvm.VirtualMachine;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Supplier;
@@ -10,6 +15,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
@@ -29,20 +35,26 @@ public class Deobfuscator {
   private final Context context = new Context();
 
   private final List<Supplier<Transformer>> transformers = new ArrayList<>();
+  @Nullable
   private final Path input;
+  @Nullable
   private final Path output;
+  private final List<Path> classes;
   private final int classReaderFlags;
   private final int classWriterFlags;
   private final boolean consoleDebug;
 
   private Deobfuscator(Builder builder) throws FileNotFoundException {
-    if (!builder.input.toFile().exists()) throw new FileNotFoundException(builder.input.toString());
+    if (builder.input == null && builder.classes.isEmpty()) {
+      throw new FileNotFoundException("No input files provided");
+    }
 
-    if (builder.output.toFile().exists())
+    if (builder.output != null && builder.output.toFile().exists())
       LOGGER.warn("Output file already exist, data will be overwritten");
 
     this.input = builder.input;
     this.output = builder.output;
+    this.classes = builder.classes;
     this.transformers.addAll(builder.transformers);
     this.classReaderFlags = builder.classReaderFlags;
     this.classWriterFlags = builder.classWriterFlags;
@@ -51,9 +63,10 @@ public class Deobfuscator {
     this.context.setLoader(
         new LibraryClassLoader(
             this.getClass().getClassLoader(),
-            builder.libraries.stream().map(Library::new).toList()));
+            builder.libraries.stream().map(path -> new Library(path, this.classWriterFlags)).toList()));
 
-    try {
+    // Temporary disabled until the sandbox is fixed
+    /*try {
       this.context.setSandBox(
           new SandBox(
               this.context.getLoader(),
@@ -64,9 +77,7 @@ public class Deobfuscator {
       if (consoleDebug) t.printStackTrace();
 
       this.context.setSandBox(null);
-    }
-
-    System.out.println();
+    }*/
   }
 
   public static Builder builder() {
@@ -86,30 +97,54 @@ public class Deobfuscator {
     }
   }
 
+  public Context getContext() {
+    return context;
+  }
+
   private void loadInput() {
-    LOGGER.info("Loading input file: {}", input);
+    if (input != null) {
+      LOGGER.info("Loading jar file: {}", input);
+      // Load jar
+      FileHelper.loadFilesFromZip(input, this::loadClass);
+      LOGGER.info("Loaded jar file: {}\n", input);
+    }
 
-    FileHelper.loadFilesFromZip(
-        input,
-        (name, bytes) -> {
-          try {
-            if (ClassHelper.isClass(bytes)) {
-              ClassWrapper classWrapper = ClassHelper.loadClass(bytes, classReaderFlags, true);
-              context.getClasses().putIfAbsent(classWrapper.name(), classWrapper);
-              context.getOriginalClasses().putIfAbsent(classWrapper.name(), classWrapper.clone());
-            } else if (!context.getFiles().containsKey(name)) {
-              context.getFiles().put(name, bytes);
-            }
-          } catch (Exception e) {
-            LOGGER.error("Could not load class: {}, adding as file", name);
-            LOGGER.debug("Error", e);
+    for (Path clazz : classes) {
+      LOGGER.info("Loading class: {}", clazz);
 
-            context.getFiles().putIfAbsent(name, bytes);
-            if (consoleDebug) e.printStackTrace();
-          }
-        });
+      try (InputStream inputStream = new FileInputStream(clazz.toFile())) {
+        // Load class
+        this.loadClass(clazz.toString(), inputStream.readAllBytes());
 
-    LOGGER.info("Loaded input file: {}\n", input);
+        LOGGER.info("Loaded class: {}\n", clazz);
+      } catch (IOException e) {
+        LOGGER.error("Could not load class: {}", clazz, e);
+      }
+    }
+  }
+
+  private void loadClass(String path, byte[] bytes) {
+    try {
+      if (ClassHelper.isClass(bytes)) {
+        ClassWrapper classWrapper = ClassHelper.loadClass(
+            path,
+            bytes,
+            this.classReaderFlags,
+            this.classWriterFlags,
+            true
+        );
+        context.getClasses().putIfAbsent(classWrapper.name(), classWrapper);
+        context.getOriginalClasses().putIfAbsent(classWrapper.name(), classWrapper.clone());
+      } else if (!context.getFiles().containsKey(path)) {
+        context.getFiles().put(path, bytes);
+      }
+    } catch (Exception e) {
+      LOGGER.error("Could not load class: {}, adding as file", path);
+      LOGGER.debug("Error", e);
+
+      context.getFiles().putIfAbsent(path, bytes);
+      if (consoleDebug) e.printStackTrace();
+    }
   }
 
   public void transform(List<Supplier<Transformer>> transformers) {
@@ -120,6 +155,8 @@ public class Deobfuscator {
   }
 
   private void saveOutput() {
+    if (this.output == null) return;
+
     LOGGER.info("Saving output file: {}", output);
 
     try (ZipOutputStream zipOutputStream =
@@ -131,11 +168,8 @@ public class Deobfuscator {
           .forEach(
               (ignored, classWrapper) -> {
                 try {
-                  ClassWriter classWriter =
-                      new LibraryClassWriter(classWriterFlags, context.getLoader());
-                  classWrapper.getClassNode().accept(classWriter);
+                  byte[] data = classWrapper.compileToBytes(this.context);
 
-                  byte[] data = classWriter.toByteArray();
                   zipOutputStream.putNextEntry(new ZipEntry(classWrapper.name() + ".class"));
                   zipOutputStream.write(data);
                 } catch (Exception e) {
@@ -193,12 +227,15 @@ public class Deobfuscator {
   public static class Builder {
 
     private final Set<Path> libraries = new HashSet<>();
-    private Path input = Path.of("input.jar");
-    private Path output = Path.of("output.jar");
+    @Nullable
+    private Path input = null;
+    @Nullable
+    private Path output = null;
+    private List<Path> classes = new ArrayList<>();
     private List<Supplier<Transformer>> transformers = List.of();
 
-    private int classReaderFlags = ClassReader.EXPAND_FRAMES;
-    private int classWriterFlags = ClassWriter.COMPUTE_MAXS;
+    private int classReaderFlags = ClassReader.SKIP_FRAMES;
+    private int classWriterFlags = ClassWriter.COMPUTE_FRAMES;
 
     private boolean consoleDebug;
 
@@ -206,28 +243,40 @@ public class Deobfuscator {
 
     private Builder() {}
 
-    public Builder input(Path input) {
+    public Builder input(@Nullable Path input) {
       this.input = input;
-      String fullName = input.getFileName().toString();
-      int dot = fullName.lastIndexOf('.');
-      this.output =
-          input
-              .getParent()
-              .resolve(
-                  dot == -1
-                      ? fullName + "-out"
-                      : fullName.substring(0, dot) + "-out" + fullName.substring(dot));
-      this.libraries.add(input);
+      if (this.input != null) {
+        String fullName = input.getFileName().toString();
+        int dot = fullName.lastIndexOf('.');
+        this.output =
+            input
+                .getParent()
+                .resolve(
+                    dot == -1
+                        ? fullName + "-out"
+                        : fullName.substring(0, dot) + "-out" + fullName.substring(dot));
+        this.libraries.add(input);
+      }
       return this;
     }
 
-    public Builder output(Path output) {
+    public Builder output(@Nullable Path output) {
       this.output = output;
       return this;
     }
 
     public Builder libraries(Path... paths) {
       this.libraries.addAll(List.of(paths));
+      return this;
+    }
+
+    public Builder classes(Path... paths) {
+      this.classes = Arrays.asList(paths);
+      return this;
+    }
+
+    public Builder clazz(Path path) {
+      this.classes.add(path);
       return this;
     }
 

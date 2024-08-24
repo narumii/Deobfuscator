@@ -8,7 +8,11 @@
   <artifactId>Diobfuscator</artifactId>
   <packaging>pom</packaging>
   <version>2.0-SNAPSHOT</version>
+
   <modules>
+    <!-- Code for test deobfuscation -->
+    <module>testData/src/java</module>
+
     <module>deobfuscator-api</module>
     <module>deobfuscator-impl</module>
     <module>deobfuscator-transformers</module>
@@ -46,7 +50,7 @@
 
   <build>
     <plugins>
-      <plugin>
+      <!--<plugin>
         <groupId>com.spotify.fmt</groupId>
         <artifactId>fmt-maven-plugin</artifactId>
         <version>2.23</version>
@@ -66,7 +70,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
+      </plugin>-->
     </plugins>
   </build>
 </project>

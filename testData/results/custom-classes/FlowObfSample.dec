@@ -1,0 +1,108 @@
+import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
+
+public class IIIIIIIIlIlIIIIlIIlIIIIIIIIlIlIllllIIIlIIIlIIllIllllIIIIllIIIIllIIllllIIIIllllIIIIIIIllIllIIIlllIlIIllIlIIllIlIIIIIlIIIIIllllIlIIllIllllIIlIIIIIIlIllIlIIIIlIlIIlIIlllIIIIlIIlIIllIlIIIlIlIlIIIIllIlllll
+    implements Listener {
+    public static int lIIIIlllIlIIllIIIlllllIlllIIllIllIIlIIllIIIllIIlIllllIIIIllIIlIIIIlIllIIlllIllIllllIIIlllIllIllIlllIlllllIIlIIIlllllIIIlIlIllllIllllIllllIIlIIllIlIIllIIllIIlIllIIllllIlllIIIIlIIllIIIIIIIIllllIlIllllIl(
+        int var0
+    ) {
+        Bukkit.getServer();
+        long var10000 = 5990235795655834774L;
+
+        while (true) {
+            switch ((int)var10000) {
+                case -1895826787:
+                    var10000 = 8257028660923634471L;
+                    break;
+                case -253412202:
+                default:
+                    Bukkit.getServer();
+                    Bukkit.getServer();
+                    var10000 = 5990235795655834774L;
+
+                    while (true) {
+                        switch ((int)var10000) {
+                            case -2133192819:
+                                var10000 = -1531123931200573428L;
+                                break;
+                            case -584824255:
+                                var10000 = 8094959526148747926L;
+                                break;
+                            case -253412202:
+                            default:
+                                Bukkit.getServer();
+                                var10000 = 5990235795655834774L;
+
+                                while (true) {
+                                    switch ((int)var10000) {
+                                        case -436830004:
+                                            var10000 = -1954010857659540341L / -6629812863376820009L;
+                                            break;
+                                        case -253412202:
+                                        default:
+                                            Bukkit.getServer();
+                                            Bukkit.getServer();
+                                            Bukkit.getServer();
+                                            return 0;
+                                    }
+                                }
+                        }
+
+                        var10000 /= 9205541525884853016L;
+                    }
+                case 93020900:
+                    var10000 = 6736707563048316139L;
+                    break;
+                case 160507798:
+                    var10000 = -7532494413388854154L;
+            }
+
+            var10000 /= -4842676545345615747L;
+        }
+    }
+
+    public IIIIIIIIlIlIIIIlIIlIIIIIIIIlIlIllllIIIlIIIlIIllIllllIIIIllIIIIllIIllllIIIIllllIIIIIIIllIllIIIlllIlIIllIlIIllIlIIIIIlIIIIIllllIlIIllIllllIIlIIIIIIlIllIlIIIIlIlIIlIIlllIIIIlIIlIIllIlIIIlIlIlIIIIllIlllll() {
+        long var10001 = 5990235795655834774L;
+
+        while (true) {
+            switch ((int)var10001) {
+                case -1254534848:
+                    byte var5 = -1;
+                    var10001 = 3160L ^ -6562666170258138906L;
+
+                    while (var5 + 339277883 == -955364710) {
+                        var10001 = 4731025713025254453L;
+                    }
+                    break;
+                case -253412202:
+                default:
+                    super();
+                    return;
+                case 485227004:
+                    byte var4 = 1;
+                    var10001 = 30229L ^ 8779745570450285121L;
+
+                    while (var4 + 196385358 == -2142502514) {
+                        var10001 = -7589003880365981361L;
+                    }
+                    break;
+                case 1712111765:
+                    byte var3 = 1;
+                    var10001 = 3676L ^ -8855161723369165997L;
+
+                    while (var3 + 1605293253 == -99680712) {
+                        var10001 = -7404679446939395966L;
+                    }
+            }
+
+            byte var6 = 1;
+            long var10002 = 18355L ^ 8016067872500683785L;
+
+            while (var6 + 700223148 == -1264305114) {
+                var10002 = -6312428108923342948L;
+            }
+
+            var10001 /= var10002;
+        }
+    }
+}

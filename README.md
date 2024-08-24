@@ -24,3 +24,6 @@
 
 > Built on: [Java 17 (Temurin?)](https://adoptium.net/temurin/releases/?version=17)
 
+## Contributing
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
+

@@ -1,0 +1,8 @@
+public class TestSimpleFlowObfuscation {
+    public void testFlow() {
+        int a = 3;
+        if (System.currentTimeMillis() == 123L) {
+            System.out.println("123");
+        }
+    }
+}

@@ -7,30 +7,39 @@ import java.util.function.Predicate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
+import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
+import uwu.narumi.deobfuscator.api.library.LibraryClassWriter;
 
 public class ClassWrapper implements Cloneable {
 
   protected static final Logger LOGGER = LogManager.getLogger(ClassWrapper.class);
 
+  private final String path;
   private final ClassNode classNode;
   private final FieldCache fieldCache;
   private final ConstantPool constantPool;
+  private final int classWriterFlags;
 
-  public ClassWrapper(ClassReader classReader, int readerMode) throws Exception {
+  public ClassWrapper(String path, ClassReader classReader, int readerMode, int classWriterFlags) throws Exception {
+    this.path = path;
     this.classNode = new ClassNode();
     this.constantPool = new ConstantPool(classReader);
     this.fieldCache = new FieldCache();
+    this.classWriterFlags = classWriterFlags;
 
     classReader.accept(this.classNode, readerMode);
   }
 
-  private ClassWrapper(ClassNode classNode, FieldCache fieldCache, ConstantPool constantPool) {
+  private ClassWrapper(String path, ClassNode classNode, FieldCache fieldCache, ConstantPool constantPool, int classWriterFlags) {
+    this.path = path;
     this.classNode = classNode;
     this.fieldCache = fieldCache;
     this.constantPool = constantPool;
+    this.classWriterFlags = classWriterFlags;
   }
 
   public Optional<MethodNode> findMethod(String name, String desc) {
@@ -110,6 +119,25 @@ public class ClassWrapper implements Cloneable {
     return classNode.name;
   }
 
+  /**
+   * Compiles class to bytes.
+   */
+  public byte[] compileToBytes(Context context) {
+    try {
+      ClassWriter classWriter = new LibraryClassWriter(this.classWriterFlags, context.getLoader());
+      this.classNode.accept(classWriter);
+
+      return classWriter.toByteArray();
+    } catch (Exception e) {
+      LOGGER.error("Error occurred while compiling class to bytes: {}", this.classNode.name);
+      throw new RuntimeException(e);
+    }
+  }
+
+  public String getPath() {
+    return path;
+  }
+
   public List<FieldNode> fields() {
     return classNode.fields;
   }
@@ -132,6 +160,6 @@ public class ClassWrapper implements Cloneable {
 
   @Override
   public ClassWrapper clone() {
-    return new ClassWrapper(ClassHelper.copy(classNode), fieldCache.clone(), constantPool.clone());
+    return new ClassWrapper(this.path, ClassHelper.copy(classNode), fieldCache.clone(), constantPool.clone(), this.classWriterFlags);
   }
 }

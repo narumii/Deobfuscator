@@ -17,7 +17,7 @@ public class Library {
   private final Map<String, byte[]> classFiles = new ConcurrentHashMap<>();
   private final Path path;
 
-  public Library(Path path) {
+  public Library(Path path, int classWriterFlags) {
     this.path = path;
     FileHelper.loadFilesFromZip(
         path,
@@ -30,8 +30,10 @@ public class Library {
           try {
             classFiles.putIfAbsent(
                 ClassHelper.loadClass(
+                        name,
                         bytes,
-                        ClassReader.SKIP_CODE | ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG)
+                        ClassReader.SKIP_CODE | ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG,
+                        classWriterFlags)
                     .name(),
                 bytes);
           } catch (Exception e) {
