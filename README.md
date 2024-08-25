@@ -31,8 +31,8 @@ If you want to use this deobfuscator, you need to start it from your IDE manuall
 
 ![tak](./assets/run-deobfuscator.gif)
 
-## Contributing
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
+## 🔧 Contributing
+Contributions are welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
 
 ---
 
