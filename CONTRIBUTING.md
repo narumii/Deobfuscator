@@ -1,20 +1,10 @@
 # Contributing
 
-## ✅ How to run deobfuscator
-1. Navigate to class [`Bootstrap.java`](./deobfuscator-impl/src/test/java/Bootstrap.java)
-2. In this class edit the deobfuscator configuration
-    - `inputJar` - Your input jar file
-    - `transformers` - Pick transformers that you want to run. You can find them in [`deobfuscator-transformers`](./deobfuscator-transformers) module.
-3. Run this class manually from your IDE
-
-![tak](./assets/run-deobfuscator.gif)
-
 ## 🪜 Project structure
 The project is structured as follows:
 - [`deobfuscator-api`](./deobfuscator-api) - The API for the deobfuscator.
 - [`deobfuscator-impl`](./deobfuscator-impl) - The main deobfuscator runner.
 - [`deobfuscator-transformers`](./deobfuscator-transformers) - Transformers for the deobfuscator.
-- [`deobfuscator-transformers-analyzer`](./deobfuscator-transformers-analyzer) - Analyzer-like transformers
 - [`testData`](./testData) - Tests for transformers
   - [`src/java`](./testData/src/java) - You can write your java code to test transformers
   - [`compiled/custom-classes`](./testData/compiled/custom-classes) - Compiled classes to test transformers. You can throw here classes from your obfuscated jars.

@@ -1,3 +1,6 @@
+# Diobfuscator
+A deobfuscator for java
+
 > [!IMPORTANT]
 > **This is dev(v2) version of diobfuscator version and it's not completed yet, if you are willing to help there is a list of things that needs to be completed. The old diobfuscator was moved to [v1 branch](https://github.com/narumii/Deobfuscator/tree/v1).**<br>
 > 
@@ -15,6 +18,22 @@
 >    - `mvn fmt:format`
 >    - `mvn fmt:check`
 
+> Built on: [Java 17 (Temurin)](https://adoptium.net/temurin/releases/?version=17)
+
+## How to run deobfuscator
+If you want to use this deobfuscator, you need to start it from your IDE manually.
+
+1. Navigate to class [`Bootstrap.java`](./deobfuscator-impl/src/test/java/Bootstrap.java)
+2. In this class edit the deobfuscator configuration
+    - `inputJar` - Your input jar file
+    - `transformers` - Pick transformers that you want to run. You can find them in [`deobfuscator-transformers`](./deobfuscator-transformers) module.
+3. Run this class manually from your IDE
+
+![tak](./assets/run-deobfuscator.gif)
+
+## Contributing
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
+
 ---
 
 <p align="center">
@@ -22,9 +41,4 @@
 </p>
 
 ---
-
-> Built on: [Java 17 (Temurin?)](https://adoptium.net/temurin/releases/?version=17)
-
-## Contributing
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
 
