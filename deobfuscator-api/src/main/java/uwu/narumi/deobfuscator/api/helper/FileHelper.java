@@ -2,8 +2,11 @@ package uwu.narumi.deobfuscator.api.helper;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.function.BiConsumer;
 import java.util.jar.JarFile;
 import org.apache.logging.log4j.LogManager;
@@ -36,22 +39,26 @@ public final class FileHelper {
     }
   }
 
-  public static void deleteDirectory(File file) {
-    if (!file.exists()) {
-      return;
-    }
-    if (file.isDirectory()) {
-      File[] files = file.listFiles();
-      if (files != null) {
-        for (File f : files) {
-          deleteDirectory(f);
-        }
-      }
-    }
+  public static void deleteDirectory(Path dir) {
     try {
-      Files.delete(file.toPath());
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+      if (Files.notExists(dir))
+        return;
+
+      Files.walkFileTree(dir, new SimpleFileVisitor<>() {
+        @Override
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+          Files.delete(dir);
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+          Files.delete(file);
+          return FileVisitResult.CONTINUE;
+        }
+      });
+    } catch (Exception e) {
+      throw new RuntimeException("Can't delete directory", e);
     }
   }
 }

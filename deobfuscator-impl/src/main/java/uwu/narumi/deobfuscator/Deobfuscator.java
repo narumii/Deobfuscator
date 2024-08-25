@@ -50,7 +50,7 @@ public class Deobfuscator {
       throw new FileNotFoundException("No input files provided");
     }
 
-    if (builder.outputJar != null && builder.outputJar.toFile().exists())
+    if (builder.outputJar != null && Files.exists(builder.outputJar))
       LOGGER.warn("Output file already exist, data will be overwritten");
 
     this.inputJar = builder.inputJar;
@@ -194,8 +194,7 @@ public class Deobfuscator {
   private void saveToJar() {
     LOGGER.info("Saving output file: {}", outputJar);
 
-    try (ZipOutputStream zipOutputStream =
-        new ZipOutputStream(new FileOutputStream(outputJar.toFile()))) {
+    try (ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(outputJar))) {
       zipOutputStream.setLevel(9);
 
       context

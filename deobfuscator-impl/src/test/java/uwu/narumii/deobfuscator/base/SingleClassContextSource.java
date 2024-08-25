@@ -1,5 +1,7 @@
 package uwu.narumii.deobfuscator.base;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.jetbrains.java.decompiler.main.extern.IContextSource;
 import org.jetbrains.java.decompiler.main.extern.IResultSaver;
 import org.jetbrains.java.decompiler.util.InterpreterUtil;
@@ -14,17 +16,17 @@ import java.io.InputStream;
 import java.util.List;
 
 public class SingleClassContextSource implements IContextSource {
-  private final File file;
+  private final Path file;
   private final String relativePath;
   private final String qualifiedName;
   private final byte[] contents;
 
-  public SingleClassContextSource(File file, String relativePath) {
+  public SingleClassContextSource(Path file, String relativePath) {
     this.file = file;
     this.relativePath = relativePath;
     try {
       // Get qualified name
-      this.contents = InterpreterUtil.getBytes(file);
+      this.contents = Files.readAllBytes(file);
       ClassWrapper classWrapper = ClassHelper.loadClass(relativePath, this.contents, ClassReader.SKIP_FRAMES, 0);
       this.qualifiedName = classWrapper.name();
     } catch (Exception e) {

@@ -1,5 +1,6 @@
 package uwu.narumii.deobfuscator.base;
 
+import java.nio.charset.StandardCharsets;
 import org.jetbrains.java.decompiler.main.extern.IResultSaver;
 
 import java.io.File;
@@ -40,24 +41,18 @@ public class AssertingResultSaver implements IResultSaver {
    */
   @Override
   public void saveClassFile(String path, String qualifiedName, String entryName, String content, int[] mapping) {
-    Path saveTo;
-    if (this.inputType == TestDeobfuscationBase.InputType.CUSTOM_JAR) {
-      saveTo = Path.of(TestDeobfuscationBase.RESULTS_CLASSES_PATH.toString(), inputType.directory(), this.jarRelativePath, entryName + ".dec");
-    } else {
-      saveTo = Path.of(TestDeobfuscationBase.RESULTS_CLASSES_PATH.toString(), inputType.directory(), entryName + ".dec");
-    }
-
-    File fileSaveTo = saveTo.toFile();
+    Path saveTo = this.inputType == TestDeobfuscationBase.InputType.CUSTOM_JAR
+        ? TestDeobfuscationBase.RESULTS_CLASSES_PATH.resolve(inputType.directory()).resolve(this.jarRelativePath).resolve(entryName + ".dec")
+        : TestDeobfuscationBase.RESULTS_CLASSES_PATH.resolve(inputType.directory()).resolve(entryName + ".dec");
 
     try {
-      if (fileSaveTo.exists()) {
+      if (Files.exists(saveTo)) {
         // Assert decompiled code
         String oldCode = Files.readString(saveTo);
         assertEquals(oldCode, content);
       } else {
         // Save content
-        fileSaveTo.getParentFile().mkdirs();
-
+        Files.createDirectories(saveTo.getParent());
         Files.writeString(saveTo, content);
 
         // Mark that result saver saved content instead of asserting it
