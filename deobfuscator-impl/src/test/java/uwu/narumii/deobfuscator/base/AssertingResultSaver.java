@@ -41,6 +41,9 @@ public class AssertingResultSaver implements IResultSaver {
    */
   @Override
   public void saveClassFile(String path, String qualifiedName, String entryName, String content, int[] mapping) {
+    // Replace CRLF with LF
+    content = content.replace("\r\n", "\n");
+
     Path saveTo = this.inputType == TestDeobfuscationBase.InputType.CUSTOM_JAR
         ? TestDeobfuscationBase.RESULTS_CLASSES_PATH.resolve(inputType.directory()).resolve(this.jarRelativePath).resolve(entryName + ".dec")
         : TestDeobfuscationBase.RESULTS_CLASSES_PATH.resolve(inputType.directory()).resolve(entryName + ".dec");
