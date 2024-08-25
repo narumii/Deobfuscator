@@ -52,5 +52,7 @@ buildNumber.properties
 /work/
 /test/
 
-# Don't add compiled classes from java code
+# Don't track compiled classes from java code
 /testData/compiled/java/
+# Don't track deobfuscated files. They are added as decompiled code
+/testData/deobfuscated/

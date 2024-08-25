@@ -418,6 +418,23 @@ public abstract class AbstractInsnNode {
         || (this.getOpcode() >= I2L && this.getOpcode() <= I2S);
   }
 
+  public boolean isVarLoad() {
+    return this.getOpcode() >= ILOAD && this.getOpcode() <= ALOAD;
+  }
+
+  public boolean isVarStore() {
+    return this.getOpcode() >= ISTORE && this.getOpcode() <= ASTORE;
+  }
+
+  public int sizeOnStack() {
+    if (this.isLong() || this.isDouble()) {
+      // Only long and double values take up two stack values
+      return 2;
+    } else {
+      return 1;
+    }
+  }
+
   public boolean isJump() {
     return this instanceof JumpInsnNode;
   }
@@ -472,6 +489,15 @@ public abstract class AbstractInsnNode {
     }
 
     return current;
+  }
+
+  public InsnNode toPop() {
+    if (this.getOpcode() == LSTORE || this.getOpcode() == DSTORE || this.sizeOnStack() == 2) {
+      // Long and double values take up two stack values. Need to use POP2
+      return new InsnNode(POP2);
+    } else {
+     return new InsnNode(POP);
+    }
   }
 
   public <T extends AbstractInsnNode> T getPreviousAs() {

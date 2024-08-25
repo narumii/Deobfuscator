@@ -25,4 +25,40 @@ public class TestInlineLocalVariables {
 
         return testVar;
     }
+
+    public static void test4() {
+        Object someObj = new Object();
+        System.out.println("" + 5 + true + 123123123123123123L);
+        System.out.println(123123.123123 + (double)123123.125F + "test" + someObj);
+    }
+
+    public static void mangle() {
+        double d = 1455.45;
+        float e = 89.345F;
+        String f = "asd";
+        Object someObj = new Object();
+        System.out.println("" + 321 + true + 657657L);
+        System.out.println(1455.45 + (double)89.345F + "asd" + someObj);
+
+        try {
+            d = 3.4534535E7;
+
+            try {
+                e = 45354.0F;
+                f = "gfj";
+                someObj = new Object();
+                System.out.println("" + 453453453 + false + 7856783457834L);
+            } catch (Exception var10) {
+            }
+
+            System.out.println(d + (double)e + f + someObj);
+        } catch (Exception var11) {
+            d = 6.5654356234E7;
+            e = 4.1454144E8F;
+            f = "hjk";
+            someObj = new Object();
+            System.out.println("" + 56876758 + true + 5498489489L);
+            System.out.println(6.5654356234E7 + (double)4.1454144E8F + "hjk" + someObj);
+        }
+    }
 }

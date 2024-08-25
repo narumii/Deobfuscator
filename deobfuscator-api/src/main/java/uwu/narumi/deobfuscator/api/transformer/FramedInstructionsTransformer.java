@@ -9,13 +9,14 @@ import uwu.narumi.deobfuscator.api.context.Context;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 /**
  * Transformer that will iterate instructions along with their current {@link Frame}s
  */
 public abstract class FramedInstructionsTransformer extends Transformer {
-  private boolean changed = false;
+  private AtomicInteger changed = new AtomicInteger(0);
 
   /**
    * Transform instruction
@@ -72,11 +73,12 @@ public abstract class FramedInstructionsTransformer extends Transformer {
             // Run the instruction transformer
             boolean transformerChanged = transformInstruction(classWrapper, methodNode, insn, frame);
             if (transformerChanged) {
-              changed = true;
+              changed.incrementAndGet();
             }
           });
         }));
 
-    return changed;
+    LOGGER.info("Transformed {} instructions", changed.get());
+    return changed.get() > 0;
   }
 }

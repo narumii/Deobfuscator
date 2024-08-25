@@ -2,12 +2,12 @@ package uwu.narumi.deobfuscator;
 
 import dev.xdark.ssvm.VirtualMachine;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Supplier;
@@ -20,12 +20,10 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.context.Context;
-import uwu.narumi.deobfuscator.api.execution.SandBox;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
 import uwu.narumi.deobfuscator.api.helper.FileHelper;
 import uwu.narumi.deobfuscator.api.library.Library;
 import uwu.narumi.deobfuscator.api.library.LibraryClassLoader;
-import uwu.narumi.deobfuscator.api.library.LibraryClassWriter;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 public class Deobfuscator {
@@ -36,25 +34,30 @@ public class Deobfuscator {
 
   private final List<Supplier<Transformer>> transformers = new ArrayList<>();
   @Nullable
-  private final Path input;
+  private final Path inputJar;
   @Nullable
-  private final Path output;
-  private final List<Path> classes;
+  private final Path outputJar;
+  @Nullable
+  private final Path outputDir;
+  private final List<ExternalClass> classes;
+
   private final int classReaderFlags;
   private final int classWriterFlags;
   private final boolean consoleDebug;
 
   private Deobfuscator(Builder builder) throws FileNotFoundException {
-    if (builder.input == null && builder.classes.isEmpty()) {
+    if (builder.inputJar == null && builder.classes.isEmpty()) {
       throw new FileNotFoundException("No input files provided");
     }
 
-    if (builder.output != null && builder.output.toFile().exists())
+    if (builder.outputJar != null && builder.outputJar.toFile().exists())
       LOGGER.warn("Output file already exist, data will be overwritten");
 
-    this.input = builder.input;
-    this.output = builder.output;
+    this.inputJar = builder.inputJar;
+    this.outputJar = builder.outputJar;
+    this.outputDir = builder.outputDir;
     this.classes = builder.classes;
+
     this.transformers.addAll(builder.transformers);
     this.classReaderFlags = builder.classReaderFlags;
     this.classWriterFlags = builder.classWriterFlags;
@@ -102,23 +105,23 @@ public class Deobfuscator {
   }
 
   private void loadInput() {
-    if (input != null) {
-      LOGGER.info("Loading jar file: {}", input);
+    if (inputJar != null) {
+      LOGGER.info("Loading jar file: {}", inputJar);
       // Load jar
-      FileHelper.loadFilesFromZip(input, this::loadClass);
-      LOGGER.info("Loaded jar file: {}\n", input);
+      FileHelper.loadFilesFromZip(inputJar, this::loadClass);
+      LOGGER.info("Loaded jar file: {}\n", inputJar);
     }
 
-    for (Path clazz : classes) {
-      LOGGER.info("Loading class: {}", clazz);
+    for (ExternalClass clazz : classes) {
+      LOGGER.info("Loading class: {}", clazz.relativePath);
 
-      try (InputStream inputStream = new FileInputStream(clazz.toFile())) {
+      try (InputStream inputStream = new FileInputStream(clazz.path.toFile())) {
         // Load class
-        this.loadClass(clazz.toString(), inputStream.readAllBytes());
+        this.loadClass(clazz.relativePath, inputStream.readAllBytes());
 
-        LOGGER.info("Loaded class: {}\n", clazz);
+        LOGGER.info("Loaded class: {}\n", clazz.relativePath);
       } catch (IOException e) {
-        LOGGER.error("Could not load class: {}", clazz, e);
+        LOGGER.error("Could not load class: {}", clazz.relativePath, e);
       }
     }
   }
@@ -154,13 +157,45 @@ public class Deobfuscator {
     transformers.forEach(transformerSupplier -> Transformer.transform(transformerSupplier, null, this.context));
   }
 
+  /**
+   * Saves deobfuscation output result
+   */
   private void saveOutput() {
-    if (this.output == null) return;
+    if (outputJar != null) {
+      saveToJar();
+    } else if (outputDir != null) {
+      saveClassesToDir();
+    } else {
+      throw new IllegalStateException("No output file or directory provided");
+    }
+  }
 
-    LOGGER.info("Saving output file: {}", output);
+  private void saveClassesToDir() {
+    LOGGER.info("Saving classes to output directory: {}", outputDir);
+
+    context
+        .getClasses()
+        .forEach((ignored, classWrapper) -> {
+          try {
+            byte[] data = classWrapper.compileToBytes(this.context);
+
+            Path path = this.outputDir.resolve(classWrapper.getPath() + ".class");
+            Files.createDirectories(path.getParent());
+            Files.write(path, data);
+          } catch (Exception e) {
+            LOGGER.error("Could not save class: {}", classWrapper.name(), e);
+          }
+
+          context.getOriginalClasses().remove(classWrapper.name());
+          context.getClasses().remove(classWrapper.name());
+        });
+  }
+
+  private void saveToJar() {
+    LOGGER.info("Saving output file: {}", outputJar);
 
     try (ZipOutputStream zipOutputStream =
-        new ZipOutputStream(new FileOutputStream(output.toFile()))) {
+        new ZipOutputStream(new FileOutputStream(outputJar.toFile()))) {
       zipOutputStream.setLevel(9);
 
       context
@@ -216,22 +251,24 @@ public class Deobfuscator {
                 context.getFiles().remove(name);
               });
     } catch (Exception e) {
-      LOGGER.error("Could not save output file: {}", output);
+      LOGGER.error("Could not save output file: {}", outputJar);
       LOGGER.debug("Error", e);
       if (consoleDebug) e.printStackTrace();
     }
 
-    LOGGER.info("Saved output file: {}\n", output);
+    LOGGER.info("Saved output file: {}\n", outputJar);
   }
 
   public static class Builder {
 
     private final Set<Path> libraries = new HashSet<>();
     @Nullable
-    private Path input = null;
+    private Path inputJar = null;
     @Nullable
-    private Path output = null;
-    private List<Path> classes = new ArrayList<>();
+    private Path outputJar = null;
+    @Nullable
+    private Path outputDir = null;
+    private List<ExternalClass> classes = new ArrayList<>();
     private List<Supplier<Transformer>> transformers = List.of();
 
     private int classReaderFlags = ClassReader.SKIP_FRAMES;
@@ -243,25 +280,33 @@ public class Deobfuscator {
 
     private Builder() {}
 
-    public Builder input(@Nullable Path input) {
-      this.input = input;
-      if (this.input != null) {
-        String fullName = input.getFileName().toString();
+    public Builder inputJar(@Nullable Path inputJar) {
+      this.inputJar = inputJar;
+      if (this.inputJar != null) {
+        String fullName = inputJar.getFileName().toString();
         int dot = fullName.lastIndexOf('.');
-        this.output =
-            input
+        this.outputJar =
+            inputJar
                 .getParent()
                 .resolve(
                     dot == -1
                         ? fullName + "-out"
                         : fullName.substring(0, dot) + "-out" + fullName.substring(dot));
-        this.libraries.add(input);
+        this.libraries.add(inputJar);
       }
       return this;
     }
 
-    public Builder output(@Nullable Path output) {
-      this.output = output;
+    public Builder outputJar(@Nullable Path outputJar) {
+      this.outputJar = outputJar;
+      return this;
+    }
+
+    /**
+     * Output dir for deobfuscated classes
+     */
+    public Builder outputDir(@Nullable Path outputDir) {
+      this.outputDir = outputDir;
       return this;
     }
 
@@ -270,13 +315,13 @@ public class Deobfuscator {
       return this;
     }
 
-    public Builder classes(Path... paths) {
-      this.classes = Arrays.asList(paths);
-      return this;
-    }
-
-    public Builder clazz(Path path) {
-      this.classes.add(path);
+    /**
+     * Add external class to deobfuscate
+     * @param path Path to external class
+     * @param relativePath Relative path for saving purposes
+     */
+    public Builder clazz(Path path, String relativePath) {
+      this.classes.add(new ExternalClass(path, relativePath));
       return this;
     }
 
@@ -309,5 +354,8 @@ public class Deobfuscator {
     public Deobfuscator build() throws FileNotFoundException {
       return new Deobfuscator(this);
     }
+  }
+
+  public record ExternalClass(Path path, String relativePath) {
   }
 }

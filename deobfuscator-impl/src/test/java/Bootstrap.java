@@ -8,7 +8,7 @@ public class Bootstrap {
 
   public static void main(String[] args) throws Exception {
     Deobfuscator.builder()
-        .input(Path.of("work", "obf-test.jar"))
+        .inputJar(Path.of("work", "obf-test.jar"))
         .virtualMachine(
             new VirtualMachine() {
               // you can do shit

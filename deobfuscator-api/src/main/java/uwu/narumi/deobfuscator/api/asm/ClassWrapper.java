@@ -18,20 +18,23 @@ public class ClassWrapper implements Cloneable {
 
   protected static final Logger LOGGER = LogManager.getLogger(ClassWrapper.class);
 
+  /**
+   * Path for saving purposes.
+   */
   private final String path;
   private final ClassNode classNode;
   private final FieldCache fieldCache;
   private final ConstantPool constantPool;
   private final int classWriterFlags;
 
-  public ClassWrapper(String path, ClassReader classReader, int readerMode, int classWriterFlags) throws Exception {
+  public ClassWrapper(String path, ClassReader classReader, int classReaderFlags, int classWriterFlags) throws Exception {
     this.path = path;
     this.classNode = new ClassNode();
     this.constantPool = new ConstantPool(classReader);
     this.fieldCache = new FieldCache();
     this.classWriterFlags = classWriterFlags;
 
-    classReader.accept(this.classNode, readerMode);
+    classReader.accept(this.classNode, classReaderFlags);
   }
 
   private ClassWrapper(String path, ClassNode classNode, FieldCache fieldCache, ConstantPool constantPool, int classWriterFlags) {
