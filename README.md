@@ -20,7 +20,7 @@ A deobfuscator for java
 
 > Built on: [Java 17 (Temurin)](https://adoptium.net/temurin/releases/?version=17)
 
-## How to run deobfuscator
+## ✅ How to run deobfuscator
 If you want to use this deobfuscator, you need to start it from your IDE manually.
 
 1. Navigate to class [`Bootstrap.java`](./deobfuscator-impl/src/test/java/Bootstrap.java)
