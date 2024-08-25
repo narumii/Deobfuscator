@@ -1,5 +1,7 @@
 package uwu.narumi.deobfuscator.core.other.impl.clean.peephole;
 
+import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.NamedOpcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Frame;
@@ -19,41 +21,72 @@ public class UselessPopCleanTransformer extends FramedInstructionsTransformer {
 
   @Override
   protected boolean transformInstruction(ClassWrapper classWrapper, MethodNode methodNode, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
-    boolean changed = false;
+    boolean shouldRemovePop = false;
 
     OriginalSourceValue firstValue = frame.getStack(frame.getStackSize() - 1);
-    for (AbstractInsnNode producer : firstValue.insns) {
-      if (insn.getOpcode() == POP2) {
-        // If the producer is a double or long, remove the pop2 and the double/long
-        if (producer.isDouble() || producer.isLong()) {
-          methodNode.instructions.remove(producer);
-          methodNode.instructions.remove(insn);
-          changed = true;
-        } else {
-          // Pop two values
-          OriginalSourceValue secondValue = frame.getStack(frame.getStackSize() - 2);
-          popSourceValue(insn, secondValue, methodNode);
-          popSourceValue(insn, firstValue, methodNode);
+    if (insn.getOpcode() == POP && areProducersConstant(firstValue)) {
+      // Pop the value from the stack
+      popSourceValue(firstValue, methodNode);
+      shouldRemovePop = true;
+    } else if (insn.getOpcode() == POP2) {
+      if (areTwoSizedValues(firstValue)) {
+        // Pop 2-sized value from the stack
+        popSourceValue(firstValue, methodNode);
+        shouldRemovePop = true;
+      } else {
+        int index = frame.getStackSize() - 2;
+        OriginalSourceValue secondValue = index >= 0 ? frame.getStack(frame.getStackSize() - 2) : null;
+
+        // Pop two values from the stack
+        if (areProducersConstant(firstValue) && (secondValue == null || areProducersConstant(secondValue))) {
+          popSourceValue(firstValue, methodNode);
+          if (secondValue != null) {
+            popSourceValue(secondValue, methodNode);
+          }
+
+          shouldRemovePop = true;
         }
-      } else if (insn.getOpcode() == POP) {
-        changed |= popSourceValue(insn, firstValue, methodNode);
       }
     }
 
-    return changed;
+    if (shouldRemovePop) {
+      methodNode.instructions.remove(insn);
+    }
+
+    return shouldRemovePop;
   }
 
-  private boolean popSourceValue(AbstractInsnNode insn, OriginalSourceValue sourceValue, MethodNode methodNode) {
-    boolean changed = false;
+  /**
+   * Checks if all producers of the source value are constants
+   */
+  private boolean areProducersConstant(OriginalSourceValue sourceValue) {
+    if (sourceValue.insns.isEmpty()) return false;
+
     for (AbstractInsnNode producer : sourceValue.insns) {
-      // If the producer is a constant, remove the pop and the constant
-      if (producer.isConstant()) {
-        methodNode.instructions.remove(producer);
-        methodNode.instructions.remove(insn);
-        changed = true;
+      if (!producer.isConstant()) {
+        return false;
       }
     }
+    return true;
+  }
 
-    return changed;
+  /**
+   * Checks if all producers of the source value are 2-sized values
+   */
+  private boolean areTwoSizedValues(OriginalSourceValue sourceValue) {
+    if (sourceValue.insns.isEmpty()) return false;
+
+    for (AbstractInsnNode producer : sourceValue.insns) {
+      if (producer.sizeOnStack() != 2) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private void popSourceValue(OriginalSourceValue value, MethodNode methodNode) {
+    for (AbstractInsnNode producer : value.insns) {
+      methodNode.instructions.remove(producer);
+    }
   }
 }

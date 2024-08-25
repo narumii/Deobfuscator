@@ -207,11 +207,11 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
         return value1;
       } else {
         // OriginalSourceInterpreter start
-        OriginalSourceValue parentValue = null;
-        if (value1.copiedFrom != null && value2.copiedFrom != null) {
-          parentValue = this.merge(value1.copiedFrom, value2.copiedFrom);
+        OriginalSourceValue copiedFrom = null;
+        if (setUnion.size() == 1 && value1.copiedFrom != null && value2.copiedFrom != null) {
+          copiedFrom = this.merge(value1.copiedFrom, value2.copiedFrom);
         }
-        return new OriginalSourceValue(Math.min(value1.size, value2.size), setUnion, parentValue);
+        return new OriginalSourceValue(Math.min(value1.size, value2.size), setUnion, copiedFrom);
         // OriginalSourceInterpreter end
       }
     }
@@ -223,11 +223,11 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
       setUnion.addAll(value2.insns);
 
       // OriginalSourceInterpreter start
-      OriginalSourceValue parentValue = null;
-      if (value1.copiedFrom != null && value2.copiedFrom != null) {
-        parentValue = this.merge(value1.copiedFrom, value2.copiedFrom);
+      OriginalSourceValue copiedFrom = null;
+      if (setUnion.size() == 1 && value1.copiedFrom != null && value2.copiedFrom != null) {
+        copiedFrom = this.merge(value1.copiedFrom, value2.copiedFrom);
       }
-      return new OriginalSourceValue(Math.min(value1.size, value2.size), setUnion, parentValue);
+      return new OriginalSourceValue(Math.min(value1.size, value2.size), setUnion, copiedFrom);
       // OriginalSourceInterpreter end
     }
     return value1;

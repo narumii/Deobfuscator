@@ -9,8 +9,6 @@ import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,17 +36,17 @@ public class InlineLocalVariablesTransformer extends Transformer {
 
     // Inline static local variables
     for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-      if (insn.getOpcode() == ILOAD) {
+      if (insn.isVarLoad()) {
         VarInsnNode varInsn = (VarInsnNode) insn;
 
         Frame<OriginalSourceValue> frame = frames.get(insn);
         if (frame == null) continue;
 
-        // ISTORE
+        // Var store instruction
         OriginalSourceValue storeVarSourceValue = frame.getLocal(varInsn.var);
         // Value reference
         OriginalSourceValue valueSourceValue = storeVarSourceValue.copiedFrom;
-        if (valueSourceValue == null || !valueSourceValue.originalSource.isOneWayProduced() || storeVarSourceValue.getProducer().getOpcode() != ISTORE) continue;
+        if (valueSourceValue == null || !valueSourceValue.originalSource.isOneWayProduced() || !storeVarSourceValue.getProducer().isVarStore()) continue;
 
         // Original source value on which we can operate
         AbstractInsnNode valueInsn = valueSourceValue.originalSource.getProducer();
