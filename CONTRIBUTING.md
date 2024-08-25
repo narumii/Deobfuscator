@@ -30,7 +30,7 @@ The project is structured as follows:
 
 ## 🪄 Transformers
 ### What are transformers?
-Whole deobfuscation process is based on transformers. Transformers are smaller classes that are responsible for deobfuscating specific obfuscation techniques. In simple words - transformers are transforming obfuscated code into a more readable form.
+Whole deobfuscation process is based on transformers. Transformers are smaller pieces that are responsible for deobfuscating specific obfuscation techniques. In simple words - transformers are transforming obfuscated code into a more readable form.
 
 ### How to create your own transformer?
 1. Create a new class in [`deobfuscator-transformers`](./deobfuscator-transformers) module.
