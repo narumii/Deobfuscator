@@ -16,13 +16,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class AssertingResultSaver implements IResultSaver {
 
   private final TestDeobfuscationBase.InputType inputType;
-  private final String jarSource;
+  private final String jarRelativePath;
 
   private boolean savedContent = false;
 
-  public AssertingResultSaver(TestDeobfuscationBase.InputType inputType, String jarSource) {
+  public AssertingResultSaver(TestDeobfuscationBase.InputType inputType, String jarRelativePath) {
     this.inputType = inputType;
-    this.jarSource = jarSource;
+    this.jarRelativePath = jarRelativePath;
   }
 
   @Override
@@ -42,7 +42,7 @@ public class AssertingResultSaver implements IResultSaver {
   public void saveClassFile(String path, String qualifiedName, String entryName, String content, int[] mapping) {
     Path saveTo;
     if (this.inputType == TestDeobfuscationBase.InputType.CUSTOM_JAR) {
-      saveTo = Path.of(TestDeobfuscationBase.RESULTS_CLASSES_PATH.toString(), inputType.directory(), this.jarSource, entryName + ".dec");
+      saveTo = Path.of(TestDeobfuscationBase.RESULTS_CLASSES_PATH.toString(), inputType.directory(), this.jarRelativePath, entryName + ".dec");
     } else {
       saveTo = Path.of(TestDeobfuscationBase.RESULTS_CLASSES_PATH.toString(), inputType.directory(), entryName + ".dec");
     }

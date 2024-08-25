@@ -88,7 +88,7 @@ public abstract class TestDeobfuscationBase {
       Deobfuscator.Builder deobfuscatorBuilder = Deobfuscator.builder()
           .transformers(this.transformers.toArray(new Supplier[0]));
 
-      File deobfuscatedJar = null;
+      File inputDir = null;
       String jarSource = null;
 
       // Get sources paths
@@ -105,7 +105,7 @@ public abstract class TestDeobfuscationBase {
         Path inputJarPath = Path.of(COMPILED_CLASSES_PATH.toString(), relativePath.toString());
         deobfuscatorBuilder.inputJar(inputJarPath);
 
-        deobfuscatedJar = Path.of(DEOBFUSCATED_CLASSES_PATH.toString(), relativePath.toString()).toFile();
+        inputDir = Path.of(DEOBFUSCATED_CLASSES_PATH.toString(), relativePath.toString()).toFile();
       } else {
         for (String sourceName : sources) {
           Path relativePath = Path.of(this.inputType.directory(), sourceName + ".class");
@@ -148,11 +148,18 @@ public abstract class TestDeobfuscationBase {
       }
 
       // Assert output
-      this.assertOutput(contextSources, deobfuscatedJar, jarSource);
+      this.assertOutput(contextSources, inputDir, jarSource);
     }
 
-    private void assertOutput(List<IContextSource> contextSources, @Nullable File inputJar, @Nullable String jarSource) {
-      AssertingResultSaver assertingResultSaver = new AssertingResultSaver(this.inputType, jarSource);
+    /**
+     * Asserts output of a decompilation result
+     *
+     * @param contextSources Classes to be decompiled
+     * @param inputDir Optionally you can give a whole directory to decompile.
+     * @param jarRelativePath Specifies a relative path in save directory. Only used for jars
+     */
+    private void assertOutput(List<IContextSource> contextSources, @Nullable File inputDir, @Nullable String jarRelativePath) {
+      AssertingResultSaver assertingResultSaver = new AssertingResultSaver(this.inputType, jarRelativePath);
 
       // Decompile classes
       Decompiler.Builder decompilerBuilder = Decompiler.builder()
@@ -161,7 +168,7 @@ public abstract class TestDeobfuscationBase {
 
       // Add sources
       if (this.inputType == InputType.CUSTOM_JAR) {
-        decompilerBuilder.inputs(inputJar);
+        decompilerBuilder.inputs(inputDir);
       } else {
         for (IContextSource contextSource : contextSources) {
           decompilerBuilder.inputs(contextSource);
