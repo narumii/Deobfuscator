@@ -1,6 +1,6 @@
 import java.io.File;
 
-public class TestInlineStaticFields2 {
+public class TestInlineStaticFieldsWithModification {
   private static final char SYSTEM_SEPARATOR = File.separatorChar;
   private static final char OTHER_SEPARATOR;
 

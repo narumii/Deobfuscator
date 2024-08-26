@@ -22,7 +22,7 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
     register("Universal Number Transformer", InputType.JAVA_CODE, List.of(UniversalNumberTransformer::new), "TestUniversalNumberTransformer");
     register("Inline static fields", InputType.JAVA_CODE, List.of(InlineStaticFieldTransformer::new), "TestInlineStaticFields");
     // TODO: Account for static field modification
-    register("Inline static fields with modification", InputType.JAVA_CODE, List.of(InlineStaticFieldTransformer::new), "TestInlineStaticFields2");
+    register("Inline static fields with modification", InputType.JAVA_CODE, List.of(InlineStaticFieldTransformer::new), "TestInlineStaticFieldsWithModification");
 
     // Samples
     // TODO: Deobfuscate switches
