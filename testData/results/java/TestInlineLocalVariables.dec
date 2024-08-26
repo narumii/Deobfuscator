@@ -33,7 +33,6 @@ public class TestInlineLocalVariables {
     }
 
     public static void mangle() {
-        double d = 1455.45;
         float e = 89.345F;
         String f = "asd";
         Object someObj = new Object();
@@ -41,7 +40,7 @@ public class TestInlineLocalVariables {
         System.out.println(1455.45 + (double)89.345F + "asd" + someObj);
 
         try {
-            d = 3.4534535E7;
+            double var12 = 3.4534535E7;
 
             try {
                 e = 45354.0F;
@@ -51,9 +50,9 @@ public class TestInlineLocalVariables {
             } catch (Exception var10) {
             }
 
-            System.out.println(d + (double)e + f + someObj);
+            System.out.println(var12 + (double)e + f + someObj);
         } catch (Exception var11) {
-            d = 6.5654356234E7;
+            double d = 6.5654356234E7;
             e = 4.1454144E8F;
             f = "hjk";
             someObj = new Object();
