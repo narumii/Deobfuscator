@@ -59,7 +59,7 @@ public class MethodMatch implements Match {
     return node instanceof MethodInsnNode
         && (opcode == -1 || node.getOpcode() == opcode)
         && (owner == null || ((MethodInsnNode) node).owner.equals(owner))
-        && (name == null || Arrays.binarySearch(name, ((MethodInsnNode) node).name) != -1)
+        && (name == null || Arrays.binarySearch(name, ((MethodInsnNode) node).name) >= 0)
         && (desc == null || ((MethodInsnNode) node).desc.equals(desc));
   }
 

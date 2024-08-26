@@ -1,6 +1,7 @@
 package uwu.narumi.deobfuscator.core.other.impl.clean.peephole;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.IincInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
@@ -27,11 +28,18 @@ public class PopUnUsedLocalVariablesTransformer extends Transformer {
 
       // Find all local variables in use
       for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-        if (insn instanceof VarInsnNode varInsnNode && insn.isVarLoad()) {
+        if ((insn instanceof VarInsnNode && !insn.isVarStore()) || insn instanceof IincInsnNode) {
           Frame<OriginalSourceValue> frame = frames.get(insn);
           if (frame == null) return;
 
-          OriginalSourceValue localVariableSourceValue = frame.getLocal(varInsnNode.var);
+          int varIndex;
+          if (insn instanceof VarInsnNode varInsnNode) {
+            varIndex = varInsnNode.var;
+          } else {
+            varIndex = ((IincInsnNode) insn).var;
+          }
+
+          OriginalSourceValue localVariableSourceValue = frame.getLocal(varIndex);
           for (AbstractInsnNode sourceInsn : localVariableSourceValue.insns) {
             // Save var stores in use
             if (sourceInsn.isVarStore()) {
