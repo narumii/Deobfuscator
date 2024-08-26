@@ -4,9 +4,9 @@ public class TestInlineStaticFields {
     public static boolean TEST3 = true;
 
     public static void test() {
-        byte var10001 = 123;
-        String var10003 = "placki";
-        boolean var10005 = true;
+        System.out.println(123);
+        System.out.println("placki");
+        System.out.println(true);
     }
 
     public static void modifyStatic() {
