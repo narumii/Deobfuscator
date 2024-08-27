@@ -75,6 +75,9 @@ public record DeobfuscatorOptions(
     private Builder() {
     }
 
+    /**
+     * Your input jar file
+     */
     @Contract("_ -> this")
     public DeobfuscatorOptions.Builder inputJar(@Nullable Path inputJar) {
       this.inputJar = inputJar;
@@ -90,6 +93,9 @@ public record DeobfuscatorOptions(
       return this;
     }
 
+    /**
+     * Output jar for deobfuscated classes. Automatically filled when input jar is set
+     */
     @Contract("_ -> this")
     public DeobfuscatorOptions.Builder outputJar(@Nullable Path outputJar) {
       this.outputJar = outputJar;
@@ -97,7 +103,7 @@ public record DeobfuscatorOptions(
     }
 
     /**
-     * Output dir for deobfuscated classes
+     * Set output dir it if you want to output raw compiled classes instead of jar file
      */
     @Contract("_ -> this")
     public DeobfuscatorOptions.Builder outputDir(@Nullable Path outputDir) {
