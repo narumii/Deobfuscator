@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Timeout;
 import org.opentest4j.TestAbortedException;
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.context.DeobfuscatorOptions;
 import uwu.narumi.deobfuscator.api.helper.FileHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
@@ -85,7 +86,7 @@ public abstract class TestDeobfuscationBase {
      */
     private void runTest() {
       // Setup builder
-      Deobfuscator.Builder deobfuscatorBuilder = Deobfuscator.builder()
+      DeobfuscatorOptions.Builder optionsBuilder = DeobfuscatorOptions.builder()
           .transformers(this.transformers.toArray(new Supplier[0]));
 
       Path inputDir = null;
@@ -103,7 +104,7 @@ public abstract class TestDeobfuscationBase {
 
         // Add jar input
         Path inputJarPath = COMPILED_CLASSES_PATH.resolve(relativePath);
-        deobfuscatorBuilder.inputJar(inputJarPath);
+        optionsBuilder.inputJar(inputJarPath);
 
         inputDir = DEOBFUSCATED_CLASSES_PATH.resolve(relativePath);
       } else {
@@ -114,23 +115,17 @@ public abstract class TestDeobfuscationBase {
           }
 
           // Add class
-          deobfuscatorBuilder.clazz(compiledClassPath, sourceName);
+          optionsBuilder.clazz(compiledClassPath, sourceName);
         }
       }
 
-      Deobfuscator deobfuscator;
-      try {
-        // Build deobfuscator
-        deobfuscator = deobfuscatorBuilder
-            .outputJar(null)
-            .outputDir(DEOBFUSCATED_CLASSES_PATH.resolve(this.inputType.directory()))
-            .build();
-      } catch (FileNotFoundException e) {
-        throw new RuntimeException(e);
-      }
+      // Last configurations
+      optionsBuilder
+          .outputJar(null)
+          .outputDir(DEOBFUSCATED_CLASSES_PATH.resolve(this.inputType.directory()));
 
-      // Run deobfuscator!
-      deobfuscator.start();
+      // Build and run deobfuscator!
+      Deobfuscator.from(optionsBuilder.build()).start();
 
       // Init context sources
       List<IContextSource> contextSources = new ArrayList<>();

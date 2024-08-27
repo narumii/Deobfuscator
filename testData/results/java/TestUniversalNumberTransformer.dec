@@ -14,4 +14,26 @@ public class TestUniversalNumberTransformer {
             System.out.println(b);
         }
     }
+
+    public void numberCasts() {
+        long temp1 = 3458347593845798359L;
+        int a = 1090614743;
+        long temp2 = 6873457893573587384L;
+        float b = 6.873458E18F;
+        double temp3 = 23423.32412121212;
+        float c = 23423.324F;
+    }
+
+    public void methodCallsOnLiterals() {
+        int a = 12;
+        int b = -1408655867;
+        int c = 123;
+        int d = 10;
+        int e = 28311552;
+        long f = 5413326752099336192L;
+        int g = 1123434234;
+        float h = 1.72E-43F;
+        long i = 4638364436490267302L;
+        double j = 6.0831E-319;
+    }
 }
