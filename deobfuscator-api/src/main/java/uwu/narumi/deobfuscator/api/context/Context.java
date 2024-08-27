@@ -14,23 +14,26 @@ public class Context {
   private final Map<String, ClassWrapper> originalClasses = new ConcurrentHashMap<>();
   private final Map<String, byte[]> files = new ConcurrentHashMap<>();
 
-  private LibraryClassLoader loader;
-  private SandBox sandBox;
+  private final DeobfuscatorOptions options;
+  private final LibraryClassLoader loader;
+  private final SandBox sandBox;
+
+  public Context(DeobfuscatorOptions options, LibraryClassLoader loader, SandBox sandBox) {
+    this.options = options;
+    this.loader = loader;
+    this.sandBox = sandBox;
+  }
+
+  public DeobfuscatorOptions getOptions() {
+    return options;
+  }
 
   public LibraryClassLoader getLoader() {
     return loader;
   }
 
-  public void setLoader(LibraryClassLoader loader) {
-    this.loader = loader;
-  }
-
   public SandBox getSandBox() {
     return sandBox;
-  }
-
-  public void setSandBox(SandBox sandBox) {
-    this.sandBox = sandBox;
   }
 
   public Collection<ClassWrapper> classes() {

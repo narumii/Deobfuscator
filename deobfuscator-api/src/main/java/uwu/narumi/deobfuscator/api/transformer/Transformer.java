@@ -87,18 +87,21 @@ public abstract class Transformer extends AsmHelper implements Opcodes {
       LOGGER.info("Ended {} transformer in {} ms", transformer.name(), (System.currentTimeMillis() - start));
 
       // Bytecode verification
-      /*if (oldInstance == null && changed) {
-        // Verify if code is valid
+      if (context.getOptions().verifyBytecode() && oldInstance == null && changed) {
+        // Verify if bytecode is valid
         try {
           verifyBytecode(scope, context);
         } catch (RuntimeException e) {
           LOGGER.error("Transformer {} produced invalid bytecode", transformer.name(), e);
         }
-      }*/
+      }
     } catch (TransformerException e) {
       LOGGER.error("! {}: {}", transformer.name(), e.getMessage());
     } catch (Exception e) {
       LOGGER.error("Error occurred when transforming {}", transformer.name(), e);
+      if (!context.getOptions().suppressErrors()) {
+        throw new RuntimeException(e);
+      }
     }
     LOGGER.info("-------------------------------------\n");
 
