@@ -84,14 +84,23 @@ public class TestSimpleFlowObfuscation {
         break;
     }
 
-    // TODO: Simplify "equals" calls
-    String d = "test";
+    // TODO: Simplify "equals" calls (in UniversalNumberTransformer)
+    String d = "test5";
     switch (d) {
       case "test":
-        System.out.println("REACHABLE test");
+        System.out.println("unreachable test");
         break;
       case "test2":
         System.out.println("unreachable test2");
+        break;
+      case "test3":
+        System.out.println("unreachable test3");
+        break;
+      case "test4":
+        System.out.println("unreachable test4");
+        break;
+      case "test5":
+        System.out.println("REACHABLE test5");
         break;
       default:
         System.out.println("unreachable default");
