@@ -37,6 +37,10 @@ public class Deobfuscator {
   private final Context context;
 
   private Deobfuscator(DeobfuscatorOptions options) {
+    if (options.inputJar() != null && !Files.exists(options.inputJar())) {
+      throw new IllegalArgumentException("Input jar does not exist");
+    }
+
     if (options.outputJar() != null && Files.exists(options.outputJar())) {
       LOGGER.warn("Output file already exist, data will be overwritten");
     }
