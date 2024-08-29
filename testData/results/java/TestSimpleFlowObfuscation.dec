@@ -13,4 +13,33 @@ public class TestSimpleFlowObfuscation {
             a++;
         }
     }
+
+    public void switches() {
+        System.out.println("REACHABLE 100");
+        System.out.println("REACHABLE 3");
+        byte var5 = -1;
+        if ("test5".equals("test5")) {
+            var5 = 4;
+        }
+
+        switch (var5) {
+            case 0:
+                System.out.println("unreachable test");
+                break;
+            case 1:
+                System.out.println("unreachable test2");
+                break;
+            case 2:
+                System.out.println("unreachable test3");
+                break;
+            case 3:
+                System.out.println("unreachable test4");
+                break;
+            case 4:
+                System.out.println("REACHABLE test5");
+                break;
+            default:
+                System.out.println("unreachable default");
+        }
+    }
 }
