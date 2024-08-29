@@ -95,8 +95,7 @@ public class Deobfuscator {
 
         LOGGER.info("Loaded class: {}\n", clazz.relativePath());
       } catch (IOException e) {
-        LOGGER.error("Could not load class: {}", clazz.relativePath());
-        throw new RuntimeException(e);
+        LOGGER.error("Could not load class: {}", clazz.relativePath(), e);
       }
     }
   }
