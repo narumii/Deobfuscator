@@ -111,7 +111,9 @@ public abstract class TestDeobfuscationBase {
         for (String sourceName : sources) {
           Path compiledClassPath = COMPILED_CLASSES_PATH.resolve(this.inputType.directory()).resolve(sourceName + ".class");
           if (Files.notExists(compiledClassPath)) {
-            throw new IllegalArgumentException("File not found: " + compiledClassPath.toAbsolutePath().normalize());
+            throw new IllegalArgumentException(
+                "Compiled class not found: '" + compiledClassPath.toAbsolutePath().normalize() + "'. You might forgot to compile the class. Use 'mvn test' to compile test classes."
+            );
           }
 
           // Add class

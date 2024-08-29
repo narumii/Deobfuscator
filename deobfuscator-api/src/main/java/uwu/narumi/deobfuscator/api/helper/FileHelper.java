@@ -1,6 +1,5 @@
 package uwu.narumi.deobfuscator.api.helper;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -26,8 +25,7 @@ public final class FileHelper {
           .forEachRemaining(
               zipEntry -> {
                 try {
-                  consumer.accept(
-                      zipEntry.getName(), zipFile.getInputStream(zipEntry).readAllBytes());
+                  consumer.accept(zipEntry.getName(), zipFile.getInputStream(zipEntry).readAllBytes());
                 } catch (Exception e) {
                   LOGGER.error("Could not load ZipEntry: {}", zipEntry.getName());
                   LOGGER.debug("Error", e);
@@ -35,7 +33,7 @@ public final class FileHelper {
               });
     } catch (Exception e) {
       LOGGER.error("Could not load file: {}", path);
-      LOGGER.debug("Error", e);
+      throw new RuntimeException(e);
     }
   }
 
