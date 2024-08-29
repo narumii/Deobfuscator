@@ -26,9 +26,9 @@ public final class FileHelper {
               zipEntry -> {
                 try {
                   consumer.accept(zipEntry.getName(), zipFile.getInputStream(zipEntry).readAllBytes());
-                } catch (IOException e) {
+                } catch (Exception e) {
                   LOGGER.error("Could not load ZipEntry: {}", zipEntry.getName());
-                  throw new RuntimeException(e);
+                  LOGGER.debug("Error", e);
                 }
               });
     } catch (Exception e) {

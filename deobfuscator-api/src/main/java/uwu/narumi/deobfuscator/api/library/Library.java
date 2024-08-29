@@ -37,7 +37,7 @@ public class Library {
                     .name(),
                 bytes);
           } catch (Exception e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Could not load {} class from {} library", name, path, e);
           }
         });
 
