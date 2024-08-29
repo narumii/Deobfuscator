@@ -69,16 +69,9 @@ public class Deobfuscator {
   }
 
   public void start() {
-    try {
-      loadInput();
-      transform(this.options.transformers());
-      saveOutput();
-    } catch (Exception e) {
-      LOGGER.error("Error occurred while obfuscation");
-      LOGGER.debug("Error", e);
-
-      if (this.options.consoleDebug()) e.printStackTrace();
-    }
+    loadInput();
+    transform(this.options.transformers());
+    saveOutput();
   }
 
   public Context getContext() {
@@ -102,7 +95,8 @@ public class Deobfuscator {
 
         LOGGER.info("Loaded class: {}\n", clazz.relativePath());
       } catch (IOException e) {
-        LOGGER.error("Could not load class: {}", clazz.relativePath(), e);
+        LOGGER.error("Could not load class: {}", clazz.relativePath());
+        throw new RuntimeException(e);
       }
     }
   }
@@ -175,6 +169,15 @@ public class Deobfuscator {
   private void saveToJar() {
     LOGGER.info("Saving output file: {}", this.options.outputJar());
 
+    // Create directories if not exists
+    if (this.options.outputJar().getParent() != null) {
+      try {
+        Files.createDirectories(this.options.outputJar().getParent());
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
     try (ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(this.options.outputJar()))) {
       zipOutputStream.setLevel(9);
 
@@ -231,10 +234,9 @@ public class Deobfuscator {
 
                 context.getFiles().remove(name);
               });
-    } catch (Exception e) {
+    } catch (IOException e) {
       LOGGER.error("Could not save output file: {}", this.options.outputJar());
-      LOGGER.debug("Error", e);
-      if (this.options.consoleDebug()) e.printStackTrace();
+      throw new RuntimeException(e);
     }
 
     LOGGER.info("Saved output file: {}\n", this.options.outputJar());
