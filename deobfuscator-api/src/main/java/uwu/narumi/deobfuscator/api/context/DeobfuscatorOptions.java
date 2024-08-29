@@ -82,13 +82,16 @@ public record DeobfuscatorOptions(
     public DeobfuscatorOptions.Builder inputJar(@Nullable Path inputJar) {
       this.inputJar = inputJar;
       if (this.inputJar != null) {
-        String fullName = inputJar.getFileName().toString();
-        int dot = fullName.lastIndexOf('.');
+        this.libraries.add(inputJar);
 
         // Auto fill output jar
-        this.outputJar = inputJar.getParent()
-            .resolve(dot == -1 ? fullName + "-out" : fullName.substring(0, dot) + "-out" + fullName.substring(dot));
-        this.libraries.add(inputJar);
+        if (this.outputJar == null) {
+          String fullName = inputJar.getFileName().toString();
+          int dot = fullName.lastIndexOf('.');
+
+          this.outputJar = inputJar.getParent()
+              .resolve(dot == -1 ? fullName + "-out" : fullName.substring(0, dot) + "-out" + fullName.substring(dot));
+        }
       }
       return this;
     }
