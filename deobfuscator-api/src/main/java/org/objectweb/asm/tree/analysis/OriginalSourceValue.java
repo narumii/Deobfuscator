@@ -74,14 +74,6 @@ public class OriginalSourceValue extends SourceValue {
    */
   private Optional<Object> constantValue = Optional.empty();
 
-  public OriginalSourceValue(OriginalSourceValue copiedFrom, AbstractInsnNode insnNode, Optional<Object> constantValue) {
-    this(copiedFrom.size, Set.of(insnNode), copiedFrom, constantValue);
-  }
-
-  public OriginalSourceValue(OriginalSourceValue copiedFrom, AbstractInsnNode insnNode) {
-    this(copiedFrom.size, Set.of(insnNode), copiedFrom);
-  }
-
   public OriginalSourceValue(int size) {
     this(size, Set.of());
   }
@@ -90,28 +82,43 @@ public class OriginalSourceValue extends SourceValue {
     this(size, Set.of(insnNode));
   }
 
-  public OriginalSourceValue(int size, AbstractInsnNode insnNode, Optional<Object> constantValue) {
-    this(size, Set.of(insnNode), null, constantValue);
-  }
-
   public OriginalSourceValue(int size, Set<AbstractInsnNode> insnSet) {
     this(size, insnSet, null);
+  }
+
+  public OriginalSourceValue(OriginalSourceValue copiedFrom, AbstractInsnNode insnNode) {
+    this(copiedFrom.size, Set.of(insnNode), copiedFrom);
   }
 
   public OriginalSourceValue(int size, Set<AbstractInsnNode> insnSet, @Nullable OriginalSourceValue copiedFrom) {
     this(size, insnSet, copiedFrom, Optional.empty());
   }
 
+  public OriginalSourceValue(int size, AbstractInsnNode insnNode, Optional<Object> constantValue) {
+    this(size, Set.of(insnNode), null, constantValue);
+  }
+
+  /**
+   * Create a new {@link OriginalSourceValue} with the given size, instruction set, copied from value and
+   * predicted constant value.
+   *
+   * @param size Stack size of the value
+   * @param insnSet Set of instructions that produce this value
+   * @param copiedFrom The value from which this value was copied or null if it was not copied
+   * @param constantValue Predicted constant value if exists
+   */
   public OriginalSourceValue(int size, Set<AbstractInsnNode> insnSet, @Nullable OriginalSourceValue copiedFrom, Optional<Object> constantValue) {
     super(size, insnSet);
     this.copiedFrom = copiedFrom;
     this.originalSource = copiedFrom == null ? this : copiedFrom.originalSource;
     if (constantValue.isPresent()) {
+      // If the constant value is present, then use it
       this.constantValue = constantValue;
     } else if (copiedFrom != null) {
+      // Copy constant value from copied value
       this.constantValue = copiedFrom.constantValue;
     } else if (insnSet.size() == 1) {
-      // Try to infer constant value
+      // Try to infer constant value from producer
       AbstractInsnNode insn = insnSet.iterator().next();
       if (insn.isConstant()) {
         this.constantValue = Optional.of(insn.asConstant());
@@ -140,6 +147,9 @@ public class OriginalSourceValue extends SourceValue {
     return insns.iterator().next();
   }
 
+  /**
+   * See {@link #constantValue}.
+   */
   public Optional<Object> getConstantValue() {
     return constantValue;
   }

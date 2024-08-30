@@ -49,10 +49,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
 
 /**
- * A semantic bytecode analyzer. <i>This class does not fully check that JSR and RET instructions
- * are valid.</i>
- *
- * @author Eric Bruneton
+ * An extended {@link Analyzer} that can simulate the execution of jump instructions (if, switch)
  */
 public class JumpPredictingAnalyzer implements Opcodes {
 
