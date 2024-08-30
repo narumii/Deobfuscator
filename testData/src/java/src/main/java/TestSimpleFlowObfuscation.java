@@ -40,7 +40,6 @@ public class TestSimpleFlowObfuscation {
       System.out.println("a is not 100");
     }
 
-    // TODO: Simplify also this
     while (a * 321 == 100) {
       a += 1;
     }

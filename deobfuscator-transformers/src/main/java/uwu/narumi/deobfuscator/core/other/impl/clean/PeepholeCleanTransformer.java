@@ -8,6 +8,9 @@ import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.PopUnUsedLocalVari
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.UselessJumpsCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.UselessPopCleanTransformer;
 
+/**
+ * A transformer that cleans up garbage instructions.
+ */
 public class PeepholeCleanTransformer extends ComposedTransformer {
 
   public PeepholeCleanTransformer() {

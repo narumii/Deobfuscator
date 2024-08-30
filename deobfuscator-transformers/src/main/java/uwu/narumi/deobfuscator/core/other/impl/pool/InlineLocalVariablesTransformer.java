@@ -31,7 +31,7 @@ public class InlineLocalVariablesTransformer extends Transformer {
   }
 
   private void inlineLocalVariables(ClassWrapper classWrapper, MethodNode methodNode) {
-    Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = analyzeOriginalSource(classWrapper.getClassNode(), methodNode);
+    Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = analyzeSource(classWrapper.getClassNode(), methodNode);
     if (frames == null) return;
 
     // Inline static local variables

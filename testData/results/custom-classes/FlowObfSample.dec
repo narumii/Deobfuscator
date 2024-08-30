@@ -9,80 +9,12 @@ public class IIIIIIIIlIlIIIIlIIlIIIIIIIIlIlIllllIIIlIIIlIIllIllllIIIIllIIIIllIIl
         int var0
     ) {
         Bukkit.getServer();
-        long var10000 = 5990235795655834774L;
-
-        while (true) {
-            switch ((int)var10000) {
-                case -1895826787:
-                    var10000 = 8257028660923634471L;
-                    break;
-                case -253412202:
-                default:
-                    Bukkit.getServer();
-                    Bukkit.getServer();
-                    var10000 = 5990235795655834774L;
-
-                    while (true) {
-                        switch ((int)var10000) {
-                            case -2133192819:
-                                var10000 = -1531123931200573428L;
-                                break;
-                            case -584824255:
-                                var10000 = 8094959526148747926L;
-                                break;
-                            case -253412202:
-                            default:
-                                Bukkit.getServer();
-                                var10000 = 5990235795655834774L;
-
-                                while (true) {
-                                    switch ((int)var10000) {
-                                        case -436830004:
-                                            var10000 = 0L;
-                                            break;
-                                        case -253412202:
-                                        default:
-                                            Bukkit.getServer();
-                                            Bukkit.getServer();
-                                            Bukkit.getServer();
-                                            return 0;
-                                    }
-                                }
-                        }
-
-                        var10000 /= 9205541525884853016L;
-                    }
-                case 93020900:
-                    var10000 = 6736707563048316139L;
-                    break;
-                case 160507798:
-                    var10000 = -7532494413388854154L;
-            }
-
-            var10000 /= -4842676545345615747L;
-        }
-    }
-
-    public IIIIIIIIlIlIIIIlIIlIIIIIIIIlIlIllllIIIlIIIlIIllIllllIIIIllIIIIllIIllllIIIIllllIIIIIIIllIllIIIlllIlIIllIlIIllIlIIIIIlIIIIIllllIlIIllIllllIIlIIIIIIlIllIlIIIIlIlIIlIIlllIIIIlIIlIIllIlIIIlIlIlIIIIllIlllll() {
-        long var10001 = 5990235795655834774L;
-
-        while (true) {
-            switch ((int)var10001) {
-                case -1254534848:
-                    var10001 = -6562666170258139970L;
-                    break;
-                case -253412202:
-                default:
-                    super();
-                    return;
-                case 485227004:
-                    var10001 = 8779745570450297940L;
-                    break;
-                case 1712111765:
-                    var10001 = -8855161723369167601L;
-            }
-
-            var10001 /= 8016067872500700090L;
-        }
+        Bukkit.getServer();
+        Bukkit.getServer();
+        Bukkit.getServer();
+        Bukkit.getServer();
+        Bukkit.getServer();
+        Bukkit.getServer();
+        return 0;
     }
 }

@@ -34,10 +34,12 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
+import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -130,6 +132,17 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
         size = 1;
         break;
     }
+
+    // Predict constant
+    if (AsmMathHelper.isMathUnaryOperation(insn.getOpcode())) {
+      Optional<Object> constant = value.getConstantValue();
+
+      if (constant.isPresent() && constant.get() instanceof Number constNum) {
+        Number result = AsmMathHelper.mathUnaryOperation(constNum, insn.getOpcode());
+        return new OriginalSourceValue(size, insn, Optional.of(result));
+      }
+    }
+
     return new OriginalSourceValue(size, insn);
   }
 
@@ -162,6 +175,18 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
         size = 1;
         break;
     }
+
+    // Predict constant
+    if (AsmMathHelper.isMathBinaryOperation(insn.getOpcode())) {
+      Optional<Object> constant1 = value1.getConstantValue();
+      Optional<Object> constant2 = value2.getConstantValue();
+
+      if (constant1.isPresent() && constant2.isPresent() && constant1.get() instanceof Number constNum1 && constant2.get() instanceof Number constNum2) {
+        Number result = AsmMathHelper.mathBinaryOperation(constNum1, constNum2, insn.getOpcode());
+        return new OriginalSourceValue(size, insn, Optional.of(result));
+      }
+    }
+
     return new OriginalSourceValue(size, insn);
   }
 

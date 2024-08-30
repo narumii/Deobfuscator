@@ -14,12 +14,12 @@ import java.util.stream.Stream;
 /**
  * Simplifies math operations on two constant values.
  */
-public class MathOperationsTransformer extends FramedInstructionsTransformer {
+public class MathBinaryOperationsTransformer extends FramedInstructionsTransformer {
 
   @Override
   protected Stream<AbstractInsnNode> getInstructionsStream(Stream<AbstractInsnNode> stream) {
     return stream
-        .filter(insn -> AsmMathHelper.isMathOperation(insn.getOpcode()));
+        .filter(insn -> AsmMathHelper.isMathBinaryOperation(insn.getOpcode()));
   }
 
   @Override
@@ -38,7 +38,7 @@ public class MathOperationsTransformer extends FramedInstructionsTransformer {
 
       Number result;
       try {
-        result = AsmMathHelper.mathOperation(value1, value2, insn.getOpcode());
+        result = AsmMathHelper.mathBinaryOperation(value1, value2, insn.getOpcode());
       } catch (ArithmeticException e) {
         // Skip division by zero
         return false;
