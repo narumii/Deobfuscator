@@ -78,11 +78,7 @@ public class JumpPredictingAnalyzer implements Opcodes {
   private boolean[] inInstructionsToProcess;
 
   /** The indices of the instructions that remain to process in the currently analyzed method. */
-  private ArrayDeque<Integer> instructionsToProcess;
-  //private int[] instructionsToProcess;
-
-  /** The number of instructions that remain to process in the currently analyzed method. */
-  //private int numInstructionsToProcess;
+  private ArrayDeque<Integer> instructionsToProcess; // Narumii - Process instructions in correct order
 
   /**
    * Constructs a new {@link Analyzer}.
@@ -118,9 +114,7 @@ public class JumpPredictingAnalyzer implements Opcodes {
     frames = (Frame<OriginalSourceValue>[]) new Frame<?>[insnListSize];
     subroutines = new Subroutine[insnListSize];
     inInstructionsToProcess = new boolean[insnListSize];
-    //instructionsToProcess = new int[insnListSize];
-    instructionsToProcess = new ArrayDeque<>();
-    //numInstructionsToProcess = 0;
+    instructionsToProcess = new ArrayDeque<>(); // Narumii - Process instructions in correct order
 
     // For each exception handler, and each instruction within its range, record in 'handlers' the
     // fact that execution can flow from this instruction to the exception handler.
@@ -153,10 +147,9 @@ public class JumpPredictingAnalyzer implements Opcodes {
     }
 
     // Control flow analysis.
-    while (!instructionsToProcess.isEmpty()) {
+    while (!instructionsToProcess.isEmpty()) { // Narumii - Process instructions in correct order
       // Get and remove one instruction from the list of instructions to process.
-      //int insnIndex = instructionsToProcess[--numInstructionsToProcess];
-      int insnIndex = instructionsToProcess.pop();
+      int insnIndex = instructionsToProcess.pop(); // Narumii - Process instructions in correct order
       Frame<OriginalSourceValue> oldFrame = frames[insnIndex];
       Subroutine subroutine = subroutines[insnIndex];
       inInstructionsToProcess[insnIndex] = false;
@@ -205,9 +198,9 @@ public class JumpPredictingAnalyzer implements Opcodes {
                 merge(insnIndex + 1, currentFrame, subroutine);
                 newControlFlowEdge(insnIndex, insnIndex + 1);
               }
-            // Narumii end
             } else {
               // No known outcome of this jump. Process normally.
+            // Narumii end
               if (insnOpcode != GOTO && insnOpcode != JSR) {
                 currentFrame.initJumpTarget(insnOpcode, /* target= */ null);
                 merge(insnIndex + 1, currentFrame, subroutine);
@@ -227,6 +220,7 @@ public class JumpPredictingAnalyzer implements Opcodes {
             }
           } else if (insnNode instanceof LookupSwitchInsnNode) {
             LookupSwitchInsnNode lookupSwitchInsn = (LookupSwitchInsnNode) insnNode;
+            // Narumii start - Predict jumps
             Optional<LabelNode> predictedJump = AsmMathHelper.predictLookupSwitch(lookupSwitchInsn, oldFrame);
             if (predictedJump.isPresent()) {
               LabelNode labelNode = predictedJump.get();
@@ -237,13 +231,11 @@ public class JumpPredictingAnalyzer implements Opcodes {
               newControlFlowEdge(insnIndex, targetInsnIndex);
             } else {
               // No prediction. Process normally.
-
-              // Default
+            // Narumii end
               int targetInsnIndex = insnList.indexOf(lookupSwitchInsn.dflt);
               currentFrame.initJumpTarget(insnOpcode, lookupSwitchInsn.dflt);
               merge(targetInsnIndex, currentFrame, subroutine);
               newControlFlowEdge(insnIndex, targetInsnIndex);
-              // Labels
               for (int i = 0; i < lookupSwitchInsn.labels.size(); ++i) {
                 LabelNode label = lookupSwitchInsn.labels.get(i);
                 targetInsnIndex = insnList.indexOf(label);
@@ -254,6 +246,7 @@ public class JumpPredictingAnalyzer implements Opcodes {
             }
           } else if (insnNode instanceof TableSwitchInsnNode) {
             TableSwitchInsnNode tableSwitchInsn = (TableSwitchInsnNode) insnNode;
+            // Narumii start - Predict jumps
             Optional<LabelNode> predictedJump = AsmMathHelper.predictTableSwitch(tableSwitchInsn, oldFrame);
             if (predictedJump.isPresent()) {
               LabelNode labelNode = predictedJump.get();
@@ -264,7 +257,7 @@ public class JumpPredictingAnalyzer implements Opcodes {
               newControlFlowEdge(insnIndex, targetInsnIndex);
             } else {
               // No prediction. Process normally.
-
+            // Narumii end
               int targetInsnIndex = insnList.indexOf(tableSwitchInsn.dflt);
               currentFrame.initJumpTarget(insnOpcode, tableSwitchInsn.dflt);
               merge(targetInsnIndex, currentFrame, subroutine);
@@ -718,8 +711,7 @@ public class JumpPredictingAnalyzer implements Opcodes {
     }
     if (changed && !inInstructionsToProcess[insnIndex]) {
       inInstructionsToProcess[insnIndex] = true;
-      instructionsToProcess.push(insnIndex);
-      //instructionsToProcess[numInstructionsToProcess++] = insnIndex;
+      instructionsToProcess.push(insnIndex); // Narumii - Process instructions in correct order
     }
   }
 
@@ -763,8 +755,7 @@ public class JumpPredictingAnalyzer implements Opcodes {
     }
     if (changed && !inInstructionsToProcess[insnIndex]) {
       inInstructionsToProcess[insnIndex] = true;
-      //instructionsToProcess[numInstructionsToProcess++] = insnIndex;
-      instructionsToProcess.push(insnIndex);
+      instructionsToProcess.push(insnIndex); // Narumii - Process instructions in correct order
     }
   }
 }
