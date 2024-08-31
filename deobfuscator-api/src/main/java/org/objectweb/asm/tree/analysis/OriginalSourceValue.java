@@ -60,15 +60,20 @@ public class OriginalSourceValue extends SourceValue {
    * <pre>
    * 1: A:
    * 2:   ldc 12L
-   * 3:   ldiv
-   * 4:   l2i
-   * 5:   lookupswitch {
-   * 6:     ...
-   * 7:   }
+   * 3:   ldc 2L
+   * 4:   ldiv
+   * 5:   l2i
+   * 6:   lookupswitch {
+   * 7:     ...
+   * 8:   }
    * </pre>
    *
-   * In line 2, the constant value is 12L. In line 3, the constant value is 12L / 2L = 6L. In line 4,
-   * the constant value is 6 (but cast to integer).
+   * In line 2, the constant value is 12L.<br>
+   * In line 3, the constant value is 2L.<br>
+   * In line 4, the constant value is 12L / 2L = 6L. <br>
+   * In line 5, the constant value is 6 (but cast to integer).
+   *
+   * <p>
    * It is so convenient because for example if you want to get value of
    * a IMUL instruction, then this field already contains the calculated value! No need to calculate it manually from stack values.
    */
