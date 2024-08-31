@@ -70,7 +70,7 @@ public class OriginalSourceValue extends SourceValue {
    *
    * In line 2, the constant value is 12L.<br>
    * In line 3, the constant value is 2L.<br>
-   * In line 4, the constant value is 12L / 2L = 6L. <br>
+   * In line 4, the constant value is 12L / 2L = 6L.<br>
    * In line 5, the constant value is 6 (but cast to integer).
    *
    * <p>
