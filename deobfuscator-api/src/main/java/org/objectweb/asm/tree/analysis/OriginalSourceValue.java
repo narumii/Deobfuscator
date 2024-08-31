@@ -74,8 +74,8 @@ public class OriginalSourceValue extends SourceValue {
    * In line 5, the constant value is 6 (but cast to integer).
    *
    * <p>
-   * It is so convenient because for example if you want to get value of
-   * a IMUL instruction, then this field already contains the calculated value! No need to calculate it manually from stack values.
+   * It is so convenient because for example if you want to get value of a IMUL instruction,
+   * then this field already contains the calculated value! No need to calculate it manually from stack values.
    */
   @Nullable
   private ConstantValue constantValue = null;
