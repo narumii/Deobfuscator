@@ -82,11 +82,11 @@ public class OriginalSourceValue extends SourceValue {
   private ConstantValue constantValue = null;
 
   public OriginalSourceValue(int size) {
-    this(size, Set.of());
+    this(size, new SmallSet<>());
   }
 
   public OriginalSourceValue(int size, AbstractInsnNode insnNode) {
-    this(size, Set.of(insnNode));
+    this(size, new SmallSet<>(insnNode));
   }
 
   public OriginalSourceValue(int size, Set<AbstractInsnNode> insnSet) {
