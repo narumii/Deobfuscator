@@ -44,6 +44,7 @@ public class OriginalSourceValue extends SourceValue {
    * 8: C:
    * 9:   ...
    * </pre>
+   *
    * When the current class is source value of instruction at line 6, then it will follow all
    * instructions (DUP, ILOAD) and jumps to get the original source value of this instruction at line 6.
    * In this example, it will return source value of instruction at line 2.
@@ -51,9 +52,9 @@ public class OriginalSourceValue extends SourceValue {
   public final OriginalSourceValue originalSource;
 
   /**
-   * Predicted constant value. It holds a constant value such as {@link Integer}, {@link Double},
-   * {@link Float}, {@link String}, {@link Type} and {@code null}. It also follows all math operations
-   * and jumps to get the constant value.
+   * Predicted constant value that holds an object to constant value such as {@link Integer}, {@link Double},
+   * {@link Float}, {@link String}, {@link Type} and {@code null}. Additionally, to {@link #originalSource} it is
+   * also doing all math operations on math operation instructions.
    *
    * <p>
    * Consider this example:
