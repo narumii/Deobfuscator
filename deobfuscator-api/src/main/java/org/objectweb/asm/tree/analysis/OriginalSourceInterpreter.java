@@ -135,11 +135,11 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
 
     // Narumii start - Predict constant
     if (AsmMathHelper.isMathUnaryOperation(insn.getOpcode())) {
-      Optional<Object> constant = value.getConstantValue();
+      OriginalSourceValue.ConstantValue constant = value.getConstantValue();
 
-      if (constant.isPresent() && constant.get() instanceof Number constNum) {
+      if (constant != null && constant.get() instanceof Number constNum) {
         Number result = AsmMathHelper.mathUnaryOperation(constNum, insn.getOpcode());
-        return new OriginalSourceValue(size, insn, Optional.of(result));
+        return new OriginalSourceValue(size, insn, OriginalSourceValue.ConstantValue.of(result));
       }
     }
     // Narumii end
@@ -179,12 +179,12 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
 
     // Narumii start - Predict constant
     if (AsmMathHelper.isMathBinaryOperation(insn.getOpcode())) {
-      Optional<Object> constant1 = value1.getConstantValue();
-      Optional<Object> constant2 = value2.getConstantValue();
+      OriginalSourceValue.ConstantValue constant1 = value1.getConstantValue();
+      OriginalSourceValue.ConstantValue constant2 = value2.getConstantValue();
 
-      if (constant1.isPresent() && constant2.isPresent() && constant1.get() instanceof Number constNum1 && constant2.get() instanceof Number constNum2) {
+      if (constant1 != null && constant2 != null && constant1.get() instanceof Number constNum1 && constant2.get() instanceof Number constNum2) {
         Number result = AsmMathHelper.mathBinaryOperation(constNum1, constNum2, insn.getOpcode());
-        return new OriginalSourceValue(size, insn, Optional.of(result));
+        return new OriginalSourceValue(size, insn, OriginalSourceValue.ConstantValue.of(result));
       }
     }
     // Narumii end

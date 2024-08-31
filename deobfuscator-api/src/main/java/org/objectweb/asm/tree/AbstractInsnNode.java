@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
@@ -344,6 +346,7 @@ public abstract class AbstractInsnNode {
     return (Type) ((LdcInsnNode) this).cst;
   }
 
+  @Nullable
   public Object asConstant() {
     if (isNumber()) {
       return asNumber();
