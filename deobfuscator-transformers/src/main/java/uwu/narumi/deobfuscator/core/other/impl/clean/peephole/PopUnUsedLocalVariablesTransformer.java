@@ -21,7 +21,7 @@ public class PopUnUsedLocalVariablesTransformer extends Transformer {
   @Override
   protected boolean transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
-      Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = AsmHelper.analyzeOriginalSource(classWrapper.getClassNode(), methodNode);
+      Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = AsmHelper.analyzeSource(classWrapper.getClassNode(), methodNode);
       if (frames == null) return;
 
       List<VarInsnNode> varStoresInUse = new ArrayList<>();

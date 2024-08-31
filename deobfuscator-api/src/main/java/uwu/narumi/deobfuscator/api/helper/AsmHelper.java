@@ -7,8 +7,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 import org.objectweb.asm.tree.analysis.Analyzer;
 import org.objectweb.asm.tree.analysis.Frame;
-import org.objectweb.asm.tree.analysis.SourceInterpreter;
-import org.objectweb.asm.tree.analysis.SourceValue;
+import org.objectweb.asm.tree.analysis.JumpPredictingAnalyzer;
 import org.objectweb.asm.tree.analysis.OriginalSourceInterpreter;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.context.Context;
@@ -140,12 +139,13 @@ public class AsmHelper implements Opcodes {
     return instructions;
   }
 
-  public static Map<AbstractInsnNode, Frame<SourceValue>> analyzeSource(
-      ClassNode classNode, MethodNode methodNode) {
+  public static Map<AbstractInsnNode, Frame<OriginalSourceValue>> analyzeSource(
+      ClassNode classNode, MethodNode methodNode
+  ) {
     try {
-      Map<AbstractInsnNode, Frame<SourceValue>> frames = new HashMap<>();
-      Frame<SourceValue>[] framesArray =
-          new Analyzer<>(new SourceInterpreter()).analyze(classNode.name, methodNode);
+      Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = new HashMap<>();
+      Frame<OriginalSourceValue>[] framesArray =
+          new JumpPredictingAnalyzer(new OriginalSourceInterpreter()).analyze(classNode.name, methodNode);
       for (int i = 0; i < framesArray.length; i++) {
         frames.put(methodNode.instructions.get(i), framesArray[i]);
       }
@@ -155,19 +155,18 @@ public class AsmHelper implements Opcodes {
     }
   }
 
-  public static Map<AbstractInsnNode, Frame<OriginalSourceValue>> analyzeOriginalSource(
-      ClassNode classNode, MethodNode methodNode
-  ) {
-    try {
-      Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = new HashMap<>();
-      Frame<OriginalSourceValue>[] framesArray =
-          new Analyzer<>(new OriginalSourceInterpreter()).analyze(classNode.name, methodNode);
-      for (int i = 0; i < framesArray.length; i++) {
-        frames.put(methodNode.instructions.get(i), framesArray[i]);
-      }
-      return frames;
-    } catch (Exception e) {
-      return null;
+  /**
+   * Removes values from the stack. You can only remove stack values that are one way produced.
+   *
+   * @param count How many values to remove from top
+   */
+  public static void removeValuesFromStack(MethodNode methodNode, Frame<OriginalSourceValue> frame, int count) {
+    for (int i = 0; i < count; i++) {
+      int stackValueIdx = frame.getStackSize() - (i + 1);
+
+      OriginalSourceValue sourceValue = frame.getStack(stackValueIdx);
+      // Remove
+      methodNode.instructions.remove(sourceValue.getProducer());
     }
   }
 

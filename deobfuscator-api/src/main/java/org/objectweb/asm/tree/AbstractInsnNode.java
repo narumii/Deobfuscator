@@ -344,6 +344,20 @@ public abstract class AbstractInsnNode {
     return (Type) ((LdcInsnNode) this).cst;
   }
 
+  public Object asConstant() {
+    if (isNumber()) {
+      return asNumber();
+    } else if (isString()) {
+      return asString();
+    } else if (isType()) {
+      return asType();
+    } else if (isNull()) {
+      return null;
+    }
+
+    throw new IllegalArgumentException("Not a constant");
+  }
+
   public int asInteger() {
     int opcode = this.getOpcode();
 

@@ -17,7 +17,6 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         InlineLocalVariablesTransformer::new,
         PeepholeCleanTransformer::new
     ), "TestInlineLocalVariables");
-    // TODO: Deobfuscate useless tricky while loops
     register("Simple flow obfuscation", InputType.JAVA_CODE, List.of(ComposedGeneralFlowTransformer::new), "TestSimpleFlowObfuscation");
     register("Universal Number Transformer", InputType.JAVA_CODE, List.of(UniversalNumberTransformer::new), "TestUniversalNumberTransformer");
     register("Inline static fields", InputType.JAVA_CODE, List.of(InlineStaticFieldTransformer::new), "TestInlineStaticFields");
@@ -25,7 +24,6 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
     register("Inline static fields with modification", InputType.JAVA_CODE, List.of(InlineStaticFieldTransformer::new), "TestInlineStaticFieldsWithModification");
 
     // Samples
-    // TODO: Deobfuscate switches
     register("Some flow obf sample", InputType.CUSTOM_CLASS, List.of(ComposedGeneralFlowTransformer::new), "FlowObfSample");
   }
 }

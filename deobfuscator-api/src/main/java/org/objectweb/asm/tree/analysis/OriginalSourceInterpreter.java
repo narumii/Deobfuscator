@@ -34,10 +34,12 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
+import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -104,9 +106,9 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
 
   @Override
   public OriginalSourceValue copyOperation(final AbstractInsnNode insn, final OriginalSourceValue value) {
-    // OriginalSourceInterpreter start - Track the original value
+    // Narumii start - Track the original value
     return new OriginalSourceValue(value, insn);
-    // OriginalSourceInterpreter end
+    // Narumii end
   }
 
   @Override
@@ -130,6 +132,18 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
         size = 1;
         break;
     }
+
+    // Narumii start - Predict constant
+    if (AsmMathHelper.isMathUnaryOperation(insn.getOpcode())) {
+      Optional<Object> constant = value.getConstantValue();
+
+      if (constant.isPresent() && constant.get() instanceof Number constNum) {
+        Number result = AsmMathHelper.mathUnaryOperation(constNum, insn.getOpcode());
+        return new OriginalSourceValue(size, insn, Optional.of(result));
+      }
+    }
+    // Narumii end
+
     return new OriginalSourceValue(size, insn);
   }
 
@@ -162,6 +176,19 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
         size = 1;
         break;
     }
+
+    // Narumii start - Predict constant
+    if (AsmMathHelper.isMathBinaryOperation(insn.getOpcode())) {
+      Optional<Object> constant1 = value1.getConstantValue();
+      Optional<Object> constant2 = value2.getConstantValue();
+
+      if (constant1.isPresent() && constant2.isPresent() && constant1.get() instanceof Number constNum1 && constant2.get() instanceof Number constNum2) {
+        Number result = AsmMathHelper.mathBinaryOperation(constNum1, constNum2, insn.getOpcode());
+        return new OriginalSourceValue(size, insn, Optional.of(result));
+      }
+    }
+    // Narumii end
+
     return new OriginalSourceValue(size, insn);
   }
 
@@ -201,34 +228,34 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
       Set<AbstractInsnNode> setUnion =
           ((SmallSet<AbstractInsnNode>) value1.insns)
               .union((SmallSet<AbstractInsnNode>) value2.insns);
-      // OriginalSourceInterpreter start
+      // Narumii start
       if (setUnion == value1.insns && value1.size == value2.size && Objects.equals(value1.copiedFrom, value2.copiedFrom)) {
-      // OriginalSourceInterpreter end
+      // Narumii end
         return value1;
       } else {
-        // OriginalSourceInterpreter start
+        // Narumii start
         OriginalSourceValue copiedFrom = null;
         if (setUnion.size() == 1 && value1.copiedFrom != null && value2.copiedFrom != null) {
           copiedFrom = this.merge(value1.copiedFrom, value2.copiedFrom);
         }
         return new OriginalSourceValue(Math.min(value1.size, value2.size), setUnion, copiedFrom);
-        // OriginalSourceInterpreter end
+        // Narumii end
       }
     }
-    // OriginalSourceInterpreter start
+    // Narumii start
     if (value1.size != value2.size || !containsAll(value1.insns, value2.insns) || !Objects.equals(value1.copiedFrom, value2.copiedFrom)) {
-    // OriginalSourceInterpreter end
+    // Narumii end
       HashSet<AbstractInsnNode> setUnion = new HashSet<>();
       setUnion.addAll(value1.insns);
       setUnion.addAll(value2.insns);
 
-      // OriginalSourceInterpreter start
+      // Narumii start
       OriginalSourceValue copiedFrom = null;
       if (setUnion.size() == 1 && value1.copiedFrom != null && value2.copiedFrom != null) {
         copiedFrom = this.merge(value1.copiedFrom, value2.copiedFrom);
       }
       return new OriginalSourceValue(Math.min(value1.size, value2.size), setUnion, copiedFrom);
-      // OriginalSourceInterpreter end
+      // Narumii end
     }
     return value1;
   }

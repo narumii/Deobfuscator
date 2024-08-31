@@ -2,7 +2,13 @@ package uwu.narumi.deobfuscator.api.helper;
 
 import static org.objectweb.asm.Opcodes.*;
 
+import org.objectweb.asm.NamedOpcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LookupSwitchInsnNode;
+import org.objectweb.asm.tree.TableSwitchInsnNode;
+import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.impl.MethodMatch;
@@ -10,6 +16,7 @@ import uwu.narumi.deobfuscator.api.asm.matcher.rule.impl.MethodMatch;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -34,7 +41,10 @@ public final class AsmMathHelper {
       IF_ICMPLE, (first, second) -> first <= second
   );
 
-  private static final Map<Integer, BiFunction<Number, Number, Number>> MATH_OPERATIONS = Map.ofEntries(
+  // Binary operations means that instructions takes two values from stack
+  private static final Map<Integer, BiFunction<Number, Number, Number>> MATH_BINARY_OPERATIONS = Map.ofEntries(
+      /// Math operations ///
+
       // Integer
       Map.entry(IADD, (first, second) -> first.intValue() + second.intValue()),
       Map.entry(ISUB, (first, second) -> first.intValue() - second.intValue()),
@@ -70,10 +80,9 @@ public final class AsmMathHelper {
       Map.entry(DSUB, (first, second) -> first.doubleValue() - second.doubleValue()),
       Map.entry(DMUL, (first, second) -> first.doubleValue() * second.doubleValue()),
       Map.entry(DDIV, (first, second) -> first.doubleValue() / second.doubleValue()),
-      Map.entry(DREM, (first, second) -> first.doubleValue() % second.doubleValue())
-  );
+      Map.entry(DREM, (first, second) -> first.doubleValue() % second.doubleValue()),
 
-  private static final Map<Integer, BiFunction<Number, Number, Integer>> MATH_COMPARES = Map.ofEntries(
+      /// Compare operations ///
       Map.entry(LCMP, (first, second) -> Long.compare(first.longValue(), second.longValue())),
       Map.entry(FCMPL, (first, second) -> Float.isNaN(first.floatValue()) || Float.isNaN(second.floatValue()) ? -1 : Float.compare(first.floatValue(), second.floatValue())),
       Map.entry(FCMPG, (first, second) -> Float.isNaN(first.floatValue()) || Float.isNaN(second.floatValue()) ? 1 : Float.compare(first.floatValue(), second.floatValue())),
@@ -81,7 +90,8 @@ public final class AsmMathHelper {
       Map.entry(DCMPG, (first, second) -> Double.isNaN(first.doubleValue()) || Double.isNaN(second.doubleValue()) ? 1 : Double.compare(first.doubleValue(), second.doubleValue()))
   );
 
-  private static final Map<Integer, Function<Number, Number>> NUMBER_CASTS = Map.ofEntries(
+  // Unary operations means that instructions takes one value from stack
+  private static final Map<Integer, Function<Number, Number>> MATH_UNARY_OPERATIONS = Map.ofEntries(
       // Integer
       Map.entry(INEG, number -> -number.intValue()),
       Map.entry(I2B, number -> number.byteValue()),
@@ -369,28 +379,20 @@ public final class AsmMathHelper {
     throw new IllegalArgumentException();
   }
 
-  public static boolean isMathOperation(int opcode) {
-    return MATH_OPERATIONS.containsKey(opcode);
+  public static boolean isMathBinaryOperation(int opcode) {
+    return MATH_BINARY_OPERATIONS.containsKey(opcode);
   }
 
-  public static Number mathOperation(Number first, Number second, int opcode) {
-    return MATH_OPERATIONS.get(opcode).apply(first, second);
+  public static Number mathBinaryOperation(Number first, Number second, int opcode) {
+    return MATH_BINARY_OPERATIONS.get(opcode).apply(first, second);
   }
 
-  public static int mathOperation(int first, int second, int opcode) {
-    return MATH_OPERATIONS.get(opcode).apply(first, second).intValue();
+  public static boolean isMathUnaryOperation(int opcode) {
+    return MATH_UNARY_OPERATIONS.containsKey(opcode);
   }
 
-  public static long mathOperation(long first, long second, int opcode) {
-    return MATH_OPERATIONS.get(opcode).apply(first, second).longValue();
-  }
-
-  public static float mathOperation(float first, float second, int opcode) {
-    return MATH_OPERATIONS.get(opcode).apply(first, second).floatValue();
-  }
-
-  public static double mathOperation(double first, double second, int opcode) {
-    return MATH_OPERATIONS.get(opcode).apply(first, second).doubleValue();
+  public static Number mathUnaryOperation(Number number, int opcode) {
+    return MATH_UNARY_OPERATIONS.get(opcode).apply(number);
   }
 
   public static boolean isOneValueCondition(int opcode) {
@@ -409,19 +411,97 @@ public final class AsmMathHelper {
     return TWO_VALUES_VALUE_CONDITION_PREDICATES.get(opcode).test(first, second);
   }
 
-  public static boolean isMathCompare(int opcode) {
-    return MATH_COMPARES.containsKey(opcode);
+  /**
+   * Predict if statement result
+   */
+  public static Optional<Boolean> predictIf(JumpInsnNode jumpInsn, Frame<OriginalSourceValue> frame) {
+    if (AsmMathHelper.isOneValueCondition(jumpInsn.getOpcode())) {
+      // One-value if statement
+
+      // Get instruction from stack that is passed to if statement
+      OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - 1);
+      Optional<Object> constantValue = sourceValue.getConstantValue();
+      if (constantValue.isEmpty()) return Optional.empty();
+
+      // Process if statement
+      if (constantValue.get() instanceof Integer value) {
+        boolean ifResult = AsmMathHelper.condition(
+            value, // Value
+            jumpInsn.getOpcode() // Opcode
+        );
+
+        return Optional.of(ifResult);
+      }
+    } else if (AsmMathHelper.isTwoValuesCondition(jumpInsn.getOpcode())) {
+      // Two-value if statements
+
+      // Get instructions from stack that are passed to if statement
+      OriginalSourceValue sourceValue1 = frame.getStack(frame.getStackSize() - 2);
+      OriginalSourceValue sourceValue2 = frame.getStack(frame.getStackSize() - 1);
+      Optional<Object> constValue1 = sourceValue1.getConstantValue();
+      Optional<Object> constValue2 = sourceValue2.getConstantValue();
+      if (constValue1.isEmpty() || constValue2.isEmpty()) return Optional.empty();
+
+      // Process if statement
+      if (constValue1.get() instanceof Integer value1 && constValue2.get() instanceof Integer value2) {
+        boolean ifResult = AsmMathHelper.condition(
+            value1, // First value
+            value2, // Second value
+            jumpInsn.getOpcode() // Opcode
+        );
+
+        return Optional.of(ifResult);
+      }
+    }
+
+    return Optional.empty();
   }
 
-  public static int compare(Number first, Number second, int opcode) {
-    return MATH_COMPARES.get(opcode).apply(first, second);
+  /**
+   * Predict lookup switch jump
+   */
+  public static Optional<LabelNode> predictLookupSwitch(LookupSwitchInsnNode lookupSwitchInsn, Frame<OriginalSourceValue> frame) {
+    OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - 1);
+    Optional<Object> constantValue = sourceValue.getConstantValue();
+    if (constantValue.isEmpty()) return Optional.empty();
+
+    if (constantValue.get() instanceof Integer value) {
+      int index = lookupSwitchInsn.keys.indexOf(value);
+
+      if (index == -1) {
+        // Jump to default
+        return Optional.of(lookupSwitchInsn.dflt);
+      } else {
+        // Match found! Jump to target
+        LabelNode targetLabel = lookupSwitchInsn.labels.get(index);
+        return Optional.of(targetLabel);
+      }
+    }
+
+    return Optional.empty();
   }
 
-  public static boolean isNumberCast(int opcode) {
-    return NUMBER_CASTS.containsKey(opcode);
-  }
+  /**
+   * Predict table switch jump
+   */
+  public static Optional<LabelNode> predictTableSwitch(TableSwitchInsnNode tableSwitchInsn, Frame<OriginalSourceValue> frame) {
+    OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - 1);
+    Optional<Object> constantValue = sourceValue.getConstantValue();
+    if (constantValue.isEmpty()) return Optional.empty();
 
-  public static Number castNumber(Number number, int opcode) {
-    return NUMBER_CASTS.get(opcode).apply(number);
+    if (constantValue.get() instanceof Integer value) {
+      int index = value - tableSwitchInsn.min;
+
+      if (index < 0 || index >= tableSwitchInsn.labels.size()) {
+        // Jump to default
+        return Optional.of(tableSwitchInsn.dflt);
+      } else {
+        // Match found! Jump to target
+        LabelNode targetLabel = tableSwitchInsn.labels.get(index);
+        return Optional.of(targetLabel);
+      }
+    }
+
+    return Optional.empty();
   }
 }

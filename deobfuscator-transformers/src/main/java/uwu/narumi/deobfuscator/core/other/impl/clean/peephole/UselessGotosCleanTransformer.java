@@ -23,7 +23,7 @@ import java.util.List;
  *   ...
  * </pre>
  */
-public class UselessJumpsCleanTransformer extends Transformer {
+public class UselessGotosCleanTransformer extends Transformer {
   private boolean changed = false;
 
   @Override

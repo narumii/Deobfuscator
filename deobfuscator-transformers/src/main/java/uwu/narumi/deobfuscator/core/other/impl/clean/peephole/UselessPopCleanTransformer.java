@@ -1,7 +1,5 @@
 package uwu.narumi.deobfuscator.core.other.impl.clean.peephole;
 
-import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.NamedOpcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Frame;
@@ -11,6 +9,8 @@ import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 
 import java.util.stream.Stream;
 
+// TODO: Remove pair of DUP and POP
+// TODO: Account for DUP2_X1, DUP2_X2, DUP_X2, etc.
 public class UselessPopCleanTransformer extends FramedInstructionsTransformer {
 
   @Override

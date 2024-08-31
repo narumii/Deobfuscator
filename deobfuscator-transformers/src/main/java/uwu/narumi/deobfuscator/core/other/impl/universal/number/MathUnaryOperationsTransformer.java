@@ -14,11 +14,11 @@ import java.util.stream.Stream;
 /**
  * Simplifies number casts on constant value.
  */
-public class NumberCastsTransformer extends FramedInstructionsTransformer {
+public class MathUnaryOperationsTransformer extends FramedInstructionsTransformer {
   @Override
   protected Stream<AbstractInsnNode> getInstructionsStream(Stream<AbstractInsnNode> stream) {
     return stream
-        .filter(insn -> AsmMathHelper.isNumberCast(insn.getOpcode()));
+        .filter(insn -> AsmMathHelper.isMathUnaryOperation(insn.getOpcode()));
   }
 
   @Override
@@ -31,7 +31,7 @@ public class NumberCastsTransformer extends FramedInstructionsTransformer {
     AbstractInsnNode valueInsn = originalSource.getProducer();
 
     if (valueInsn.isNumber()) {
-      Number castedNumber = AsmMathHelper.castNumber(valueInsn.asNumber(), insn.getOpcode());
+      Number castedNumber = AsmMathHelper.mathUnaryOperation(valueInsn.asNumber(), insn.getOpcode());
 
       methodNode.instructions.set(insn, AsmHelper.getNumber(castedNumber));
       methodNode.instructions.remove(sourceValue.getProducer());

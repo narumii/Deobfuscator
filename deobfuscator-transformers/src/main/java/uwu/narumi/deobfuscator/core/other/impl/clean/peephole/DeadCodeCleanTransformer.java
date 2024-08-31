@@ -1,14 +1,14 @@
 package uwu.narumi.deobfuscator.core.other.impl.clean.peephole;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.analysis.Analyzer;
-import org.objectweb.asm.tree.analysis.AnalyzerException;
-import org.objectweb.asm.tree.analysis.BasicInterpreter;
 import org.objectweb.asm.tree.analysis.Frame;
+import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.context.Context;
+import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
+
+import java.util.Map;
 
 public class DeadCodeCleanTransformer extends Transformer {
   private boolean changed = false;
@@ -16,22 +16,15 @@ public class DeadCodeCleanTransformer extends Transformer {
   @Override
   protected boolean transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
-      Analyzer<?> analyzer = new Analyzer<>(new BasicInterpreter());
-      try {
-        analyzer.analyze(classWrapper.name(), methodNode);
-      } catch (AnalyzerException e) {
-        // Skip invalid methods
-        return;
-      }
-      Frame<?>[] frames = analyzer.getFrames();
-      AbstractInsnNode[] insns = methodNode.instructions.toArray();
-      for (int i = 0; i < frames.length; i++) {
-        AbstractInsnNode insn = insns[i];
+      Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = AsmHelper.analyzeSource(classWrapper.getClassNode(), methodNode);
+      if (frames == null) return;
 
-        // If frame is null then it means that the code is unreachable
-        if (frames[i] == null && insn.getType() != AbstractInsnNode.LABEL) {
+      for (var entry : frames.entrySet()) {
+        AbstractInsnNode insn = entry.getKey();
+        Frame<OriginalSourceValue> frame = entry.getValue();
+        if (frame == null && insn.getType() != AbstractInsnNode.LABEL) {
+          // Remove unreachable instruction
           methodNode.instructions.remove(insn);
-          insns[i] = null;
           changed = true;
         }
       }

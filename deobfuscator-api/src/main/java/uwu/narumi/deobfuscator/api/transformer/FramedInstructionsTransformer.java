@@ -61,7 +61,7 @@ public abstract class FramedInstructionsTransformer extends Transformer {
           if (getInstructionsStream(Arrays.stream(methodNode.instructions.toArray())).findAny().isEmpty()) return;
 
           // Get frames of the method
-          Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = analyzeOriginalSource(classWrapper.getClassNode(), methodNode);
+          Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = analyzeSource(classWrapper.getClassNode(), methodNode);
           if (frames == null) return;
 
           // Iterate over instructions

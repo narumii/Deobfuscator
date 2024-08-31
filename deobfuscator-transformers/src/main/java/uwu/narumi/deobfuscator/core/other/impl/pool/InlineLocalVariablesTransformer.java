@@ -7,57 +7,47 @@ import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.context.Context;
+import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 /**
  * Inlines constant local variables
  */
-public class InlineLocalVariablesTransformer extends Transformer {
+public class InlineLocalVariablesTransformer extends FramedInstructionsTransformer {
   public InlineLocalVariablesTransformer() {
     this.rerunOnChange = true;
   }
 
-  private boolean changed = false;
-
   @Override
-  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
-    context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
-      inlineLocalVariables(classWrapper, methodNode);
-    }));
-
-    return changed;
+  protected Stream<AbstractInsnNode> getInstructionsStream(Stream<AbstractInsnNode> stream) {
+    return stream
+        .filter(AbstractInsnNode::isVarLoad);
   }
 
-  private void inlineLocalVariables(ClassWrapper classWrapper, MethodNode methodNode) {
-    Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = analyzeOriginalSource(classWrapper.getClassNode(), methodNode);
-    if (frames == null) return;
+  @Override
+  protected boolean transformInstruction(ClassWrapper classWrapper, MethodNode methodNode, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
+    VarInsnNode varInsn = (VarInsnNode) insn;
 
-    // Inline static local variables
-    for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-      if (insn.isVarLoad()) {
-        VarInsnNode varInsn = (VarInsnNode) insn;
+    // Var store instruction
+    OriginalSourceValue storeVarSourceValue = frame.getLocal(varInsn.var);
+    // Value reference
+    OriginalSourceValue valueSourceValue = storeVarSourceValue.copiedFrom;
+    if (valueSourceValue == null || !valueSourceValue.originalSource.isOneWayProduced() || !storeVarSourceValue.getProducer().isVarStore()) return false;
 
-        Frame<OriginalSourceValue> frame = frames.get(insn);
-        if (frame == null) continue;
+    // Original source value on which we can operate
+    AbstractInsnNode valueInsn = valueSourceValue.originalSource.getProducer();
 
-        // Var store instruction
-        OriginalSourceValue storeVarSourceValue = frame.getLocal(varInsn.var);
-        // Value reference
-        OriginalSourceValue valueSourceValue = storeVarSourceValue.copiedFrom;
-        if (valueSourceValue == null || !valueSourceValue.originalSource.isOneWayProduced() || !storeVarSourceValue.getProducer().isVarStore()) continue;
+    if (valueInsn.isConstant()) {
+      AbstractInsnNode clone = valueInsn.clone(null);
+      methodNode.instructions.set(insn, clone);
 
-        // Original source value on which we can operate
-        AbstractInsnNode valueInsn = valueSourceValue.originalSource.getProducer();
-
-        if (valueInsn.isConstant()) {
-          AbstractInsnNode clone = valueInsn.clone(null);
-          methodNode.instructions.set(insn, clone);
-
-          changed = true;
-        }
-      }
+      return true;
     }
+
+    return false;
   }
 }
