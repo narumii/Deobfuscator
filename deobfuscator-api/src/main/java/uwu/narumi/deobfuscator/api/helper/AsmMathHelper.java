@@ -420,8 +420,8 @@ public final class AsmMathHelper {
 
       // Get instruction from stack that is passed to if statement
       OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - 1);
-      Optional<Object> constantValue = sourceValue.getConstantValue();
-      if (constantValue.isEmpty()) return Optional.empty();
+      OriginalSourceValue.ConstantValue constantValue = sourceValue.getConstantValue();
+      if (constantValue == null) return Optional.empty();
 
       // Process if statement
       if (constantValue.get() instanceof Integer value) {
@@ -438,9 +438,9 @@ public final class AsmMathHelper {
       // Get instructions from stack that are passed to if statement
       OriginalSourceValue sourceValue1 = frame.getStack(frame.getStackSize() - 2);
       OriginalSourceValue sourceValue2 = frame.getStack(frame.getStackSize() - 1);
-      Optional<Object> constValue1 = sourceValue1.getConstantValue();
-      Optional<Object> constValue2 = sourceValue2.getConstantValue();
-      if (constValue1.isEmpty() || constValue2.isEmpty()) return Optional.empty();
+      OriginalSourceValue.ConstantValue constValue1 = sourceValue1.getConstantValue();
+      OriginalSourceValue.ConstantValue constValue2 = sourceValue2.getConstantValue();
+      if (constValue1 == null || constValue2 == null) return Optional.empty();
 
       // Process if statement
       if (constValue1.get() instanceof Integer value1 && constValue2.get() instanceof Integer value2) {
@@ -462,8 +462,8 @@ public final class AsmMathHelper {
    */
   public static Optional<LabelNode> predictLookupSwitch(LookupSwitchInsnNode lookupSwitchInsn, Frame<OriginalSourceValue> frame) {
     OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - 1);
-    Optional<Object> constantValue = sourceValue.getConstantValue();
-    if (constantValue.isEmpty()) return Optional.empty();
+    OriginalSourceValue.ConstantValue constantValue = sourceValue.getConstantValue();
+    if (constantValue == null) return Optional.empty();
 
     if (constantValue.get() instanceof Integer value) {
       int index = lookupSwitchInsn.keys.indexOf(value);
@@ -486,8 +486,8 @@ public final class AsmMathHelper {
    */
   public static Optional<LabelNode> predictTableSwitch(TableSwitchInsnNode tableSwitchInsn, Frame<OriginalSourceValue> frame) {
     OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - 1);
-    Optional<Object> constantValue = sourceValue.getConstantValue();
-    if (constantValue.isEmpty()) return Optional.empty();
+    OriginalSourceValue.ConstantValue constantValue = sourceValue.getConstantValue();
+    if (constantValue == null) return Optional.empty();
 
     if (constantValue.get() instanceof Integer value) {
       int index = value - tableSwitchInsn.min;

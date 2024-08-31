@@ -135,11 +135,11 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
 
     // Narumii start - Predict constant
     if (AsmMathHelper.isMathUnaryOperation(insn.getOpcode())) {
-      Optional<Object> constant = value.getConstantValue();
+      OriginalSourceValue.ConstantValue constant = value.getConstantValue();
 
-      if (constant.isPresent() && constant.get() instanceof Number constNum) {
+      if (constant != null && constant.get() instanceof Number constNum) {
         Number result = AsmMathHelper.mathUnaryOperation(constNum, insn.getOpcode());
-        return new OriginalSourceValue(size, insn, Optional.of(result));
+        return new OriginalSourceValue(size, insn, OriginalSourceValue.ConstantValue.of(result));
       }
     }
     // Narumii end
@@ -179,12 +179,12 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
 
     // Narumii start - Predict constant
     if (AsmMathHelper.isMathBinaryOperation(insn.getOpcode())) {
-      Optional<Object> constant1 = value1.getConstantValue();
-      Optional<Object> constant2 = value2.getConstantValue();
+      OriginalSourceValue.ConstantValue constant1 = value1.getConstantValue();
+      OriginalSourceValue.ConstantValue constant2 = value2.getConstantValue();
 
-      if (constant1.isPresent() && constant2.isPresent() && constant1.get() instanceof Number constNum1 && constant2.get() instanceof Number constNum2) {
+      if (constant1 != null && constant2 != null && constant1.get() instanceof Number constNum1 && constant2.get() instanceof Number constNum2) {
         Number result = AsmMathHelper.mathBinaryOperation(constNum1, constNum2, insn.getOpcode());
-        return new OriginalSourceValue(size, insn, Optional.of(result));
+        return new OriginalSourceValue(size, insn, OriginalSourceValue.ConstantValue.of(result));
       }
     }
     // Narumii end
@@ -228,9 +228,7 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
       Set<AbstractInsnNode> setUnion =
           ((SmallSet<AbstractInsnNode>) value1.insns)
               .union((SmallSet<AbstractInsnNode>) value2.insns);
-      // Narumii start
-      if (setUnion == value1.insns && value1.size == value2.size && Objects.equals(value1.copiedFrom, value2.copiedFrom)) {
-      // Narumii end
+      if (setUnion == value1.insns && value1.size == value2.size && Objects.equals(value1.copiedFrom, value2.copiedFrom)) { // Narumii
         return value1;
       } else {
         // Narumii start
@@ -242,9 +240,7 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
         // Narumii end
       }
     }
-    // Narumii start
-    if (value1.size != value2.size || !containsAll(value1.insns, value2.insns) || !Objects.equals(value1.copiedFrom, value2.copiedFrom)) {
-    // Narumii end
+    if (value1.size != value2.size || !containsAll(value1.insns, value2.insns) || !Objects.equals(value1.copiedFrom, value2.copiedFrom)) { // Narumii
       HashSet<AbstractInsnNode> setUnion = new HashSet<>();
       setUnion.addAll(value1.insns);
       setUnion.addAll(value2.insns);

@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
-import org.objectweb.asm.tree.analysis.Analyzer;
+import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.JumpPredictingAnalyzer;
 import org.objectweb.asm.tree.analysis.OriginalSourceInterpreter;
@@ -142,17 +142,18 @@ public class AsmHelper implements Opcodes {
   public static Map<AbstractInsnNode, Frame<OriginalSourceValue>> analyzeSource(
       ClassNode classNode, MethodNode methodNode
   ) {
+    Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = new HashMap<>();
+    Frame<OriginalSourceValue>[] framesArray;
     try {
-      Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = new HashMap<>();
-      Frame<OriginalSourceValue>[] framesArray =
-          new JumpPredictingAnalyzer(new OriginalSourceInterpreter()).analyze(classNode.name, methodNode);
-      for (int i = 0; i < framesArray.length; i++) {
-        frames.put(methodNode.instructions.get(i), framesArray[i]);
-      }
-      return frames;
-    } catch (Exception e) {
+      framesArray = new JumpPredictingAnalyzer(new OriginalSourceInterpreter()).analyze(classNode.name, methodNode);
+    } catch (AnalyzerException e) {
+      // Return null on invalid method
       return null;
     }
+    for (int i = 0; i < framesArray.length; i++) {
+      frames.put(methodNode.instructions.get(i), framesArray[i]);
+    }
+    return frames;
   }
 
   /**
