@@ -195,6 +195,9 @@ public class OriginalSourceValue extends SourceValue {
   /**
    * We need to create our own {@link Optional}-like class because {@link Optional} can't
    * store nullable values which we need to store.
+   *
+   * @param value A constant value. It can be {@link Integer}, {@link Double},
+   * {@link Float}, {@link String}, {@link Type} or {@code null}
    */
   public record ConstantValue(Object value) {
     public static ConstantValue of(Object value) {
