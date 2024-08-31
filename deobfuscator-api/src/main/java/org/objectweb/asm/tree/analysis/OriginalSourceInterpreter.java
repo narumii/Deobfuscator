@@ -228,9 +228,7 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
       Set<AbstractInsnNode> setUnion =
           ((SmallSet<AbstractInsnNode>) value1.insns)
               .union((SmallSet<AbstractInsnNode>) value2.insns);
-      // Narumii start
-      if (setUnion == value1.insns && value1.size == value2.size && Objects.equals(value1.copiedFrom, value2.copiedFrom)) {
-      // Narumii end
+      if (setUnion == value1.insns && value1.size == value2.size && Objects.equals(value1.copiedFrom, value2.copiedFrom)) { // Narumii
         return value1;
       } else {
         // Narumii start
@@ -242,9 +240,7 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
         // Narumii end
       }
     }
-    // Narumii start
-    if (value1.size != value2.size || !containsAll(value1.insns, value2.insns) || !Objects.equals(value1.copiedFrom, value2.copiedFrom)) {
-    // Narumii end
+    if (value1.size != value2.size || !containsAll(value1.insns, value2.insns) || !Objects.equals(value1.copiedFrom, value2.copiedFrom)) { // Narumii
       HashSet<AbstractInsnNode> setUnion = new HashSet<>();
       setUnion.addAll(value1.insns);
       setUnion.addAll(value2.insns);
