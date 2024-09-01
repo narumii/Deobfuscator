@@ -64,46 +64,47 @@ public abstract class Transformer extends AsmHelper implements Opcodes {
       Context context,
       @Nullable Transformer oldInstance
   ) {
-    boolean changed = false;
-
     Transformer transformer = transformerSupplier.get();
     if (oldInstance != null && transformer == oldInstance) {
       throw new IllegalArgumentException("transformerSupplier tried to reuse existing transformer instance. You must pass a new instance of transformer");
     }
 
     LOGGER.info("-------------------------------------");
+
+    LOGGER.info("Running {} transformer", transformer.name());
+    long start = System.currentTimeMillis();
+
+    // Run the transformer!
+    boolean changed;
     try {
-
-      LOGGER.info("Running {} transformer", transformer.name());
-      long start = System.currentTimeMillis();
-
-      // Run the transformer!
       changed = transformer.transform(scope, context);
-      if (changed && transformer.shouldRerunOnChange()) {
-        LOGGER.info("Changes detected. Rerunning {} transformer", transformer.name());
-        Transformer.transform(transformerSupplier, scope, context, transformer);
-      }
-
-      LOGGER.info("Ended {} transformer in {} ms", transformer.name(), (System.currentTimeMillis() - start));
-
-      // Bytecode verification
-      if (context.getOptions().verifyBytecode() && oldInstance == null && changed) {
-        // Verify if bytecode is valid
-        try {
-          verifyBytecode(scope, context);
-        } catch (RuntimeException e) {
-          LOGGER.error("Transformer {} produced invalid bytecode", transformer.name(), e);
-        }
-      }
     } catch (TransformerException e) {
       LOGGER.error("! {}: {}", transformer.name(), e.getMessage());
+      return false;
     } catch (Exception e) {
       LOGGER.error("Error occurred when transforming {}", transformer.name(), e);
       if (!context.getOptions().suppressErrors()) {
         throw new RuntimeException(e);
       }
+      return false;
     }
-    LOGGER.info("-------------------------------------\n");
+
+    LOGGER.info("Ended {} transformer in {} ms", transformer.name(), (System.currentTimeMillis() - start));
+
+    if (changed && transformer.shouldRerunOnChange()) {
+      LOGGER.info("Changes detected. Rerunning {} transformer", transformer.name());
+      Transformer.transform(transformerSupplier, scope, context, transformer);
+    }
+
+    // Bytecode verification
+    if (context.getOptions().verifyBytecode() && oldInstance == null && changed) {
+      // Verify if bytecode is valid
+      try {
+        verifyBytecode(scope, context);
+      } catch (RuntimeException e) {
+        LOGGER.error("Transformer {} produced invalid bytecode", transformer.name(), e);
+      }
+    }
 
     return changed;
   }

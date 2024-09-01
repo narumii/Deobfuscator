@@ -93,7 +93,7 @@ public class OriginalSourceValue extends SourceValue {
     this(size, insnSet, null);
   }
 
-  public OriginalSourceValue(OriginalSourceValue copiedFrom, AbstractInsnNode insnNode) {
+  public OriginalSourceValue(AbstractInsnNode insnNode, OriginalSourceValue copiedFrom) {
     this(copiedFrom.size, new SmallSet<>(insnNode), copiedFrom);
   }
 

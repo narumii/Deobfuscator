@@ -107,7 +107,7 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
   @Override
   public OriginalSourceValue copyOperation(final AbstractInsnNode insn, final OriginalSourceValue value) {
     // Narumii start - Track the original value
-    return new OriginalSourceValue(value, insn);
+    return new OriginalSourceValue(insn, value);
     // Narumii end
   }
 
