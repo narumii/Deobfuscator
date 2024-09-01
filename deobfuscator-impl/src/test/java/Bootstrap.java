@@ -4,7 +4,7 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.api.context.DeobfuscatorOptions;
-import uwu.narumi.deobfuscator.core.other.composed.ComposedGeneralFlowTransformer;
+import uwu.narumi.deobfuscator.core.other.composed.general.ComposedGeneralFlowTransformer;
 
 public class Bootstrap {
 
