@@ -1,4 +1,4 @@
-package uwu.narumii.deobfuscator.base;
+package uwu.narumi.deobfuscator.base;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

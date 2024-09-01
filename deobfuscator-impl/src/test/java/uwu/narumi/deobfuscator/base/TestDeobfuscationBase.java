@@ -1,8 +1,7 @@
-package uwu.narumii.deobfuscator.base;
+package uwu.narumi.deobfuscator.base;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.core.util.FileUtils;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.java.decompiler.api.Decompiler;
 import org.jetbrains.java.decompiler.main.extern.IContextSource;
@@ -14,19 +13,14 @@ import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.Timeout;
 import org.opentest4j.TestAbortedException;
 import uwu.narumi.deobfuscator.Deobfuscator;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.context.DeobfuscatorOptions;
 import uwu.narumi.deobfuscator.api.helper.FileHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 

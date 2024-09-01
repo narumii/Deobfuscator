@@ -1,9 +1,7 @@
-package uwu.narumii.deobfuscator.base;
+package uwu.narumi.deobfuscator.base;
 
-import java.nio.charset.StandardCharsets;
 import org.jetbrains.java.decompiler.main.extern.IResultSaver;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

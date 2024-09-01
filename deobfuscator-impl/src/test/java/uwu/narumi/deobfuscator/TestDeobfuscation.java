@@ -1,11 +1,11 @@
-package uwu.narumii.deobfuscator;
+package uwu.narumi.deobfuscator;
 
 import uwu.narumi.deobfuscator.core.other.composed.ComposedGeneralFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.PeepholeCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineLocalVariablesTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
-import uwu.narumii.deobfuscator.base.TestDeobfuscationBase;
+import uwu.narumi.deobfuscator.base.TestDeobfuscationBase;
 
 import java.util.List;
 
