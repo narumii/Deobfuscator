@@ -94,7 +94,7 @@ public class OriginalSourceValue extends SourceValue {
   }
 
   public OriginalSourceValue(OriginalSourceValue copiedFrom, AbstractInsnNode insnNode) {
-    this(copiedFrom.size, Set.of(insnNode), copiedFrom);
+    this(copiedFrom.size, new SmallSet<>(insnNode), copiedFrom);
   }
 
   public OriginalSourceValue(int size, Set<AbstractInsnNode> insnSet, @Nullable OriginalSourceValue copiedFrom) {
@@ -102,7 +102,7 @@ public class OriginalSourceValue extends SourceValue {
   }
 
   public OriginalSourceValue(int size, AbstractInsnNode insnNode, @Nullable ConstantValue constantValue) {
-    this(size, Set.of(insnNode), null, constantValue);
+    this(size, new SmallSet<>(insnNode), null, constantValue);
   }
 
   /**
