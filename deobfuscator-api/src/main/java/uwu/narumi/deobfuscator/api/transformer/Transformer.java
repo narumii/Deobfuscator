@@ -9,7 +9,6 @@ import org.objectweb.asm.tree.analysis.Analyzer;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.BasicValue;
 import org.objectweb.asm.tree.analysis.BasicVerifier;
-import org.objectweb.asm.tree.analysis.SimpleVerifier;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.exception.TransformerException;
@@ -92,7 +91,7 @@ public abstract class Transformer extends AsmHelper implements Opcodes {
     LOGGER.info("Ended {} transformer in {} ms", transformer.name(), (System.currentTimeMillis() - start));
 
     if (changed && transformer.shouldRerunOnChange()) {
-      LOGGER.info("Changes detected. Rerunning {} transformer", transformer.name());
+      LOGGER.info("\uD83D\uDD04 Changes detected. Rerunning {} transformer", transformer.name());
       Transformer.transform(transformerSupplier, scope, context, transformer);
     }
 
