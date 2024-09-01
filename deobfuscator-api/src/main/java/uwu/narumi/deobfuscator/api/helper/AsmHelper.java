@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.Frame;
@@ -139,6 +140,13 @@ public class AsmHelper implements Opcodes {
     return instructions;
   }
 
+  /**
+   * Analyzes the stack frames of the method
+   *
+   * @param classNode The owner class
+   * @param methodNode Method
+   * @return A map which corresponds to: instruction -> its own stack frame
+   */
   public static Map<AbstractInsnNode, Frame<OriginalSourceValue>> analyzeSource(
       ClassNode classNode, MethodNode methodNode
   ) {
@@ -169,6 +177,27 @@ public class AsmHelper implements Opcodes {
       // Remove
       methodNode.instructions.remove(sourceValue.getProducer());
     }
+  }
+
+  /**
+   * Convert constant value to instruction that represents this constant
+   *
+   * @param value A constant value
+   * @return An instruction that represents this constant
+   */
+  public static AbstractInsnNode toConstantInsn(Object value) {
+    if (value == null)
+      return new InsnNode(ACONST_NULL);
+    if (value instanceof String || value instanceof Type)
+      return new LdcInsnNode(value);
+    if (value instanceof Number number)
+      return getNumber(number);
+    if (value instanceof Boolean bool)
+      return getNumber(bool ? 1 : 0);
+    if (value instanceof Character character)
+      return getNumber(character);
+
+    throw new IllegalArgumentException("Not a constant");
   }
 
   public static InsnList from(AbstractInsnNode... nodes) {

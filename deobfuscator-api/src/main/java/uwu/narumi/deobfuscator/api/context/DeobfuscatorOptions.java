@@ -168,7 +168,8 @@ public record DeobfuscatorOptions(
     }
 
     /**
-     * Flags for {@link ClassWriter}
+     * Flags for {@link ClassWriter}. When you set it to {@code 0} you will disable checking the validity
+     * of the bytecode. Although this is not recommended.
      */
     @Contract("_ -> this")
     public DeobfuscatorOptions.Builder classWriterFlags(int classWriterFlags) {

@@ -8,7 +8,6 @@ A deobfuscator for java
 > - Testing InstructionMatcher
 > - Implementing/Improving transformers
 > - Writing tests
-> - Safety checks on putstatic in FieldInlineTransformers (overriding values)
 > - Feedback on how the new api presents itself (mainly InstructionMatcher)
 >   <br>
 > 

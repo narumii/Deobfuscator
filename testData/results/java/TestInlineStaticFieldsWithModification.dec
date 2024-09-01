@@ -6,7 +6,7 @@ public class TestInlineStaticFieldsWithModification {
 
     private static int getAdsCriticalOffset(String fileName) {
         int offset1 = fileName.lastIndexOf(SYSTEM_SEPARATOR);
-        int offset2 = fileName.lastIndexOf(92);
+        int offset2 = fileName.lastIndexOf(OTHER_SEPARATOR);
         if (offset1 == -1) {
             return offset2 == -1 ? 0 : offset2 + 1;
         } else {

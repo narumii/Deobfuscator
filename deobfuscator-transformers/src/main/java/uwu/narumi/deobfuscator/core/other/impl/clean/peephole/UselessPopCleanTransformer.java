@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 public class UselessPopCleanTransformer extends FramedInstructionsTransformer {
 
   @Override
-  protected Stream<AbstractInsnNode> getInstructionsStream(Stream<AbstractInsnNode> stream) {
+  protected Stream<AbstractInsnNode> buildInstructionsStream(Stream<AbstractInsnNode> stream) {
     return stream
         .filter(insn -> insn.getOpcode() == POP || insn.getOpcode() == POP2);
   }

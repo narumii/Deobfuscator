@@ -32,7 +32,7 @@ public abstract class FramedInstructionsTransformer extends Transformer {
   /**
    * Returns classes stream on which the transformer will be iterating
    */
-  protected Stream<ClassWrapper> getClassesStream(Stream<ClassWrapper> stream) {
+  protected Stream<ClassWrapper> buildClassesStream(Stream<ClassWrapper> stream) {
     // Override this method to filter classes
     return stream;
   }
@@ -40,7 +40,7 @@ public abstract class FramedInstructionsTransformer extends Transformer {
   /**
    * Returns methods stream on which the transformer will be iterating
    */
-  protected Stream<MethodNode> getMethodsStream(Stream<MethodNode> stream) {
+  protected Stream<MethodNode> buildMethodsStream(Stream<MethodNode> stream) {
     // Override this method to filter methods
     return stream;
   }
@@ -48,24 +48,24 @@ public abstract class FramedInstructionsTransformer extends Transformer {
   /**
    * Returns instructions stream on which the transformer will be iterating
    */
-  protected Stream<AbstractInsnNode> getInstructionsStream(Stream<AbstractInsnNode> stream) {
+  protected Stream<AbstractInsnNode> buildInstructionsStream(Stream<AbstractInsnNode> stream) {
     // Override this method to filter instructions
     return stream;
   }
 
   @Override
   protected boolean transform(ClassWrapper scope, Context context) throws Exception {
-    getClassesStream(context.classes(scope).stream()).forEach(classWrapper -> getMethodsStream(classWrapper.methods().stream())
+    buildClassesStream(context.classes(scope).stream()).forEach(classWrapper -> buildMethodsStream(classWrapper.methods().stream())
         .forEach(methodNode -> {
           // Skip if no instructions
-          if (getInstructionsStream(Arrays.stream(methodNode.instructions.toArray())).findAny().isEmpty()) return;
+          if (buildInstructionsStream(Arrays.stream(methodNode.instructions.toArray())).findAny().isEmpty()) return;
 
           // Get frames of the method
           Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = analyzeSource(classWrapper.getClassNode(), methodNode);
           if (frames == null) return;
 
           // Iterate over instructions
-          getInstructionsStream(Arrays.stream(methodNode.instructions.toArray())).forEach(insn -> {
+          buildInstructionsStream(Arrays.stream(methodNode.instructions.toArray())).forEach(insn -> {
             // Get current frame
             Frame<OriginalSourceValue> frame = frames.get(insn);
             if (frame == null) return;

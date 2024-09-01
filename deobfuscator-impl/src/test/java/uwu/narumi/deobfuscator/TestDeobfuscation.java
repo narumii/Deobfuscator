@@ -19,8 +19,8 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
     ), "TestInlineLocalVariables");
     register("Simple flow obfuscation", InputType.JAVA_CODE, List.of(ComposedGeneralFlowTransformer::new), "TestSimpleFlowObfuscation");
     register("Universal Number Transformer", InputType.JAVA_CODE, List.of(UniversalNumberTransformer::new), "TestUniversalNumberTransformer");
+    // TODO: Uninitialized static fields should replace with 0?
     register("Inline static fields", InputType.JAVA_CODE, List.of(InlineStaticFieldTransformer::new), "TestInlineStaticFields");
-    // TODO: Account for static field modification
     register("Inline static fields with modification", InputType.JAVA_CODE, List.of(InlineStaticFieldTransformer::new), "TestInlineStaticFieldsWithModification");
 
     // Samples
