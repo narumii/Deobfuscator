@@ -1,4 +1,4 @@
-package uwu.narumi.deobfuscator.core.other.composed;
+package uwu.narumi.deobfuscator.core.other.composed.general;
 
 import uwu.narumi.deobfuscator.api.transformer.ComposedTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.InvalidMethodCleanTransformer;

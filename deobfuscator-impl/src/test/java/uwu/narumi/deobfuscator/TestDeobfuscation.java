@@ -1,6 +1,6 @@
 package uwu.narumi.deobfuscator;
 
-import uwu.narumi.deobfuscator.core.other.composed.ComposedGeneralFlowTransformer;
+import uwu.narumi.deobfuscator.core.other.composed.general.ComposedGeneralFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.PeepholeCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineLocalVariablesTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;

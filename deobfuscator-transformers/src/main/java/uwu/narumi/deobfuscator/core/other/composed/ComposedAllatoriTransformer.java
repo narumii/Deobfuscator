@@ -4,12 +4,12 @@ import uwu.narumi.deobfuscator.api.transformer.ComposedTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.allatori.AllatoriStringTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
 
-public class ComposedAllatoriStrongStringTransformer extends ComposedTransformer {
+public class ComposedAllatoriTransformer extends ComposedTransformer {
 
-    public ComposedAllatoriStrongStringTransformer() {
+    public ComposedAllatoriTransformer(boolean strongString) {
         super(
             UniversalNumberTransformer::new,
-            () -> new AllatoriStringTransformer(true)
+            () -> new AllatoriStringTransformer(strongString)
         );
     }
 }
