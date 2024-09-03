@@ -9,6 +9,7 @@ import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 
+import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -26,7 +27,7 @@ public class InlineLocalVariablesTransformer extends FramedInstructionsTransform
   }
 
   @Override
-  protected boolean transformInstruction(Context context, ClassWrapper classWrapper, MethodNode methodNode, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
+  protected boolean transformInstruction(Context context, ClassWrapper classWrapper, MethodNode methodNode, Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
     VarInsnNode varInsn = (VarInsnNode) insn;
 
     // Var store instruction

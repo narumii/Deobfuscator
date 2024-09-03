@@ -11,11 +11,12 @@ import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
 import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 
+import java.util.Map;
 import java.util.Optional;
 
 public class CleanRedundantJumpsTransformer extends FramedInstructionsTransformer {
   @Override
-  protected boolean transformInstruction(Context context, ClassWrapper classWrapper, MethodNode methodNode, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
+  protected boolean transformInstruction(Context context, ClassWrapper classWrapper, MethodNode methodNode, Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
     if (!(insn instanceof JumpInsnNode jumpInsn)) return false;
 
     Optional<Boolean> optIfResult = AsmMathHelper.predictIf(jumpInsn, frame);

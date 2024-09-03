@@ -10,6 +10,7 @@ import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
 import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 
+import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -24,7 +25,7 @@ public class MathBinaryOperationsTransformer extends FramedInstructionsTransform
   }
 
   @Override
-  protected boolean transformInstruction(Context context, ClassWrapper classWrapper, MethodNode methodNode, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
+  protected boolean transformInstruction(Context context, ClassWrapper classWrapper, MethodNode methodNode, Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
     // Get instructions from stack that are passed
     OriginalSourceValue value1SourceValue = frame.getStack(frame.getStackSize() - 2);
     OriginalSourceValue value2SourceValue = frame.getStack(frame.getStackSize() - 1);

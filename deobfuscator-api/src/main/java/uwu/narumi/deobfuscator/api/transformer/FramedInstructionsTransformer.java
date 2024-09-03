@@ -23,11 +23,19 @@ public abstract class FramedInstructionsTransformer extends FramedMethodsTransfo
    * @param context Current context
    * @param classWrapper Current class
    * @param methodNode Current method
+   * @param frames Frames of the current method
    * @param insn Current instruction
    * @param frame Current frame
    * @return If changed
    */
-  protected abstract boolean transformInstruction(Context context, ClassWrapper classWrapper, MethodNode methodNode, AbstractInsnNode insn, Frame<OriginalSourceValue> frame);
+  protected abstract boolean transformInstruction(
+      Context context,
+      ClassWrapper classWrapper,
+      MethodNode methodNode,
+      Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames,
+      AbstractInsnNode insn,
+      Frame<OriginalSourceValue> frame
+  );
 
   /**
    * Returns instructions stream on which the transformer will be iterating
@@ -45,7 +53,7 @@ public abstract class FramedInstructionsTransformer extends FramedMethodsTransfo
       if (frame == null) return;
 
       // Run the instruction transformer
-      boolean transformerChanged = transformInstruction(context, classWrapper, methodNode, insn, frame);
+      boolean transformerChanged = transformInstruction(context, classWrapper, methodNode, frames, insn, frame);
       if (transformerChanged) {
         this.markChange();
       }

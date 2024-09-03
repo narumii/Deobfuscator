@@ -10,13 +10,15 @@ import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
 import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 
+import java.util.Map;
+
 /**
  * Simplifies method calls on constant literals.
  */
 public class MethodCallsOnLiteralsTransformer extends FramedInstructionsTransformer {
 
   @Override
-  protected boolean transformInstruction(Context context, ClassWrapper classWrapper, MethodNode methodNode, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
+  protected boolean transformInstruction(Context context, ClassWrapper classWrapper, MethodNode methodNode, Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
     // Transform method calls on literals
     for (Match mathMatch : AsmMathHelper.METHOD_CALLS_ON_LITERALS) {
       if (mathMatch.test(insn)) {
