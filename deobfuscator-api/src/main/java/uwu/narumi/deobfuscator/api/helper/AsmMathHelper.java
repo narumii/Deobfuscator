@@ -94,27 +94,27 @@ public final class AsmMathHelper {
   private static final Map<Integer, Function<Number, Number>> MATH_UNARY_OPERATIONS = Map.ofEntries(
       // Integer
       Map.entry(INEG, number -> -number.intValue()),
-      Map.entry(I2B, number -> number.byteValue()),
-      Map.entry(I2C, number -> number.shortValue()),
-      Map.entry(I2D, number -> number.doubleValue()),
-      Map.entry(I2F, number -> number.floatValue()),
-      Map.entry(I2L, number -> number.longValue()),
-      Map.entry(I2S, number -> number.shortValue()),
+      Map.entry(I2B, Number::byteValue),
+      Map.entry(I2C, Number::shortValue),
+      Map.entry(I2D, Number::doubleValue),
+      Map.entry(I2F, Number::floatValue),
+      Map.entry(I2L, Number::longValue),
+      Map.entry(I2S, Number::shortValue),
       // Long
       Map.entry(LNEG, number -> -number.longValue()),
-      Map.entry(L2D, number -> number.doubleValue()),
-      Map.entry(L2F, number -> number.floatValue()),
-      Map.entry(L2I, number -> number.intValue()),
+      Map.entry(L2D, Number::doubleValue),
+      Map.entry(L2F, Number::floatValue),
+      Map.entry(L2I, Number::intValue),
       // Float
       Map.entry(FNEG, number -> -number.floatValue()),
-      Map.entry(F2D, number -> number.doubleValue()),
-      Map.entry(F2I, number -> number.intValue()),
-      Map.entry(F2L, number -> number.longValue()),
+      Map.entry(F2D, Number::doubleValue),
+      Map.entry(F2I, Number::intValue),
+      Map.entry(F2L, Number::longValue),
       // Double
       Map.entry(DNEG, number -> -number.doubleValue()),
-      Map.entry(D2F, number -> number.floatValue()),
-      Map.entry(D2I, number -> number.intValue()),
-      Map.entry(D2L, number -> number.longValue())
+      Map.entry(D2F, Number::floatValue),
+      Map.entry(D2I, Number::intValue),
+      Map.entry(D2L, Number::longValue)
   );
 
   public static final Match STRING_LENGTH =
