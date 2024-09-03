@@ -2,7 +2,6 @@ package uwu.narumi.deobfuscator.api.helper;
 
 import static org.objectweb.asm.Opcodes.*;
 
-import org.objectweb.asm.NamedOpcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
