@@ -6,6 +6,7 @@ import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
+import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
 import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 
@@ -15,7 +16,7 @@ import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 public class MethodCallsOnLiteralsTransformer extends FramedInstructionsTransformer {
 
   @Override
-  protected boolean transformInstruction(ClassWrapper classWrapper, MethodNode methodNode, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
+  protected boolean transformInstruction(Context context, ClassWrapper classWrapper, MethodNode methodNode, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
     // Transform method calls on literals
     for (Match mathMatch : AsmMathHelper.METHOD_CALLS_ON_LITERALS) {
       if (mathMatch.test(insn)) {
