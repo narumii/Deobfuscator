@@ -44,7 +44,7 @@ public abstract class Transformer extends AsmHelper implements Opcodes {
   protected abstract void transform(ClassWrapper scope, Context context) throws Exception;
 
   /**
-   * Marks that transformer changed something. You must use it in your transformer for
+   * Marks that transformer changed something. You MUST use it somewhere in your transformer.
    */
   protected void markChange() {
     this.changes.incrementAndGet();
