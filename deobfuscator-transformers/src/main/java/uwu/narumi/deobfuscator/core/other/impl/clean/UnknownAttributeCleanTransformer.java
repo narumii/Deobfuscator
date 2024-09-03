@@ -10,7 +10,7 @@ public class UnknownAttributeCleanTransformer extends Transformer {
   private boolean changed = false;
 
   @Override
-  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
+  protected void transform(ClassWrapper scope, Context context) throws Exception {
     context
         .classes(scope)
         .forEach(
@@ -24,6 +24,8 @@ public class UnknownAttributeCleanTransformer extends Transformer {
                   .forEach(fieldNode -> changed |= fieldNode.attrs.removeIf(Attribute::isUnknown));
             });
 
-    return changed;
+    if (changed) {
+      markChange();
+    }
   }
 }

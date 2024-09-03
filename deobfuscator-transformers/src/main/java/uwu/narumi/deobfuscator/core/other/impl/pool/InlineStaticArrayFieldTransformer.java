@@ -154,7 +154,6 @@ public class InlineStaticArrayFieldTransformer extends Transformer {
 
   private final boolean scanOnlyStaticBlock;
   private final AtomicInteger index = new AtomicInteger();
-  private final AtomicInteger inline = new AtomicInteger();
 
   public InlineStaticArrayFieldTransformer() {
     this(false);
@@ -165,7 +164,7 @@ public class InlineStaticArrayFieldTransformer extends Transformer {
   }
 
   @Override
-  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
+  protected void transform(ClassWrapper scope, Context context) throws Exception {
     context
         .classes(scope)
         .forEach(
@@ -228,13 +227,11 @@ public class InlineStaticArrayFieldTransformer extends Transformer {
                                     }
 
                                     result.remove();
-                                    inline.incrementAndGet();
+                                    this.markChange();
                                   }));
             });
 
-    LOGGER.info("Inlined {} objects in {} classes", inline.get(), context.classes().size());
-
-    return inline.get() > 0;
+    LOGGER.info("Inlined {} objects in {} classes", this.getChangesCount(), context.classes().size());
   }
 
   private void extractData(ClassWrapper classWrapper, MethodNode methodNode, Context context) {

@@ -7,7 +7,7 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 public class JunkClassCleanTransformer extends Transformer {
 
   @Override
-  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
+  protected void transform(ClassWrapper scope, Context context) throws Exception {
     throw new UnsupportedOperationException("TODO");
   }
 }

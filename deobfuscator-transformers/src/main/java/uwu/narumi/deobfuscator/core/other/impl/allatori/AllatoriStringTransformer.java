@@ -19,8 +19,6 @@ public class AllatoriStringTransformer extends Transformer {
 
     private HashMap<String, DecryptionMethod> decryptors = new HashMap<>();
 
-    private final AtomicInteger resolved = new AtomicInteger();
-
     private boolean strong;
 
     public AllatoriStringTransformer(boolean strong) {
@@ -30,7 +28,7 @@ public class AllatoriStringTransformer extends Transformer {
     /* Written by https://github.com/Lampadina17 | 06/08/2024 */
     /* use UniversalNumberTransformer before this transformer to decrypt keys */
     @Override
-    protected boolean transform(ClassWrapper scope, Context context) throws Exception {
+    protected void transform(ClassWrapper scope, Context context) throws Exception {
         context.classes(scope).forEach(classWrapper -> {
             classWrapper.methods().forEach(methodNode -> {
 
@@ -82,7 +80,7 @@ public class AllatoriStringTransformer extends Transformer {
                             ldc.cst = dec2.v4weak(dec1.v4strong((String) ldc.cst, methodNode.name + classWrapper.name().replace("/", ".")));
                             methodNode.instructions.remove(nextnext);
                             methodNode.instructions.remove(next);
-                            resolved.incrementAndGet();
+                            this.markChange();
                             return;
                         }
 
@@ -95,15 +93,13 @@ public class AllatoriStringTransformer extends Transformer {
                             }
                             /* Remove invoke */
                             methodNode.instructions.remove(next);
-                            resolved.incrementAndGet();
+                            this.markChange();
                         }
                     }
                 });
             });
         });
-        LOGGER.info("Decrypted {} strings in {} classes", resolved.get(), context.classes().size());
-
-        return resolved.get() > 0;
+        LOGGER.info("Decrypted {} strings in {} classes", this.getChangesCount(), context.classes().size());
     }
 
     public class DecryptionMethod {

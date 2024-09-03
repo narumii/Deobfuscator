@@ -11,10 +11,8 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 public class UnUsedLabelCleanTransformer extends Transformer {
 
-  private boolean changed = false;
-
   @Override
-  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
+  protected void transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).stream()
         .flatMap(classWrapper -> classWrapper.methods().stream())
         .forEach(
@@ -56,10 +54,8 @@ public class UnUsedLabelCleanTransformer extends Transformer {
                   .filter(node -> !labelNodes.contains(node))
                   .forEach(insn -> {
                     methodNode.instructions.remove(insn);
-                    changed = true;
+                    this.markChange();
                   });
             });
-
-    return changed;
   }
 }

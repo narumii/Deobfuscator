@@ -8,10 +8,8 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 public class LineNumberCleanTransformer extends Transformer {
 
-  private boolean changed = false;
-
   @Override
-  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
+  protected void transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).stream()
         .flatMap(classWrapper -> classWrapper.methods().stream())
         .forEach(
@@ -20,9 +18,7 @@ public class LineNumberCleanTransformer extends Transformer {
                     .filter(node -> node instanceof LineNumberNode)
                     .forEach(node -> {
                         methodNode.instructions.remove(node);
-                        changed = true;
+                        this.markChange();
                     }));
-
-    return changed;
   }
 }

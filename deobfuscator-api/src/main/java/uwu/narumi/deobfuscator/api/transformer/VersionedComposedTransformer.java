@@ -18,7 +18,7 @@ public abstract class VersionedComposedTransformer extends Transformer {
   private boolean changed = false;
 
   @Override
-  protected boolean transform(ClassWrapper scope, Context context) {
+  protected void transform(ClassWrapper scope, Context context) {
     Map<String, List<Supplier<Transformer>>> transformers = transformersByVersions();
     if (!transformers.containsKey(version)) {
       throw new IllegalArgumentException(String.format("Version '%s' not found!", version));
@@ -28,7 +28,9 @@ public abstract class VersionedComposedTransformer extends Transformer {
         .get(version)
         .forEach(transformer -> changed |= Transformer.transform(transformer, scope, context));
 
-    return changed;
+    if (changed) {
+      markChange();
+    }
   }
 
   public abstract Map<String, List<Supplier<Transformer>>> transformersByVersions();

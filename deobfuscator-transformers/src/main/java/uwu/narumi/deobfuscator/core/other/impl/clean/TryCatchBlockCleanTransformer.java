@@ -6,17 +6,13 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 public class TryCatchBlockCleanTransformer extends Transformer {
 
-  private boolean changed = false;
-
   @Override
-  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
+  protected void transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).stream()
         .flatMap(classWrapper -> classWrapper.methods().stream())
         .forEach(methodNode -> {
           methodNode.tryCatchBlocks = null;
-          changed = true;
+          this.markChange();
         });
-
-    return changed;
   }
 }

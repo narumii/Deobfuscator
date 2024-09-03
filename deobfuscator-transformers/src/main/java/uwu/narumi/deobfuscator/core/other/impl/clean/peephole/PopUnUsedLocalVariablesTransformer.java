@@ -16,10 +16,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PopUnUsedLocalVariablesTransformer extends Transformer {
-  private final AtomicInteger removedVars = new AtomicInteger(0);
 
   @Override
-  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
+  protected void transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
       Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = AsmHelper.analyzeSource(classWrapper.getClassNode(), methodNode);
       if (frames == null) return;
@@ -56,14 +55,12 @@ public class PopUnUsedLocalVariablesTransformer extends Transformer {
             // Pop the value from the stack
             methodNode.instructions.set(insn, insn.toPop());
 
-            removedVars.incrementAndGet();
+            this.markChange();
           }
         }
       }
     }));
 
-    LOGGER.info("Removed {} unused local variables", removedVars.get());
-
-    return removedVars.get() > 0;
+    LOGGER.info("Removed {} unused local variables", this.getChangesCount());
   }
 }

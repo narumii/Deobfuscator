@@ -81,10 +81,8 @@ public class AccessRepairTransformer extends Transformer {
     ACC_SYNTHETIC
   };
 
-  private boolean changed = false;
-
   @Override
-  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
+  protected void transform(ClassWrapper scope, Context context) throws Exception {
     context
         .classes(scope)
         .forEach(
@@ -93,7 +91,7 @@ public class AccessRepairTransformer extends Transformer {
               for (int access : CLASS) {
                 if (isAccess(classAccess, access)) {
                   classAccess &= ~access;
-                  changed = true;
+                  this.markChange();
                 }
               }
               classWrapper.getClassNode().access = classAccess;
@@ -105,7 +103,7 @@ public class AccessRepairTransformer extends Transformer {
                         for (int access : METHOD) {
                           if (isAccess(methodNode.access, access)) {
                             methodNode.access &= ~access;
-                            changed = true;
+                            this.markChange();
                           }
                         }
 
@@ -115,7 +113,7 @@ public class AccessRepairTransformer extends Transformer {
                                 for (int access : PARAMETER) {
                                   if (isAccess(parameterNode.access, access)) {
                                     parameterNode.access &= ~access;
-                                    changed = true;
+                                    this.markChange();
                                   }
                                 }
                               });
@@ -128,14 +126,12 @@ public class AccessRepairTransformer extends Transformer {
                         for (int access : FIELD) {
                           if (isAccess(fieldNode.access, access)) {
                             fieldNode.access &= ~access;
-                            changed = true;
+                            this.markChange();
                           }
                         }
                       });
 
               // TODO: Module maybe?
             });
-
-    return changed;
   }
 }

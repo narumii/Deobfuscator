@@ -21,11 +21,9 @@ public class ZelixStringTransformer extends Transformer {
 
     HashMap<String, List<String>> encryptedStrings = new HashMap<>();
 
-    private final AtomicInteger resolved = new AtomicInteger();
-
     /* Written by https://github.com/Lampadina17 | OG 19/07/2024, Rewritten 09/08/2024 */
     @Override
-    protected boolean transform(ClassWrapper scope, Context context) throws Exception {
+    protected void transform(ClassWrapper scope, Context context) throws Exception {
         context.classes(scope).forEach(classWrapper -> {
             /* Extract key type 1 from hardcoded xor encryption */
             classWrapper.methods().stream()
@@ -135,7 +133,7 @@ public class ZelixStringTransformer extends Transformer {
                                                 methodNode.instructions.remove(ain.getPrevious().getPrevious());
                                                 methodNode.instructions.remove(ain.getPrevious());
                                                 methodNode.instructions.remove(ain);
-                                                resolved.incrementAndGet();
+                                                this.markChange();
                                             } catch (Exception e) {
                                             }
                                     });
@@ -169,15 +167,13 @@ public class ZelixStringTransformer extends Transformer {
                                                 methodNode.instructions.remove(ain.getNext().getNext());
                                                 methodNode.instructions.remove(ain.getNext());
                                                 methodNode.instructions.remove(ain);
-                                                resolved.incrementAndGet();
+                                                this.markChange();
                                             });
                             }
                         }
                     });
         });
-        LOGGER.info("Decrypted {} strings in {} classes", resolved.get(), context.classes().size());
-
-        return resolved.get() > 0;
+        LOGGER.info("Decrypted {} strings in {} classes", this.getChangesCount(), context.classes().size());
     }
 
     /* Convert arraylist to array and shift values, when a bug transform into a feature (Key type 2) */

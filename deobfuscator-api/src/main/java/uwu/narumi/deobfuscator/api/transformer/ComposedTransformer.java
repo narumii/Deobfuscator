@@ -21,14 +21,13 @@ public class ComposedTransformer extends Transformer {
     this.rerunOnChange = rerunOnChange;
   }
 
-  private boolean changed = false;
-
   @Override
-  protected boolean transform(ClassWrapper scope, Context context) {
+  protected void transform(ClassWrapper scope, Context context) {
     transformers.forEach(transformerSupplier -> {
-      changed |= Transformer.transform(transformerSupplier, scope, context);
+      boolean changed = Transformer.transform(transformerSupplier, scope, context);
+      if (changed) {
+        this.markChange();
+      }
     });
-
-    return changed;
   }
 }

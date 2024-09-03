@@ -24,10 +24,9 @@ import java.util.List;
  * </pre>
  */
 public class UselessGotosCleanTransformer extends Transformer {
-  private boolean changed = false;
 
   @Override
-  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
+  protected void transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
       for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
         if (insn.getOpcode() == GOTO) {
@@ -47,14 +46,12 @@ public class UselessGotosCleanTransformer extends Transformer {
               // Remove the goto and the label
               methodNode.instructions.remove(labelNode);
               methodNode.instructions.remove(jumpInsn);
-              changed = true;
+              this.markChange();
             }
           }
         }
       }
     }));
-
-    return changed;
   }
 
   private boolean isLabelUsedOnlyByInstructions(MethodNode methodNode, LabelNode labelNode) {

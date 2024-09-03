@@ -12,10 +12,9 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
  * Remove invalid methods. WARNING: If some transformer will produce invalid bytecode in methods, this transformer will remove them.
  */
 public class InvalidMethodCleanTransformer extends Transformer {
-  private boolean changed = false;
 
   @Override
-  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
+  protected void transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).forEach(classWrapper -> {
       var iterator = classWrapper.methods().iterator();
       while (iterator.hasNext()) {
@@ -28,11 +27,9 @@ public class InvalidMethodCleanTransformer extends Transformer {
           // Remove invalid method
           LOGGER.warn("Found invalid method: {}#{}{}. Removing...", classWrapper.name(), methodNode.name, methodNode.desc);
           iterator.remove();
-          changed = true;
+          markChange();
         }
       }
     });
-
-    return changed;
   }
 }

@@ -11,10 +11,9 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 import java.util.Map;
 
 public class DeadCodeCleanTransformer extends Transformer {
-  private boolean changed = false;
 
   @Override
-  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
+  protected void transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
       Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = AsmHelper.analyzeSource(classWrapper.getClassNode(), methodNode);
       if (frames == null) return;
@@ -25,11 +24,9 @@ public class DeadCodeCleanTransformer extends Transformer {
         if (frame == null && insn.getType() != AbstractInsnNode.LABEL) {
           // Remove unreachable instruction
           methodNode.instructions.remove(insn);
-          changed = true;
+          this.markChange();
         }
       }
     }));
-
-    return changed;
   }
 }

@@ -15,16 +15,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Inlines constant static fields
  */
 public class InlineStaticFieldTransformer extends Transformer {
-  private final AtomicInteger inlined = new AtomicInteger();
 
   @Override
-  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
+  protected void transform(ClassWrapper scope, Context context) throws Exception {
     List<FieldRef> notConstantFields = new ArrayList<>();
     Map<FieldRef, AbstractInsnNode> staticConstantFields = new HashMap<>();
 
@@ -101,12 +99,11 @@ public class InlineStaticFieldTransformer extends Transformer {
             if (constValue != null) {
               // Replace it!
               methodNode.instructions.set(insn, constValue.clone(null));
-              inlined.incrementAndGet();
+              this.markChange();
             }
           });
     }));
 
-    LOGGER.info("Inlined {} constant static fields", inlined);
-    return inlined.get() > 0;
+    LOGGER.info("Inlined {} constant static fields", this.getChangesCount());
   }
 }

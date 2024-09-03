@@ -11,7 +11,7 @@ public class TryCatchRepairTransformer extends Transformer {
   private boolean changed = false;
 
   @Override
-  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
+  protected void transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).stream()
         .flatMap(classWrapper -> classWrapper.methods().stream())
         .forEach(
@@ -48,6 +48,8 @@ public class TryCatchRepairTransformer extends Transformer {
                           .noneMatch(tbce -> tbce.type.equals(exception)));
             });
 
-    return changed;
+    if (changed) {
+      this.markChange();
+    }
   }
 }

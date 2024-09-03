@@ -16,10 +16,10 @@ import java.util.stream.Stream;
  * Transformer that will iterate instructions along with their current {@link Frame}s
  */
 public abstract class FramedInstructionsTransformer extends Transformer {
-  private AtomicInteger changed = new AtomicInteger(0);
 
   /**
-   * Transform instruction
+   * Transform instruction. DO NOT use {@link Transformer#markChange()} as you need to pass here as
+   * a return if changed something
    *
    * @param classWrapper Current class
    * @param methodNode   Current method
@@ -54,7 +54,7 @@ public abstract class FramedInstructionsTransformer extends Transformer {
   }
 
   @Override
-  protected boolean transform(ClassWrapper scope, Context context) throws Exception {
+  protected void transform(ClassWrapper scope, Context context) throws Exception {
     buildClassesStream(context.classes(scope).stream()).forEach(classWrapper -> buildMethodsStream(classWrapper.methods().stream())
         .forEach(methodNode -> {
           // Skip if no instructions
@@ -73,12 +73,11 @@ public abstract class FramedInstructionsTransformer extends Transformer {
             // Run the instruction transformer
             boolean transformerChanged = transformInstruction(classWrapper, methodNode, insn, frame);
             if (transformerChanged) {
-              changed.incrementAndGet();
+              this.markChange();
             }
           });
         }));
 
-    LOGGER.info("Transformed {} instructions", changed.get());
-    return changed.get() > 0;
+    LOGGER.info("Transformed {} instructions", this.getChangesCount());
   }
 }
