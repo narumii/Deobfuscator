@@ -11,7 +11,7 @@ import uwu.narumi.deobfuscator.api.library.LibraryClassLoader;
 public class Context {
 
   private final Map<String, ClassWrapper> classes = new ConcurrentHashMap<>();
-  private final Map<String, ClassWrapper> originalClasses = new ConcurrentHashMap<>();
+  private final Map<String, byte[]> originalClasses = new ConcurrentHashMap<>();
   private final Map<String, byte[]> files = new ConcurrentHashMap<>();
 
   private final DeobfuscatorOptions options;
@@ -71,7 +71,7 @@ public class Context {
     return classes;
   }
 
-  public Map<String, ClassWrapper> getOriginalClasses() {
+  public Map<String, byte[]> getOriginalClasses() {
     return originalClasses;
   }
 

@@ -1,11 +1,12 @@
 package uwu.narumi.deobfuscator.api.asm.matcher.rule.impl;
 
 import java.util.function.Predicate;
-import org.objectweb.asm.tree.AbstractInsnNode;
+
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
 
-public class InvokeDynamicMatch implements Match {
+public class InvokeDynamicMatch extends Match {
   private String name;
   private String desc;
 
@@ -16,35 +17,23 @@ public class InvokeDynamicMatch implements Match {
 
   private Predicate<Object[]> bsmArgsPredicate;
 
-  private Transformation transformation;
-
   private InvokeDynamicMatch() {}
 
   public static InvokeDynamicMatch create() {
     return new InvokeDynamicMatch();
   }
 
-  public Match defineTransformation(Transformation transformation) {
-    this.transformation = transformation;
-    return this;
-  }
-
   @Override
-  public Transformation transformation() {
-    return this.transformation;
-  }
-
-  @Override
-  public boolean test(AbstractInsnNode node) {
-    return node instanceof InvokeDynamicInsnNode
-        && (name == null || ((InvokeDynamicInsnNode) node).name.equals(name))
-        && (desc == null || ((InvokeDynamicInsnNode) node).desc.equals(desc))
-        && (bsmOwner == null || ((InvokeDynamicInsnNode) node).bsm.getOwner().equals(bsmOwner))
-        && (bsmName == null || ((InvokeDynamicInsnNode) node).bsm.getName().equals(bsmName))
-        && (bsmDesc == null || ((InvokeDynamicInsnNode) node).bsm.getDesc().equals(bsmDesc))
-        && (bsmTag == -1 || ((InvokeDynamicInsnNode) node).bsm.getTag() == bsmTag)
+  protected boolean test(MatchContext context) {
+    return context.insn() instanceof InvokeDynamicInsnNode invokeDynamicInsn
+        && (name == null || invokeDynamicInsn.name.equals(name))
+        && (desc == null || invokeDynamicInsn.desc.equals(desc))
+        && (bsmOwner == null || invokeDynamicInsn.bsm.getOwner().equals(bsmOwner))
+        && (bsmName == null || invokeDynamicInsn.bsm.getName().equals(bsmName))
+        && (bsmDesc == null || invokeDynamicInsn.bsm.getDesc().equals(bsmDesc))
+        && (bsmTag == -1 || invokeDynamicInsn.bsm.getTag() == bsmTag)
         && (bsmArgsPredicate == null
-            || bsmArgsPredicate.test(((InvokeDynamicInsnNode) node).bsmArgs));
+            || bsmArgsPredicate.test(invokeDynamicInsn.bsmArgs));
   }
 
   public InvokeDynamicMatch name(String name) {
@@ -82,7 +71,7 @@ public class InvokeDynamicMatch implements Match {
     return this;
   }
 
-  public static class Pred implements Match {
+  public static class Pred extends Match {
     private Predicate<String> name;
     private Predicate<String> desc;
 
@@ -100,16 +89,15 @@ public class InvokeDynamicMatch implements Match {
     }
 
     @Override
-    public boolean test(AbstractInsnNode node) {
-      return node instanceof InvokeDynamicInsnNode
-          && (name == null || name.test(((InvokeDynamicInsnNode) node).name))
-          && (desc == null || desc.test(((InvokeDynamicInsnNode) node).desc))
-          && (bsmOwner == null || bsmOwner.test(((InvokeDynamicInsnNode) node).bsm.getOwner()))
-          && (bsmName == null || bsmName.test(((InvokeDynamicInsnNode) node).bsm.getName()))
-          && (bsmDesc == null || bsmDesc.test(((InvokeDynamicInsnNode) node).bsm.getDesc()))
-          && (bsmTag == null || bsmTag.test(((InvokeDynamicInsnNode) node).bsm.getTag()))
-          && (bsmArgsPredicate == null
-              || bsmArgsPredicate.test(((InvokeDynamicInsnNode) node).bsmArgs));
+    protected boolean test(MatchContext context) {
+      return context.insn() instanceof InvokeDynamicInsnNode invokeDynamicInsn
+          && (name == null || name.test(invokeDynamicInsn.name))
+          && (desc == null || desc.test(invokeDynamicInsn.desc))
+          && (bsmOwner == null || bsmOwner.test(invokeDynamicInsn.bsm.getOwner()))
+          && (bsmName == null || bsmName.test(invokeDynamicInsn.bsm.getName()))
+          && (bsmDesc == null || bsmDesc.test(invokeDynamicInsn.bsm.getDesc()))
+          && (bsmTag == null || bsmTag.test(invokeDynamicInsn.bsm.getTag()))
+          && (bsmArgsPredicate == null || bsmArgsPredicate.test(invokeDynamicInsn.bsmArgs));
     }
 
     public Pred name(Predicate<String> name) {

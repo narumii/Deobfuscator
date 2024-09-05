@@ -1,9 +1,9 @@
 package uwu.narumi.deobfuscator.api.asm.matcher.rule.impl;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
 
-public class RangeOpcodeMatch implements Match {
+public class RangeOpcodeMatch extends Match {
   private final int start;
   private final int end;
 
@@ -17,7 +17,7 @@ public class RangeOpcodeMatch implements Match {
   }
 
   @Override
-  public boolean test(AbstractInsnNode node) {
-    return node != null && node.getOpcode() >= start && node.getOpcode() <= end;
+  protected boolean test(MatchContext context) {
+    return context.insn().getOpcode() >= start && context.insn().getOpcode() <= end;
   }
 }

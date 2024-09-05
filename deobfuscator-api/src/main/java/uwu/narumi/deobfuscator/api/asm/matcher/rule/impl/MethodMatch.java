@@ -3,18 +3,16 @@ package uwu.narumi.deobfuscator.api.asm.matcher.rule.impl;
 import java.util.Arrays;
 
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
 
-public class MethodMatch implements Match {
+public class MethodMatch extends Match {
 
   private final int opcode;
   private String owner;
   private String[] name;
   private String desc;
-
-  private Transformation transformation;
 
   private MethodMatch(int opcode) {
     this.opcode = opcode;
@@ -44,23 +42,13 @@ public class MethodMatch implements Match {
     return new MethodMatch(Opcodes.INVOKEINTERFACE);
   }
 
-  public Match defineTransformation(Transformation transformation) {
-    this.transformation = transformation;
-    return this;
-  }
-
   @Override
-  public Transformation transformation() {
-    return this.transformation;
-  }
-
-  @Override
-  public boolean test(AbstractInsnNode node) {
-    return node instanceof MethodInsnNode
-        && (opcode == -1 || node.getOpcode() == opcode)
-        && (owner == null || ((MethodInsnNode) node).owner.equals(owner))
-        && (name == null || Arrays.binarySearch(name, ((MethodInsnNode) node).name) >= 0)
-        && (desc == null || ((MethodInsnNode) node).desc.equals(desc));
+  protected boolean test(MatchContext context) {
+    return context.insn() instanceof MethodInsnNode methodInsn
+        && (opcode == -1 || methodInsn.getOpcode() == opcode)
+        && (owner == null || methodInsn.owner.equals(owner))
+        && (name == null || Arrays.binarySearch(name, methodInsn.name) >= 0)
+        && (desc == null || methodInsn.desc.equals(desc));
   }
 
   public MethodMatch owner(String owner) {

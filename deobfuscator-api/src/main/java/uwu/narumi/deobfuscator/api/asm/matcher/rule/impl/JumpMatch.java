@@ -1,11 +1,11 @@
 package uwu.narumi.deobfuscator.api.asm.matcher.rule.impl;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
 
-public class JumpMatch implements Match {
+public class JumpMatch extends Match {
 
   private final int opcode;
   private final LabelNode labelNode;
@@ -32,9 +32,9 @@ public class JumpMatch implements Match {
   }
 
   @Override
-  public boolean test(AbstractInsnNode node) {
-    return node instanceof JumpInsnNode
-        && (opcode == -1 || node.getOpcode() == opcode)
-        && (labelNode == null || ((JumpInsnNode) node).label.equals(labelNode));
+  protected boolean test(MatchContext context) {
+    return context.insn() instanceof JumpInsnNode jumpInsn
+        && (opcode == -1 || jumpInsn.getOpcode() == opcode)
+        && (labelNode == null || jumpInsn.label.equals(labelNode));
   }
 }

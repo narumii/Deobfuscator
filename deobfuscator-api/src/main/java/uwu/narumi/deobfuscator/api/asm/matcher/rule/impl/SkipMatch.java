@@ -1,9 +1,9 @@
 package uwu.narumi.deobfuscator.api.asm.matcher.rule.impl;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
 
-public class SkipMatch implements Match {
+public class SkipMatch extends Match {
 
   private SkipMatch() {}
 
@@ -12,7 +12,7 @@ public class SkipMatch implements Match {
   }
 
   @Override
-  public boolean test(AbstractInsnNode node) {
+  protected boolean test(MatchContext context) {
     return true;
   }
 }

@@ -1,18 +1,16 @@
 package uwu.narumi.deobfuscator.api.asm.matcher.rule.impl;
 
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
 
-public class FieldMatch implements Match {
+public class FieldMatch extends Match {
 
   private final int opcode;
   private String owner;
   private String name;
   private String desc;
-
-  private Transformation transformation;
 
   private FieldMatch(int opcode) {
     this.opcode = opcode;
@@ -42,23 +40,13 @@ public class FieldMatch implements Match {
     return new FieldMatch(Opcodes.GETFIELD);
   }
 
-  public Match transformation(Transformation transformation) {
-    this.transformation = transformation;
-    return this;
-  }
-
   @Override
-  public Transformation transformation() {
-    return this.transformation;
-  }
-
-  @Override
-  public boolean test(AbstractInsnNode node) {
-    return node instanceof FieldInsnNode
-        && (opcode == -1 || node.getOpcode() == opcode)
-        && (owner == null || ((FieldInsnNode) node).owner.equals(owner))
-        && (name == null || ((FieldInsnNode) node).name.equals(name))
-        && (desc == null || ((FieldInsnNode) node).desc.equals(desc));
+  protected boolean test(MatchContext context) {
+    return context.insn() instanceof FieldInsnNode fieldInsn
+        && (opcode == -1 || fieldInsn.getOpcode() == opcode)
+        && (owner == null || fieldInsn.owner.equals(owner))
+        && (name == null || fieldInsn.name.equals(name))
+        && (desc == null || fieldInsn.desc.equals(desc));
   }
 
   public FieldMatch owner(String owner) {

@@ -2,13 +2,11 @@ package uwu.narumi.deobfuscator.core.other.impl.clean.peephole;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.asm.InstructionContext;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 
-import java.util.Map;
 import java.util.stream.Stream;
 
 // TODO: Remove pair of DUP and POP
@@ -22,28 +20,30 @@ public class UselessPopCleanTransformer extends FramedInstructionsTransformer {
   }
 
   @Override
-  protected boolean transformInstruction(Context context, ClassWrapper classWrapper, MethodNode methodNode, Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
+  protected boolean transformInstruction(Context context, InstructionContext insnContext) {
+    AbstractInsnNode insn = insnContext.insn();
+
     boolean shouldRemovePop = false;
 
-    OriginalSourceValue firstValue = frame.getStack(frame.getStackSize() - 1);
+    OriginalSourceValue firstValue = insnContext.frame().getStack(insnContext.frame().getStackSize() - 1);
     if (insn.getOpcode() == POP && areProducersConstant(firstValue)) {
       // Pop the value from the stack
-      popSourceValue(firstValue, methodNode);
+      popSourceValue(firstValue, insnContext.methodNode());
       shouldRemovePop = true;
     } else if (insn.getOpcode() == POP2) {
       if (areTwoSizedValues(firstValue)) {
         // Pop 2-sized value from the stack
-        popSourceValue(firstValue, methodNode);
+        popSourceValue(firstValue, insnContext.methodNode());
         shouldRemovePop = true;
       } else {
-        int index = frame.getStackSize() - 2;
-        OriginalSourceValue secondValue = index >= 0 ? frame.getStack(frame.getStackSize() - 2) : null;
+        int index = insnContext.frame().getStackSize() - 2;
+        OriginalSourceValue secondValue = index >= 0 ? insnContext.frame().getStack(insnContext.frame().getStackSize() - 2) : null;
 
         // Pop two values from the stack
         if (areProducersConstant(firstValue) && (secondValue == null || areProducersConstant(secondValue))) {
-          popSourceValue(firstValue, methodNode);
+          popSourceValue(firstValue, insnContext.methodNode());
           if (secondValue != null) {
-            popSourceValue(secondValue, methodNode);
+            popSourceValue(secondValue, insnContext.methodNode());
           }
 
           shouldRemovePop = true;
@@ -52,7 +52,7 @@ public class UselessPopCleanTransformer extends FramedInstructionsTransformer {
     }
 
     if (shouldRemovePop) {
-      methodNode.instructions.remove(insn);
+      insnContext.methodNode().instructions.remove(insn);
     }
 
     return shouldRemovePop;

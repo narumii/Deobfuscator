@@ -1,11 +1,9 @@
 package uwu.narumi.deobfuscator.api.asm.matcher.rule.impl;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
 
-public class FloatMatch implements Match {
-
-  private static final Match EMPTY = AbstractInsnNode::isFloat;
+public class FloatMatch extends Match {
 
   private final float number;
 
@@ -18,11 +16,11 @@ public class FloatMatch implements Match {
   }
 
   public static Match of() {
-    return EMPTY;
+    return Match.predicate(context -> context.insn().isFloat());
   }
 
   @Override
-  public boolean test(AbstractInsnNode node) {
-    return node.isFloat() && node.asFloat() == number;
+  protected boolean test(MatchContext context) {
+    return context.insn().isFloat() && context.insn().asFloat() == number;
   }
 }

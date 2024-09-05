@@ -1,16 +1,13 @@
 package uwu.narumi.deobfuscator.core.other.impl.universal.number;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.asm.InstructionContext;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
 import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 
-import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -24,19 +21,19 @@ public class MathUnaryOperationsTransformer extends FramedInstructionsTransforme
   }
 
   @Override
-  protected boolean transformInstruction(Context context, ClassWrapper classWrapper, MethodNode methodNode, Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
+  protected boolean transformInstruction(Context context, InstructionContext insnContext) {
     // Get instructions from stack that are passed
-    OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - 1);
+    OriginalSourceValue sourceValue = insnContext.frame().getStack(insnContext.frame().getStackSize() - 1);
     OriginalSourceValue originalSource = sourceValue.originalSource;
     if (!originalSource.isOneWayProduced()) return false;
 
     AbstractInsnNode valueInsn = originalSource.getProducer();
 
     if (valueInsn.isNumber()) {
-      Number castedNumber = AsmMathHelper.mathUnaryOperation(valueInsn.asNumber(), insn.getOpcode());
+      Number castedNumber = AsmMathHelper.mathUnaryOperation(valueInsn.asNumber(), insnContext.insn().getOpcode());
 
-      methodNode.instructions.set(insn, AsmHelper.getNumber(castedNumber));
-      methodNode.instructions.remove(sourceValue.getProducer());
+      insnContext.methodNode().instructions.set(insnContext.insn(), AsmHelper.getNumber(castedNumber));
+      insnContext.methodNode().instructions.remove(sourceValue.getProducer());
 
       return true;
     }

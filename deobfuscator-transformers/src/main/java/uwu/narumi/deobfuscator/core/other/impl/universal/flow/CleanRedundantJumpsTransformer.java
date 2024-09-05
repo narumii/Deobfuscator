@@ -1,38 +1,34 @@
 package uwu.narumi.deobfuscator.core.other.impl.universal.flow;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.analysis.Frame;
-import org.objectweb.asm.tree.analysis.OriginalSourceValue;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.asm.InstructionContext;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
 import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 
-import java.util.Map;
 import java.util.Optional;
 
 public class CleanRedundantJumpsTransformer extends FramedInstructionsTransformer {
   @Override
-  protected boolean transformInstruction(Context context, ClassWrapper classWrapper, MethodNode methodNode, Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
-    if (!(insn instanceof JumpInsnNode jumpInsn)) return false;
+  protected boolean transformInstruction(Context context, InstructionContext insnContext) {
+    if (!(insnContext.insn() instanceof JumpInsnNode jumpInsn)) return false;
 
-    Optional<Boolean> optIfResult = AsmMathHelper.predictIf(jumpInsn, frame);
+    Optional<Boolean> optIfResult = AsmMathHelper.predictIf(jumpInsn, insnContext.frame());
 
     if (optIfResult.isEmpty()) return false;
 
     boolean ifResult = optIfResult.get();
 
-    if (AsmMathHelper.isOneValueCondition(insn.getOpcode())) {
-      AsmHelper.removeValuesFromStack(methodNode, frame, 1);
-    } else if (AsmMathHelper.isTwoValuesCondition(insn.getOpcode())) {
-      AsmHelper.removeValuesFromStack(methodNode, frame, 2);
+    if (AsmMathHelper.isOneValueCondition(jumpInsn.getOpcode())) {
+      AsmHelper.removeValuesFromStack(insnContext.methodNode(), insnContext.frame(), 1);
+    } else if (AsmMathHelper.isTwoValuesCondition(jumpInsn.getOpcode())) {
+      AsmHelper.removeValuesFromStack(insnContext.methodNode(), insnContext.frame(), 2);
     }
 
     // Replace if with corresponding GOTO or remove it
-    processRedundantIfStatement(methodNode, jumpInsn, ifResult);
+    processRedundantIfStatement(insnContext.methodNode(), jumpInsn, ifResult);
 
     return true;
   }

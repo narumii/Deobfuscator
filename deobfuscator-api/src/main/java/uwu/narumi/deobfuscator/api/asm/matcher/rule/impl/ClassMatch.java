@@ -1,10 +1,12 @@
 package uwu.narumi.deobfuscator.api.asm.matcher.rule.impl;
 
-import java.util.function.Predicate;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
 
-public class ClassMatch implements Match {
+import java.util.function.Predicate;
+
+public class ClassMatch extends Match {
 
   private final Class<? extends AbstractInsnNode> clazz;
 
@@ -17,11 +19,11 @@ public class ClassMatch implements Match {
   }
 
   @Override
-  public boolean test(AbstractInsnNode node) {
-    return node != null && node.getClass().equals(clazz);
+  protected boolean test(MatchContext context) {
+    return context.insn() != null && context.insn().getClass().equals(clazz);
   }
 
-  public static class Pred implements Match {
+  public static class Pred extends Match {
     private final Predicate<Class<? extends AbstractInsnNode>> clazz;
 
     private Pred(Predicate<Class<? extends AbstractInsnNode>> clazz) {
@@ -33,8 +35,8 @@ public class ClassMatch implements Match {
     }
 
     @Override
-    public boolean test(AbstractInsnNode node) {
-      return node != null && clazz.test(node.getClass());
+    protected boolean test(MatchContext context) {
+      return context.insn() != null && clazz.test(context.insn().getClass());
     }
   }
 }

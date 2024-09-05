@@ -1,9 +1,9 @@
 package uwu.narumi.deobfuscator.api.asm.matcher.rule.impl;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
 
-public class OpcodeMatch implements Match {
+public class OpcodeMatch extends Match {
   private final int opcode;
 
   private OpcodeMatch(int opcode) {
@@ -15,7 +15,7 @@ public class OpcodeMatch implements Match {
   }
 
   @Override
-  public boolean test(AbstractInsnNode node) {
-    return node != null && node.getOpcode() == opcode;
+  protected boolean test(MatchContext context) {
+    return context.insn().getOpcode() == opcode;
   }
 }

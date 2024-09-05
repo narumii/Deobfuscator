@@ -2,6 +2,8 @@ package uwu.narumi.deobfuscator.api.helper;
 
 import java.util.*;
 import java.util.function.Predicate;
+
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -147,6 +149,7 @@ public class AsmHelper implements Opcodes {
    * @param methodNode Method
    * @return A map which corresponds to: instruction -> its own stack frame
    */
+  @NotNull
   public static Map<AbstractInsnNode, Frame<OriginalSourceValue>> analyzeSource(
       ClassNode classNode, MethodNode methodNode
   ) {
@@ -155,13 +158,12 @@ public class AsmHelper implements Opcodes {
     try {
       framesArray = new JumpPredictingAnalyzer(new OriginalSourceInterpreter()).analyze(classNode.name, methodNode);
     } catch (AnalyzerException e) {
-      // Return null on invalid method
-      return null;
+      throw new RuntimeException(e);
     }
     for (int i = 0; i < framesArray.length; i++) {
       frames.put(methodNode.instructions.get(i), framesArray[i]);
     }
-    return frames;
+    return Collections.unmodifiableMap(frames);
   }
 
   /**

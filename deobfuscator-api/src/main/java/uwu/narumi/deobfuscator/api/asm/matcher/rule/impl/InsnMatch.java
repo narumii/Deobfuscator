@@ -2,8 +2,9 @@ package uwu.narumi.deobfuscator.api.asm.matcher.rule.impl;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
 
-public class InsnMatch implements Match {
+public class InsnMatch extends Match {
 
   private final AbstractInsnNode node;
 
@@ -16,7 +17,7 @@ public class InsnMatch implements Match {
   }
 
   @Override
-  public boolean test(AbstractInsnNode node) {
-    return this.node.equals(node);
+  protected boolean test(MatchContext context) {
+    return this.node.equals(context.insn());
   }
 }

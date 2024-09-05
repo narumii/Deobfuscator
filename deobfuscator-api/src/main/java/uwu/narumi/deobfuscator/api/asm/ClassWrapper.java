@@ -122,6 +122,10 @@ public class ClassWrapper implements Cloneable {
     return classNode.name;
   }
 
+  public String canonicalName() {
+    return classNode.name.replace('/', '.');
+  }
+
   /**
    * Compiles class to bytes.
    */
@@ -131,8 +135,7 @@ public class ClassWrapper implements Cloneable {
       this.classNode.accept(classWriter);
 
       return classWriter.toByteArray();
-    } catch (Exception e) {
-      LOGGER.error("Error occurred while compiling class to bytes: {}", this.classNode.name);
+    } catch (Throwable e) {
       throw new RuntimeException(e);
     }
   }

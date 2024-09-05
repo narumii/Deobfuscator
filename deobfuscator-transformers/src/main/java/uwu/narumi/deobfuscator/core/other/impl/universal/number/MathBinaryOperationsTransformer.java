@@ -1,16 +1,13 @@
 package uwu.narumi.deobfuscator.core.other.impl.universal.number;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.asm.InstructionContext;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
 import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 
-import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -25,10 +22,10 @@ public class MathBinaryOperationsTransformer extends FramedInstructionsTransform
   }
 
   @Override
-  protected boolean transformInstruction(Context context, ClassWrapper classWrapper, MethodNode methodNode, Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
+  protected boolean transformInstruction(Context context, InstructionContext insnContext) {
     // Get instructions from stack that are passed
-    OriginalSourceValue value1SourceValue = frame.getStack(frame.getStackSize() - 2);
-    OriginalSourceValue value2SourceValue = frame.getStack(frame.getStackSize() - 1);
+    OriginalSourceValue value1SourceValue = insnContext.frame().getStack(insnContext.frame().getStackSize() - 2);
+    OriginalSourceValue value2SourceValue = insnContext.frame().getStack(insnContext.frame().getStackSize() - 1);
     if (!value1SourceValue.originalSource.isOneWayProduced() || !value2SourceValue.originalSource.isOneWayProduced()) return false;
 
     AbstractInsnNode value1Insn = value1SourceValue.originalSource.getProducer();
@@ -40,15 +37,15 @@ public class MathBinaryOperationsTransformer extends FramedInstructionsTransform
 
       Number result;
       try {
-        result = AsmMathHelper.mathBinaryOperation(value1, value2, insn.getOpcode());
+        result = AsmMathHelper.mathBinaryOperation(value1, value2, insnContext.insn().getOpcode());
       } catch (ArithmeticException e) {
         // Skip division by zero
         return false;
       }
 
-      methodNode.instructions.set(insn, AsmHelper.getNumber(result));
-      methodNode.instructions.remove(value1SourceValue.getProducer());
-      methodNode.instructions.remove(value2SourceValue.getProducer());
+      insnContext.methodNode().instructions.set(insnContext.insn(), AsmHelper.getNumber(result));
+      insnContext.methodNode().instructions.remove(value1SourceValue.getProducer());
+      insnContext.methodNode().instructions.remove(value2SourceValue.getProducer());
 
       return true;
     }

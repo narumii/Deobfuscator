@@ -29,7 +29,6 @@ public class InlineStaticFieldTransformer extends Transformer {
     // Find all static constant fields
     context.classes(scope).forEach(classWrapper -> findClInit(classWrapper.getClassNode()).ifPresent(clInit -> {
       var frames = AsmHelper.analyzeSource(classWrapper.getClassNode(), clInit);
-      if (frames == null) return;
 
       Arrays.stream(clInit.instructions.toArray())
           .filter(insn -> insn.getOpcode() == PUTSTATIC)

@@ -1,11 +1,10 @@
 package uwu.narumi.deobfuscator.api.asm.matcher.rule.impl;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
 
-public class IntegerMatch implements Match {
+public class IntegerMatch extends Match {
 
-  private static final Match EMPTY = AbstractInsnNode::isInteger;
   private final int number;
 
   public IntegerMatch(int number) {
@@ -17,11 +16,11 @@ public class IntegerMatch implements Match {
   }
 
   public static Match of() {
-    return EMPTY;
+    return Match.predicate(context -> context.insn().isInteger());
   }
 
   @Override
-  public boolean test(AbstractInsnNode node) {
-    return node.isInteger() && node.asInteger() == number;
+  protected boolean test(MatchContext context) {
+    return context.insn().isInteger() && context.insn().asInteger() == number;
   }
 }

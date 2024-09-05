@@ -1,11 +1,9 @@
 package uwu.narumi.deobfuscator.api.asm.matcher.rule.impl;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
 
-public class LongMatch implements Match {
-
-  private static final Match EMPTY = AbstractInsnNode::isLong;
+public class LongMatch extends Match {
 
   private final long number;
 
@@ -18,11 +16,11 @@ public class LongMatch implements Match {
   }
 
   public static Match of() {
-    return EMPTY;
+    return Match.predicate(context -> context.insn().isLong());
   }
 
   @Override
-  public boolean test(AbstractInsnNode node) {
-    return node.isLong() && node.asLong() == number;
+  protected boolean test(MatchContext context) {
+    return context.insn().isLong() && context.insn().asLong() == number;
   }
 }

@@ -121,245 +121,235 @@ public final class AsmMathHelper {
           .owner("java/lang/String")
           .name("length")
           .desc("()I")
-          .defineTransformation(
-              (methodNode, node, frame) -> {
-                // Get value from stack
-                OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - 1);
-                OriginalSourceValue originalSourceValue = sourceValue.originalSource;
-                if (!originalSourceValue.isOneWayProduced()) return false;
+          .defineTransformation(context -> {
+            // Get value from stack
+            OriginalSourceValue sourceValue = context.frame().getStack(context.frame().getStackSize() - 1);
+            OriginalSourceValue originalSourceValue = sourceValue.originalSource;
+            if (!originalSourceValue.isOneWayProduced()) return false;
 
-                AbstractInsnNode originalInsn = originalSourceValue.getProducer();
-                if (!originalInsn.isString()) return false;
+            AbstractInsnNode originalInsn = originalSourceValue.getProducer();
+            if (!originalInsn.isString()) return false;
 
-                methodNode.instructions.set(
-                    node,
-                    AsmHelper.getNumber(originalInsn.asString().length())
-                );
-                methodNode.instructions.remove(sourceValue.getProducer());
-                return true;
-              });
+            context.methodNode().instructions.set(
+                context.insn(),
+                AsmHelper.getNumber(originalInsn.asString().length())
+            );
+            context.methodNode().instructions.remove(sourceValue.getProducer());
+            return true;
+          });
 
   public static final Match STRING_HASHCODE =
       MethodMatch.invokeVirtual()
           .owner("java/lang/String")
           .name("hashCode")
           .desc("()I")
-          .defineTransformation(
-              (methodNode, node, frame) -> {
-                // Get value from stack
-                OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - 1);
-                OriginalSourceValue originalSourceValue = sourceValue.originalSource;
-                if (!originalSourceValue.isOneWayProduced()) return false;
+          .defineTransformation(context -> {
+            // Get value from stack
+            OriginalSourceValue sourceValue = context.frame().getStack(context.frame().getStackSize() - 1);
+            OriginalSourceValue originalSourceValue = sourceValue.originalSource;
+            if (!originalSourceValue.isOneWayProduced()) return false;
 
-                AbstractInsnNode originalInsn = originalSourceValue.getProducer();
-                if (!originalInsn.isString()) return false;
+            AbstractInsnNode originalInsn = originalSourceValue.getProducer();
+            if (!originalInsn.isString()) return false;
 
-                methodNode.instructions.set(
-                    node,
-                    AsmHelper.getNumber(originalInsn.asString().hashCode())
-                );
-                methodNode.instructions.remove(sourceValue.getProducer());
-                return true;
-              });
+            context.methodNode().instructions.set(
+                context.insn(),
+                AsmHelper.getNumber(originalInsn.asString().hashCode())
+            );
+            context.methodNode().instructions.remove(sourceValue.getProducer());
+            return true;
+          });
 
   public static final Match STRING_TO_INTEGER =
       MethodMatch.invokeStatic()
           .owner("java/lang/Integer")
           .name("parseInt", "valueOf")
           .desc("(Ljava/lang/String;)I")
-          .defineTransformation(
-              (methodNode, node, frame) -> {
-                // Get value from stack
-                OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - 1);
-                OriginalSourceValue originalSourceValue = sourceValue.originalSource;
-                if (!originalSourceValue.isOneWayProduced()) return false;
+          .defineTransformation(context -> {
+            // Get value from stack
+            OriginalSourceValue sourceValue = context.frame().getStack(context.frame().getStackSize() - 1);
+            OriginalSourceValue originalSourceValue = sourceValue.originalSource;
+            if (!originalSourceValue.isOneWayProduced()) return false;
 
-                AbstractInsnNode originalInsn = originalSourceValue.getProducer();
-                // Integer#parseInt(String)
-                if (!originalInsn.isString()) return false;
+            AbstractInsnNode originalInsn = originalSourceValue.getProducer();
+            // Integer#parseInt(String)
+            if (!originalInsn.isString()) return false;
 
-                methodNode.instructions.set(
-                    node,
-                    AsmHelper.getNumber(Integer.parseInt(originalInsn.asString()))
-                );
-                methodNode.instructions.remove(sourceValue.getProducer());
-                return true;
-              });
+            context.methodNode().instructions.set(
+                context.insn(),
+                AsmHelper.getNumber(Integer.parseInt(originalInsn.asString()))
+            );
+            context.methodNode().instructions.remove(sourceValue.getProducer());
+            return true;
+          });
 
   public static final Match STRING_TO_INTEGER_RADIX =
       MethodMatch.invokeStatic()
           .owner("java/lang/Integer")
           .name("parseInt", "valueOf")
           .desc("(Ljava/lang/String;I)I")
-          .defineTransformation(
-              (methodNode, node, frame) -> {
-                // Get values from stack
-                OriginalSourceValue firstValue = frame.getStack(frame.getStackSize() - 2);
-                OriginalSourceValue originalFirstValue = firstValue.originalSource;
-                OriginalSourceValue secondValue = frame.getStack(frame.getStackSize() - 1);
-                OriginalSourceValue originalSecondValue = secondValue.originalSource;
-                if (!originalFirstValue.isOneWayProduced() || !originalSecondValue.isOneWayProduced()) return false;
+          .defineTransformation(context -> {
+            // Get values from stack
+            OriginalSourceValue firstValue = context.frame().getStack(context.frame().getStackSize() - 2);
+            OriginalSourceValue originalFirstValue = firstValue.originalSource;
+            OriginalSourceValue secondValue = context.frame().getStack(context.frame().getStackSize() - 1);
+            OriginalSourceValue originalSecondValue = secondValue.originalSource;
+            if (!originalFirstValue.isOneWayProduced() || !originalSecondValue.isOneWayProduced()) return false;
 
-                AbstractInsnNode originalFirstInsn = originalFirstValue.getProducer();
-                AbstractInsnNode originalSecondInsn = originalSecondValue.getProducer();
+            AbstractInsnNode originalFirstInsn = originalFirstValue.getProducer();
+            AbstractInsnNode originalSecondInsn = originalSecondValue.getProducer();
 
-                // Integer#parseInt(String, int)
-                if (!originalFirstInsn.isString() || !originalSecondInsn.isInteger()) return false;
+            // Integer#parseInt(String, int)
+            if (!originalFirstInsn.isString() || !originalSecondInsn.isInteger()) return false;
 
-                methodNode.instructions.set(
-                    node,
-                    AsmHelper.getNumber(
-                        Integer.parseInt(originalFirstInsn.asString(), originalSecondInsn.asInteger())
-                    )
-                );
-                methodNode.instructions.remove(firstValue.getProducer());
-                methodNode.instructions.remove(secondValue.getProducer());
-                return true;
-              });
+            context.methodNode().instructions.set(
+                context.insn(),
+                AsmHelper.getNumber(
+                    Integer.parseInt(originalFirstInsn.asString(), originalSecondInsn.asInteger())
+                )
+            );
+            context.methodNode().instructions.remove(firstValue.getProducer());
+            context.methodNode().instructions.remove(secondValue.getProducer());
+            return true;
+          });
 
   public static final Match INTEGER_REVERSE =
       MethodMatch.invokeStatic()
           .owner("java/lang/Integer")
           .name("reverse")
           .desc("(I)I")
-          .defineTransformation(
-              (methodNode, node, frame) -> {
-                // Get value from stack
-                OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - 1);
-                OriginalSourceValue originalSourceValue = sourceValue.originalSource;
-                if (!originalSourceValue.isOneWayProduced()) return false;
+          .defineTransformation(context -> {
+            // Get value from stack
+            OriginalSourceValue sourceValue = context.frame().getStack(context.frame().getStackSize() - 1);
+            OriginalSourceValue originalSourceValue = sourceValue.originalSource;
+            if (!originalSourceValue.isOneWayProduced()) return false;
 
-                AbstractInsnNode originalInsn = originalSourceValue.getProducer();
-                // Integer#reverse(int)
-                if (!originalInsn.isInteger()) return false;
+            AbstractInsnNode originalInsn = originalSourceValue.getProducer();
+            // Integer#reverse(int)
+            if (!originalInsn.isInteger()) return false;
 
-                methodNode.instructions.set(
-                    node,
-                    AsmHelper.getNumber(Integer.reverse(originalInsn.asInteger()))
-                );
-                methodNode.instructions.remove(sourceValue.getProducer());
-                return true;
-              });
+            context.methodNode().instructions.set(
+                context.insn(),
+                AsmHelper.getNumber(Integer.reverse(originalInsn.asInteger()))
+            );
+            context.methodNode().instructions.remove(sourceValue.getProducer());
+            return true;
+          });
 
   public static final Match LONG_REVERSE =
       MethodMatch.invokeStatic()
           .owner("java/lang/Long")
           .name("reverse")
           .desc("(J)J")
-          .defineTransformation(
-              (methodNode, node, frame) -> {
-                // Get value from stack
-                OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - 1);
-                OriginalSourceValue originalSourceValue = sourceValue.originalSource;
-                if (!originalSourceValue.isOneWayProduced()) return false;
+          .defineTransformation(context -> {
+            // Get value from stack
+            OriginalSourceValue sourceValue = context.frame().getStack(context.frame().getStackSize() - 1);
+            OriginalSourceValue originalSourceValue = sourceValue.originalSource;
+            if (!originalSourceValue.isOneWayProduced()) return false;
 
-                AbstractInsnNode originalInsn = originalSourceValue.getProducer();
-                // Long#reverse(long)
-                if (!originalInsn.isLong()) return false;
+            AbstractInsnNode originalInsn = originalSourceValue.getProducer();
+            // Long#reverse(long)
+            if (!originalInsn.isLong()) return false;
 
-                methodNode.instructions.set(
-                    node,
-                    AsmHelper.getNumber(Long.reverse(originalInsn.asLong()))
-                );
-                methodNode.instructions.remove(sourceValue.getProducer());
-                return true;
-              });
+            context.methodNode().instructions.set(
+                context.insn(),
+                AsmHelper.getNumber(Long.reverse(originalInsn.asLong()))
+            );
+            context.methodNode().instructions.remove(sourceValue.getProducer());
+            return true;
+          });
 
   public static final Match FLOAT_TO_BITS =
       MethodMatch.invokeStatic()
           .owner("java/lang/Float")
           .name("floatToIntBits")
           .desc("(F)I")
-          .defineTransformation(
-              (methodNode, node, frame) -> {
-                // Get value from stack
-                OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - 1);
-                OriginalSourceValue originalSourceValue = sourceValue.originalSource;
-                if (!originalSourceValue.isOneWayProduced()) return false;
+          .defineTransformation(context -> {
+            // Get value from stack
+            OriginalSourceValue sourceValue = context.frame().getStack(context.frame().getStackSize() - 1);
+            OriginalSourceValue originalSourceValue = sourceValue.originalSource;
+            if (!originalSourceValue.isOneWayProduced()) return false;
 
-                AbstractInsnNode originalInsn = originalSourceValue.getProducer();
-                // Float#floatToIntBits(float)
-                if (!originalInsn.isFloat()) return false;
+            AbstractInsnNode originalInsn = originalSourceValue.getProducer();
+            // Float#floatToIntBits(float)
+            if (!originalInsn.isFloat()) return false;
 
-                methodNode.instructions.set(
-                    node,
-                    AsmHelper.getNumber(Float.floatToIntBits(originalInsn.asFloat()))
-                );
-                methodNode.instructions.remove(sourceValue.getProducer());
-                return true;
-              });
+            context.methodNode().instructions.set(
+                context.insn(),
+                AsmHelper.getNumber(Float.floatToIntBits(originalInsn.asFloat()))
+            );
+            context.methodNode().instructions.remove(sourceValue.getProducer());
+            return true;
+          });
 
   public static final Match BITS_TO_FLOAT =
       MethodMatch.invokeStatic()
           .owner("java/lang/Float")
           .name("intBitsToFloat")
           .desc("(I)F")
-          .defineTransformation(
-              (methodNode, node, frame) -> {
-                // Get value from stack
-                OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - 1);
-                OriginalSourceValue originalSourceValue = sourceValue.originalSource;
-                if (!originalSourceValue.isOneWayProduced()) return false;
+          .defineTransformation(context -> {
+            // Get value from stack
+            OriginalSourceValue sourceValue = context.frame().getStack(context.frame().getStackSize() - 1);
+            OriginalSourceValue originalSourceValue = sourceValue.originalSource;
+            if (!originalSourceValue.isOneWayProduced()) return false;
 
-                AbstractInsnNode originalInsn = originalSourceValue.getProducer();
-                // Float#intBitsToFloat(int)
-                if (!originalInsn.isInteger()) return false;
+            AbstractInsnNode originalInsn = originalSourceValue.getProducer();
+            // Float#intBitsToFloat(int)
+            if (!originalInsn.isInteger()) return false;
 
-                methodNode.instructions.set(
-                    node,
-                    AsmHelper.getNumber(Float.intBitsToFloat(originalInsn.asInteger()))
-                );
-                methodNode.instructions.remove(sourceValue.getProducer());
-                return true;
-              });
+            context.methodNode().instructions.set(
+                context.insn(),
+                AsmHelper.getNumber(Float.intBitsToFloat(originalInsn.asInteger()))
+            );
+            context.methodNode().instructions.remove(sourceValue.getProducer());
+            return true;
+          });
 
   public static final Match DOUBLE_TO_BITS =
       MethodMatch.invokeStatic()
           .owner("java/lang/Double")
           .name("doubleToLongBits")
           .desc("(D)J")
-          .defineTransformation(
-              (methodNode, node, frame) -> {
-                // Get value from stack
-                OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - 1);
-                OriginalSourceValue originalSourceValue = sourceValue.originalSource;
-                if (!originalSourceValue.isOneWayProduced()) return false;
+          .defineTransformation(context -> {
+            // Get value from stack
+            OriginalSourceValue sourceValue = context.frame().getStack(context.frame().getStackSize() - 1);
+            OriginalSourceValue originalSourceValue = sourceValue.originalSource;
+            if (!originalSourceValue.isOneWayProduced()) return false;
 
-                AbstractInsnNode originalInsn = originalSourceValue.getProducer();
-                // Double#doubleToLongBits(double)
-                if (!originalInsn.isDouble()) return false;
+            AbstractInsnNode originalInsn = originalSourceValue.getProducer();
+            // Double#doubleToLongBits(double)
+            if (!originalInsn.isDouble()) return false;
 
-                methodNode.instructions.set(
-                    node,
-                    AsmHelper.getNumber(Double.doubleToLongBits(originalInsn.asDouble()))
-                );
-                methodNode.instructions.remove(sourceValue.getProducer());
-                return true;
-              });
+            context.methodNode().instructions.set(
+                context.insn(),
+                AsmHelper.getNumber(Double.doubleToLongBits(originalInsn.asDouble()))
+            );
+            context.methodNode().instructions.remove(sourceValue.getProducer());
+            return true;
+          });
 
   public static final Match BITS_TO_DOUBLE =
       MethodMatch.invokeStatic()
           .owner("java/lang/Double")
           .name("longBitsToDouble")
           .desc("(J)D")
-          .defineTransformation(
-              (methodNode, node, frame) -> {
-                // Get value from stack
-                OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - 1);
-                OriginalSourceValue originalSourceValue = sourceValue.originalSource;
-                if (!originalSourceValue.isOneWayProduced()) return false;
+          .defineTransformation(context -> {
+            // Get value from stack
+            OriginalSourceValue sourceValue = context.frame().getStack(context.frame().getStackSize() - 1);
+            OriginalSourceValue originalSourceValue = sourceValue.originalSource;
+            if (!originalSourceValue.isOneWayProduced()) return false;
 
-                AbstractInsnNode originalInsn = originalSourceValue.getProducer();
-                // Double#longBitsToDouble(long)
-                if (!originalInsn.isLong()) return false;
+            AbstractInsnNode originalInsn = originalSourceValue.getProducer();
+            // Double#longBitsToDouble(long)
+            if (!originalInsn.isLong()) return false;
 
-                methodNode.instructions.set(
-                    node,
-                    AsmHelper.getNumber(Double.longBitsToDouble(originalInsn.asLong()))
-                );
-                methodNode.instructions.remove(sourceValue.getProducer());
-                return true;
-              });
+            context.methodNode().instructions.set(
+                context.insn(),
+                AsmHelper.getNumber(Double.longBitsToDouble(originalInsn.asLong()))
+            );
+            context.methodNode().instructions.remove(sourceValue.getProducer());
+            return true;
+          });
 
   public static final List<Match> METHOD_CALLS_ON_LITERALS = List.of(
       STRING_LENGTH,

@@ -38,7 +38,6 @@ import java.util.function.Predicate;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
-import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
 
 /**
  * A node that represents a bytecode instruction. <i>An instruction can appear at most once in at
@@ -491,10 +490,6 @@ public abstract class AbstractInsnNode {
 
   public boolean isInvokeDynamicInsn() {
     return this instanceof InvokeDynamicInsnNode;
-  }
-
-  public boolean matches(Match match) {
-    return match.test(this);
   }
 
   public AbstractInsnNode getPrevious(int offset) {

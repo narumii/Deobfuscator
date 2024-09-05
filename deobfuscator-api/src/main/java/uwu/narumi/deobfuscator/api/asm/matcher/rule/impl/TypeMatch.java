@@ -1,10 +1,10 @@
 package uwu.narumi.deobfuscator.api.asm.matcher.rule.impl;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
 
-public class TypeMatch implements Match {
+public class TypeMatch extends Match {
 
   private final int opcode;
   private final String desc;
@@ -31,9 +31,9 @@ public class TypeMatch implements Match {
   }
 
   @Override
-  public boolean test(AbstractInsnNode node) {
-    return node instanceof TypeInsnNode
-        && (opcode == -1 || node.getOpcode() == opcode)
-        && (desc == null || ((TypeInsnNode) node).desc.equals(desc));
+  protected boolean test(MatchContext context) {
+    return context.insn() instanceof TypeInsnNode typeInsn
+        && (opcode == -1 || typeInsn.getOpcode() == opcode)
+        && (desc == null || typeInsn.desc.equals(desc));
   }
 }

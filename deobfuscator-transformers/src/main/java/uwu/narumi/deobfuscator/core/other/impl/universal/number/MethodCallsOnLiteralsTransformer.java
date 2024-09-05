@@ -1,16 +1,10 @@
 package uwu.narumi.deobfuscator.core.other.impl.universal.number;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.analysis.Frame;
-import org.objectweb.asm.tree.analysis.OriginalSourceValue;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.asm.InstructionContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
 import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
-
-import java.util.Map;
 
 /**
  * Simplifies method calls on constant literals.
@@ -18,11 +12,11 @@ import java.util.Map;
 public class MethodCallsOnLiteralsTransformer extends FramedInstructionsTransformer {
 
   @Override
-  protected boolean transformInstruction(Context context, ClassWrapper classWrapper, MethodNode methodNode, Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
+  protected boolean transformInstruction(Context context, InstructionContext insnContext) {
     // Transform method calls on literals
     for (Match mathMatch : AsmMathHelper.METHOD_CALLS_ON_LITERALS) {
-      if (mathMatch.test(insn)) {
-        boolean success = mathMatch.transformation().transform(methodNode, insn, frame);
+      if (mathMatch.matches(insnContext)) {
+        boolean success = mathMatch.transformation().transform(insnContext);
         if (success) {
           return true;
         }

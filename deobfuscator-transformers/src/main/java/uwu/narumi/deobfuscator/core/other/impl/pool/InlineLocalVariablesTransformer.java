@@ -1,15 +1,12 @@
 package uwu.narumi.deobfuscator.core.other.impl.pool;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
-import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.asm.InstructionContext;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 
-import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -27,11 +24,11 @@ public class InlineLocalVariablesTransformer extends FramedInstructionsTransform
   }
 
   @Override
-  protected boolean transformInstruction(Context context, ClassWrapper classWrapper, MethodNode methodNode, Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames, AbstractInsnNode insn, Frame<OriginalSourceValue> frame) {
-    VarInsnNode varInsn = (VarInsnNode) insn;
+  protected boolean transformInstruction(Context context, InstructionContext insnContext) {
+    VarInsnNode varInsn = (VarInsnNode) insnContext.insn();
 
     // Var store instruction
-    OriginalSourceValue storeVarSourceValue = frame.getLocal(varInsn.var);
+    OriginalSourceValue storeVarSourceValue = insnContext.frame().getLocal(varInsn.var);
     // Value reference
     OriginalSourceValue valueSourceValue = storeVarSourceValue.copiedFrom;
     if (valueSourceValue == null || !valueSourceValue.originalSource.isOneWayProduced() || !storeVarSourceValue.getProducer().isVarStore()) return false;
@@ -41,7 +38,7 @@ public class InlineLocalVariablesTransformer extends FramedInstructionsTransform
 
     if (valueInsn.isConstant()) {
       AbstractInsnNode clone = valueInsn.clone(null);
-      methodNode.instructions.set(insn, clone);
+      insnContext.methodNode().instructions.set(insnContext.insn(), clone);
 
       return true;
     }
