@@ -32,7 +32,7 @@ If you want to use this deobfuscator, you need to start it from your IDE manuall
 ![tak](./assets/run-deobfuscator.gif)
 
 > [!NOTE]
-> As you probably saw, the java tells us that we are using `SecurityManager` which is deprecated and marked for removal.
+> As you probably saw, java tells us that we are using `SecurityManager` which is deprecated and marked for removal.
 > 
 > ![placek](./assets/securitymanager-deprecated.png)
 > 
