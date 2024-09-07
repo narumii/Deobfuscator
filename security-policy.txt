@@ -1,0 +1,4 @@
+// Required for SecurityManager to grant all permissions to our deobfuscator and later change that permissions for SandboxClassLoader
+grant {
+    permission java.security.AllPermission;
+};

@@ -42,11 +42,11 @@ public abstract class TestDeobfuscationBase {
    * Register input files for testing
    *
    * @param testName Test name
-   * @param inputType Input type. See enum options.
+   * @param inputType Input type. See enum optionsConsumer.
    * @param transformers Transformers to use
    * @param sources You can choose one class or multiple classes for testing
    */
-  protected void register(String testName, InputType inputType, List<Supplier<Transformer>> transformers, String... sources) {
+  protected void register(String testName, InputType inputType, List<Supplier<Transformer>> transformers, Source... sources) {
     // Register
     this.registeredTests.add(new RegisteredTest(testName, inputType, transformers, sources));
   }
@@ -67,7 +67,15 @@ public abstract class TestDeobfuscationBase {
     return this.registeredTests.stream().map(RegisteredTest::buildTest);
   }
 
-  public record RegisteredTest(String testName, InputType inputType, List<Supplier<Transformer>> transformers, String[] sources) {
+  /**
+   * @see TestDeobfuscationBase#register(String, InputType, List, Source...)
+   */
+  public record RegisteredTest(
+      String testName,
+      InputType inputType,
+      List<Supplier<Transformer>> transformers,
+      Source[] sources
+  ) {
     /**
      * Build test
      */
@@ -92,7 +100,7 @@ public abstract class TestDeobfuscationBase {
           throw new IllegalArgumentException("Cannot use multiple sources with a jar input");
         }
 
-        jarSource = sources[0];
+        jarSource = sources[0].sourceName;
 
         Path relativePath = Path.of(this.inputType.directory(), sources[0] + ".jar");
 
@@ -102,8 +110,8 @@ public abstract class TestDeobfuscationBase {
 
         inputDir = DEOBFUSCATED_CLASSES_PATH.resolve(relativePath);
       } else {
-        for (String sourceName : sources) {
-          Path compiledClassPath = COMPILED_CLASSES_PATH.resolve(this.inputType.directory()).resolve(sourceName + ".class");
+        for (Source source : sources) {
+          Path compiledClassPath = COMPILED_CLASSES_PATH.resolve(this.inputType.directory()).resolve(source.sourceName + ".class");
           if (Files.notExists(compiledClassPath)) {
             throw new IllegalArgumentException(
                 "Compiled class not found: '" + compiledClassPath.toAbsolutePath().normalize() + "'. You might forgot to compile the class. Use 'mvn test' to compile test classes."
@@ -111,7 +119,7 @@ public abstract class TestDeobfuscationBase {
           }
 
           // Add class
-          optionsBuilder.clazz(compiledClassPath, sourceName);
+          optionsBuilder.clazz(compiledClassPath, source.sourceName);
         }
       }
 
@@ -126,10 +134,13 @@ public abstract class TestDeobfuscationBase {
       // Init context sources
       List<IContextSource> contextSources = new ArrayList<>();
       if (this.inputType != InputType.CUSTOM_JAR) {
-        for (String sourceName : sources) {
+        for (Source source : sources) {
+          if (!source.decompile) continue;
+
           contextSources.add(new SingleClassContextSource(
-              DEOBFUSCATED_CLASSES_PATH.resolve(this.inputType.directory()).resolve(sourceName + ".class"),
-              sourceName));
+              DEOBFUSCATED_CLASSES_PATH.resolve(this.inputType.directory()).resolve(source.sourceName + ".class"),
+              source.sourceName
+          ));
         }
       }
 
@@ -184,6 +195,20 @@ public abstract class TestDeobfuscationBase {
 
     public String directory() {
       return directory;
+    }
+  }
+
+  /**
+   * @param sourceName Class or jar path
+   * @param decompile Should decompile this source. Does not work with {@link InputType#CUSTOM_JAR}
+   */
+  public record Source(String sourceName, boolean decompile) {
+    public static Source of(String source, boolean decompile) {
+      return new Source(source, decompile);
+    }
+
+    public static Source of(String source) {
+      return of(source, true);
     }
   }
 }

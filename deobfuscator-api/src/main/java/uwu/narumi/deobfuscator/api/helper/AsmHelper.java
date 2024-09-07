@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -150,6 +151,7 @@ public class AsmHelper implements Opcodes {
    * @return A map which corresponds to: instruction -> its own stack frame
    */
   @NotNull
+  @Unmodifiable
   public static Map<AbstractInsnNode, Frame<OriginalSourceValue>> analyzeSource(
       ClassNode classNode, MethodNode methodNode
   ) {

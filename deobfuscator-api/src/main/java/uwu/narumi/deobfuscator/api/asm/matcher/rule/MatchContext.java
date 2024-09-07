@@ -26,10 +26,6 @@ public record MatchContext(
     return new MatchContext(insnContext, new HashMap<>(), new ArrayList<>());
   }
 
-  /*public MatchContext clone() {
-    return new MatchContext(insnContext, new HashMap<>(storage), new ArrayList<>(collectedInsns));
-  }*/
-
   /**
    * Merges other context into this context
    */
@@ -57,7 +53,7 @@ public record MatchContext(
    */
   public void removeAll() {
     for (AbstractInsnNode insn : this.collectedInsns) {
-      this.insnContext.methodNode().instructions.remove(insn);
+      this.insnContext.methodContext().methodNode().instructions.remove(insn);
     }
   }
 }

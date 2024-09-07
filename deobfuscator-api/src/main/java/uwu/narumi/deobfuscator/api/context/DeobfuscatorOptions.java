@@ -82,8 +82,6 @@ public record DeobfuscatorOptions(
     public DeobfuscatorOptions.Builder inputJar(@Nullable Path inputJar) {
       this.inputJar = inputJar;
       if (this.inputJar != null) {
-        this.libraries.add(inputJar);
-
         // Auto fill output jar
         if (this.outputJar == null) {
           String fullName = inputJar.getFileName().toString();

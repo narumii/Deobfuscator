@@ -28,6 +28,8 @@
                 <configuration>
                     <junitArtifactName>org.junit.jupiter:junit-jupiter</junitArtifactName>
                     <trimStackTrace>false</trimStackTrace>
+                    <!-- Enable security manager for SandboxClassLoader to work -->
+                    <argLine>-Djava.security.manager -Djava.security.policy=../security-policy.txt</argLine>
                 </configuration>
             </plugin>
         </plugins>

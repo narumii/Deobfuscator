@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.Policy;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.zip.ZipEntry;
@@ -16,6 +17,7 @@ import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.context.DeobfuscatorOptions;
 import uwu.narumi.deobfuscator.api.execution.SandBox;
+import uwu.narumi.deobfuscator.api.execution.SandboxPolicy;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
 import uwu.narumi.deobfuscator.api.helper.FileHelper;
 import uwu.narumi.deobfuscator.api.library.Library;
@@ -47,9 +49,24 @@ public class Deobfuscator {
 
     this.options = options;
 
+    // Setup policy for SandboxClassLoader
+    Policy.setPolicy(new SandboxPolicy());
+
+    List<Library> libraries = new ArrayList<>();
+    // Add libraries
+    libraries.addAll(options.libraries().stream().map(path -> new Library(path, options.classWriterFlags())).toList());
+    // Add input jar as a library
+    if (options.inputJar() != null) {
+      libraries.add(new Library(options.inputJar(), options.classWriterFlags()));
+    }
+    // Add raw classes as a library
+    if (!options.classes().isEmpty()) {
+      libraries.add(new Library(options.classes(), options.classWriterFlags()));
+    }
+
     LibraryClassLoader libraryClassLoader = new LibraryClassLoader(
         this.getClass().getClassLoader(),
-        options.libraries().stream().map(path -> new Library(path, options.classWriterFlags())).toList()
+        libraries
     );
 
     // Temporary disabled until the sandbox is fixed

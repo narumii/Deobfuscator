@@ -6,6 +6,7 @@ import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.InstructionContext;
+import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.context.Context;
 
 import java.util.Arrays;
@@ -59,15 +60,14 @@ public abstract class FramedInstructionsTransformer extends Transformer {
           if (buildInstructionsStream(Arrays.stream(methodNode.instructions.toArray())).findAny().isEmpty()) return;
 
           // Get frames of the method
-          Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = analyzeSource(classWrapper.getClassNode(), methodNode);
+          MethodContext methodContext = MethodContext.create(classWrapper, methodNode);
 
           // Iterate over instructions
           buildInstructionsStream(Arrays.stream(methodNode.instructions.toArray())).forEach(insn -> {
-            // Get current frame
-            Frame<OriginalSourceValue> frame = frames.get(insn);
-            if (frame == null) return;
+            InstructionContext insnContext = new InstructionContext(insn, methodContext);
 
-            InstructionContext insnContext = new InstructionContext(insn, classWrapper, methodNode, frames);
+            // Check if frame exists
+            if (insnContext.frame() == null) return;
 
             // Run the instruction transformer
             boolean transformerChanged = transformInstruction(context, insnContext);
