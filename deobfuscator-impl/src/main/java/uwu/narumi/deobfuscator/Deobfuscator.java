@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import dev.xdark.ssvm.VirtualMachine;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
@@ -73,7 +74,7 @@ public class Deobfuscator {
     SandBox sandBox = null;
     /*try {
       sandBox = new SandBox(
-          this.context.getLoader(),
+          libraryClassLoader,
           options.virtualMachine() == null ? new VirtualMachine() : options.virtualMachine()
       );
     } catch (Throwable t) {
