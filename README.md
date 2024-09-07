@@ -36,7 +36,7 @@ If you want to use this deobfuscator, you need to start it from your IDE manuall
 > 
 > ![placek](./assets/securitymanager-deprecated.png)
 > 
-> The deobfuscator uses the class `SandboxClassLoader` that can safely load classes from untrusted places. The main feature of this classloader is that it prevents dangerous calls like `System.exit`, file-operations or command execution. As you can see in [JEP 411](https://openjdk.org/jeps/411) there isn't currently any alternative, but they want to add different API before `SecurityManager` removal. So for now this is okay to use `SecurityManager` as this is the only option.
+> The deobfuscator uses the class `SandboxClassLoader` that can safely load classes from untrusted places. The main feature of this classloader is that it prevents dangerous calls like `System.exit`, file operations or command execution. As you can see in [JEP 411](https://openjdk.org/jeps/411) there isn't currently any alternative, but they want to add different API before `SecurityManager` removal. So for now this is okay to use `SecurityManager` as this is the only option.
 
 ## 🔧 Contributing
 Contributions are welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
