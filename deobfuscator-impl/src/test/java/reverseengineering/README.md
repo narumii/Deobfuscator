@@ -1,1 +1,1 @@
-You can place here classes from obfuscated that you have reverse-engineered (for example: complex number/string pool), and you can reference them inside your transformers for readability.
+You can place here your reverse-engineered classes from obfuscated jars (for example: complex number pool, complex string pool), and you can reference them inside your transformers. This will make complex transformers' code more readable.

@@ -27,9 +27,14 @@ If you want to use this deobfuscator, you need to start it from your IDE manuall
 3. In this class edit the deobfuscator configuration
     - `inputJar` - Your obfuscated jar file that you placed in step 1
     - `transformers` - Pick transformers that you want to run. You can find them in [`deobfuscator-transformers`](./deobfuscator-transformers) module.
-4. Run this class manually from your IDE
+4. Run this class manually from your IDE. You must use pre-configured IntelliJ task named `Bootstrap` that we created OR append `-Djava.security.manager -Djava.security.policy=./security-policy.txt` to the java command's VM options.
 
 ![tak](./assets/run-deobfuscator.gif)
+
+> [!NOTE]
+> As you probably saw, the java tells us that we are using `SecurityManager` which is deprecated and marked for removal.
+> ![placek](./assets/securitymanager-deprecated.png)
+> The deobfuscator uses the class `SandboxClassLoader` that can safely load classes from untrusted places. The main feature of this classloader is that it prevents dangerous calls like `System.exit`, file-operations or command execution. As you can see in [JEP 411](https://openjdk.org/jeps/411) there isn't currently any alternative, but they want to add different API before `SecurityManager` removal. So for now this is okay to use `SecurityManager` as this is the only option.
 
 ## 🔧 Contributing
 Contributions are welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
