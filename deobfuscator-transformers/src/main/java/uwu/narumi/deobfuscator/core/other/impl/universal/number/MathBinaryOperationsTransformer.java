@@ -43,9 +43,8 @@ public class MathBinaryOperationsTransformer extends FramedInstructionsTransform
         return false;
       }
 
+      insnContext.pop(2);
       insnContext.methodNode().instructions.set(insnContext.insn(), AsmHelper.getNumber(result));
-      insnContext.methodNode().instructions.remove(value1SourceValue.getProducer());
-      insnContext.methodNode().instructions.remove(value2SourceValue.getProducer());
 
       return true;
     }

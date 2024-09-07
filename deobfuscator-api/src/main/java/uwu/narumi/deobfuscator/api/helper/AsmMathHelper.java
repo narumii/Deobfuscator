@@ -130,11 +130,11 @@ public final class AsmMathHelper {
             AbstractInsnNode originalInsn = originalSourceValue.getProducer();
             if (!originalInsn.isString()) return false;
 
+            context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
                 AsmHelper.getNumber(originalInsn.asString().length())
             );
-            context.methodNode().instructions.remove(sourceValue.getProducer());
             return true;
           });
 
@@ -152,11 +152,11 @@ public final class AsmMathHelper {
             AbstractInsnNode originalInsn = originalSourceValue.getProducer();
             if (!originalInsn.isString()) return false;
 
+            context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
                 AsmHelper.getNumber(originalInsn.asString().hashCode())
             );
-            context.methodNode().instructions.remove(sourceValue.getProducer());
             return true;
           });
 
@@ -175,11 +175,11 @@ public final class AsmMathHelper {
             // Integer#parseInt(String)
             if (!originalInsn.isString()) return false;
 
+            context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
                 AsmHelper.getNumber(Integer.parseInt(originalInsn.asString()))
             );
-            context.methodNode().instructions.remove(sourceValue.getProducer());
             return true;
           });
 
@@ -202,14 +202,13 @@ public final class AsmMathHelper {
             // Integer#parseInt(String, int)
             if (!originalFirstInsn.isString() || !originalSecondInsn.isInteger()) return false;
 
+            context.pop(2);
             context.methodNode().instructions.set(
                 context.insn(),
                 AsmHelper.getNumber(
                     Integer.parseInt(originalFirstInsn.asString(), originalSecondInsn.asInteger())
                 )
             );
-            context.methodNode().instructions.remove(firstValue.getProducer());
-            context.methodNode().instructions.remove(secondValue.getProducer());
             return true;
           });
 
@@ -228,11 +227,11 @@ public final class AsmMathHelper {
             // Integer#reverse(int)
             if (!originalInsn.isInteger()) return false;
 
+            context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
                 AsmHelper.getNumber(Integer.reverse(originalInsn.asInteger()))
             );
-            context.methodNode().instructions.remove(sourceValue.getProducer());
             return true;
           });
 
@@ -251,11 +250,11 @@ public final class AsmMathHelper {
             // Long#reverse(long)
             if (!originalInsn.isLong()) return false;
 
+            context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
                 AsmHelper.getNumber(Long.reverse(originalInsn.asLong()))
             );
-            context.methodNode().instructions.remove(sourceValue.getProducer());
             return true;
           });
 
@@ -274,11 +273,11 @@ public final class AsmMathHelper {
             // Float#floatToIntBits(float)
             if (!originalInsn.isFloat()) return false;
 
+            context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
                 AsmHelper.getNumber(Float.floatToIntBits(originalInsn.asFloat()))
             );
-            context.methodNode().instructions.remove(sourceValue.getProducer());
             return true;
           });
 
@@ -297,11 +296,11 @@ public final class AsmMathHelper {
             // Float#intBitsToFloat(int)
             if (!originalInsn.isInteger()) return false;
 
+            context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
                 AsmHelper.getNumber(Float.intBitsToFloat(originalInsn.asInteger()))
             );
-            context.methodNode().instructions.remove(sourceValue.getProducer());
             return true;
           });
 
@@ -320,11 +319,11 @@ public final class AsmMathHelper {
             // Double#doubleToLongBits(double)
             if (!originalInsn.isDouble()) return false;
 
+            context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
                 AsmHelper.getNumber(Double.doubleToLongBits(originalInsn.asDouble()))
             );
-            context.methodNode().instructions.remove(sourceValue.getProducer());
             return true;
           });
 
@@ -343,11 +342,11 @@ public final class AsmMathHelper {
             // Double#longBitsToDouble(long)
             if (!originalInsn.isLong()) return false;
 
+            context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
                 AsmHelper.getNumber(Double.longBitsToDouble(originalInsn.asLong()))
             );
-            context.methodNode().instructions.remove(sourceValue.getProducer());
             return true;
           });
 

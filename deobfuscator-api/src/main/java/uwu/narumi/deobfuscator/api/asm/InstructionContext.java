@@ -1,6 +1,8 @@
 package uwu.narumi.deobfuscator.api.asm;
 
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
@@ -26,5 +28,21 @@ public record InstructionContext(
 
   public MethodNode methodNode() {
     return this.methodContext.methodNode();
+  }
+
+  /**
+   * Adds POP instruction to pop current instruction.
+   *
+   * @param count Stack values count to pop
+   */
+  public void pop(int count) {
+    for (int i = 0; i < count; i++) {
+      int stackValueIdx = frame().getStackSize() - (i + 1);
+      OriginalSourceValue sourceValue = frame().getStack(stackValueIdx);
+
+      // Pop
+      InsnNode popInsn = sourceValue.getSize() == 2 ? new InsnNode(Opcodes.POP2) : new InsnNode(Opcodes.POP);
+      this.methodNode().instructions.insertBefore(this.insn, popInsn);
+    }
   }
 }

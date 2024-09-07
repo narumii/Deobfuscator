@@ -169,21 +169,6 @@ public class AsmHelper implements Opcodes {
   }
 
   /**
-   * Removes values from the stack. You can only remove stack values that are one way produced.
-   *
-   * @param count How many values to remove from top
-   */
-  public static void removeValuesFromStack(MethodNode methodNode, Frame<OriginalSourceValue> frame, int count) {
-    for (int i = 0; i < count; i++) {
-      int stackValueIdx = frame.getStackSize() - (i + 1);
-
-      OriginalSourceValue sourceValue = frame.getStack(stackValueIdx);
-      // Remove
-      methodNode.instructions.remove(sourceValue.getProducer());
-    }
-  }
-
-  /**
    * Convert constant value to instruction that represents this constant
    *
    * @param value A constant value

@@ -4,7 +4,6 @@ import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import uwu.narumi.deobfuscator.api.asm.InstructionContext;
 import uwu.narumi.deobfuscator.api.context.Context;
-import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
 import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 
@@ -22,9 +21,9 @@ public class CleanRedundantJumpsTransformer extends FramedInstructionsTransforme
     boolean ifResult = optIfResult.get();
 
     if (AsmMathHelper.isOneValueCondition(jumpInsn.getOpcode())) {
-      AsmHelper.removeValuesFromStack(insnContext.methodNode(), insnContext.frame(), 1);
+      insnContext.pop(1);
     } else if (AsmMathHelper.isTwoValuesCondition(jumpInsn.getOpcode())) {
-      AsmHelper.removeValuesFromStack(insnContext.methodNode(), insnContext.frame(), 2);
+      insnContext.pop(2);
     }
 
     // Replace if with corresponding GOTO or remove it

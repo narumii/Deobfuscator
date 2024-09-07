@@ -13,10 +13,6 @@ import java.util.stream.Stream;
  * Inlines constant local variables
  */
 public class InlineLocalVariablesTransformer extends FramedInstructionsTransformer {
-  public InlineLocalVariablesTransformer() {
-    this.rerunOnChange = true;
-  }
-
   @Override
   protected Stream<AbstractInsnNode> buildInstructionsStream(Stream<AbstractInsnNode> stream) {
     return stream

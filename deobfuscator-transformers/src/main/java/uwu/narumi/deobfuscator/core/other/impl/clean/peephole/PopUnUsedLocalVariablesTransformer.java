@@ -59,6 +59,6 @@ public class PopUnUsedLocalVariablesTransformer extends Transformer {
       }
     }));
 
-    LOGGER.info("Removed {} unused local variables", this.getChangesCount());
+    LOGGER.info("Popped {} unused local variables", this.getChangesCount());
   }
 }

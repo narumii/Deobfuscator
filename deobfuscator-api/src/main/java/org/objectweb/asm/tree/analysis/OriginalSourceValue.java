@@ -4,6 +4,9 @@ import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -81,6 +84,11 @@ public class OriginalSourceValue extends SourceValue {
   @Nullable
   private ConstantValue constantValue = null;
 
+  /**
+   * Children that copied this source value
+   */
+  private final List<OriginalSourceValue> children = new ArrayList<>();
+
   public OriginalSourceValue(int size) {
     this(size, new SmallSet<>());
   }
@@ -118,6 +126,12 @@ public class OriginalSourceValue extends SourceValue {
     super(size, insnSet);
     this.copiedFrom = copiedFrom;
     this.originalSource = copiedFrom == null ? this : copiedFrom.originalSource;
+
+    if (copiedFrom != null) {
+      // Add child
+      copiedFrom.addChild(this);
+    }
+
     if (constantValue != null) {
       // If the constant value is present, then use it
       this.constantValue = constantValue;
@@ -160,6 +174,14 @@ public class OriginalSourceValue extends SourceValue {
   @Nullable
   public ConstantValue getConstantValue() {
     return constantValue;
+  }
+
+  void addChild(OriginalSourceValue child) {
+    this.children.add(child);
+  }
+
+  public List<OriginalSourceValue> getChildren() {
+    return Collections.unmodifiableList(children);
   }
 
   /**

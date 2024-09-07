@@ -9,9 +9,11 @@ import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 
 import java.util.stream.Stream;
 
-// TODO: Remove pair of DUP and POP
-// TODO: Account for DUP2_X1, DUP2_X2, DUP_X2, etc.
+// TODO: Handle DUP2
 public class UselessPopCleanTransformer extends FramedInstructionsTransformer {
+  public UselessPopCleanTransformer() {
+    this.rerunOnChange = true;
+  }
 
   @Override
   protected Stream<AbstractInsnNode> buildInstructionsStream(Stream<AbstractInsnNode> stream) {
@@ -58,14 +60,28 @@ public class UselessPopCleanTransformer extends FramedInstructionsTransformer {
     return shouldRemovePop;
   }
 
+  private boolean isSourceValueRemovable(OriginalSourceValue sourceValue) {
+    if (sourceValue.insns.isEmpty()) {
+      // Nothing to remove. Probably a local variable
+      return false;
+    }
+    if (!sourceValue.getChildren().isEmpty()) {
+      // Other source values depends on this source value
+      // Also there is a small bug https://gitlab.ow2.org/asm/asm/-/merge_requests/414
+      return false;
+    }
+
+    return true;
+  }
+
   /**
    * Checks if all producers of the source value are constants
    */
   private boolean areProducersConstant(OriginalSourceValue sourceValue) {
-    if (sourceValue.insns.isEmpty()) return false;
+    if (!isSourceValueRemovable(sourceValue)) return false;
 
     for (AbstractInsnNode producer : sourceValue.insns) {
-      if (!producer.isConstant()) {
+      if (!(producer.isConstant() || producer.getOpcode() == DUP)) {
         return false;
       }
     }
@@ -76,7 +92,7 @@ public class UselessPopCleanTransformer extends FramedInstructionsTransformer {
    * Checks if all producers of the source value are 2-sized values
    */
   private boolean areTwoSizedValues(OriginalSourceValue sourceValue) {
-    if (sourceValue.insns.isEmpty()) return false;
+    if (!isSourceValueRemovable(sourceValue)) return false;
 
     for (AbstractInsnNode producer : sourceValue.insns) {
       if (producer.sizeOnStack() != 2) {

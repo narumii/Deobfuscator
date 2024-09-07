@@ -32,8 +32,8 @@ public class MathUnaryOperationsTransformer extends FramedInstructionsTransforme
     if (valueInsn.isNumber()) {
       Number castedNumber = AsmMathHelper.mathUnaryOperation(valueInsn.asNumber(), insnContext.insn().getOpcode());
 
+      insnContext.pop(1);
       insnContext.methodNode().instructions.set(insnContext.insn(), AsmHelper.getNumber(castedNumber));
-      insnContext.methodNode().instructions.remove(sourceValue.getProducer());
 
       return true;
     }
