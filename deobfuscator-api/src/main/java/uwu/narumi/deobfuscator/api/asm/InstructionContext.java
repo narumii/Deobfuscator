@@ -31,7 +31,7 @@ public record InstructionContext(
   }
 
   /**
-   * Adds POP instruction to pop current instruction.
+   * Pops current instruction by adding POP instruction before this instruction
    *
    * @param count Stack values count to pop
    */
