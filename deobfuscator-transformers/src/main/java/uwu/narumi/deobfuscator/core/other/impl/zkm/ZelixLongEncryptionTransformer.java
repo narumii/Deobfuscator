@@ -2,7 +2,6 @@ package uwu.narumi.deobfuscator.core.other.impl.zkm;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.InstructionContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
@@ -14,15 +13,10 @@ import uwu.narumi.deobfuscator.api.asm.matcher.rule.impl.MethodMatch;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.execution.SandboxClassLoader;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
-import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Decrypts {@code long} numbers <a href="https://www.zelix.com/klassmaster/featuresLongEncryption.html">https://www.zelix.com/klassmaster/featuresLongEncryption.html</a>
@@ -98,11 +92,7 @@ public class ZelixLongEncryptionTransformer extends Transformer {
 
             // Set field to decrypted long value!
             insnContext.methodNode().instructions.insertBefore(insnContext.insn(), AsmHelper.getNumber(value));
-
-            // Add decrypter classes to remove
-
             markChange();
-
           } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
           }
