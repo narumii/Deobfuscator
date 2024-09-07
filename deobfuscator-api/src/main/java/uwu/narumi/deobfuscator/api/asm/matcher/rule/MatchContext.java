@@ -6,12 +6,13 @@ import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.asm.InstructionContext;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Immutable match context
+ * Immutable match context. After matching process, the context is frozen by {@link MatchContext#freeze()}
  *
  * @param insnContext Instruction context
  * @param storage Storage for saving some instructions in matching process. id -> match context
@@ -26,8 +27,12 @@ public record MatchContext(
     return new MatchContext(insnContext, new HashMap<>(), new ArrayList<>());
   }
 
+  public MatchContext freeze() {
+    return new MatchContext(this.insnContext, Collections.unmodifiableMap(this.storage), Collections.unmodifiableList(this.collectedInsns));
+  }
+
   /**
-   * Merges other context into this context
+   * Merges other {@link MatchContext} into this {@link MatchContext}
    */
   public void merge(MatchContext other) {
     this.storage.putAll(other.storage);

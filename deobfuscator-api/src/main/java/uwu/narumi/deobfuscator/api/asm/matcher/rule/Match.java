@@ -96,7 +96,7 @@ public abstract class Match {
       context.collectedInsns().add(context.insn());
 
       // We have match!
-      return context;
+      return context.freeze();
     }
 
     // We don't have match
