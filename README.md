@@ -27,7 +27,7 @@ If you want to use this deobfuscator, you need to start it from your IDE manuall
 3. In this class edit the deobfuscator configuration
     - `inputJar` - Your obfuscated jar file that you placed in step 1
     - `transformers` - Pick transformers that you want to run. You can find them in [`deobfuscator-transformers`](./deobfuscator-transformers) module.
-4. Run this class manually from your IDE. You must use pre-configured IntelliJ task named `Bootstrap` that we created OR append `-Djava.security.manager -Djava.security.policy=./security-policy.txt` to the java command's VM options.
+4. Run this class manually from your IDE. You MUST use our pre-configured IntelliJ task named `Bootstrap` OR append `-Djava.security.manager -Djava.security.policy=./security-policy.txt` to the java command's VM options.
 
 ![tak](./assets/run-deobfuscator.gif)
 
