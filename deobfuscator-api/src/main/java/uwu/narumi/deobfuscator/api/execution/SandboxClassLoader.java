@@ -34,7 +34,7 @@ public class SandboxClassLoader extends ClassLoader {
 
   public SandboxClassLoader(Context context) {
     if (System.getSecurityManager() == null) {
-      LOGGER.error("SecurityManager is not initialized. It is required to secure you from running arbitrary code on your machine. Please use the built-in IntelliJ task named 'Bootstrap' (see README.md)");
+      LOGGER.error("SecurityManager is not initialized. It is required to secure arbitrary code execution on your machine, by blocking dangerous operations inside sandbox. Please use the built-in IntelliJ task named 'Bootstrap' (see README.md)");
       throw new SecurityException("SecurityManager is not initialized");
     }
     this.context = context;
