@@ -22,7 +22,7 @@ public record InstructionContext(
     Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames
 ) {
 
-  public InstructionContext ofInsn(AbstractInsnNode insn) {
+  public InstructionContext of(AbstractInsnNode insn) {
     return new InstructionContext(insn, classWrapper, methodNode, frames);
   }
 

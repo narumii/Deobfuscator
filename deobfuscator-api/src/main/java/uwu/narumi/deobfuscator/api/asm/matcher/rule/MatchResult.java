@@ -17,5 +17,4 @@ public record MatchResult(
     Map<String, AbstractInsnNode> storage,
     List<AbstractInsnNode> collectedInsns
 ) {
-  // TODO: Methods like: "remove", "replace", etc.
 }

@@ -28,25 +28,24 @@ public abstract class Match {
    * @return If matches
    */
   public boolean matches(InstructionContext context) {
-    return this.matches(MatchContext.of(context));
+    return this.matchResult(context) != null;
   }
 
   /**
-   * @return {@link MatchResult} if matches or {@code null} if it does not match
+   * @return {@link MatchContext} if matches or {@code null} if it does not match
    */
-  public MatchResult matchResult(InstructionContext context) {
+  public MatchContext matchResult(InstructionContext context) {
     return this.matchResult(MatchContext.of(context));
   }
 
   public boolean matches(MatchContext context) {
-    MatchResult matchResult = this.matchResult(context);
-    return matchResult != null;
+    return this.matchResult(context) != null;
   }
 
   /**
-   * @return {@link MatchResult} if matches or {@code null} if it does not match
+   * @return {@link MatchContext} if matches or {@code null} if it does not match
    */
-  public MatchResult matchResult(MatchContext context) {
+  public MatchContext matchResult(MatchContext context) {
     boolean match = this.test(context);
 
     if (match) {
@@ -79,7 +78,11 @@ public abstract class Match {
           }
 
           AbstractInsnNode stackValueInsn = sourceValue.getProducer();
-          if (!stackMatch.matches(context.ofInsn(stackValueInsn))) {
+          MatchContext resultContext = stackMatch.matchResult(context.insnContext().of(stackValueInsn));
+          if (resultContext != null) {
+            // Merge contexts
+            context.merge(resultContext);
+          } else {
             return null;
           }
         }
@@ -87,13 +90,13 @@ public abstract class Match {
 
       if (this.saveId != null) {
         // Save to storage
-        context.storage().put(this.saveId, context.insn());
+        context.storage().put(this.saveId, context);
       }
 
       context.collectedInsns().add(context.insn());
 
       // We have match!
-      return new MatchResult(context.insn(), context.storage(), context.collectedInsns());
+      return context;
     }
 
     // We don't have match
@@ -104,12 +107,6 @@ public abstract class Match {
    * @see #matches(InstructionContext)
    */
   protected abstract boolean test(MatchContext context);
-
-  public Match offset(int offset) {
-    return Match.predicate(context ->
-        matches(context.ofInsn(offset < 0 ? context.insn().getPrevious(Math.abs(offset)) : context.insn().getNext(offset)))
-    );
-  }
 
   public Match and(Match match) {
     return Match.predicate(context -> matches(context) && match.matches(context));

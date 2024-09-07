@@ -4,6 +4,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LineNumberNode;
+import uwu.narumi.deobfuscator.api.asm.InstructionContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
 
@@ -72,7 +73,7 @@ public class SequenceMatch extends Match {
         return false;
       }
 
-      MatchContext currentInsnContext = context.ofInsn(currentInsn);
+      InstructionContext currentInsnContext = context.insnContext().of(currentInsn);
       if (this.skipMatches.stream().anyMatch(match -> match.matches(currentInsnContext))) {
         // Skip instruction
         currentInsn = currentInsn.getNext();
@@ -81,7 +82,11 @@ public class SequenceMatch extends Match {
 
       // Find match
       Match match = this.matches[matchIdx];
-      if (!match.matches(currentInsnContext)) {
+      MatchContext resultContext = match.matchResult(currentInsnContext);
+      if (resultContext != null) {
+        context.merge(resultContext);
+      } else {
+        // No match
         return false;
       }
 
@@ -89,19 +94,6 @@ public class SequenceMatch extends Match {
       currentInsn = currentInsn.getNext();
       matchIdx++;
     }
-
-
-    /*AbstractInsnNode currentInsn = context.insn();
-
-    for (Match match : matches) {
-      if (currentInsn == null) return false;
-
-      if (!match.matches(context.ofInsn(currentInsn))) {
-        return false;
-      }
-
-      currentInsn = currentInsn.getNext();
-    }*/
 
     return true;
   }
