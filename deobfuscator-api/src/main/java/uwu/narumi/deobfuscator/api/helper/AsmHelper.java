@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.NamedOpcodes;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
@@ -166,6 +167,10 @@ public class AsmHelper implements Opcodes {
       frames.put(methodNode.instructions.get(i), framesArray[i]);
     }
     return Collections.unmodifiableMap(frames);
+  }
+
+  public static List<String> prettyInsnList(InsnList insnList) {
+    return Arrays.stream(insnList.toArray()).map(insn -> NamedOpcodes.map(insn.getOpcode())).toList();
   }
 
   /**

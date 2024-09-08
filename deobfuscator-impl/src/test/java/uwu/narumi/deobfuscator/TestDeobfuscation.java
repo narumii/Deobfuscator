@@ -7,6 +7,7 @@ import uwu.narumi.deobfuscator.core.other.impl.pool.InlineLocalVariablesTransfor
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
 import uwu.narumi.deobfuscator.base.TestDeobfuscationBase;
+import uwu.narumi.deobfuscator.transformer.TestSandboxSecurityTransformer;
 
 import java.util.List;
 
@@ -23,6 +24,9 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
     // TODO: Uninitialized static fields should replace with 0?
     register("Inline static fields", InputType.JAVA_CODE, List.of(InlineStaticFieldTransformer::new), Source.of("TestInlineStaticFields"));
     register("Inline static fields with modification", InputType.JAVA_CODE, List.of(InlineStaticFieldTransformer::new), Source.of("TestInlineStaticFieldsWithModification"));
+
+    // Sandbox security. Should throw
+    registerThrows("Sandbox security", InputType.JAVA_CODE, List.of(TestSandboxSecurityTransformer::new), Source.of("TestSandboxSecurity"));
 
     // Samples
     register("Some flow obf sample", InputType.CUSTOM_CLASS, List.of(ComposedGeneralFlowTransformer::new), Source.of("FlowObfSample"));

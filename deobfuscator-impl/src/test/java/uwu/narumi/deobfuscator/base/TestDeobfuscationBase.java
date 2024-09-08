@@ -1,5 +1,6 @@
 package uwu.narumi.deobfuscator.base;
 
+import com.sun.jdi.InvocationException;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.jetbrains.annotations.Nullable;
@@ -24,6 +25,8 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 @Timeout(60)
 public abstract class TestDeobfuscationBase {
   public static final Path TEST_DATA_PATH = Path.of("..", "testData");
@@ -47,8 +50,11 @@ public abstract class TestDeobfuscationBase {
    * @param sources You can choose one class or multiple classes for testing
    */
   protected void register(String testName, InputType inputType, List<Supplier<Transformer>> transformers, Source... sources) {
-    // Register
-    this.registeredTests.add(new RegisteredTest(testName, inputType, transformers, sources));
+    this.registeredTests.add(new RegisteredTest(testName, false, inputType, transformers, sources));
+  }
+
+  protected void registerThrows(String testName, InputType inputType, List<Supplier<Transformer>> transformers, Source... sources) {
+    this.registeredTests.add(new RegisteredTest(testName, true, inputType, transformers, sources));
   }
 
   @BeforeAll
@@ -72,6 +78,7 @@ public abstract class TestDeobfuscationBase {
    */
   public record RegisteredTest(
       String testName,
+      boolean throwable,
       InputType inputType,
       List<Supplier<Transformer>> transformers,
       Source[] sources
@@ -129,7 +136,15 @@ public abstract class TestDeobfuscationBase {
           .outputDir(DEOBFUSCATED_CLASSES_PATH.resolve(this.inputType.directory()));
 
       // Build and run deobfuscator!
-      Deobfuscator.from(optionsBuilder.build()).start();
+      if (this.throwable) {
+        assertThrows(RuntimeException.class, () -> {
+          Deobfuscator.from(optionsBuilder.build()).start();
+        });
+        // If the deobfuscator throws an exception, then there is no output. Return
+        return;
+      } else {
+        Deobfuscator.from(optionsBuilder.build()).start();
+      }
 
       // Init context sources
       List<IContextSource> contextSources = new ArrayList<>();
