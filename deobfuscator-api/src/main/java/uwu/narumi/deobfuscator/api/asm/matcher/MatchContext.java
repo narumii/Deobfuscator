@@ -1,4 +1,4 @@
-package uwu.narumi.deobfuscator.api.asm.matcher.rule;
+package uwu.narumi.deobfuscator.api.asm.matcher;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.analysis.Frame;

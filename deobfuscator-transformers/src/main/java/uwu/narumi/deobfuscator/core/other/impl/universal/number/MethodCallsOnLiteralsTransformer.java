@@ -1,7 +1,7 @@
 package uwu.narumi.deobfuscator.core.other.impl.universal.number;
 
 import uwu.narumi.deobfuscator.api.asm.InstructionContext;
-import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.Match;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
 import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;

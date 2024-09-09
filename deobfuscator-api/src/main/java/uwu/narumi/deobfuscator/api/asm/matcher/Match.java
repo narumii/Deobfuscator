@@ -1,9 +1,9 @@
-package uwu.narumi.deobfuscator.api.asm.matcher.rule;
+package uwu.narumi.deobfuscator.api.asm.matcher;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.asm.InstructionContext;
-import uwu.narumi.deobfuscator.api.asm.matcher.rule.impl.SkipMatch;
+import uwu.narumi.deobfuscator.api.asm.matcher.impl.SkipMatch;
 
 import java.util.ArrayList;
 import java.util.List;

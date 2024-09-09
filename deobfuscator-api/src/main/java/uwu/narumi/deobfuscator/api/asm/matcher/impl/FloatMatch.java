@@ -1,7 +1,7 @@
-package uwu.narumi.deobfuscator.api.asm.matcher.rule.impl;
+package uwu.narumi.deobfuscator.api.asm.matcher.impl;
 
-import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
-import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
+import uwu.narumi.deobfuscator.api.asm.matcher.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 
 public class FloatMatch extends Match {
 

@@ -9,8 +9,8 @@ import org.objectweb.asm.tree.LookupSwitchInsnNode;
 import org.objectweb.asm.tree.TableSwitchInsnNode;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
-import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
-import uwu.narumi.deobfuscator.api.asm.matcher.rule.impl.MethodMatch;
+import uwu.narumi.deobfuscator.api.asm.matcher.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.impl.MethodMatch;
 
 import java.util.List;
 import java.util.Map;

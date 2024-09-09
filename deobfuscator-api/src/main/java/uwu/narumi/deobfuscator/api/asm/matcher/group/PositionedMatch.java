@@ -1,8 +1,8 @@
-package uwu.narumi.deobfuscator.api.asm.matcher.rule.group;
+package uwu.narumi.deobfuscator.api.asm.matcher.group;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
-import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
-import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
+import uwu.narumi.deobfuscator.api.asm.matcher.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 
 public class PositionedMatch extends Match {
 

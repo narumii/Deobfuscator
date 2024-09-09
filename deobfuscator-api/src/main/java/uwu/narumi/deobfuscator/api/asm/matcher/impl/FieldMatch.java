@@ -1,9 +1,9 @@
-package uwu.narumi.deobfuscator.api.asm.matcher.rule.impl;
+package uwu.narumi.deobfuscator.api.asm.matcher.impl;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.FieldInsnNode;
-import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
-import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
+import uwu.narumi.deobfuscator.api.asm.matcher.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 
 public class FieldMatch extends Match {
 

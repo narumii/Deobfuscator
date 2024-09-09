@@ -1,12 +1,12 @@
-package uwu.narumi.deobfuscator.api.asm.matcher.rule.group;
+package uwu.narumi.deobfuscator.api.asm.matcher.group;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LineNumberNode;
 import uwu.narumi.deobfuscator.api.asm.InstructionContext;
-import uwu.narumi.deobfuscator.api.asm.matcher.rule.Match;
-import uwu.narumi.deobfuscator.api.asm.matcher.rule.MatchContext;
+import uwu.narumi.deobfuscator.api.asm.matcher.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 
 import java.util.ArrayList;
 import java.util.List;
