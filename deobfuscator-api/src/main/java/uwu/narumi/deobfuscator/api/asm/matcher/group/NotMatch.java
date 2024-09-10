@@ -17,6 +17,6 @@ public class NotMatch extends Match {
 
   @Override
   protected boolean test(MatchContext context) {
-    return !match.matches(context);
+    return !match.matchAndMerge(context.insnContext(), context);
   }
 }

@@ -82,10 +82,7 @@ public class SequenceMatch extends Match {
 
       // Find match
       Match match = this.matches[matchIdx];
-      MatchContext resultContext = match.matchResult(currentInsnContext);
-      if (resultContext != null) {
-        context.merge(resultContext);
-      } else {
+      if (!match.matchAndMerge(currentInsnContext, context)) {
         // No match
         return false;
       }

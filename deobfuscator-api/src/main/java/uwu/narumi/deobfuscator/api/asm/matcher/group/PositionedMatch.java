@@ -20,13 +20,7 @@ public class PositionedMatch extends Match {
 
   @Override
   protected boolean test(MatchContext context) {
-    MatchContext resultContext = this.match.matchResult(context.insnContext().of(walk(context.insn())));
-    if (resultContext != null) {
-      context.merge(resultContext);
-      return true;
-    } else {
-      return false;
-    }
+    return this.match.matchAndMerge(context.insnContext().of(walk(context.insn())), context);
   }
 
   private AbstractInsnNode walk(AbstractInsnNode node) {

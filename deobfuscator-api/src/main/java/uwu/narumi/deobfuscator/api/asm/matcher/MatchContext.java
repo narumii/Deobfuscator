@@ -36,7 +36,12 @@ public record MatchContext(
    */
   public void merge(MatchContext other) {
     this.storage.putAll(other.storage);
-    this.collectedInsns.addAll(other.collectedInsns);
+    for (AbstractInsnNode insn : other.collectedInsns) {
+      // Don't allow duplicates
+      if (this.collectedInsns.contains(insn)) continue;
+
+      this.collectedInsns.add(insn);
+    }
   }
 
   /**

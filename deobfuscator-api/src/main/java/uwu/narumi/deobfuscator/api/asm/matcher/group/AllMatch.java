@@ -18,7 +18,7 @@ public class AllMatch extends Match {
   @Override
   protected boolean test(MatchContext context) {
     for (Match match : matches) {
-      if (!match.matches(context)) return false;
+      if (!match.matchAndMerge(context.insnContext(), context)) return false;
     }
 
     return true;
