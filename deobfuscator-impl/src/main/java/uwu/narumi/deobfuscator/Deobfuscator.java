@@ -115,7 +115,7 @@ public class Deobfuscator {
       }
     } catch (Exception e) {
       LOGGER.error("Could not load class: {}, adding as file", path);
-      if (this.options.printStacktraces()) LOGGER.error(e);
+      if (this.options.printStacktraces()) LOGGER.throwing(e);
 
       context.getFiles().putIfAbsent(path, bytes);
     }
@@ -188,7 +188,7 @@ public class Deobfuscator {
                   zipOutputStream.write(data);
                 } catch (Exception e) {
                   LOGGER.error("Could not save class, saving original class instead of deobfuscated: {}", classWrapper.name());
-                  if (this.options.printStacktraces()) LOGGER.error(e);
+                  if (this.options.printStacktraces()) LOGGER.throwing(e);
 
                   try {
                     // Save original class as a fallback
@@ -198,7 +198,7 @@ public class Deobfuscator {
                     zipOutputStream.write(data);
                   } catch (Exception e2) {
                     LOGGER.error("Could not save original class: {}", classWrapper.name());
-                    if (this.options.printStacktraces()) LOGGER.error(e2);
+                    if (this.options.printStacktraces()) LOGGER.throwing(e2);
                   }
                 }
 
@@ -215,7 +215,7 @@ public class Deobfuscator {
                   zipOutputStream.write(data);
                 } catch (Exception e) {
                   LOGGER.error("Could not save file: {}", name);
-                  if (this.options.printStacktraces()) LOGGER.error(e);
+                  if (this.options.printStacktraces()) LOGGER.throwing(e);
                 }
 
                 context.getFiles().remove(name);
