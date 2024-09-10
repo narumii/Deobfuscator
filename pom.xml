@@ -23,21 +23,7 @@
 
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
-
-    <asm.version>9.7</asm.version>
-    <log4j.version>2.23.1</log4j.version>
-    <slf4j.version>2.0.13</slf4j.version>
-    <kafedjud.version>1.10.2</kafedjud.version>
-    <ssvm.version>d559ea90bb</ssvm.version>
-    <jlinker.version>205d8eaa1f</jlinker.version>
   </properties>
-
-  <repositories>
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-    </repository>
-  </repositories>
 
   <dependencies>
     <dependency>

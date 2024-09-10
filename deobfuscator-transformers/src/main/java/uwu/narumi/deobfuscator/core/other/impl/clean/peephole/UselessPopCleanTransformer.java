@@ -67,7 +67,6 @@ public class UselessPopCleanTransformer extends FramedInstructionsTransformer {
     }
     if (!sourceValue.getChildren().isEmpty()) {
       // Other source values depends on this source value
-      // Also there is a small bug https://gitlab.ow2.org/asm/asm/-/merge_requests/414
       return false;
     }
 

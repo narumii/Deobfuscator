@@ -15,7 +15,27 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Snapshot -->
+        <asm.version>9.8-20240908.112439-20</asm.version>
+
+        <log4j.version>2.23.1</log4j.version>
+        <slf4j.version>2.0.13</slf4j.version>
+        <kafedjud.version>1.10.2</kafedjud.version>
+        <ssvm.version>d559ea90bb</ssvm.version>
+        <jlinker.version>205d8eaa1f</jlinker.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>ow2-repo</id>
+            <url>https://repository.ow2.org/nexus/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
