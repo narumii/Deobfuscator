@@ -26,7 +26,7 @@ If you want to use this deobfuscator, you need to start it from your IDE manuall
 2. Navigate to class [`Bootstrap.java`](./deobfuscator-impl/src/test/java/Bootstrap.java)
 3. In this class edit the deobfuscator configuration
     - `inputJar` - Your obfuscated jar file that you placed in step 1
-    - `transformers` - Pick transformers that you want to run. You can find them in [`deobfuscator-transformers`](./deobfuscator-transformers) module.
+    - `transformers` - Pick transformers that you want to run. You can find them in [`deobfuscator-transformers`](./deobfuscator-transformers/src/main/java/uwu/narumi/deobfuscator/core/other) module.
 4. Run this class manually from your IDE. You can use our pre-configured IntelliJ task named `Bootstrap`.
 
 ![tak](./assets/run-deobfuscator.gif)
