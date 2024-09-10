@@ -20,8 +20,7 @@ public class Bootstrap {
                 // Pick your transformers here
                 () -> new ComposedGeneralFlowTransformer()
             )
-            .consoleDebug()
-            .suppressErrors()
+            .continueOnError()
             .classReaderFlags(ClassReader.SKIP_FRAMES)
             .classWriterFlags(ClassWriter.COMPUTE_FRAMES)
             .build()

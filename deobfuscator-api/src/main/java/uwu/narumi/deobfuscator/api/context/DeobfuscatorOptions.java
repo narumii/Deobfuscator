@@ -30,8 +30,8 @@ public record DeobfuscatorOptions(
     int classReaderFlags,
     int classWriterFlags,
 
-    boolean consoleDebug,
-    boolean suppressErrors,
+    boolean printStacktraces,
+    boolean continueOnError,
     boolean verifyBytecode,
 
     VirtualMachine virtualMachine
@@ -66,8 +66,8 @@ public record DeobfuscatorOptions(
     private int classReaderFlags = ClassReader.SKIP_FRAMES;
     private int classWriterFlags = ClassWriter.COMPUTE_FRAMES;
 
-    private boolean consoleDebug = false;
-    private boolean suppressErrors = false;
+    private boolean printStacktraces = true;
+    private boolean continueOnError = false;
     private boolean verifyBytecode = false;
 
     private VirtualMachine virtualMachine = null;
@@ -176,11 +176,11 @@ public record DeobfuscatorOptions(
     }
 
     /**
-     * Enables stacktraces logging
+     * Disables stacktraces logging
      */
     @Contract(" -> this")
-    public DeobfuscatorOptions.Builder consoleDebug() {
-      this.consoleDebug = true;
+    public DeobfuscatorOptions.Builder noStacktraces() {
+      this.printStacktraces = false;
       return this;
     }
 
@@ -188,8 +188,8 @@ public record DeobfuscatorOptions(
      * Continue deobfuscation even if errors occur
      */
     @Contract(" -> this")
-    public DeobfuscatorOptions.Builder suppressErrors() {
-      this.suppressErrors = true;
+    public DeobfuscatorOptions.Builder continueOnError() {
+      this.continueOnError = true;
       return this;
     }
 
@@ -238,8 +238,8 @@ public record DeobfuscatorOptions(
           classReaderFlags,
           classWriterFlags,
           // Other config
-          consoleDebug,
-          suppressErrors,
+          printStacktraces,
+          continueOnError,
           verifyBytecode,
 
           virtualMachine

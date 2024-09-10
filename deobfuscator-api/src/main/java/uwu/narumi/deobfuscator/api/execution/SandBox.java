@@ -25,11 +25,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uwu.narumi.deobfuscator.api.library.LibraryClassLoader;
 
+/**
+ * A wrapper for {@link VirtualMachine}
+ */
 public class SandBox {
 
   private static final Logger LOGGER = LogManager.getLogger(SandBox.class);
-
-  private final LibraryClassLoader loader;
 
   private final VirtualMachine virtualMachine;
   private final MemoryManager memoryManager;
@@ -41,7 +42,6 @@ public class SandBox {
   }
 
   public SandBox(LibraryClassLoader loader, VirtualMachine virtualMachine) {
-    this.loader = loader;
     this.virtualMachine = virtualMachine;
 
     try {
@@ -86,18 +86,24 @@ public class SandBox {
   }
 
   /**
+   * @see SandBox#logVMException(VMException, VirtualMachine)
+   */
+  public void logVMException(VMException ex) {
+    logVMException(ex, this.virtualMachine);
+  }
+
+  /**
    * Converts {@link VMException} into readable java exception
    */
-  public void handleVMException(VMException ex) {
+  public static void logVMException(VMException ex, VirtualMachine vm) {
     InstanceValue oop = ex.getOop();
-    if (oop.getJavaClass() == virtualMachine.getSymbols().java_lang_ExceptionInInitializerError()) {
-      oop = (InstanceValue) virtualMachine.getOperations().getReference(oop, "exception", "Ljava/lang/Throwable;");
+    if (oop.getJavaClass() == vm.getSymbols().java_lang_ExceptionInInitializerError()) {
+      oop = (InstanceValue) vm.getOperations().getReference(oop, "exception", "Ljava/lang/Throwable;");
     }
 
     // Print pretty exception
     LOGGER.error(oop);
-    LOGGER.error(virtualMachine.getOperations().toJavaException(oop));
-    throw ex;
+    LOGGER.error(vm.getOperations().toJavaException(oop));
   }
 
   public VirtualMachine getVirtualMachine() {

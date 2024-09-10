@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import dev.xdark.ssvm.VirtualMachine;
+import dev.xdark.ssvm.execution.VMException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
@@ -36,15 +37,14 @@ public class Context {
   public SandBox getSandBox() {
     if (this.sandBox == null) {
       // Lazily load sandbox
+      VirtualMachine vm = options.virtualMachine() == null ? new VirtualMachine() : options.virtualMachine();
       try {
-        this.sandBox = new SandBox(
-            this.libraryLoader,
-            options.virtualMachine() == null ? new VirtualMachine() : options.virtualMachine()
-        );
-      } catch (Throwable t) {
-        LOGGER.error("SSVM bootstrap failed");
-        LOGGER.debug("Error", t);
-        if (options.consoleDebug()) t.printStackTrace();
+        this.sandBox = new SandBox(this.libraryLoader, vm);
+      } catch (VMException ex) {
+        LOGGER.error("SSVM bootstrap failed. Make sure that you run this deobfuscator on java 17");
+        SandBox.logVMException(ex, vm);
+
+        throw new RuntimeException(ex);
       }
     }
     return this.sandBox;

@@ -100,7 +100,7 @@ public abstract class Transformer extends AsmHelper implements Opcodes {
       return false;
     } catch (Exception e) {
       LOGGER.error("Error occurred when transforming {}", transformer.name(), e);
-      if (!context.getOptions().suppressErrors()) {
+      if (!context.getOptions().continueOnError()) {
         throw new RuntimeException(e);
       }
       return false;

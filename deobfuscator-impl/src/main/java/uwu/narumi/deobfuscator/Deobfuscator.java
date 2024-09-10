@@ -10,13 +10,11 @@ import java.util.function.Supplier;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import dev.xdark.ssvm.VirtualMachine;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.context.DeobfuscatorOptions;
-import uwu.narumi.deobfuscator.api.execution.SandBox;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
 import uwu.narumi.deobfuscator.api.helper.FileHelper;
 import uwu.narumi.deobfuscator.api.library.Library;
@@ -117,10 +115,9 @@ public class Deobfuscator {
       }
     } catch (Exception e) {
       LOGGER.error("Could not load class: {}, adding as file", path);
-      LOGGER.debug("Error", e);
+      if (this.options.printStacktraces()) LOGGER.error(e);
 
       context.getFiles().putIfAbsent(path, bytes);
-      if (this.options.consoleDebug()) e.printStackTrace();
     }
   }
 
@@ -191,8 +188,7 @@ public class Deobfuscator {
                   zipOutputStream.write(data);
                 } catch (Exception e) {
                   LOGGER.error("Could not save class, saving original class instead of deobfuscated: {}", classWrapper.name());
-                  LOGGER.debug("Error", e);
-                  if (this.options.consoleDebug()) e.printStackTrace();
+                  if (this.options.printStacktraces()) LOGGER.error(e);
 
                   try {
                     // Save original class as a fallback
@@ -202,9 +198,7 @@ public class Deobfuscator {
                     zipOutputStream.write(data);
                   } catch (Exception e2) {
                     LOGGER.error("Could not save original class: {}", classWrapper.name());
-                    LOGGER.debug("Error", e2);
-
-                    if (this.options.consoleDebug()) e2.printStackTrace();
+                    if (this.options.printStacktraces()) LOGGER.error(e2);
                   }
                 }
 
@@ -221,9 +215,7 @@ public class Deobfuscator {
                   zipOutputStream.write(data);
                 } catch (Exception e) {
                   LOGGER.error("Could not save file: {}", name);
-                  LOGGER.debug("Error", e);
-
-                  if (this.options.consoleDebug()) e.printStackTrace();
+                  if (this.options.printStacktraces()) LOGGER.error(e);
                 }
 
                 context.getFiles().remove(name);
