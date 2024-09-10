@@ -93,12 +93,7 @@ public class UselessPopCleanTransformer extends FramedInstructionsTransformer {
   private boolean areTwoSizedValues(OriginalSourceValue sourceValue) {
     if (!isSourceValueRemovable(sourceValue)) return false;
 
-    for (AbstractInsnNode producer : sourceValue.insns) {
-      if (producer.sizeOnStack() != 2) {
-        return false;
-      }
-    }
-    return true;
+    return sourceValue.getSize() == 2;
   }
 
   private void popSourceValue(OriginalSourceValue value, MethodNode methodNode) {

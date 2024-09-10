@@ -1,6 +1,5 @@
 package uwu.narumi.deobfuscator.base;
 
-import com.sun.jdi.InvocationException;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.jetbrains.annotations.Nullable;

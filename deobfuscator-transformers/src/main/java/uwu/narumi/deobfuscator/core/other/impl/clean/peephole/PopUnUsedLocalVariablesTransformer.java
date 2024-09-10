@@ -6,27 +6,29 @@ import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.asm.InstructionContext;
+import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.context.Context;
-import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class PopUnUsedLocalVariablesTransformer extends Transformer {
 
   @Override
   protected void transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
-      Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = AsmHelper.analyzeSource(classWrapper.getClassNode(), methodNode);
+      MethodContext methodContext = MethodContext.create(classWrapper, methodNode);
 
       List<VarInsnNode> varStoresInUse = new ArrayList<>();
 
       // Find all local variables in use
       for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
         if ((insn instanceof VarInsnNode && !insn.isVarStore()) || insn instanceof IincInsnNode) {
-          Frame<OriginalSourceValue> frame = frames.get(insn);
+          InstructionContext insnContext = methodContext.createInsnContext(insn);
+
+          Frame<OriginalSourceValue> frame = insnContext.frame();
           if (frame == null) return;
 
           int varIndex;
@@ -50,8 +52,12 @@ public class PopUnUsedLocalVariablesTransformer extends Transformer {
       for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
         if (insn instanceof VarInsnNode varInsnNode && insn.isVarStore()) {
           if (!varStoresInUse.contains(varInsnNode)) {
+            InstructionContext insnContext = methodContext.createInsnContext(insn);
+
             // Pop the value from the stack
-            methodNode.instructions.set(insn, insn.toPop());
+            insnContext.pop(1);
+
+            methodNode.instructions.remove(insn);
 
             this.markChange();
           }
