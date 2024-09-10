@@ -1,5 +1,8 @@
 package uwu.narumi.deobfuscator.core.other.impl.zkm;
 
+import dev.xdark.ssvm.invoke.Argument;
+import dev.xdark.ssvm.mirror.type.InstanceClass;
+import dev.xdark.ssvm.value.ObjectValue;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
@@ -11,12 +14,12 @@ import uwu.narumi.deobfuscator.api.asm.matcher.impl.FieldMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.LongMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.MethodMatch;
 import uwu.narumi.deobfuscator.api.context.Context;
-import uwu.narumi.deobfuscator.api.execution.SandboxClassLoader;
+import uwu.narumi.deobfuscator.api.execution.SandBox;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Decrypts {@code long} numbers <a href="https://www.zelix.com/klassmaster/featuresLongEncryption.html">https://www.zelix.com/klassmaster/featuresLongEncryption.html</a>
@@ -48,10 +51,10 @@ public class ZelixLongEncryptionTransformer extends Transformer {
               .stack(LongMatch.of().save("key-1")) // Key 1
           ));
 
-  private SandboxClassLoader sandboxClassLoader;
-
   @Override
   protected void transform(ClassWrapper scope, Context context) throws Exception {
+    List<String> classesToRemove = new ArrayList<>();
+
     context.classes(scope).forEach(classWrapper -> classWrapper.findClInit().ifPresent(clinit -> {
       MethodContext methodContext = MethodContext.create(classWrapper, clinit);
 
@@ -71,21 +74,38 @@ public class ZelixLongEncryptionTransformer extends Transformer {
           long key2 = result.storage().get("key-2").insn().asLong();
           long decryptKey = result.storage().get("decrypt-key").insn().asLong();
 
-          ClassWrapper longDecrypterClass = context.getClasses().get(createDecrypterInsn.owner);
-          if (this.sandboxClassLoader == null) {
-            // Lazily load sandbox classloader
-            this.sandboxClassLoader = new SandboxClassLoader(context);
-          }
+          ClassWrapper longDecrypterCreatorClass = context.getClasses().get(createDecrypterInsn.owner);
 
           try {
-            Class<?> clazz = Class.forName(longDecrypterClass.canonicalName(), true, sandboxClassLoader);
+            SandBox sandBox = context.getSandBox();
+
             // Create decrypter
-            Method createDecrypterMethod = clazz.getDeclaredMethod(createDecrypterInsn.name, long.class, long.class, Object.class);
-            Object longDecrypter = createDecrypterMethod.invoke(null, key1, key2, null);
+            InstanceClass clazz = sandBox.getHelper().loadClass(longDecrypterCreatorClass.canonicalName());
+            ObjectValue longDecrypterInstance = sandBox.getInvocationUtil().invokeReference(
+                clazz.getMethod(createDecrypterInsn.name, createDecrypterInsn.desc),
+                Argument.int64(key1), // Key 1
+                Argument.int64(key2), // Key 2
+                Argument.reference(sandBox.getMemoryManager().nullValue()) // Lookup class
+            );
 
             // Decrypt long value
-            Method decryptMethod = longDecrypter.getClass().getDeclaredMethod(decryptInsn.name, long.class);
-            long value = (long) decryptMethod.invoke(longDecrypter, decryptKey);
+            InstanceClass longDecrypterClass = (InstanceClass) sandBox.getMemoryManager().readClass(longDecrypterInstance);
+            long value = sandBox.getInvocationUtil().invokeLong(
+                longDecrypterClass.getMethod(decryptInsn.name, decryptInsn.desc),
+                Argument.reference(longDecrypterInstance),
+                Argument.int64(decryptKey)
+            );
+
+            // Add classes to remove
+            if (!classesToRemove.contains(longDecrypterCreatorClass.name())) {
+              classesToRemove.add(longDecrypterCreatorClass.name());
+            }
+            if (!classesToRemove.contains(longDecrypterClass.getInternalName())) {
+              classesToRemove.add(longDecrypterClass.getInternalName());
+            }
+            if (!classesToRemove.contains(longDecrypterCreatorClass.getClassNode().interfaces.get(0))) {
+              classesToRemove.add(longDecrypterCreatorClass.getClassNode().interfaces.get(0));
+            }
 
             // Remove all instructions that creates decrypter
             decryptContext.removeAll();
@@ -93,14 +113,13 @@ public class ZelixLongEncryptionTransformer extends Transformer {
             // Set field to decrypted long value!
             insnContext.methodNode().instructions.insertBefore(insnContext.insn(), AsmHelper.getNumber(value));
             markChange();
-          } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+          } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
           }
         }
       }
     }));
 
-    // Remove decrypter classes
-    this.sandboxClassLoader.getLoadedCustomClasses().forEach(clazzName -> context.getClasses().remove(clazzName));
+    classesToRemove.forEach(className -> context.getClasses().remove(className));
   }
 }

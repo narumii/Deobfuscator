@@ -131,7 +131,7 @@ public class ClassWrapper implements Cloneable {
    */
   public byte[] compileToBytes(Context context) {
     try {
-      ClassWriter classWriter = new LibraryClassWriter(this.classWriterFlags, context.getLoader());
+      ClassWriter classWriter = new LibraryClassWriter(this.classWriterFlags, context.getLibraryLoader());
       this.classNode.accept(classWriter);
 
       return classWriter.toByteArray();

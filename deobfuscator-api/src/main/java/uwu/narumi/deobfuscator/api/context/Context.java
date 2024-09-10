@@ -4,36 +4,58 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import dev.xdark.ssvm.VirtualMachine;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.execution.SandBox;
 import uwu.narumi.deobfuscator.api.library.LibraryClassLoader;
 
 public class Context {
 
+  private static final Logger LOGGER = LogManager.getLogger(Context.class);
+
   private final Map<String, ClassWrapper> classes = new ConcurrentHashMap<>();
   private final Map<String, byte[]> originalClasses = new ConcurrentHashMap<>();
   private final Map<String, byte[]> files = new ConcurrentHashMap<>();
 
   private final DeobfuscatorOptions options;
-  private final LibraryClassLoader loader;
-  private final SandBox sandBox;
+  private final LibraryClassLoader libraryLoader;
 
-  public Context(DeobfuscatorOptions options, LibraryClassLoader loader, SandBox sandBox) {
+  private SandBox sandBox = null;
+
+  public Context(DeobfuscatorOptions options, LibraryClassLoader libraryLoader) {
     this.options = options;
-    this.loader = loader;
-    this.sandBox = sandBox;
+    this.libraryLoader = libraryLoader;
+  }
+
+  /**
+   * Gets sandbox or creates if it does not exist.
+   */
+  public SandBox getSandBox() {
+    if (this.sandBox == null) {
+      // Lazily load sandbox
+      try {
+        this.sandBox = new SandBox(
+            this.libraryLoader,
+            options.virtualMachine() == null ? new VirtualMachine() : options.virtualMachine()
+        );
+      } catch (Throwable t) {
+        LOGGER.error("SSVM bootstrap failed");
+        LOGGER.debug("Error", t);
+        if (options.consoleDebug()) t.printStackTrace();
+      }
+    }
+    return this.sandBox;
   }
 
   public DeobfuscatorOptions getOptions() {
     return options;
   }
 
-  public LibraryClassLoader getLoader() {
-    return loader;
-  }
-
-  public SandBox getSandBox() {
-    return sandBox;
+  public LibraryClassLoader getLibraryLoader() {
+    return libraryLoader;
   }
 
   public Collection<ClassWrapper> classes() {

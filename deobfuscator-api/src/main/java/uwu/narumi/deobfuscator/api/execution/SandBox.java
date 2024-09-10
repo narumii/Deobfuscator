@@ -7,6 +7,7 @@ import dev.xdark.ssvm.api.MethodInvoker;
 import dev.xdark.ssvm.api.VMInterface;
 import dev.xdark.ssvm.classloading.SupplyingClassLoaderInstaller;
 import dev.xdark.ssvm.execution.ExecutionEngine;
+import dev.xdark.ssvm.execution.VMException;
 import dev.xdark.ssvm.filesystem.FileManager;
 import dev.xdark.ssvm.invoke.InvocationUtil;
 import dev.xdark.ssvm.memory.management.MemoryManager;
@@ -18,16 +19,22 @@ import dev.xdark.ssvm.thread.ThreadManager;
 import dev.xdark.ssvm.util.Reflection;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
+import dev.xdark.ssvm.value.InstanceValue;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import uwu.narumi.deobfuscator.api.library.LibraryClassLoader;
 
 public class SandBox {
 
+  private static final Logger LOGGER = LogManager.getLogger(SandBox.class);
+
   private final LibraryClassLoader loader;
 
-  private VirtualMachine virtualMachine;
-  private MemoryManager memoryManager;
-  private SupplyingClassLoaderInstaller.Helper helper;
-  private InvocationUtil invocationUtil;
+  private final VirtualMachine virtualMachine;
+  private final MemoryManager memoryManager;
+  private final SupplyingClassLoaderInstaller.Helper helper;
+  private final InvocationUtil invocationUtil;
 
   public SandBox(LibraryClassLoader loader) {
     this(loader, new VirtualMachine());
@@ -41,11 +48,8 @@ public class SandBox {
       this.virtualMachine.initialize();
       this.virtualMachine.bootstrap();
       this.memoryManager = virtualMachine.getMemoryManager();
-      this.helper =
-          SupplyingClassLoaderInstaller.install(
-              virtualMachine,
-              new ClassLoaderDataSupplier(loader)
-                  .append(SupplyingClassLoaderInstaller.supplyFromRuntime()));
+      // Install all classes from deobfuscator context
+      this.helper = SupplyingClassLoaderInstaller.install(virtualMachine, new ClassLoaderDataSupplier(loader));
       this.invocationUtil = InvocationUtil.create(virtualMachine);
       patchVm();
     } catch (Exception e) {
@@ -79,6 +83,21 @@ public class SandBox {
     PrintWriter printWriter = new PrintWriter(stringWriter);
     t.printStackTrace(printWriter);
     return stringWriter.toString();
+  }
+
+  /**
+   * Converts {@link VMException} into readable java exception
+   */
+  public void handleVMException(VMException ex) {
+    InstanceValue oop = ex.getOop();
+    if (oop.getJavaClass() == virtualMachine.getSymbols().java_lang_ExceptionInInitializerError()) {
+      oop = (InstanceValue) virtualMachine.getOperations().getReference(oop, "exception", "Ljava/lang/Throwable;");
+    }
+
+    // Print pretty exception
+    LOGGER.error(oop);
+    LOGGER.error(virtualMachine.getOperations().toJavaException(oop));
+    throw ex;
   }
 
   public VirtualMachine getVirtualMachine() {
