@@ -40,6 +40,12 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
           OpcodeMatch.of(ARETURN)
       );
 
+  private static final Match INVOKE_AND_RETURN =
+      SequenceMatch.of(
+          MethodMatch.invokeStatic().save("invocation"),
+          OpcodeMatch.of(ATHROW)
+      );
+
   @Override
   protected void transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).forEach(classWrapper -> {
@@ -56,12 +62,6 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
         }
       });
 
-      Match invokeAndReturnMatch =
-          SequenceMatch.of(
-              MethodMatch.invokeStatic().save("invocation"),
-              OpcodeMatch.of(ATHROW)
-          );
-
       List<MethodRef> toRemove = new ArrayList<>();
 
       // Remove try-catches with these instant return exception methods
@@ -70,7 +70,7 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
 
         methodNode.tryCatchBlocks.removeIf(tryBlock -> {
           InstructionContext start = framelessContext.newInsnContext(tryBlock.handler.getNext());
-          MatchContext result = invokeAndReturnMatch.matchResult(start);
+          MatchContext result = INVOKE_AND_RETURN.matchResult(start);
           if (result != null) {
             MethodRef methodRef = MethodRef.of((MethodInsnNode) result.insn());
 
