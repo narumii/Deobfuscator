@@ -104,6 +104,7 @@ public class ZelixLongEncryptionTransformer extends Transformer {
       }
     }));
 
+    // Remove decrypter classes
     sandBox.getUsedCustomClasses().forEach(clazz -> context.getClasses().remove(clazz.getInternalName()));
   }
 }
