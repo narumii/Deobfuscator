@@ -63,7 +63,6 @@ public final class PacketEvents implements Listener, EventManager {
     private static final long a = 110160429747013L;
 
     public PacketEvents() {
-        long var1 = 125984749057137L;
         int var10000 = Vulcan_Q();
         super();
         int var3 = var10000;
@@ -83,7 +82,6 @@ public final class PacketEvents implements Listener, EventManager {
     }
 
     public static PacketEvents Vulcan_o(Plugin var0) {
-        long var1 = 60184643744606L;
         int var3 = Vulcan_a();
         boolean var10000 = Bukkit.isPrimaryThread();
         if (var3 == 0) {
@@ -272,7 +270,6 @@ public final class PacketEvents implements Listener, EventManager {
 
     // $VF: Irreducible bytecode was duplicated to produce valid code
     public void Vulcan_o(PacketEventsSettings var1) {
-        long var2 = 68094010456234L;
         int var10000 = Vulcan_Q();
         this.Vulcan_g();
         int var4 = var10000;
@@ -308,7 +305,7 @@ public final class PacketEvents implements Listener, EventManager {
             if (var4 != 0) {
                 if (var7) {
                     Metrics var5 = new Metrics((JavaPlugin)this.Vulcan_a(), 11327);
-                    var5.addCustomChart(new SimplePie("packetevents_version", this::lambda$init$0));
+                    var5.addCustomChart(new SimplePie("packetevents_version", () -> this.Vulcan_x().toString()));
                 }
             } else if (var7) {
                 break label62;
@@ -321,7 +318,30 @@ public final class PacketEvents implements Listener, EventManager {
         label53: {
             Runnable var6;
             label52: {
-                var6 = this::lambda$init$1;
+                var6 = () -> {
+                    long var1x = 66876338785522L;
+                    long var3 = 119084676127620L;
+                    long var5x = 123797029215992L;
+                    Bukkit.getPluginManager().registerEvents(this.bukkitEventProcessorInternal, plugin);
+                    int var10000x = Vulcan_a();
+                    Iterator var8 = Bukkit.getOnlinePlayers().iterator();
+                    int var7x = var10000x;
+
+                    while (var8.hasNext()) {
+                        Player var9 = (Player)var8.next();
+
+                        try {
+                            this.injector.Vulcan_D(new Object[]{var5x, var9});
+                            this.Vulcan_N().Vulcan_X(new Object[]{var3, new PostPlayerInjectEvent(var9, false)});
+                        } catch (Exception var10) {
+                            var9.kickPlayer("Failed to inject... Please rejoin!");
+                        }
+
+                        if (var7x != 0) {
+                            break;
+                        }
+                    }
+                };
                 if (var4 != 0) {
                     if (!this.lateBind) {
                         break label52;
@@ -465,7 +485,6 @@ public final class PacketEvents implements Listener, EventManager {
 
     private void Vulcan_H() {
         label16: {
-            long var1 = 47494217086680L;
             int var3 = Vulcan_Q();
             PacketEvents var10000 = this;
             if (var3 != 0) {
@@ -479,76 +498,45 @@ public final class PacketEvents implements Listener, EventManager {
             var10000.updateChecker = new UpdateChecker();
         }
 
-        Thread var4 = new Thread(this::lambda$handleUpdateCheck$2, "packetevents-update-check-thread");
-        var4.start();
-    }
+        Thread var4 = new Thread(() -> {
+            long var1 = 73114304934084L;
+            long var3x = 71820540609001L;
+            int var10000x = Vulcan_a();
+            this.Vulcan_a().getLogger().info("[packetevents] Checking for an update, please wait...");
+            int var5 = var10000x;
+            UpdateCheckerStatus var6 = this.updateChecker.Vulcan_M(new Object[]{var3x});
+            int var7 = 5;
+            byte var8 = 5;
+            int var9 = 0;
 
-    private void lambda$handleUpdateCheck$2() {
-        long var1 = 73114304934084L;
-        long var3 = 71820540609001L;
-        int var10000 = Vulcan_a();
-        this.Vulcan_a().getLogger().info("[packetevents] Checking for an update, please wait...");
-        int var5 = var10000;
-        UpdateCheckerStatus var6 = this.updateChecker.Vulcan_M(new Object[]{var3});
-        int var7 = 5;
-        byte var8 = 5;
-        int var9 = 0;
+            while (var9 < var8 && (var6 == UpdateCheckerStatus.FAILED || var5 != 0)) {
+                this.Vulcan_a().getLogger().severe("[packetevents] Checking for an update again in " + var7 + " seconds...");
 
-        while (var9 < var8 && (var6 == UpdateCheckerStatus.FAILED || var5 != 0)) {
-            this.Vulcan_a().getLogger().severe("[packetevents] Checking for an update again in " + var7 + " seconds...");
-
-            try {
-                Thread.sleep((long)var7 * 1000L);
-            } catch (InterruptedException var11) {
-                var11.printStackTrace();
-            }
-
-            var7 *= 2;
-            var6 = this.updateChecker.Vulcan_M(new Object[]{var3});
-            if (var5 == 0) {
-                if (var9 == 4) {
-                    this.Vulcan_a().getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
-                    if (var5 == 0) {
-                        break;
-                    }
+                try {
+                    Thread.sleep((long)var7 * 1000L);
+                } catch (InterruptedException var11) {
+                    var11.printStackTrace();
                 }
 
-                var9++;
+                var7 *= 2;
+                var6 = this.updateChecker.Vulcan_M(new Object[]{var3x});
+                if (var5 == 0) {
+                    if (var9 == 4) {
+                        this.Vulcan_a().getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
+                        if (var5 == 0) {
+                            break;
+                        }
+                    }
+
+                    var9++;
+                }
+
+                if (var5 != 0) {
+                    break;
+                }
             }
-
-            if (var5 != 0) {
-                break;
-            }
-        }
-    }
-
-    private void lambda$init$1() {
-        long var1 = 66876338785522L;
-        long var3 = 119084676127620L;
-        long var5 = 123797029215992L;
-        Bukkit.getPluginManager().registerEvents(this.bukkitEventProcessorInternal, plugin);
-        int var10000 = Vulcan_a();
-        Iterator var8 = Bukkit.getOnlinePlayers().iterator();
-        int var7 = var10000;
-
-        while (var8.hasNext()) {
-            Player var9 = (Player)var8.next();
-
-            try {
-                this.injector.Vulcan_D(new Object[]{var5, var9});
-                this.Vulcan_N().Vulcan_X(new Object[]{var3, new PostPlayerInjectEvent(var9, false)});
-            } catch (Exception var11) {
-                var9.kickPlayer("Failed to inject... Please rejoin!");
-            }
-
-            if (var7 != 0) {
-                break;
-            }
-        }
-    }
-
-    private String lambda$init$0() {
-        return this.Vulcan_x().toString();
+        }, "packetevents-update-check-thread");
+        var4.start();
     }
 
     public static void Vulcan_x(int var0) {
