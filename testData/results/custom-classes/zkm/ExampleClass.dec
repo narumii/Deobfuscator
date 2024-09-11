@@ -569,8 +569,4 @@ public final class PacketEvents implements Listener, EventManager {
             Vulcan_x(49);
         }
     }
-
-    private static Exception a(Exception var0) {
-        return var0;
-    }
 }

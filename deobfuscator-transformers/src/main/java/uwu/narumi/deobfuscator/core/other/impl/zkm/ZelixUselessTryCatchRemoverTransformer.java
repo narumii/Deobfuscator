@@ -6,6 +6,7 @@ import uwu.narumi.deobfuscator.api.asm.InstructionContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.MethodRef;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.group.SequenceMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.MethodMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
@@ -57,12 +58,11 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
 
       Match invokeAndReturnMatch =
           SequenceMatch.of(
-              MethodMatch.invokeStatic().and(Match.predicate(ctx -> {
-                MethodRef methodRef = MethodRef.of((MethodInsnNode) ctx.insn());
-                return instantReturnExceptionMethods.contains(methodRef);
-              })),
+              MethodMatch.invokeStatic().save("invocation"),
               OpcodeMatch.of(ATHROW)
           );
+
+      List<MethodRef> toRemove = new ArrayList<>();
 
       // Remove try-catches with these instant return exception methods
       classWrapper.methods().forEach(methodNode -> {
@@ -70,7 +70,14 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
 
         methodNode.tryCatchBlocks.removeIf(tryBlock -> {
           InstructionContext start = framelessContext.newInsnContext(tryBlock.handler.getNext());
-          if (invokeAndReturnMatch.matches(start)) {
+          MatchContext result = invokeAndReturnMatch.matchResult(start);
+          if (result != null) {
+            MethodRef methodRef = MethodRef.of((MethodInsnNode) result.insn());
+
+            if (!toRemove.contains(methodRef)) {
+              toRemove.add(methodRef);
+            }
+
             markChange();
             return true;
           } else {
@@ -78,6 +85,9 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
           }
         });
       });
+
+      // Remove instant return exception methods
+      classWrapper.methods().removeIf(methodNode -> toRemove.contains(MethodRef.of(classWrapper.getClassNode(), methodNode)));
     });
   }
 }
