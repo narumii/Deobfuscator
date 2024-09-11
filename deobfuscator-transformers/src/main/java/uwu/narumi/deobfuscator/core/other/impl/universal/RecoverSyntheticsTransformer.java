@@ -13,6 +13,7 @@ public class RecoverSyntheticsTransformer extends Transformer {
         if (methodNode.name.startsWith("lambda$")) {
           // Mark as synthetic
           methodNode.access |= ACC_SYNTHETIC;
+          markChange();
         }
       });
     });
