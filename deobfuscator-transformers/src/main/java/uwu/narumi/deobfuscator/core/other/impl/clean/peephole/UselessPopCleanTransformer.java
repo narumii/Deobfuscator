@@ -9,7 +9,6 @@ import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
 
 import java.util.stream.Stream;
 
-// TODO: Handle DUP2
 public class UselessPopCleanTransformer extends FramedInstructionsTransformer {
   public UselessPopCleanTransformer() {
     this.rerunOnChange = true;
@@ -28,18 +27,27 @@ public class UselessPopCleanTransformer extends FramedInstructionsTransformer {
     boolean shouldRemovePop = false;
 
     OriginalSourceValue firstValue = insnContext.frame().getStack(insnContext.frame().getStackSize() - 1);
-    if (insn.getOpcode() == POP && areProducersConstant(firstValue)) {
-      // Pop the value from the stack
-      popSourceValue(firstValue, insnContext.methodNode());
-      shouldRemovePop = true;
-    } else if (insn.getOpcode() == POP2) {
-      if (areTwoSizedValues(firstValue)) {
-        // Pop 2-sized value from the stack
+    // Return if we can't remove the source value
+    if (!isSourceValueRemovable(firstValue)) return false;
+
+    if (insn.getOpcode() == POP) {
+      if (areProducersConstant(firstValue)) {
+        // Pop the value from the stack
         popSourceValue(firstValue, insnContext.methodNode());
         shouldRemovePop = true;
+      }
+    } else if (insn.getOpcode() == POP2) {
+      if (firstValue.getSize() == 2) {
+        if (areProducersConstant(firstValue)) {
+          // Pop 2-sized value from the stack
+          popSourceValue(firstValue, insnContext.methodNode());
+          shouldRemovePop = true;
+        }
       } else {
         int index = insnContext.frame().getStackSize() - 2;
         OriginalSourceValue secondValue = index >= 0 ? insnContext.frame().getStack(insnContext.frame().getStackSize() - 2) : null;
+        // Return if we can't remove the source value
+        if (secondValue != null && !isSourceValueRemovable(firstValue)) return false;
 
         // Pop two values from the stack
         if (areProducersConstant(firstValue) && (secondValue == null || areProducersConstant(secondValue))) {
@@ -61,23 +69,15 @@ public class UselessPopCleanTransformer extends FramedInstructionsTransformer {
   }
 
   private boolean isSourceValueRemovable(OriginalSourceValue sourceValue) {
-    if (sourceValue.insns.isEmpty()) {
-      // Nothing to remove. Probably a local variable
-      return false;
-    }
-    if (!sourceValue.getChildren().isEmpty()) {
-      // Other source values depends on this source value
-      return false;
-    }
-
-    return true;
+    // Other source values depends on this source value
+    return sourceValue.getChildren().isEmpty();
   }
 
   /**
    * Checks if all producers of the source value are constants
    */
   private boolean areProducersConstant(OriginalSourceValue sourceValue) {
-    if (!isSourceValueRemovable(sourceValue)) return false;
+    if (sourceValue.insns.isEmpty()) return false;
 
     for (AbstractInsnNode producer : sourceValue.insns) {
       if (!(producer.isConstant() || producer.getOpcode() == DUP)) {
@@ -85,15 +85,6 @@ public class UselessPopCleanTransformer extends FramedInstructionsTransformer {
       }
     }
     return true;
-  }
-
-  /**
-   * Checks if all producers of the source value are 2-sized values
-   */
-  private boolean areTwoSizedValues(OriginalSourceValue sourceValue) {
-    if (!isSourceValueRemovable(sourceValue)) return false;
-
-    return sourceValue.getSize() == 2;
   }
 
   private void popSourceValue(OriginalSourceValue value, MethodNode methodNode) {

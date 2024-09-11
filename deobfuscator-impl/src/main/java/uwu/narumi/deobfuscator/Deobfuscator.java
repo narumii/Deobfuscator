@@ -81,7 +81,7 @@ public class Deobfuscator {
       LOGGER.info("Loading jar file: {}", this.options.inputJar());
       // Load jar
       FileHelper.loadFilesFromZip(this.options.inputJar(), this::loadClass);
-      LOGGER.info("Loaded jar file: {}\n", this.options.inputJar());
+      LOGGER.info("Loaded jar file: {}", this.options.inputJar());
     }
 
     for (DeobfuscatorOptions.ExternalClass clazz : this.options.classes()) {
@@ -91,7 +91,7 @@ public class Deobfuscator {
         // Load class
         this.loadClass(clazz.relativePath(), inputStream.readAllBytes());
 
-        LOGGER.info("Loaded class: {}\n", clazz.relativePath());
+        LOGGER.info("Loaded class: {}", clazz.relativePath());
       } catch (IOException e) {
         LOGGER.error("Could not load class: {}", clazz.relativePath(), e);
       }
