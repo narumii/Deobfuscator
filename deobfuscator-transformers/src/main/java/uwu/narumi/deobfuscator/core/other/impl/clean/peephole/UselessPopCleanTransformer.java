@@ -22,63 +22,69 @@ public class UselessPopCleanTransformer extends FramedInstructionsTransformer {
 
   @Override
   protected boolean transformInstruction(Context context, InstructionContext insnContext) {
-    AbstractInsnNode insn = insnContext.insn();
+    boolean success = tryRemovePop(insnContext);
 
-    boolean shouldRemovePop = false;
-
-    OriginalSourceValue firstValue = insnContext.frame().getStack(insnContext.frame().getStackSize() - 1);
-    // Return if we can't remove the source value
-    if (!isSourceValueRemovable(firstValue)) return false;
-
-    if (insn.getOpcode() == POP) {
-      if (areProducersConstant(firstValue)) {
-        // Pop the value from the stack
-        popSourceValue(firstValue, insnContext.methodNode());
-        shouldRemovePop = true;
-      }
-    } else if (insn.getOpcode() == POP2) {
-      if (firstValue.getSize() == 2) {
-        if (areProducersConstant(firstValue)) {
-          // Pop 2-sized value from the stack
-          popSourceValue(firstValue, insnContext.methodNode());
-          shouldRemovePop = true;
-        }
-      } else {
-        int index = insnContext.frame().getStackSize() - 2;
-        OriginalSourceValue secondValue = index >= 0 ? insnContext.frame().getStack(insnContext.frame().getStackSize() - 2) : null;
-        // Return if we can't remove the source value
-        if (secondValue != null && !isSourceValueRemovable(firstValue)) return false;
-
-        // Pop two values from the stack
-        if (areProducersConstant(firstValue) && (secondValue == null || areProducersConstant(secondValue))) {
-          popSourceValue(firstValue, insnContext.methodNode());
-          if (secondValue != null) {
-            popSourceValue(secondValue, insnContext.methodNode());
-          }
-
-          shouldRemovePop = true;
-        }
-      }
+    if (success) {
+      insnContext.methodNode().instructions.remove(insnContext.insn());
     }
 
-    if (shouldRemovePop) {
-      insnContext.methodNode().instructions.remove(insn);
-    }
-
-    return shouldRemovePop;
-  }
-
-  private boolean isSourceValueRemovable(OriginalSourceValue sourceValue) {
-    // Other source values depends on this source value
-    return sourceValue.getChildren().isEmpty();
+    return success;
   }
 
   /**
-   * Checks if all producers of the source value are constants
+   * Tries to remove pop's source values
+   *
+   * @param insnContext Instructon context
+   * @return If removed
    */
-  private boolean areProducersConstant(OriginalSourceValue sourceValue) {
-    if (sourceValue.insns.isEmpty()) return false;
+  private boolean tryRemovePop(InstructionContext insnContext) {
+    AbstractInsnNode insn = insnContext.insn();
+    OriginalSourceValue firstValue = insnContext.frame().getStack(insnContext.frame().getStackSize() - 1);
 
+    if (!canPop(firstValue)) return false;
+
+    if (insn.getOpcode() == POP) {
+      // Pop the value from the stack
+      popSourceValue(firstValue, insnContext.methodNode());
+      return true;
+    } else if (insn.getOpcode() == POP2) {
+      if (firstValue.getSize() == 2) {
+        // Pop 2-sized value from the stack
+        popSourceValue(firstValue, insnContext.methodNode());
+      } else {
+        // Pop two values from the stack
+
+        int index = insnContext.frame().getStackSize() - 2;
+        OriginalSourceValue secondValue = index >= 0 ? insnContext.frame().getStack(insnContext.frame().getStackSize() - 2) : null;
+        // Return if we can't remove the source value
+        if (secondValue != null && !canPop(secondValue)) return false;
+
+        // Pop
+        popSourceValue(firstValue, insnContext.methodNode());
+        if (secondValue != null) {
+          popSourceValue(secondValue, insnContext.methodNode());
+        }
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Checks if source value can be popped
+   */
+  private boolean canPop(OriginalSourceValue sourceValue) {
+    if (sourceValue.insns.isEmpty()) {
+      // Nothing to remove. Probably a local variable
+      return false;
+    }
+    if (!sourceValue.getChildren().isEmpty()) {
+      // Other source values depends on this source value
+      return false;
+    }
+
+    // Check if all producers of the source value are constants
     for (AbstractInsnNode producer : sourceValue.insns) {
       if (!(producer.isConstant() || producer.getOpcode() == DUP)) {
         return false;
