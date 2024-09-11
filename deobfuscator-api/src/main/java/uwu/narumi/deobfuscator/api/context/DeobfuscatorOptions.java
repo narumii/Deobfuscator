@@ -32,9 +32,7 @@ public record DeobfuscatorOptions(
 
     boolean printStacktraces,
     boolean continueOnError,
-    boolean verifyBytecode,
-
-    VirtualMachine virtualMachine
+    boolean verifyBytecode
 ) {
   public static DeobfuscatorOptions.Builder builder() {
     return new DeobfuscatorOptions.Builder();
@@ -69,8 +67,6 @@ public record DeobfuscatorOptions(
     private boolean printStacktraces = true;
     private boolean continueOnError = false;
     private boolean verifyBytecode = false;
-
-    private VirtualMachine virtualMachine = null;
 
     private Builder() {
     }
@@ -203,12 +199,6 @@ public record DeobfuscatorOptions(
       return this;
     }
 
-    @Contract("_ -> this")
-    public DeobfuscatorOptions.Builder virtualMachine(VirtualMachine virtualMachine) {
-      this.virtualMachine = virtualMachine;
-      return this;
-    }
-
     /**
      * Build immutable {@link DeobfuscatorOptions} with options verification
      */
@@ -240,9 +230,7 @@ public record DeobfuscatorOptions(
           // Other config
           printStacktraces,
           continueOnError,
-          verifyBytecode,
-
-          virtualMachine
+          verifyBytecode
       );
     }
   }

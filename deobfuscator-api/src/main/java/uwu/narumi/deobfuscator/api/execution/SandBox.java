@@ -12,84 +12,88 @@ import dev.xdark.ssvm.filesystem.FileManager;
 import dev.xdark.ssvm.invoke.InvocationUtil;
 import dev.xdark.ssvm.memory.management.MemoryManager;
 import dev.xdark.ssvm.mirror.type.InstanceClass;
+import dev.xdark.ssvm.mirror.type.JavaClass;
 import dev.xdark.ssvm.operation.VMOperations;
 import dev.xdark.ssvm.symbol.Primitives;
 import dev.xdark.ssvm.symbol.Symbols;
 import dev.xdark.ssvm.thread.ThreadManager;
 import dev.xdark.ssvm.util.Reflection;
+
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 
 import dev.xdark.ssvm.value.InstanceValue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import uwu.narumi.deobfuscator.api.library.LibraryClassLoader;
+import uwu.narumi.deobfuscator.api.context.Context;
 
 /**
- * A wrapper for {@link VirtualMachine}
+ * A wrapper for {@link VirtualMachine} with some additional features and patches
  */
 public class SandBox {
 
   private static final Logger LOGGER = LogManager.getLogger(SandBox.class);
 
-  private final VirtualMachine virtualMachine;
+  private final VirtualMachine vm;
+  private final Context context;
   private final MemoryManager memoryManager;
   private final SupplyingClassLoaderInstaller.Helper helper;
   private final InvocationUtil invocationUtil;
 
-  public SandBox(LibraryClassLoader loader) {
-    this(loader, new VirtualMachine());
+  public SandBox(Context context) {
+    this(context, new VirtualMachine());
   }
 
-  public SandBox(LibraryClassLoader loader, VirtualMachine virtualMachine) {
-    this.virtualMachine = virtualMachine;
+  public SandBox(Context context, VirtualMachine vm) {
+    LOGGER.info("Initializing SSVM sandbox...");
+    this.context = context;
+    this.vm = vm;
 
     try {
-      this.virtualMachine.initialize();
-      this.virtualMachine.bootstrap();
-      this.memoryManager = virtualMachine.getMemoryManager();
+      this.vm.initialize();
+      this.vm.bootstrap();
+      this.memoryManager = vm.getMemoryManager();
       // Install all classes from deobfuscator context
-      this.helper = SupplyingClassLoaderInstaller.install(virtualMachine, new ClassLoaderDataSupplier(loader));
-      this.invocationUtil = InvocationUtil.create(virtualMachine);
+      this.helper = SupplyingClassLoaderInstaller.install(vm, new ClassLoaderDataSupplier(context.getLibraryLoader()));
+      this.invocationUtil = InvocationUtil.create(vm);
       patchVm();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    } catch (VMException ex) {
+      LOGGER.error("SSVM bootstrap failed. Make sure that you run this deobfuscator on java 17");
+      SandBox.logVMException(ex, vm);
+
+      throw new RuntimeException(ex);
+    } catch (IOException ex) {
+      throw new RuntimeException(ex);
     }
+    LOGGER.info("Initialized SSVM sandbox");
   }
 
   private void patchVm() {
     // Some patches to circumvent bugs arising from VM implementation changes in later versions
-    if (virtualMachine.getJvmVersion() > 8) {
+    if (vm.getJvmVersion() > 8) {
       // Bug in SSVM makes it think there are overlapping sleeps, so until that gets fixed we stub
       // out sleeping.
-      InstanceClass thread = virtualMachine.getSymbols().java_lang_Thread();
-      virtualMachine
-          .getInterface()
+      InstanceClass thread = vm.getSymbols().java_lang_Thread();
+      vm.getInterface()
           .setInvoker(thread.getMethod("sleep", "(J)V"), MethodInvoker.noop());
 
       // SSVM manages its own memory, and this conflicts with it. Stubbing it out keeps everyone
       // happy.
-      InstanceClass bits = (InstanceClass) virtualMachine.findBootstrapClass("java/nio/Bits");
+      InstanceClass bits = (InstanceClass) vm.findBootstrapClass("java/nio/Bits");
       if (bits != null) {
-        virtualMachine
-            .getInterface()
+        vm.getInterface()
             .setInvoker(bits.getMethod("reserveMemory", "(JJ)V"), MethodInvoker.noop());
       }
     }
-  }
-
-  public static String toString(Throwable t) {
-    StringWriter stringWriter = new StringWriter();
-    PrintWriter printWriter = new PrintWriter(stringWriter);
-    t.printStackTrace(printWriter);
-    return stringWriter.toString();
   }
 
   /**
    * @see SandBox#logVMException(VMException, VirtualMachine)
    */
   public void logVMException(VMException ex) {
-    logVMException(ex, this.virtualMachine);
+    logVMException(ex, this.vm);
   }
 
   /**
@@ -106,12 +110,12 @@ public class SandBox {
     LOGGER.error(vm.getOperations().toJavaException(oop));
   }
 
-  public VirtualMachine getVirtualMachine() {
-    return virtualMachine;
+  public VirtualMachine vm() {
+    return vm;
   }
 
   public VMInterface getVMInterface() {
-    return virtualMachine.getInterface();
+    return vm.getInterface();
   }
 
   public MemoryManager getMemoryManager() {
@@ -127,38 +131,47 @@ public class SandBox {
   }
 
   public Symbols getSymbols() {
-    return virtualMachine.getSymbols();
+    return vm.getSymbols();
   }
 
   public Primitives getPrimitives() {
-    return virtualMachine.getPrimitives();
+    return vm.getPrimitives();
   }
 
   public VMOperations getOperations() {
-    return virtualMachine.getOperations();
+    return vm.getOperations();
   }
 
   public LinkResolver getLinkResolver() {
-    return virtualMachine.getLinkResolver();
+    return vm.getLinkResolver();
   }
 
   public RuntimeResolver getRuntimeResolver() {
-    return virtualMachine.getRuntimeResolver();
+    return vm.getRuntimeResolver();
   }
 
   public Reflection getReflection() {
-    return virtualMachine.getReflection();
+    return vm.getReflection();
   }
 
   public ThreadManager getThreadManager() {
-    return virtualMachine.getThreadManager();
+    return vm.getThreadManager();
   }
 
   public FileManager getFileManager() {
-    return virtualMachine.getFileManager();
+    return vm.getFileManager();
   }
 
   public ExecutionEngine getExecutionEngine() {
-    return virtualMachine.getExecutionEngine();
+    return vm.getExecutionEngine();
+  }
+
+  /**
+   * Gets all classes from {@link Context} that were used by sandbox
+   */
+  public List<JavaClass> getUsedCustomClasses() {
+    return this.vm.getClassStorage().list().stream()
+        .filter(clazz -> this.context.getClasses().containsKey(clazz.getInternalName()))
+        .toList();
   }
 }

@@ -1,4 +1,3 @@
-import dev.xdark.ssvm.VirtualMachine;
 import java.nio.file.Path;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -12,10 +11,6 @@ public class Bootstrap {
     Deobfuscator.from(
         DeobfuscatorOptions.builder()
             .inputJar(Path.of("work", "obf-test.jar"))
-            .virtualMachine(
-                new VirtualMachine() {
-                  // you can do shit
-                })
             .transformers(
                 // Pick your transformers here
                 () -> new ComposedGeneralFlowTransformer()

@@ -18,9 +18,6 @@ import uwu.narumi.deobfuscator.api.execution.SandBox;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Decrypts {@code long} numbers <a href="https://www.zelix.com/klassmaster/featuresLongEncryption.html">https://www.zelix.com/klassmaster/featuresLongEncryption.html</a>
  *
@@ -53,7 +50,7 @@ public class ZelixLongEncryptionTransformer extends Transformer {
 
   @Override
   protected void transform(ClassWrapper scope, Context context) throws Exception {
-    List<String> classesToRemove = new ArrayList<>();
+    SandBox sandBox = new SandBox(context);
 
     context.classes(scope).forEach(classWrapper -> classWrapper.findClInit().ifPresent(clinit -> {
       MethodContext methodContext = MethodContext.create(classWrapper, clinit);
@@ -77,8 +74,6 @@ public class ZelixLongEncryptionTransformer extends Transformer {
           ClassWrapper longDecrypterCreatorClass = context.getClasses().get(createDecrypterInsn.owner);
 
           try {
-            SandBox sandBox = context.getSandBox();
-
             // Create decrypter
             InstanceClass clazz = sandBox.getHelper().loadClass(longDecrypterCreatorClass.canonicalName());
             ObjectValue longDecrypterInstance = sandBox.getInvocationUtil().invokeReference(
@@ -96,17 +91,6 @@ public class ZelixLongEncryptionTransformer extends Transformer {
                 Argument.int64(decryptKey)
             );
 
-            // Add classes to remove
-            if (!classesToRemove.contains(longDecrypterCreatorClass.name())) {
-              classesToRemove.add(longDecrypterCreatorClass.name());
-            }
-            if (!classesToRemove.contains(longDecrypterClass.getInternalName())) {
-              classesToRemove.add(longDecrypterClass.getInternalName());
-            }
-            if (!classesToRemove.contains(longDecrypterCreatorClass.getClassNode().interfaces.get(0))) {
-              classesToRemove.add(longDecrypterCreatorClass.getClassNode().interfaces.get(0));
-            }
-
             // Remove all instructions that creates decrypter
             decryptContext.removeAll();
 
@@ -120,6 +104,6 @@ public class ZelixLongEncryptionTransformer extends Transformer {
       }
     }));
 
-    classesToRemove.forEach(className -> context.getClasses().remove(className));
+    sandBox.getUsedCustomClasses().forEach(clazz -> context.getClasses().remove(clazz.getInternalName()));
   }
 }

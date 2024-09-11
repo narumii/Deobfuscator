@@ -5,8 +5,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import dev.xdark.ssvm.VirtualMachine;
-import dev.xdark.ssvm.execution.VMException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
@@ -24,7 +22,7 @@ public class Context {
   private final DeobfuscatorOptions options;
   private final LibraryClassLoader libraryLoader;
 
-  private SandBox sandBox = null;
+  private SandBox globalSandBox = null;
 
   public Context(DeobfuscatorOptions options, LibraryClassLoader libraryLoader) {
     this.options = options;
@@ -35,19 +33,11 @@ public class Context {
    * Gets sandbox or creates if it does not exist.
    */
   public SandBox getSandBox() {
-    if (this.sandBox == null) {
+    if (this.globalSandBox == null) {
       // Lazily load sandbox
-      VirtualMachine vm = options.virtualMachine() == null ? new VirtualMachine() : options.virtualMachine();
-      try {
-        this.sandBox = new SandBox(this.libraryLoader, vm);
-      } catch (VMException ex) {
-        LOGGER.error("SSVM bootstrap failed. Make sure that you run this deobfuscator on java 17");
-        SandBox.logVMException(ex, vm);
-
-        throw new RuntimeException(ex);
-      }
+      this.globalSandBox = new SandBox(this);
     }
-    return this.sandBox;
+    return this.globalSandBox;
   }
 
   public DeobfuscatorOptions getOptions() {
