@@ -19,14 +19,14 @@ public class PopUnUsedLocalVariablesTransformer extends Transformer {
   @Override
   protected void transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
-      MethodContext methodContext = MethodContext.create(classWrapper, methodNode);
+      MethodContext methodContext = MethodContext.compute(classWrapper, methodNode);
 
       List<VarInsnNode> varStoresInUse = new ArrayList<>();
 
       // Find all local variables in use
       for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
         if ((insn instanceof VarInsnNode && !insn.isVarStore()) || insn instanceof IincInsnNode) {
-          InstructionContext insnContext = methodContext.createInsnContext(insn);
+          InstructionContext insnContext = methodContext.newInsnContext(insn);
 
           Frame<OriginalSourceValue> frame = insnContext.frame();
           if (frame == null) return;
@@ -52,7 +52,7 @@ public class PopUnUsedLocalVariablesTransformer extends Transformer {
       for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
         if (insn instanceof VarInsnNode varInsnNode && insn.isVarStore()) {
           if (!varStoresInUse.contains(varInsnNode)) {
-            InstructionContext insnContext = methodContext.createInsnContext(insn);
+            InstructionContext insnContext = methodContext.newInsnContext(insn);
 
             // Pop the value from the stack
             insnContext.pop(1);

@@ -3,14 +3,12 @@ package uwu.narumi.deobfuscator.api.transformer;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Frame;
-import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.InstructionContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.context.Context;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -60,7 +58,7 @@ public abstract class FramedInstructionsTransformer extends Transformer {
           if (buildInstructionsStream(Arrays.stream(methodNode.instructions.toArray())).findAny().isEmpty()) return;
 
           // Get frames of the method
-          MethodContext methodContext = MethodContext.create(classWrapper, methodNode);
+          MethodContext methodContext = MethodContext.compute(classWrapper, methodNode);
 
           // Iterate over instructions
           buildInstructionsStream(Arrays.stream(methodNode.instructions.toArray())).forEach(insn -> {

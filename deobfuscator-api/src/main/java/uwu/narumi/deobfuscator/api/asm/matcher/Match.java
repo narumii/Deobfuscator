@@ -64,6 +64,10 @@ public abstract class Match {
     if (!this.stackMatches.isEmpty()) {
       // Match values from stack
 
+      if (insnContext.methodContext().frames() == null) {
+        throw new IllegalStateException("Got frameless method context");
+      }
+
       if (context.frame() == null) {
         // If we expect stack values, then frame can't be null
         return null;

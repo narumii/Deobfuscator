@@ -53,10 +53,10 @@ public class ZelixLongEncryptionTransformer extends Transformer {
     SandBox sandBox = new SandBox(context);
 
     context.classes(scope).forEach(classWrapper -> classWrapper.findClInit().ifPresent(clinit -> {
-      MethodContext methodContext = MethodContext.create(classWrapper, clinit);
+      MethodContext methodContext = MethodContext.compute(classWrapper, clinit);
 
       for (AbstractInsnNode insn : clinit.instructions) {
-        InstructionContext insnContext = methodContext.createInsnContext(insn);
+        InstructionContext insnContext = methodContext.newInsnContext(insn);
         if (insnContext.frame() == null) return;
 
         MatchContext result = DECRYPT_LONG_MATCHER.matchResult(insnContext);

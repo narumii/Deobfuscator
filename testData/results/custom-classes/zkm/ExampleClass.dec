@@ -1,24 +1,42 @@
 package io.github.repooper.packetevents;
 
+import io.github.repooper.packetevents.bstats.Metrics;
+import io.github.repooper.packetevents.bstats.Metrics.SimplePie;
 import io.github.repooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.repooper.packetevents.event.manager.EventManager;
+import io.github.repooper.packetevents.event.manager.PEEventManager;
 import io.github.repooper.packetevents.exceptions.PacketEventsLoadFailureException;
 import io.github.repooper.packetevents.injector.GlobalChannelInjector;
+import io.github.repooper.packetevents.packettype.PacketType;
+import io.github.repooper.packetevents.packettype.PacketTypeClasses;
+import io.github.repooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.repooper.packetevents.packetwrappers.play.out.entityequipment.WrappedPacketOutEntityEquipment.EquipmentSlot;
 import io.github.repooper.packetevents.processor.BukkitEventProcessorInternal;
 import io.github.repooper.packetevents.processor.PacketProcessorInternal;
 import io.github.repooper.packetevents.settings.PacketEventsSettings;
 import io.github.repooper.packetevents.updatechecker.UpdateChecker;
+import io.github.repooper.packetevents.updatechecker.UpdateChecker.UpdateCheckerStatus;
+import io.github.repooper.packetevents.utils.entityfinder.EntityFinderUtils;
+import io.github.repooper.packetevents.utils.guava.GuavaUtils;
 import io.github.repooper.packetevents.utils.netty.bytebuf.ByteBufUtil;
+import io.github.repooper.packetevents.utils.netty.bytebuf.ByteBufUtil_7;
+import io.github.repooper.packetevents.utils.netty.bytebuf.ByteBufUtil_8;
+import io.github.repooper.packetevents.utils.nms.NMSUtils;
 import io.github.repooper.packetevents.utils.player.PlayerUtils;
 import io.github.repooper.packetevents.utils.server.ServerUtils;
+import io.github.repooper.packetevents.utils.server.ServerVersion;
 import io.github.repooper.packetevents.utils.version.PEVersion;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+import me.frep.vulcan.spigot.check.AbstractCheck;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.ServicePriority;
+import org.bukkit.plugin.ServicesManager;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public final class PacketEvents implements Listener, EventManager {
     private static PacketEvents instance;
@@ -45,173 +63,60 @@ public final class PacketEvents implements Listener, EventManager {
     private static final long a = 110160429747013L;
 
     public PacketEvents() {
-        // $VF: Couldn't be decompiled
-        // Please report this to the Vineflower issue tracker, at https://github.com/Vineflower/vineflower/issues with a copy of the class file (if you have the rights to distribute it!)
-        // java.lang.RuntimeException: parsing failure!
-        //   at org.jetbrains.java.decompiler.modules.decompiler.decompose.DomHelper.parseGraph(DomHelper.java:211)
-        //   at org.jetbrains.java.decompiler.main.rels.MethodProcessor.codeToJava(MethodProcessor.java:166)
-        //
-        // Bytecode:
-        // 00: getstatic io/github/repooper/packetevents/PacketEvents.a J
-        // 03: ldc2_w 24900701945652
-        // 06: lxor
-        // 07: lstore 1
-        // 08: invokestatic io/github/repooper/packetevents/PacketEvents.Vulcan_Q ()I
-        // 0b: aload 0
-        // 0c: invokespecial java/lang/Object.<init> ()V
-        // 0f: istore 3
-        // 10: aload 0
-        // 11: new io/github/repooper/packetevents/utils/version/PEVersion
-        // 14: dup
-        // 15: bipush 3
-        // 16: newarray 10
-        // 18: dup
-        // 19: bipush 0
-        // 1a: bipush 1
-        // 1b: iastore
-        // 1c: dup
-        // 1d: bipush 1
-        // 1e: bipush 8
-        // 20: iastore
-        // 21: dup
-        // 22: bipush 2
-        // 23: bipush 4
-        // 24: iastore
-        // 25: invokespecial io/github/repooper/packetevents/utils/version/PEVersion.<init> ([I)V
-        // 28: putfield io/github/repooper/packetevents/PacketEvents.version Lio/github/repooper/packetevents/utils/version/PEVersion;
-        // 2b: aload 0
-        // 2c: new io/github/repooper/packetevents/event/manager/PEEventManager
-        // 2f: dup
-        // 30: invokespecial io/github/repooper/packetevents/event/manager/PEEventManager.<init> ()V
-        // 33: putfield io/github/repooper/packetevents/PacketEvents.eventManager Lio/github/repooper/packetevents/event/manager/EventManager;
-        // 36: aload 0
-        // 37: new io/github/repooper/packetevents/utils/player/PlayerUtils
-        // 3a: dup
-        // 3b: invokespecial io/github/repooper/packetevents/utils/player/PlayerUtils.<init> ()V
-        // 3e: putfield io/github/repooper/packetevents/PacketEvents.playerUtils Lio/github/repooper/packetevents/utils/player/PlayerUtils;
-        // 41: aload 0
-        // 42: new io/github/repooper/packetevents/utils/server/ServerUtils
-        // 45: dup
-        // 46: invokespecial io/github/repooper/packetevents/utils/server/ServerUtils.<init> ()V
-        // 49: putfield io/github/repooper/packetevents/PacketEvents.serverUtils Lio/github/repooper/packetevents/utils/server/ServerUtils;
-        // 4c: aload 0
-        // 4d: new io/github/repooper/packetevents/processor/PacketProcessorInternal
-        // 50: dup
-        // 51: invokespecial io/github/repooper/packetevents/processor/PacketProcessorInternal.<init> ()V
-        // 54: putfield io/github/repooper/packetevents/PacketEvents.packetProcessorInternal Lio/github/repooper/packetevents/processor/PacketProcessorInternal;
-        // 57: aload 0
-        // 58: new io/github/repooper/packetevents/processor/BukkitEventProcessorInternal
-        // 5b: dup
-        // 5c: invokespecial io/github/repooper/packetevents/processor/BukkitEventProcessorInternal.<init> ()V
-        // 5f: putfield io/github/repooper/packetevents/PacketEvents.bukkitEventProcessorInternal Lio/github/repooper/packetevents/processor/BukkitEventProcessorInternal;
-        // 62: aload 0
-        // 63: new io/github/repooper/packetevents/injector/GlobalChannelInjector
-        // 66: dup
-        // 67: invokespecial io/github/repooper/packetevents/injector/GlobalChannelInjector.<init> ()V
-        // 6a: putfield io/github/repooper/packetevents/PacketEvents.injector Lio/github/repooper/packetevents/injector/GlobalChannelInjector;
-        // 6d: aload 0
-        // 6e: new java/util/concurrent/atomic/AtomicBoolean
-        // 71: dup
-        // 72: invokespecial java/util/concurrent/atomic/AtomicBoolean.<init> ()V
-        // 75: putfield io/github/repooper/packetevents/PacketEvents.injectorReady Ljava/util/concurrent/atomic/AtomicBoolean;
-        // 78: aload 0
-        // 79: new io/github/repooper/packetevents/settings/PacketEventsSettings
-        // 7c: dup
-        // 7d: invokespecial io/github/repooper/packetevents/settings/PacketEventsSettings.<init> ()V
-        // 80: putfield io/github/repooper/packetevents/PacketEvents.settings Lio/github/repooper/packetevents/settings/PacketEventsSettings;
-        // 83: aload 0
-        // 84: bipush 0
-        // 85: putfield io/github/repooper/packetevents/PacketEvents.lateBind Z
-        // 88: iload 3
-        // 89: ifne a5
-        // 8c: invokestatic me/frep/vulcan/spigot/check/AbstractCheck.Vulcan_a ()Z
-        // 8f: ifeq a1
-        // 92: goto 99
-        // 95: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 98: athrow
-        // 99: bipush 0
-        // 9a: goto a2
-        // 9d: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // a0: athrow
-        // a1: bipush 1
-        // a2: invokestatic me/frep/vulcan/spigot/check/AbstractCheck.Vulcan_t (Z)V
-        // a5: return
+        long var1 = 125984749057137L;
+        int var10000 = Vulcan_Q();
+        super();
+        int var3 = var10000;
+        this.version = new PEVersion(new int[]{1, 8, 4});
+        this.eventManager = new PEEventManager();
+        this.playerUtils = new PlayerUtils();
+        this.serverUtils = new ServerUtils();
+        this.packetProcessorInternal = new PacketProcessorInternal();
+        this.bukkitEventProcessorInternal = new BukkitEventProcessorInternal();
+        this.injector = new GlobalChannelInjector();
+        this.injectorReady = new AtomicBoolean();
+        this.settings = new PacketEventsSettings();
+        this.lateBind = false;
+        if (var3 == 0) {
+            AbstractCheck.Vulcan_t(!AbstractCheck.Vulcan_a());
+        }
     }
 
-    public static PacketEvents Vulcan_o(Plugin param0) {
-        // $VF: Couldn't be decompiled
-        // Please report this to the Vineflower issue tracker, at https://github.com/Vineflower/vineflower/issues with a copy of the class file (if you have the rights to distribute it!)
-        // java.lang.RuntimeException: parsing failure!
-        //   at org.jetbrains.java.decompiler.modules.decompiler.decompose.DomHelper.parseGraph(DomHelper.java:211)
-        //   at org.jetbrains.java.decompiler.main.rels.MethodProcessor.codeToJava(MethodProcessor.java:166)
-        //
-        // Bytecode:
-        // 00: getstatic io/github/repooper/packetevents/PacketEvents.a J
-        // 03: ldc2_w 90763078088731
-        // 06: lxor
-        // 07: lstore 1
-        // 08: invokestatic io/github/repooper/packetevents/PacketEvents.Vulcan_a ()I
-        // 0b: istore 3
-        // 0c: invokestatic org/bukkit/Bukkit.isPrimaryThread ()Z
-        // 0f: iload 3
-        // 10: ifne 39
-        // 13: ifeq 75
-        // 16: goto 1d
-        // 19: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 1c: athrow
-        // 1d: invokestatic org/bukkit/Bukkit.getServicesManager ()Lorg/bukkit/plugin/ServicesManager;
-        // 20: ldc io/github/repooper/packetevents/PacketEvents
-        // 22: iload 3
-        // 23: ifne 68
-        // 26: goto 2d
-        // 29: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 2c: athrow
-        // 2d: invokeinterface org/bukkit/plugin/ServicesManager.isProvidedFor (Ljava/lang/Class;)Z 2
-        // 32: goto 39
-        // 35: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 38: athrow
-        // 39: ifne 63
-        // 3c: new io/github/repooper/packetevents/PacketEvents
-        // 3f: dup
-        // 40: invokespecial io/github/repooper/packetevents/PacketEvents.<init> ()V
-        // 43: putstatic io/github/repooper/packetevents/PacketEvents.instance Lio/github/repooper/packetevents/PacketEvents;
-        // 46: invokestatic org/bukkit/Bukkit.getServicesManager ()Lorg/bukkit/plugin/ServicesManager;
-        // 49: ldc io/github/repooper/packetevents/PacketEvents
-        // 4b: getstatic io/github/repooper/packetevents/PacketEvents.instance Lio/github/repooper/packetevents/PacketEvents;
-        // 4e: aload 0
-        // 4f: getstatic org/bukkit/plugin/ServicePriority.Normal Lorg/bukkit/plugin/ServicePriority;
-        // 52: invokeinterface org/bukkit/plugin/ServicesManager.register (Ljava/lang/Class;Ljava/lang/Object;Lorg/bukkit/plugin/Plugin;Lorg/bukkit/plugin/ServicePriority;)V 5
-        // 57: aload 0
-        // 58: putstatic io/github/repooper/packetevents/PacketEvents.plugin Lorg/bukkit/plugin/Plugin;
-        // 5b: getstatic io/github/repooper/packetevents/PacketEvents.instance Lio/github/repooper/packetevents/PacketEvents;
-        // 5e: areturn
-        // 5f: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 62: athrow
-        // 63: invokestatic org/bukkit/Bukkit.getServicesManager ()Lorg/bukkit/plugin/ServicesManager;
-        // 66: ldc io/github/repooper/packetevents/PacketEvents
-        // 68: invokeinterface org/bukkit/plugin/ServicesManager.load (Ljava/lang/Class;)Ljava/lang/Object; 2
-        // 6d: checkcast io/github/repooper/packetevents/PacketEvents
-        // 70: dup
-        // 71: putstatic io/github/repooper/packetevents/PacketEvents.instance Lio/github/repooper/packetevents/PacketEvents;
-        // 74: areturn
-        // 75: getstatic io/github/repooper/packetevents/PacketEvents.instance Lio/github/repooper/packetevents/PacketEvents;
-        // 78: iload 3
-        // 79: ifne 9e
-        // 7c: ifnonnull 9b
-        // 7f: goto 86
-        // 82: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 85: athrow
-        // 86: aload 0
-        // 87: putstatic io/github/repooper/packetevents/PacketEvents.plugin Lorg/bukkit/plugin/Plugin;
-        // 8a: new io/github/repooper/packetevents/PacketEvents
-        // 8d: dup
-        // 8e: invokespecial io/github/repooper/packetevents/PacketEvents.<init> ()V
-        // 91: putstatic io/github/repooper/packetevents/PacketEvents.instance Lio/github/repooper/packetevents/PacketEvents;
-        // 94: goto 9b
-        // 97: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 9a: athrow
-        // 9b: getstatic io/github/repooper/packetevents/PacketEvents.instance Lio/github/repooper/packetevents/PacketEvents;
-        // 9e: areturn
+    public static PacketEvents Vulcan_o(Plugin var0) {
+        long var1 = 60184643744606L;
+        int var3 = Vulcan_a();
+        boolean var10000 = Bukkit.isPrimaryThread();
+        if (var3 == 0) {
+            if (!var10000) {
+                PacketEvents var5 = instance;
+                if (var3 == 0) {
+                    if (instance == null) {
+                        plugin = var0;
+                        instance = new PacketEvents();
+                    }
+
+                    var5 = instance;
+                }
+
+                return var5;
+            }
+
+            ServicesManager var4 = Bukkit.getServicesManager();
+            if (var3 != 0) {
+                return instance = (PacketEvents)var4.load(PacketEvents.class);
+            }
+
+            var10000 = var4.isProvidedFor(PacketEvents.class);
+        }
+
+        if (!var10000) {
+            instance = new PacketEvents();
+            Bukkit.getServicesManager().register(PacketEvents.class, instance, var0, ServicePriority.Normal);
+            plugin = var0;
+            return instance;
+        } else {
+            return instance = (PacketEvents)Bukkit.getServicesManager().load(PacketEvents.class);
+        }
     }
 
     public static PacketEvents Vulcan_V() {
@@ -224,306 +129,127 @@ public final class PacketEvents implements Listener, EventManager {
     }
 
     public void Vulcan_g() {
-        // $VF: Couldn't be decompiled
-        // Please report this to the Vineflower issue tracker, at https://github.com/Vineflower/vineflower/issues with a copy of the class file (if you have the rights to distribute it!)
-        // java.lang.RuntimeException: parsing failure!
-        //   at org.jetbrains.java.decompiler.modules.decompiler.decompose.DomHelper.parseGraph(DomHelper.java:211)
-        //   at org.jetbrains.java.decompiler.main.rels.MethodProcessor.codeToJava(MethodProcessor.java:166)
-        //
-        // Bytecode:
-        // 000: getstatic io/github/repooper/packetevents/PacketEvents.a J
-        // 003: ldc2_w 76694096191799
-        // 006: lxor
-        // 007: lstore 1
-        // 008: lload 1
-        // 009: dup2
-        // 00a: ldc2_w 134390714831194
-        // 00d: lxor
-        // 00e: lstore 3
-        // 00f: dup2
-        // 010: ldc2_w 59702869466378
-        // 013: lxor
-        // 014: lstore 5
-        // 016: dup2
-        // 017: ldc2_w 94226918271622
-        // 01a: lxor
-        // 01b: lstore 7
-        // 01d: dup2
-        // 01e: ldc2_w 50171660319506
-        // 021: lxor
-        // 022: lstore 9
-        // 024: dup2
-        // 025: ldc2_w 114135042709307
-        // 028: lxor
-        // 029: lstore 11
-        // 02b: dup2
-        // 02c: ldc2_w 108812243163017
-        // 02f: lxor
-        // 030: lstore 13
-        // 032: dup2
-        // 033: ldc2_w 17370043723958
-        // 036: lxor
-        // 037: lstore 15
-        // 039: pop2
-        // 03a: invokestatic io/github/repooper/packetevents/PacketEvents.Vulcan_Q ()I
-        // 03d: istore 17
-        // 03f: aload 0
-        // 040: getfield io/github/repooper/packetevents/PacketEvents.loaded Z
-        // 043: iload 17
-        // 045: ifeq 069
-        // 048: ifne 255
-        // 04b: goto 052
-        // 04e: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 051: athrow
-        // 052: aload 0
-        // 053: iload 17
-        // 055: ifeq 06d
-        // 058: goto 05f
-        // 05b: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 05e: athrow
-        // 05f: getfield io/github/repooper/packetevents/PacketEvents.loading Z
-        // 062: goto 069
-        // 065: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 068: athrow
-        // 069: ifne 255
-        // 06c: aload 0
-        // 06d: bipush 1
-        // 06e: putfield io/github/repooper/packetevents/PacketEvents.loading Z
-        // 071: invokestatic io/github/repooper/packetevents/utils/server/ServerVersion.Vulcan__ ()Lio/github/repooper/packetevents/utils/server/ServerVersion;
-        // 074: astore 18
-        // 076: aload 18
-        // 078: putstatic io/github/repooper/packetevents/packetwrappers/WrappedPacket.version Lio/github/repooper/packetevents/utils/server/ServerVersion;
-        // 07b: aload 18
-        // 07d: putstatic io/github/repooper/packetevents/utils/nms/NMSUtils.version Lio/github/repooper/packetevents/utils/server/ServerVersion;
-        // 080: aload 18
-        // 082: putstatic io/github/repooper/packetevents/utils/entityfinder/EntityFinderUtils.version Lio/github/repooper/packetevents/utils/server/ServerVersion;
-        // 085: aload 0
-        // 086: new java/lang/StringBuilder
-        // 089: dup
-        // 08a: invokespecial java/lang/StringBuilder.<init> ()V
-        // 08d: ldc "pe-"
-        // 08f: invokevirtual java/lang/StringBuilder.append (Ljava/lang/String;)Ljava/lang/StringBuilder;
-        // 092: getstatic io/github/repooper/packetevents/PacketEvents.plugin Lorg/bukkit/plugin/Plugin;
-        // 095: invokeinterface org/bukkit/plugin/Plugin.getName ()Ljava/lang/String; 1
-        // 09a: invokevirtual java/lang/StringBuilder.append (Ljava/lang/String;)Ljava/lang/StringBuilder;
-        // 09d: invokevirtual java/lang/StringBuilder.toString ()Ljava/lang/String;
-        // 0a0: putfield io/github/repooper/packetevents/PacketEvents.handlerName Ljava/lang/String;
-        // 0a3: lload 15
-        // 0a5: bipush 1
-        // 0a6: anewarray 4
-        // 0a9: dup_x2
-        // 0aa: dup_x2
-        // 0ab: pop
-        // 0ac: invokestatic java/lang/Long.valueOf (J)Ljava/lang/Long;
-        // 0af: bipush 0
-        // 0b0: swap
-        // 0b1: aastore
-        // 0b2: invokestatic io/github/repooper/packetevents/utils/nms/NMSUtils.Vulcan_S ([Ljava/lang/Object;)V
-        // 0b5: lload 13
-        // 0b7: bipush 1
-        // 0b8: anewarray 4
-        // 0bb: dup_x2
-        // 0bc: dup_x2
-        // 0bd: pop
-        // 0be: invokestatic java/lang/Long.valueOf (J)Ljava/lang/Long;
-        // 0c1: bipush 0
-        // 0c2: swap
-        // 0c3: aastore
-        // 0c4: invokestatic io/github/repooper/packetevents/packettype/PacketTypeClasses.Vulcan_Y ([Ljava/lang/Object;)V
-        // 0c7: lload 7
-        // 0c9: bipush 1
-        // 0ca: anewarray 4
-        // 0cd: dup_x2
-        // 0ce: dup_x2
-        // 0cf: pop
-        // 0d0: invokestatic java/lang/Long.valueOf (J)Ljava/lang/Long;
-        // 0d3: bipush 0
-        // 0d4: swap
-        // 0d5: aastore
-        // 0d6: invokestatic io/github/repooper/packetevents/packettype/PacketType.Vulcan_R ([Ljava/lang/Object;)V
-        // 0d9: lload 9
-        // 0db: bipush 1
-        // 0dc: anewarray 4
-        // 0df: dup_x2
-        // 0e0: dup_x2
-        // 0e1: pop
-        // 0e2: invokestatic java/lang/Long.valueOf (J)Ljava/lang/Long;
-        // 0e5: bipush 0
-        // 0e6: swap
-        // 0e7: aastore
-        // 0e8: invokestatic io/github/repooper/packetevents/utils/entityfinder/EntityFinderUtils.Vulcan_k ([Ljava/lang/Object;)V
-        // 0eb: aload 0
-        // 0ec: invokevirtual io/github/repooper/packetevents/PacketEvents.Vulcan_l ()Lio/github/repooper/packetevents/utils/server/ServerUtils;
-        // 0ef: lload 3
-        // 0f0: bipush 1
-        // 0f1: anewarray 4
-        // 0f4: dup_x2
-        // 0f5: dup_x2
-        // 0f6: pop
-        // 0f7: invokestatic java/lang/Long.valueOf (J)Ljava/lang/Long;
-        // 0fa: bipush 0
-        // 0fb: swap
-        // 0fc: aastore
-        // 0fd: invokestatic io/github/repooper/packetevents/utils/guava/GuavaUtils.Vulcan_C ([Ljava/lang/Object;)Ljava/util/concurrent/ConcurrentMap;
-        // 100: putfield io/github/repooper/packetevents/utils/server/ServerUtils.entityCache Ljava/util/Map;
-        // 103: iload 17
-        // 105: ifeq 17c
-        // 108: aload 18
-        // 10a: getstatic io/github/repooper/packetevents/utils/server/ServerVersion.v_1_9 Lio/github/repooper/packetevents/utils/server/ServerVersion;
-        // 10d: invokevirtual io/github/repooper/packetevents/utils/server/ServerVersion.Vulcan_P (Lio/github/repooper/packetevents/utils/server/ServerVersion;)Z
-        // 110: ifeq 152
-        // 113: invokestatic io/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot.values ()[Lio/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot;
-        // 116: astore 19
-        // 118: aload 19
-        // 11a: arraylength
-        // 11b: istore 20
-        // 11d: bipush 0
-        // 11e: istore 21
-        // 120: iload 21
-        // 122: iload 20
-        // 124: if_icmpge 14d
-        // 127: aload 19
-        // 129: iload 21
-        // 12b: aaload
-        // 12c: astore 22
-        // 12e: aload 22
-        // 130: aload 22
-        // 132: invokevirtual io/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot.ordinal ()I
-        // 135: i2b
-        // 136: putfield io/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot.id B
-        // 139: iinc 21 1
-        // 13c: iload 17
-        // 13e: ifeq 183
-        // 141: iload 17
-        // 143: ifne 120
-        // 146: goto 14d
-        // 149: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 14c: athrow
-        // 14d: iload 17
-        // 14f: ifne 183
-        // 152: getstatic io/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot.MAINHAND Lio/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot;
-        // 155: bipush 0
-        // 156: putfield io/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot.id B
-        // 159: getstatic io/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot.OFFHAND Lio/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot;
-        // 15c: bipush -1
-        // 15d: putfield io/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot.id B
-        // 160: getstatic io/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot.BOOTS Lio/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot;
-        // 163: bipush 1
-        // 164: putfield io/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot.id B
-        // 167: getstatic io/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot.LEGGINGS Lio/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot;
-        // 16a: bipush 2
-        // 16b: putfield io/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot.id B
-        // 16e: getstatic io/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot.CHESTPLATE Lio/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot;
-        // 171: bipush 3
-        // 172: putfield io/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot.id B
-        // 175: goto 17c
-        // 178: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 17b: athrow
-        // 17c: getstatic io/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot.HELMET Lio/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot;
-        // 17f: bipush 4
-        // 180: putfield io/github/repooper/packetevents/packetwrappers/play/out/entityequipment/WrappedPacketOutEntityEquipment$EquipmentSlot.id B
-        // 183: goto 197
-        // 186: astore 19
-        // 188: aload 0
-        // 189: bipush 0
-        // 18a: putfield io/github/repooper/packetevents/PacketEvents.loading Z
-        // 18d: new io/github/repooper/packetevents/exceptions/PacketEventsLoadFailureException
-        // 190: dup
-        // 191: aload 19
-        // 193: invokespecial io/github/repooper/packetevents/exceptions/PacketEventsLoadFailureException.<init> (Ljava/lang/Throwable;)V
-        // 196: athrow
-        // 197: aload 0
-        // 198: getstatic io/github/repooper/packetevents/utils/nms/NMSUtils.legacyNettyImportMode Z
-        // 19b: ifeq 1ac
-        // 19e: new io/github/repooper/packetevents/utils/netty/bytebuf/ByteBufUtil_7
-        // 1a1: dup
-        // 1a2: invokespecial io/github/repooper/packetevents/utils/netty/bytebuf/ByteBufUtil_7.<init> ()V
-        // 1a5: goto 1b3
-        // 1a8: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 1ab: athrow
-        // 1ac: new io/github/repooper/packetevents/utils/netty/bytebuf/ByteBufUtil_8
-        // 1af: dup
-        // 1b0: invokespecial io/github/repooper/packetevents/utils/netty/bytebuf/ByteBufUtil_8.<init> ()V
-        // 1b3: putfield io/github/repooper/packetevents/PacketEvents.byteBufUtil Lio/github/repooper/packetevents/utils/netty/bytebuf/ByteBufUtil;
-        // 1b6: aload 0
-        // 1b7: new io/github/repooper/packetevents/updatechecker/UpdateChecker
-        // 1ba: dup
-        // 1bb: invokespecial io/github/repooper/packetevents/updatechecker/UpdateChecker.<init> ()V
-        // 1be: putfield io/github/repooper/packetevents/PacketEvents.updateChecker Lio/github/repooper/packetevents/updatechecker/UpdateChecker;
-        // 1c1: aload 0
-        // 1c2: iload 17
-        // 1c4: ifeq 251
-        // 1c7: getfield io/github/repooper/packetevents/PacketEvents.injectorReady Ljava/util/concurrent/atomic/AtomicBoolean;
-        // 1ca: invokevirtual java/util/concurrent/atomic/AtomicBoolean.get ()Z
-        // 1cd: ifne 24b
-        // 1d0: goto 1d7
-        // 1d3: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 1d6: athrow
-        // 1d7: aload 0
-        // 1d8: getfield io/github/repooper/packetevents/PacketEvents.injector Lio/github/repooper/packetevents/injector/GlobalChannelInjector;
-        // 1db: lload 5
-        // 1dd: bipush 1
-        // 1de: anewarray 4
-        // 1e1: dup_x2
-        // 1e2: dup_x2
-        // 1e3: pop
-        // 1e4: invokestatic java/lang/Long.valueOf (J)Ljava/lang/Long;
-        // 1e7: bipush 0
-        // 1e8: swap
-        // 1e9: aastore
-        // 1ea: invokevirtual io/github/repooper/packetevents/injector/GlobalChannelInjector.Vulcan_b ([Ljava/lang/Object;)V
-        // 1ed: aload 0
-        // 1ee: aload 0
-        // 1ef: getfield io/github/repooper/packetevents/PacketEvents.injector Lio/github/repooper/packetevents/injector/GlobalChannelInjector;
-        // 1f2: lload 11
-        // 1f4: bipush 1
-        // 1f5: anewarray 4
-        // 1f8: dup_x2
-        // 1f9: dup_x2
-        // 1fa: pop
-        // 1fb: invokestatic java/lang/Long.valueOf (J)Ljava/lang/Long;
-        // 1fe: bipush 0
-        // 1ff: swap
-        // 200: aastore
-        // 201: invokevirtual io/github/repooper/packetevents/injector/GlobalChannelInjector.Vulcan_K ([Ljava/lang/Object;)Z
-        // 204: iload 17
-        // 206: ifeq 21b
-        // 209: goto 210
-        // 20c: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 20f: athrow
-        // 210: ifne 21e
-        // 213: goto 21a
-        // 216: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 219: athrow
-        // 21a: bipush 1
-        // 21b: goto 21f
-        // 21e: bipush 0
-        // 21f: putfield io/github/repooper/packetevents/PacketEvents.lateBind Z
-        // 222: aload 0
-        // 223: iload 17
-        // 225: ifeq 244
-        // 228: getfield io/github/repooper/packetevents/PacketEvents.lateBind Z
-        // 22b: ifne 243
-        // 22e: goto 235
-        // 231: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 234: athrow
-        // 235: aload 0
-        // 236: getfield io/github/repooper/packetevents/PacketEvents.injector Lio/github/repooper/packetevents/injector/GlobalChannelInjector;
-        // 239: invokevirtual io/github/repooper/packetevents/injector/GlobalChannelInjector.Vulcan_B ()V
-        // 23c: goto 243
-        // 23f: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 242: athrow
-        // 243: aload 0
-        // 244: getfield io/github/repooper/packetevents/PacketEvents.injectorReady Ljava/util/concurrent/atomic/AtomicBoolean;
-        // 247: bipush 1
-        // 248: invokevirtual java/util/concurrent/atomic/AtomicBoolean.set (Z)V
-        // 24b: aload 0
-        // 24c: bipush 1
-        // 24d: putfield io/github/repooper/packetevents/PacketEvents.loaded Z
-        // 250: aload 0
-        // 251: bipush 0
-        // 252: putfield io/github/repooper/packetevents/PacketEvents.loading Z
-        // 255: return
+        long var3;
+        long var5;
+        long var7;
+        long var9;
+        long var11;
+        long var13;
+        long var15;
+        int var17;
+        PacketEvents var24;
+        label108: {
+            long var1 = 37314761108082L;
+            var3 = 100924278520616L;
+            var5 = 26099128416120L;
+            var7 = 127830791373044L;
+            var9 = 13544093978976L;
+            var11 = 77232768417097L;
+            var13 = 73696640073211L;
+            var15 = 50836346346180L;
+            var17 = Vulcan_Q();
+            boolean var10000 = this.loaded;
+            if (var17 != 0) {
+                if (this.loaded) {
+                    return;
+                }
+
+                var24 = this;
+                if (var17 == 0) {
+                    break label108;
+                }
+
+                var10000 = this.loading;
+            }
+
+            if (var10000) {
+                return;
+            }
+
+            var24 = this;
+        }
+
+        var24.loading = true;
+        ServerVersion var18 = ServerVersion.Vulcan__();
+        WrappedPacket.version = var18;
+        NMSUtils.version = var18;
+        EntityFinderUtils.version = var18;
+        this.handlerName = "pe-" + plugin.getName();
+
+        try {
+            label91: {
+                NMSUtils.Vulcan_S(new Object[]{var15});
+                PacketTypeClasses.Vulcan_Y(new Object[]{var13});
+                PacketType.Vulcan_R(new Object[]{var7});
+                EntityFinderUtils.Vulcan_k(new Object[]{var9});
+                this.Vulcan_l().entityCache = GuavaUtils.Vulcan_C(new Object[]{var3});
+                if (var17 != 0) {
+                    if (var18.Vulcan_P(ServerVersion.v_1_9)) {
+                        EquipmentSlot[] var19 = EquipmentSlot.values();
+                        int var20 = var19.length;
+                        int var21 = 0;
+
+                        while (var21 < var20) {
+                            EquipmentSlot var22 = var19[var21];
+                            var22.id = (byte)var22.ordinal();
+                            var21++;
+                            if (var17 == 0) {
+                                break label91;
+                            }
+
+                            if (var17 == 0) {
+                                break;
+                            }
+                        }
+
+                        if (var17 != 0) {
+                            break label91;
+                        }
+                    }
+
+                    EquipmentSlot.MAINHAND.id = 0;
+                    EquipmentSlot.OFFHAND.id = -1;
+                    EquipmentSlot.BOOTS.id = 1;
+                    EquipmentSlot.LEGGINGS.id = 2;
+                    EquipmentSlot.CHESTPLATE.id = 3;
+                }
+
+                EquipmentSlot.HELMET.id = 4;
+            }
+        } catch (Exception var23) {
+            this.loading = false;
+            throw new PacketEventsLoadFailureException(var23);
+        }
+
+        this.byteBufUtil = (ByteBufUtil)(NMSUtils.legacyNettyImportMode ? new ByteBufUtil_7() : new ByteBufUtil_8());
+        this.updateChecker = new UpdateChecker();
+        var24 = this;
+        if (var17 != 0) {
+            if (!this.injectorReady.get()) {
+                this.injector.Vulcan_b(new Object[]{var5});
+                boolean var10001 = this.injector.Vulcan_K(new Object[]{var11});
+                if (var17 != 0) {
+                    var10001 = !var10001;
+                }
+
+                this.lateBind = var10001;
+                var24 = this;
+                if (var17 != 0) {
+                    if (!this.lateBind) {
+                        this.injector.Vulcan_B();
+                    }
+
+                    var24 = this;
+                }
+
+                var24.injectorReady.set(true);
+            }
+
+            this.loaded = true;
+            var24 = this;
+        }
+
+        var24.loading = false;
     }
 
     @Deprecated
@@ -544,147 +270,77 @@ public final class PacketEvents implements Listener, EventManager {
         this.Vulcan_o(this.Vulcan_N());
     }
 
-    public void Vulcan_o(PacketEventsSettings param1) {
-        // $VF: Couldn't be decompiled
-        // Please report this to the Vineflower issue tracker, at https://github.com/Vineflower/vineflower/issues with a copy of the class file (if you have the rights to distribute it!)
-        // java.lang.RuntimeException: parsing failure!
-        //   at org.jetbrains.java.decompiler.modules.decompiler.decompose.DomHelper.parseGraph(DomHelper.java:211)
-        //   at org.jetbrains.java.decompiler.main.rels.MethodProcessor.codeToJava(MethodProcessor.java:166)
-        //
-        // Bytecode:
-        // 000: getstatic io/github/repooper/packetevents/PacketEvents.a J
-        // 003: ldc2_w 98813876728815
-        // 006: lxor
-        // 007: lstore 2
-        // 008: invokestatic io/github/repooper/packetevents/PacketEvents.Vulcan_Q ()I
-        // 00b: aload 0
-        // 00c: invokevirtual io/github/repooper/packetevents/PacketEvents.Vulcan_g ()V
-        // 00f: istore 4
-        // 011: aload 0
-        // 012: getfield io/github/repooper/packetevents/PacketEvents.initialized Z
-        // 015: iload 4
-        // 017: ifeq 02f
-        // 01a: ifne 136
-        // 01d: goto 024
-        // 020: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 023: athrow
-        // 024: aload 0
-        // 025: getfield io/github/repooper/packetevents/PacketEvents.initializing Z
-        // 028: goto 02f
-        // 02b: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 02e: athrow
-        // 02f: iload 4
-        // 031: ifeq 066
-        // 034: ifne 136
-        // 037: goto 03e
-        // 03a: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 03d: athrow
-        // 03e: aload 0
-        // 03f: bipush 1
-        // 040: putfield io/github/repooper/packetevents/PacketEvents.initializing Z
-        // 043: aload 0
-        // 044: aload 1
-        // 045: putfield io/github/repooper/packetevents/PacketEvents.settings Lio/github/repooper/packetevents/settings/PacketEventsSettings;
-        // 048: aload 0
-        // 049: getfield io/github/repooper/packetevents/PacketEvents.settings Lio/github/repooper/packetevents/settings/PacketEventsSettings;
-        // 04c: bipush 0
-        // 04d: anewarray 4
-        // 050: invokevirtual io/github/repooper/packetevents/settings/PacketEventsSettings.Vulcan_T ([Ljava/lang/Object;)Lio/github/repooper/packetevents/settings/PacketEventsSettings;
-        // 053: pop
-        // 054: aload 0
-        // 055: getfield io/github/repooper/packetevents/PacketEvents.settings Lio/github/repooper/packetevents/settings/PacketEventsSettings;
-        // 058: bipush 0
-        // 059: anewarray 4
-        // 05c: invokevirtual io/github/repooper/packetevents/settings/PacketEventsSettings.Vulcan_j ([Ljava/lang/Object;)Z
-        // 05f: goto 066
-        // 062: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 065: athrow
-        // 066: iload 4
-        // 068: ifeq 08b
-        // 06b: ifeq 080
-        // 06e: goto 075
-        // 071: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 074: athrow
-        // 075: aload 0
-        // 076: invokespecial io/github/repooper/packetevents/PacketEvents.Vulcan_H ()V
-        // 079: goto 080
-        // 07c: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 07f: athrow
-        // 080: aload 0
-        // 081: getfield io/github/repooper/packetevents/PacketEvents.settings Lio/github/repooper/packetevents/settings/PacketEventsSettings;
-        // 084: bipush 0
-        // 085: anewarray 4
-        // 088: invokevirtual io/github/repooper/packetevents/settings/PacketEventsSettings.Vulcan_o ([Ljava/lang/Object;)Z
-        // 08b: iload 4
-        // 08d: ifeq 0c9
-        // 090: ifeq 0c2
-        // 093: goto 09a
-        // 096: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 099: athrow
-        // 09a: new io/github/repooper/packetevents/bstats/Metrics
-        // 09d: dup
-        // 09e: aload 0
-        // 09f: invokevirtual io/github/repooper/packetevents/PacketEvents.Vulcan_a ()Lorg/bukkit/plugin/Plugin;
-        // 0a2: checkcast org/bukkit/plugin/java/JavaPlugin
-        // 0a5: sipush 11327
-        // 0a8: invokespecial io/github/repooper/packetevents/bstats/Metrics.<init> (Lorg/bukkit/plugin/java/JavaPlugin;I)V
-        // 0ab: astore 5
-        // 0ad: aload 5
-        // 0af: new io/github/repooper/packetevents/bstats/Metrics$SimplePie
-        // 0b2: dup
-        // 0b3: ldc_w "packetevents_version"
-        // 0b6: aload 0
-        // 0b7: invokedynamic call (Lio/github/repooper/packetevents/PacketEvents;)Ljava/util/concurrent/Callable; bsm=java/lang/invoke/LambdaMetafactory.metafactory (Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite; args=[ ()Ljava/lang/Object;, io/github/repooper/packetevents/PacketEvents.lambda$init$0 ()Ljava/lang/String;, ()Ljava/lang/String; ]
-        // 0bc: invokespecial io/github/repooper/packetevents/bstats/Metrics$SimplePie.<init> (Ljava/lang/String;Ljava/util/concurrent/Callable;)V
-        // 0bf: invokevirtual io/github/repooper/packetevents/bstats/Metrics.addCustomChart (Lio/github/repooper/packetevents/bstats/Metrics$CustomChart;)V
-        // 0c2: aload 0
-        // 0c3: getfield io/github/repooper/packetevents/PacketEvents.injectorReady Ljava/util/concurrent/atomic/AtomicBoolean;
-        // 0c6: invokevirtual java/util/concurrent/atomic/AtomicBoolean.get ()Z
-        // 0c9: ifne 0cf
-        // 0cc: goto 0c2
-        // 0cf: aload 0
-        // 0d0: invokedynamic run (Lio/github/repooper/packetevents/PacketEvents;)Ljava/lang/Runnable; bsm=java/lang/invoke/LambdaMetafactory.metafactory (Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite; args=[ ()V, io/github/repooper/packetevents/PacketEvents.lambda$init$1 ()V, ()V ]
-        // 0d5: astore 5
-        // 0d7: aload 0
-        // 0d8: getfield io/github/repooper/packetevents/PacketEvents.lateBind Z
-        // 0db: iload 4
-        // 0dd: ifeq 118
-        // 0e0: ifeq 11e
-        // 0e3: goto 0ea
-        // 0e6: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 0e9: athrow
-        // 0ea: invokestatic org/bukkit/Bukkit.getScheduler ()Lorg/bukkit/scheduler/BukkitScheduler;
-        // 0ed: getstatic io/github/repooper/packetevents/PacketEvents.plugin Lorg/bukkit/plugin/Plugin;
-        // 0f0: aload 0
-        // 0f1: getfield io/github/repooper/packetevents/PacketEvents.injector Lio/github/repooper/packetevents/injector/GlobalChannelInjector;
-        // 0f4: dup
-        // 0f5: invokevirtual java/lang/Object.getClass ()Ljava/lang/Class;
-        // 0f8: pop
-        // 0f9: invokedynamic run (Lio/github/repooper/packetevents/injector/GlobalChannelInjector;)Ljava/lang/Runnable; bsm=java/lang/invoke/LambdaMetafactory.metafactory (Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite; args=[ ()V, io/github/repooper/packetevents/injector/GlobalChannelInjector.Vulcan_B ()V, ()V ]
-        // 0fe: invokeinterface org/bukkit/scheduler/BukkitScheduler.scheduleSyncDelayedTask (Lorg/bukkit/plugin/Plugin;Ljava/lang/Runnable;)I 3
-        // 103: pop
-        // 104: invokestatic org/bukkit/Bukkit.getScheduler ()Lorg/bukkit/scheduler/BukkitScheduler;
-        // 107: getstatic io/github/repooper/packetevents/PacketEvents.plugin Lorg/bukkit/plugin/Plugin;
-        // 10a: aload 5
-        // 10c: invokeinterface org/bukkit/scheduler/BukkitScheduler.scheduleSyncDelayedTask (Lorg/bukkit/plugin/Plugin;Ljava/lang/Runnable;)I 3
-        // 111: goto 118
-        // 114: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 117: athrow
-        // 118: pop
-        // 119: iload 4
-        // 11b: ifne 12c
-        // 11e: aload 5
-        // 120: invokeinterface java/lang/Runnable.run ()V 1
-        // 125: goto 12c
-        // 128: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 12b: athrow
-        // 12c: aload 0
-        // 12d: bipush 1
-        // 12e: putfield io/github/repooper/packetevents/PacketEvents.initialized Z
-        // 131: aload 0
-        // 132: bipush 0
-        // 133: putfield io/github/repooper/packetevents/PacketEvents.initializing Z
-        // 136: return
+    // $VF: Irreducible bytecode was duplicated to produce valid code
+    public void Vulcan_o(PacketEventsSettings var1) {
+        long var2 = 68094010456234L;
+        int var10000 = Vulcan_Q();
+        this.Vulcan_g();
+        int var4 = var10000;
+        boolean var7 = this.initialized;
+        if (var4 != 0) {
+            if (this.initialized) {
+                return;
+            }
+
+            var7 = this.initializing;
+        }
+
+        if (var4 != 0) {
+            if (var7) {
+                return;
+            }
+
+            this.initializing = true;
+            this.settings = var1;
+            this.settings.Vulcan_T(new Object[0]);
+            var7 = this.settings.Vulcan_j(new Object[0]);
+        }
+
+        if (var4 != 0) {
+            if (var7) {
+                this.Vulcan_H();
+            }
+
+            var7 = this.settings.Vulcan_o(new Object[0]);
+        }
+
+        label62: {
+            if (var4 != 0) {
+                if (var7) {
+                    Metrics var5 = new Metrics((JavaPlugin)this.Vulcan_a(), 11327);
+                    var5.addCustomChart(new SimplePie("packetevents_version", this::lambda$init$0));
+                }
+            } else if (var7) {
+                break label62;
+            }
+
+            while (!this.injectorReady.get()) {
+            }
+        }
+
+        label53: {
+            Runnable var6;
+            label52: {
+                var6 = this::lambda$init$1;
+                if (var4 != 0) {
+                    if (!this.lateBind) {
+                        break label52;
+                    }
+
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, this.injector::Vulcan_B);
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, var6);
+                }
+
+                if (var4 != 0) {
+                    break label53;
+                }
+            }
+
+            var6.run();
+        }
+
+        this.initialized = true;
+        this.initializing = false;
     }
 
     @Deprecated
@@ -698,105 +354,39 @@ public final class PacketEvents implements Listener, EventManager {
     }
 
     public void Vulcan_o() {
-        // $VF: Couldn't be decompiled
-        // Please report this to the Vineflower issue tracker, at https://github.com/Vineflower/vineflower/issues with a copy of the class file (if you have the rights to distribute it!)
-        // java.lang.RuntimeException: parsing failure!
-        //   at org.jetbrains.java.decompiler.modules.decompiler.decompose.DomHelper.parseGraph(DomHelper.java:211)
-        //   at org.jetbrains.java.decompiler.main.rels.MethodProcessor.codeToJava(MethodProcessor.java:166)
-        //
-        // Bytecode:
-        // 00: getstatic io/github/repooper/packetevents/PacketEvents.a J
-        // 03: ldc2_w 87318851020892
-        // 06: lxor
-        // 07: lstore 1
-        // 08: lload 1
-        // 09: dup2
-        // 0a: ldc2_w 139409847091296
-        // 0d: lxor
-        // 0e: lstore 3
-        // 0f: dup2
-        // 10: ldc2_w 29839000160880
-        // 13: lxor
-        // 14: lstore 5
-        // 16: pop2
-        // 17: invokestatic io/github/repooper/packetevents/PacketEvents.Vulcan_Q ()I
-        // 1a: istore 7
-        // 1c: aload 0
-        // 1d: getfield io/github/repooper/packetevents/PacketEvents.initialized Z
-        // 20: iload 7
-        // 22: ifeq 3a
-        // 25: ifeq b8
-        // 28: goto 2f
-        // 2b: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 2e: athrow
-        // 2f: aload 0
-        // 30: getfield io/github/repooper/packetevents/PacketEvents.terminating Z
-        // 33: goto 3a
-        // 36: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 39: athrow
-        // 3a: ifne b8
-        // 3d: invokestatic org/bukkit/Bukkit.getOnlinePlayers ()Ljava/util/Collection;
-        // 40: invokeinterface java/util/Collection.iterator ()Ljava/util/Iterator; 1
-        // 45: astore 8
-        // 47: aload 8
-        // 49: invokeinterface java/util/Iterator.hasNext ()Z 1
-        // 4e: ifeq 8b
-        // 51: aload 8
-        // 53: invokeinterface java/util/Iterator.next ()Ljava/lang/Object; 1
-        // 58: checkcast org/bukkit/entity/Player
-        // 5b: astore 9
-        // 5d: aload 0
-        // 5e: getfield io/github/repooper/packetevents/PacketEvents.injector Lio/github/repooper/packetevents/injector/GlobalChannelInjector;
-        // 61: lload 5
-        // 63: aload 9
-        // 65: bipush 2
-        // 66: anewarray 4
-        // 69: dup_x1
-        // 6a: swap
-        // 6b: bipush 1
-        // 6c: swap
-        // 6d: aastore
-        // 6e: dup_x2
-        // 6f: dup_x2
-        // 70: pop
-        // 71: invokestatic java/lang/Long.valueOf (J)Ljava/lang/Long;
-        // 74: bipush 0
-        // 75: swap
-        // 76: aastore
-        // 77: invokevirtual io/github/repooper/packetevents/injector/GlobalChannelInjector.Vulcan_Q ([Ljava/lang/Object;)V
-        // 7a: iload 7
-        // 7c: ifeq b3
-        // 7f: iload 7
-        // 81: ifne 47
-        // 84: goto 8b
-        // 87: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 8a: athrow
-        // 8b: aload 0
-        // 8c: getfield io/github/repooper/packetevents/PacketEvents.injector Lio/github/repooper/packetevents/injector/GlobalChannelInjector;
-        // 8f: lload 3
-        // 90: bipush 1
-        // 91: anewarray 4
-        // 94: dup_x2
-        // 95: dup_x2
-        // 96: pop
-        // 97: invokestatic java/lang/Long.valueOf (J)Ljava/lang/Long;
-        // 9a: bipush 0
-        // 9b: swap
-        // 9c: aastore
-        // 9d: invokevirtual io/github/repooper/packetevents/injector/GlobalChannelInjector.Vulcan_d ([Ljava/lang/Object;)V
-        // a0: aload 0
-        // a1: invokevirtual io/github/repooper/packetevents/PacketEvents.Vulcan_N ()Lio/github/repooper/packetevents/event/manager/EventManager;
-        // a4: bipush 0
-        // a5: anewarray 4
-        // a8: invokeinterface io/github/repooper/packetevents/event/manager/EventManager.Vulcan_h ([Ljava/lang/Object;)Lio/github/repooper/packetevents/event/manager/EventManager; 2
-        // ad: pop
-        // ae: aload 0
-        // af: bipush 0
-        // b0: putfield io/github/repooper/packetevents/PacketEvents.initialized Z
-        // b3: aload 0
-        // b4: bipush 0
-        // b5: putfield io/github/repooper/packetevents/PacketEvents.terminating Z
-        // b8: return
+        long var1 = 47666491843353L;
+        long var3 = 94080624911225L;
+        long var5 = 53297714112873L;
+        int var7 = Vulcan_Q();
+        boolean var10000 = this.initialized;
+        if (var7 != 0) {
+            if (!this.initialized) {
+                return;
+            }
+
+            var10000 = this.terminating;
+        }
+
+        if (!var10000) {
+            label28: {
+                for (Player var9 : Bukkit.getOnlinePlayers()) {
+                    this.injector.Vulcan_Q(new Object[]{var5, var9});
+                    if (var7 == 0) {
+                        break label28;
+                    }
+
+                    if (var7 == 0) {
+                        break;
+                    }
+                }
+
+                this.injector.Vulcan_d(new Object[]{var3});
+                this.Vulcan_N().Vulcan_h(new Object[0]);
+                this.initialized = false;
+            }
+
+            this.terminating = false;
+        }
     }
 
     @Deprecated
@@ -874,179 +464,68 @@ public final class PacketEvents implements Listener, EventManager {
     }
 
     private void Vulcan_H() {
-        // $VF: Couldn't be decompiled
-        // Please report this to the Vineflower issue tracker, at https://github.com/Vineflower/vineflower/issues with a copy of the class file (if you have the rights to distribute it!)
-        // java.lang.RuntimeException: parsing failure!
-        //   at org.jetbrains.java.decompiler.modules.decompiler.decompose.DomHelper.parseGraph(DomHelper.java:211)
-        //   at org.jetbrains.java.decompiler.main.rels.MethodProcessor.codeToJava(MethodProcessor.java:166)
-        //
-        // Bytecode:
-        // 00: getstatic io/github/repooper/packetevents/PacketEvents.a J
-        // 03: ldc2_w 86872738545053
-        // 06: lxor
-        // 07: lstore 1
-        // 08: invokestatic io/github/repooper/packetevents/PacketEvents.Vulcan_Q ()I
-        // 0b: istore 3
-        // 0c: aload 0
-        // 0d: iload 3
-        // 0e: ifeq 26
-        // 11: getfield io/github/repooper/packetevents/PacketEvents.updateChecker Lio/github/repooper/packetevents/updatechecker/UpdateChecker;
-        // 14: ifnonnull 30
-        // 17: goto 1e
-        // 1a: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 1d: athrow
-        // 1e: aload 0
-        // 1f: goto 26
-        // 22: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 25: athrow
-        // 26: new io/github/repooper/packetevents/updatechecker/UpdateChecker
-        // 29: dup
-        // 2a: invokespecial io/github/repooper/packetevents/updatechecker/UpdateChecker.<init> ()V
-        // 2d: putfield io/github/repooper/packetevents/PacketEvents.updateChecker Lio/github/repooper/packetevents/updatechecker/UpdateChecker;
-        // 30: new java/lang/Thread
-        // 33: dup
-        // 34: aload 0
-        // 35: invokedynamic run (Lio/github/repooper/packetevents/PacketEvents;)Ljava/lang/Runnable; bsm=java/lang/invoke/LambdaMetafactory.metafactory (Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite; args=[ ()V, io/github/repooper/packetevents/PacketEvents.lambda$handleUpdateCheck$2 ()V, ()V ]
-        // 3a: ldc_w "packetevents-update-check-thread"
-        // 3d: invokespecial java/lang/Thread.<init> (Ljava/lang/Runnable;Ljava/lang/String;)V
-        // 40: astore 4
-        // 42: aload 4
-        // 44: invokevirtual java/lang/Thread.start ()V
-        // 47: return
+        label16: {
+            long var1 = 47494217086680L;
+            int var3 = Vulcan_Q();
+            PacketEvents var10000 = this;
+            if (var3 != 0) {
+                if (this.updateChecker != null) {
+                    break label16;
+                }
+
+                var10000 = this;
+            }
+
+            var10000.updateChecker = new UpdateChecker();
+        }
+
+        Thread var4 = new Thread(this::lambda$handleUpdateCheck$2, "packetevents-update-check-thread");
+        var4.start();
     }
 
     private void lambda$handleUpdateCheck$2() {
-        // $VF: Couldn't be decompiled
-        // Please report this to the Vineflower issue tracker, at https://github.com/Vineflower/vineflower/issues with a copy of the class file (if you have the rights to distribute it!)
-        // java.lang.RuntimeException: parsing failure!
-        //   at org.jetbrains.java.decompiler.modules.decompiler.decompose.DomHelper.parseGraph(DomHelper.java:211)
-        //   at org.jetbrains.java.decompiler.main.rels.MethodProcessor.codeToJava(MethodProcessor.java:166)
-        //
-        // Bytecode:
-        // 00: getstatic io/github/repooper/packetevents/PacketEvents.a J
-        // 03: ldc2_w 42124928416641
-        // 06: lxor
-        // 07: lstore 1
-        // 08: lload 1
-        // 09: dup2
-        // 0a: ldc2_w 3492980977965
-        // 0d: lxor
-        // 0e: lstore 3
-        // 0f: pop2
-        // 10: invokestatic io/github/repooper/packetevents/PacketEvents.Vulcan_a ()I
-        // 13: aload 0
-        // 14: invokevirtual io/github/repooper/packetevents/PacketEvents.Vulcan_a ()Lorg/bukkit/plugin/Plugin;
-        // 17: invokeinterface org/bukkit/plugin/Plugin.getLogger ()Ljava/util/logging/Logger; 1
-        // 1c: ldc_w "[packetevents] Checking for an update, please wait..."
-        // 1f: invokevirtual java/util/logging/Logger.info (Ljava/lang/String;)V
-        // 22: istore 5
-        // 24: aload 0
-        // 25: getfield io/github/repooper/packetevents/PacketEvents.updateChecker Lio/github/repooper/packetevents/updatechecker/UpdateChecker;
-        // 28: lload 3
-        // 29: bipush 1
-        // 2a: anewarray 4
-        // 2d: dup_x2
-        // 2e: dup_x2
-        // 2f: pop
-        // 30: invokestatic java/lang/Long.valueOf (J)Ljava/lang/Long;
-        // 33: bipush 0
-        // 34: swap
-        // 35: aastore
-        // 36: invokevirtual io/github/repooper/packetevents/updatechecker/UpdateChecker.Vulcan_M ([Ljava/lang/Object;)Lio/github/repooper/packetevents/updatechecker/UpdateChecker$UpdateCheckerStatus;
-        // 39: astore 6
-        // 3b: bipush 5
-        // 3c: istore 7
-        // 3e: bipush 5
-        // 3f: istore 8
-        // 41: bipush 0
-        // 42: istore 9
-        // 44: iload 9
-        // 46: iload 8
-        // 48: if_icmpge fa
-        // 4b: aload 6
-        // 4d: getstatic io/github/repooper/packetevents/updatechecker/UpdateChecker$UpdateCheckerStatus.FAILED Lio/github/repooper/packetevents/updatechecker/UpdateChecker$UpdateCheckerStatus;
-        // 50: if_acmpeq 5f
-        // 53: iload 5
-        // 55: ifeq fa
-        // 58: goto 5f
-        // 5b: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 5e: athrow
-        // 5f: aload 0
-        // 60: invokevirtual io/github/repooper/packetevents/PacketEvents.Vulcan_a ()Lorg/bukkit/plugin/Plugin;
-        // 63: invokeinterface org/bukkit/plugin/Plugin.getLogger ()Ljava/util/logging/Logger; 1
-        // 68: new java/lang/StringBuilder
-        // 6b: dup
-        // 6c: invokespecial java/lang/StringBuilder.<init> ()V
-        // 6f: ldc_w "[packetevents] Checking for an update again in "
-        // 72: invokevirtual java/lang/StringBuilder.append (Ljava/lang/String;)Ljava/lang/StringBuilder;
-        // 75: iload 7
-        // 77: invokevirtual java/lang/StringBuilder.append (I)Ljava/lang/StringBuilder;
-        // 7a: ldc_w " seconds..."
-        // 7d: invokevirtual java/lang/StringBuilder.append (Ljava/lang/String;)Ljava/lang/StringBuilder;
-        // 80: invokevirtual java/lang/StringBuilder.toString ()Ljava/lang/String;
-        // 83: invokevirtual java/util/logging/Logger.severe (Ljava/lang/String;)V
-        // 86: iload 7
-        // 88: i2l
-        // 89: ldc2_w 1000
-        // 8c: lmul
-        // 8d: invokestatic java/lang/Thread.sleep (J)V
-        // 90: goto 9e
-        // 93: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // 96: athrow
-        // 97: astore 10
-        // 99: aload 10
-        // 9b: invokevirtual java/lang/InterruptedException.printStackTrace ()V
-        // 9e: iload 7
-        // a0: bipush 2
-        // a1: imul
-        // a2: istore 7
-        // a4: aload 0
-        // a5: getfield io/github/repooper/packetevents/PacketEvents.updateChecker Lio/github/repooper/packetevents/updatechecker/UpdateChecker;
-        // a8: lload 3
-        // a9: bipush 1
-        // aa: anewarray 4
-        // ad: dup_x2
-        // ae: dup_x2
-        // af: pop
-        // b0: invokestatic java/lang/Long.valueOf (J)Ljava/lang/Long;
-        // b3: bipush 0
-        // b4: swap
-        // b5: aastore
-        // b6: invokevirtual io/github/repooper/packetevents/updatechecker/UpdateChecker.Vulcan_M ([Ljava/lang/Object;)Lio/github/repooper/packetevents/updatechecker/UpdateChecker$UpdateCheckerStatus;
-        // b9: astore 6
-        // bb: iload 5
-        // bd: ifne f5
-        // c0: iload 9
-        // c2: iload 8
-        // c4: bipush 1
-        // c5: isub
-        // c6: if_icmpne eb
-        // c9: goto d0
-        // cc: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // cf: athrow
-        // d0: aload 0
-        // d1: invokevirtual io/github/repooper/packetevents/PacketEvents.Vulcan_a ()Lorg/bukkit/plugin/Plugin;
-        // d4: invokeinterface org/bukkit/plugin/Plugin.getLogger ()Ljava/util/logging/Logger; 1
-        // d9: ldc_w "[packetevents] PacketEvents failed to check for an update. No longer retrying."
-        // dc: invokevirtual java/util/logging/Logger.severe (Ljava/lang/String;)V
-        // df: iload 5
-        // e1: ifeq fa
-        // e4: goto eb
-        // e7: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // ea: athrow
-        // eb: iinc 9 1
-        // ee: goto f5
-        // f1: invokestatic io/github/repooper/packetevents/PacketEvents.a (Ljava/lang/Exception;)Ljava/lang/Exception;
-        // f4: athrow
-        // f5: iload 5
-        // f7: ifeq 44
-        // fa: return
+        long var1 = 73114304934084L;
+        long var3 = 71820540609001L;
+        int var10000 = Vulcan_a();
+        this.Vulcan_a().getLogger().info("[packetevents] Checking for an update, please wait...");
+        int var5 = var10000;
+        UpdateCheckerStatus var6 = this.updateChecker.Vulcan_M(new Object[]{var3});
+        int var7 = 5;
+        byte var8 = 5;
+        int var9 = 0;
+
+        while (var9 < var8 && (var6 == UpdateCheckerStatus.FAILED || var5 != 0)) {
+            this.Vulcan_a().getLogger().severe("[packetevents] Checking for an update again in " + var7 + " seconds...");
+
+            try {
+                Thread.sleep((long)var7 * 1000L);
+            } catch (InterruptedException var11) {
+                var11.printStackTrace();
+            }
+
+            var7 *= 2;
+            var6 = this.updateChecker.Vulcan_M(new Object[]{var3});
+            if (var5 == 0) {
+                if (var9 == 4) {
+                    this.Vulcan_a().getLogger().severe("[packetevents] PacketEvents failed to check for an update. No longer retrying.");
+                    if (var5 == 0) {
+                        break;
+                    }
+                }
+
+                var9++;
+            }
+
+            if (var5 != 0) {
+                break;
+            }
+        }
     }
 
     private void lambda$init$1() {
-        long var1 = a ^ 97729382598583L;
-        long var3 = var1 ^ 88632349906806L;
-        long var5 = var1 ^ 83860873908746L;
+        long var1 = 66876338785522L;
+        long var3 = 119084676127620L;
+        long var5 = 123797029215992L;
         Bukkit.getPluginManager().registerEvents(this.bukkitEventProcessorInternal, plugin);
         int var10000 = Vulcan_a();
         Iterator var8 = Bukkit.getOnlinePlayers().iterator();
@@ -1082,12 +561,7 @@ public final class PacketEvents implements Listener, EventManager {
 
     public static int Vulcan_Q() {
         int var0 = Vulcan_a();
-
-        try {
-            return var0 == 0 ? 76 : 0;
-        } catch (PacketEventsLoadFailureException var1) {
-            throw a(var1);
-        }
+        return var0 == 0 ? 76 : 0;
     }
 
     static {

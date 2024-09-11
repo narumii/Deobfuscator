@@ -22,12 +22,19 @@ public record MethodContext(
     @Unmodifiable Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames
 ) {
 
-  public static MethodContext create(ClassWrapper classWrapper, MethodNode methodNode) {
+  /**
+   * Creates new {@link MethodContext} and computes its frames
+   */
+  public static MethodContext compute(ClassWrapper classWrapper, MethodNode methodNode) {
     Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = AsmHelper.analyzeSource(classWrapper.getClassNode(), methodNode);
     return new MethodContext(classWrapper, methodNode, frames);
   }
 
-  public InstructionContext createInsnContext(AbstractInsnNode insn) {
+  public static MethodContext frameless(ClassWrapper classWrapper, MethodNode methodNode) {
+    return new MethodContext(classWrapper, methodNode, null);
+  }
+
+  public InstructionContext newInsnContext(AbstractInsnNode insn) {
     return new InstructionContext(insn, this);
   }
 }

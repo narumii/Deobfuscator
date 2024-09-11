@@ -12,13 +12,13 @@ import uwu.narumi.deobfuscator.core.other.impl.universal.number.MathUnaryOperati
 public class UniversalNumberTransformer extends ComposedTransformer {
   public UniversalNumberTransformer() {
     super(
-        MethodCallsOnLiteralsTransformer::new,
-        MathBinaryOperationsTransformer::new,
-        MathUnaryOperationsTransformer::new,
+        () -> new ComposedTransformer(true,
+            MethodCallsOnLiteralsTransformer::new,
+            MathBinaryOperationsTransformer::new,
+            MathUnaryOperationsTransformer::new
+        ),
 
         UselessPopCleanTransformer::new
     );
-
-    this.rerunOnChange = true;
   }
 }
