@@ -17,7 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Removes useless try catches
+ * Removes useless try catches. References:
+ * <ul>
+ * <li>https://www.zelix.com/klassmaster/featuresExceptionObfuscation.html</li>
+ * </ul>
+ *
  * <pre>
  * {@code
  * try {

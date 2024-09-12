@@ -19,10 +19,15 @@ import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 /**
- * Decrypts {@code long} numbers <a href="https://www.zelix.com/klassmaster/featuresLongEncryption.html">https://www.zelix.com/klassmaster/featuresLongEncryption.html</a>
+ * Decrypts {@code long} numbers. References:
+ * <ul>
+ * <li>https://www.zelix.com/klassmaster/featuresLongEncryption.html</li>
+ * <li>https://www.zelix.com/klassmaster/featuresMethodParameterChanges.html</li>
+ * </ul>
  *
  * <p>Example long decrypter usage in zelix:
  * <pre>
+ * {@code
  *   ldc 5832394289974403481L
  *   ldc -8943439614781261032L
  *   invokestatic java/lang/invoke/MethodHandles.lookup ()Ljava/lang/invoke/MethodHandles$Lookup;
@@ -33,6 +38,7 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
  *   // Decrypt method
  *   invokeinterface me/frep/vulcan/spigot/Vulcan_a.a (J)J
  *   putstatic io/github/repooper/packetevents/PacketEventsPlugin.a J
+ * }
  * </pre>
  */
 // TODO: Apparently it seems like the order of decrypting sometimes matters due to https://www.zelix.com/klassmaster/featuresMethodParameterChanges.html and https://www.zelix.com/klassmaster/docs/classInitializationOrderStatement.html
