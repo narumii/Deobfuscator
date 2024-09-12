@@ -35,6 +35,7 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
  *   putstatic io/github/repooper/packetevents/PacketEventsPlugin.a J
  * </pre>
  */
+// TODO: Apparently is seems like the order of decrypting sometimes matters due to https://www.zelix.com/klassmaster/featuresMethodParameterChanges.html and https://www.zelix.com/klassmaster/docs/classInitializationOrderStatement.html
 public class ZelixLongEncryptionTransformer extends Transformer {
 
   private static final Match DECRYPT_LONG_MATCHER = FieldMatch.putStatic().desc("J")

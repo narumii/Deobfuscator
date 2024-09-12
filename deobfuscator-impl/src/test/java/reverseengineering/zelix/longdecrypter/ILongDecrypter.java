@@ -3,7 +3,7 @@ package reverseengineering.zelix.longdecrypter;
 public interface ILongDecrypter {
   void setParent(ILongDecrypter parent);
 
-  int[] getNumberPool();
+  int[] getEncryptionInts();
 
   long decrypt(long decryptKey);
 

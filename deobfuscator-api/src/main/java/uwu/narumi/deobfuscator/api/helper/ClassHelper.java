@@ -40,7 +40,10 @@ public final class ClassHelper {
    * @param fix Fix class using CAFED00D
    */
   public static ClassWrapper loadClass(String path, byte[] bytes, int classReaderFlags, int classWriterFlags, boolean fix) throws Exception {
-    return new ClassWrapper(path, new ClassReader(fix ? fixClass(bytes) : bytes), classReaderFlags, classWriterFlags);
+    // Fix class
+    bytes = fix ? fixClass(bytes) : bytes;
+
+    return new ClassWrapper(path, new ClassReader(bytes), classReaderFlags, classWriterFlags);
   }
 
   public static byte[] fixClass(byte[] bytes) throws InvalidClassException {
@@ -49,13 +52,6 @@ public final class ClassHelper {
     bytes = new ClassFileWriter().write(classFile);
 
     return bytes;
-  }
-
-  public static byte[] classToBytes(ClassNode classNode, int writerMode) {
-    ClassWriter classWriter = new ClassWriter(writerMode);
-    classNode.accept(classWriter);
-
-    return classWriter.toByteArray();
   }
 
   public static ClassNode copy(ClassNode classNode) {
