@@ -26,10 +26,10 @@ public class SimpleLongDecrypter implements ILongDecrypter {
 
   // a
   public static ILongDecrypter buildNumberDecryptor(long key1, long key2, Class<?> lookupClass) {
-    SharedLongDecrypter.a(key1 > 0L); // ??
+    FallbackLongDecrypter.a(key1 > 0L); // ??
     ILongDecrypter first = createNumberDecryptor(key1);
     ILongDecrypter second = createNumberDecryptor(key2);
-    ILongDecrypter var7 = SharedLongDecrypter.getPairStatic(first, second);
+    ILongDecrypter var7 = FallbackLongDecrypter.getPairStatic(first, second);
     if (lookupClass != null) {
       // Seems like it should do checks if in sandbox, but this list is never queried. Who knows ¯\_(ツ)_/¯
       lookupClasses.add(lookupClass);
@@ -57,13 +57,13 @@ public class SimpleLongDecrypter implements ILongDecrypter {
     return new SimpleLongDecrypter(key);
   }
 
-  static void initSharedDecrypter(SharedLongDecrypter sharedDecrypter) {
+  static void initSharedDecrypter(FallbackLongDecrypter sharedDecrypter) {
     cachedDecryptorsSize = cachedLongDecrypters.size();
     sort();
     sharedDecrypter.init();
   }
 
-  static void initEncryptionData(SharedLongDecrypter sharedDecrypter) {
+  static void initEncryptionData(FallbackLongDecrypter sharedDecrypter) {
     sort();
     int[] var10000 = mutableEncryptionInts = new int[64];
     var10000[0] = -21;

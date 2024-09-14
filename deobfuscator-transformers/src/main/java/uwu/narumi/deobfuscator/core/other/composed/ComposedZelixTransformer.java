@@ -10,11 +10,18 @@ import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransfor
 import uwu.narumi.deobfuscator.core.other.impl.zkm.ZelixLongEncryptionMPCTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.zkm.ZelixUselessTryCatchRemoverTransformer;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Work in progress
  */
 public class ComposedZelixTransformer extends ComposedTransformer {
   public ComposedZelixTransformer() {
+    this(new HashMap<>());
+  }
+
+  public ComposedZelixTransformer(Map<String, String> classInitializationOrder) {
     super(
         JsrInlinerTransformer::new,
         RecoverSyntheticsTransformer::new,
@@ -22,7 +29,7 @@ public class ComposedZelixTransformer extends ComposedTransformer {
         // Fixes flow a bit
         ZelixUselessTryCatchRemoverTransformer::new,
 
-        ZelixLongEncryptionMPCTransformer::new,
+        () -> new ZelixLongEncryptionMPCTransformer(classInitializationOrder),
         InlineStaticFieldTransformer::new,
         UniversalNumberTransformer::new,
 

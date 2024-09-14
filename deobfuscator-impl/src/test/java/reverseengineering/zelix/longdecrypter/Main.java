@@ -9,7 +9,7 @@ public class Main {
     // LongDecrypter2 instances
     ILongDecrypter a1Instance = SimpleLongDecrypter.buildNumberDecryptor(900058104405336414L, 6106449219005125011L, MethodHandles.lookup().lookupClass());
     ILongDecrypter a2Instance = SimpleLongDecrypter.buildNumberDecryptor(5832394289974403481L, -8943439614781261032L, MethodHandles.lookup().lookupClass());
-    //ILongDecrypter a2Instance = LongDecrypter1.buildNumberDecryptor(5832394123974403481L, -8943439614781261032L, MethodHandles.lookup().lookupClass());
+    //ILongDecrypter a2Instance = LongDecrypter1.buildNumberDecryptor(5832394123974403481L, -8943439614781261032L, MethodHandles.lookup().lookupClass()); // Invalid keys test
     ILongDecrypter a3Instance = SimpleLongDecrypter.buildNumberDecryptor(-1563944528177415659L, 8240211990857304620L, MethodHandles.lookup().lookupClass());
 
     System.out.println(a1Instance);

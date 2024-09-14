@@ -5,7 +5,6 @@ import dev.xdark.ssvm.invoke.Argument;
 import dev.xdark.ssvm.mirror.type.InstanceClass;
 import dev.xdark.ssvm.value.ObjectValue;
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
@@ -22,16 +21,24 @@ import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
- * Decrypts {@code long} numbers that uses a technique called Method Parameter Changes. References:
+ * Decrypts {@code long} numbers that uses a technique called Method Parameter Changes. When an author specified
+ * the {@code classInitializationOrderStatement} option then you also need to pass it to the constructor. But don't worry.
+ * The deobfuscator will tell you if this will be needed.
+ *
+ * <p>References:
  * <ul>
  * <li>https://www.zelix.com/klassmaster/featuresLongEncryption.html</li>
  * <li>https://www.zelix.com/klassmaster/featuresMethodParameterChanges.html</li>
+ * <li>https://www.zelix.com/klassmaster/docs/classInitializationOrderStatement.html</li>
  * </ul>
  *
- * <p>Example long decrypter usage in zelix:
+ * <p>Example long decrypter usage in zelix is here {@link reverseengineering.zelix.longdecrypter.Main} and:
  * <pre>
  * {@code
  *   ldc 5832394289974403481L
@@ -47,8 +54,6 @@ import java.util.List;
  * }
  * </pre>
  */
-// TODO: Apparently it seems like the order of decrypting sometimes matters due to https://www.zelix.com/klassmaster/featuresMethodParameterChanges.html and https://www.zelix.com/klassmaster/docs/classInitializationOrderStatement.htm
-// TODO: Allow to specify class initialization order manually
 public class ZelixLongEncryptionMPCTransformer extends Transformer {
 
   private static final Match DECRYPT_LONG_MATCHER = FieldMatch.putStatic().desc("J")
@@ -62,17 +67,50 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
               .stack(LongMatch.of().save("key-1")) // Key 1
           ));
 
+  // Config
+  /**
+   * Example: key="mypackage.Class0", value="mypackage.Class1" - You guarantee Class0 always initialized before Class1
+   *
+   * <ul>
+   * <li>key Class that will always be initialized BEFORE {@code value}. It is an internal name
+   * <li>value Class that will always be initialized AFTER {@code key}. It is an internal name
+   * </ul>
+   */
+  private final Map<String, String> classInitOrder;
+
   private SandBox sandBox;
   private final List<String> processedClasses = new ArrayList<>(); // class internal names
+
+  public ZelixLongEncryptionMPCTransformer() {
+    this.classInitOrder = new HashMap<>();
+  }
+
+  public ZelixLongEncryptionMPCTransformer(Map<String, String> classInitOrder) {
+    this.classInitOrder = classInitOrder.entrySet().stream()
+        .collect(
+            // Replace all '.' with '/'
+            Collectors.toMap(
+                entry -> entry.getKey().replace('.', '/'), // Key
+                entry -> entry.getValue().replace('.', '/') // Value
+            )
+        );
+  }
 
   @Override
   protected void transform(ClassWrapper scope, Context context) throws Exception {
     sandBox = new SandBox(context);
 
-    context.classes(scope).forEach(classWrapper -> {
-      // Don't process already processed classes
-      if (processedClasses.contains(classWrapper.name())) return;
+    // Firstly, process the manual list of class initialization order
+    for (var entry : classInitOrder.entrySet()) {
+      ClassWrapper first = context.getClasses().get(entry.getKey());
+      ClassWrapper second = context.getClasses().get(entry.getValue());
 
+      decryptEncryptedLongs(context, first);
+      decryptEncryptedLongs(context, second);
+    }
+
+    // Decrypt longs
+    context.classes(scope).forEach(classWrapper -> {
       decryptEncryptedLongs(context, classWrapper);
     });
 
@@ -84,11 +122,15 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
    * Decrypts encrypted longs
    */
   private void decryptEncryptedLongs(Context context, ClassWrapper classWrapper) {
+    // Don't process already processed classes
+    if (processedClasses.contains(classWrapper.name())) return;
+
     // Find clinit
     if (classWrapper.findClInit().isEmpty()) return;
     MethodNode clinit = classWrapper.findClInit().get();
 
-    // Firstly, process encrypted longs in the super class
+    // Zelix came up with a great idea to infer class initialization order by the super classes.
+    // So firstly, process encrypted longs in the super class
     if (classWrapper.classNode().superName != null && !classWrapper.classNode().superName.equals("java/lang/Object")) {
       ClassWrapper superClass = context.getClasses().get(classWrapper.classNode().superName);
       if (superClass != null) {
@@ -128,10 +170,15 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
           InstanceClass longDecrypterClass = (InstanceClass) sandBox.getMemoryManager().readClass(longDecrypterInstance);
 
           //String instanceStringified = sandBox.vm().getOperations().toString(longDecrypterInstance);
-          //System.out.println(classWrapper.name()+" -> "+instanceStringified);
+          //System.out.println(classWrapper.name() + " -> " + instanceStringified);
 
-          if (isSharedDecrypter(longDecrypterClass)) {
-            LOGGER.error("Detected Shared Decrypter! Decrypted values may be wrong. Probably classes weren't loaded in proper order.");
+          if (isFallbackDecrypter(longDecrypterClass)) {
+            LOGGER.error("Detected that '{}' class is decrypted out of order. Decrypted number will have wrong value.", classWrapper.name());
+            LOGGER.error("The author used 'classInitializationOrderStatement' (https://www.zelix.com/klassmaster/docs/classInitializationOrderStatement.html) " +
+                "during jar obfuscation to specify class initialization order manually. " +
+                "You need to pass to ZelixLongEncryptionMPCTransformer a class initialization order. The easiest way wille be doing a static analysis " +
+                "and find where the mentioned class is used."
+            );
           }
 
           // Decrypt long value
@@ -159,14 +206,17 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
     processedClasses.add(classWrapper.name());
   }
 
-  private boolean isSharedDecrypter(InstanceClass clazz) {
-    String selfDesc = "L"+clazz.getInternalName()+";";
+  /**
+   * Checks if the class is {@link reverseengineering.zelix.longdecrypter.FallbackLongDecrypter}
+   */
+  private boolean isFallbackDecrypter(InstanceClass clazz) {
+    String selfDesc = "L" + clazz.getInternalName() + ";";
     return clazz.staticFieldArea().list().size() == 2
         && clazz.staticFieldArea().list().get(0).getDesc().equals("Z")
         && clazz.staticFieldArea().list().get(1).getDesc().equals(selfDesc)
         && clazz.virtualFieldArea().list().size() == 4
         && clazz.virtualFieldArea().list().get(0).getDesc().equals("Ljava/util/concurrent/ConcurrentHashMap;")
-        //&& clazz.virtualFieldArea().list().get(1).getDesc().equals("TODO")
+        //&& clazz.virtualFieldArea().list().get(1).getDesc().equals("too hard to infer XD")
         && clazz.virtualFieldArea().list().get(2).getDesc().equals("[I")
         && clazz.virtualFieldArea().list().get(3).getDesc().equals("J");
   }

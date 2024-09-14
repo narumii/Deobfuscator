@@ -3,18 +3,23 @@ package reverseengineering.zelix.longdecrypter;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Shared long decrypter. This means that when you will decrypt number using it,
- * then the state of ALL decrypters would change (due to {@link SimpleLongDecrypter#mutableEncryptionInts}).
+ * Decrypter that uses shared {@link SimpleLongDecrypter#mutableEncryptionInts}. This decrypter is only used when it
+ * cannot find registered decryption for given numbers.
+ * {@link FallbackLongDecrypter#decrypt(long)} is never called in untouched jar obfuscated using zelix. When
+ * {@link FallbackLongDecrypter#decrypt(long)} is called (which is an error) then it intentionally breaks every other
+ * decrypter, by overriding their {@link SimpleLongDecrypter#getEncryptionInts()}, making them unusable.
+ * <p>
+ * This decrypter only exists here to make it harder to deobfuscate the jar and to confuse people that try to deobfuscate it.
  */
-public class SharedLongDecrypter implements ILongDecrypter {
+public class FallbackLongDecrypter implements ILongDecrypter {
   private static boolean e;
-  private static SharedLongDecrypter INSTANCE = new SharedLongDecrypter();
+  private static FallbackLongDecrypter INSTANCE = new FallbackLongDecrypter();
   private ConcurrentHashMap<ILongDecrypter, ILongDecrypter> decrypterToDecrypterMap = new ConcurrentHashMap<>();
   private ILongDecrypter parent;
   private int[] encryptionInts;
   private long key;
 
-  public SharedLongDecrypter() {
+  public FallbackLongDecrypter() {
     this.initCachedDecryptersMap();
     this.encryptionInts = new int[64];
     this.encryptionInts[0] = -47;
@@ -154,7 +159,7 @@ public class SharedLongDecrypter implements ILongDecrypter {
     if (this == other) {
       return true;
     } else {
-      return other instanceof SharedLongDecrypter ? System.identityHashCode(this) - System.identityHashCode(other) <= 0 : false;
+      return other instanceof FallbackLongDecrypter ? System.identityHashCode(this) - System.identityHashCode(other) <= 0 : false;
     }
   }
 
