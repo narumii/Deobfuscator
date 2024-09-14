@@ -12,8 +12,8 @@ public class AnnotationCleanTransformer extends Transformer {
         .classes(scope)
         .forEach(
             classWrapper -> {
-              classWrapper.getClassNode().invisibleAnnotations = null;
-              classWrapper.getClassNode().invisibleAnnotations = null;
+              classWrapper.classNode().invisibleAnnotations = null;
+              classWrapper.classNode().invisibleAnnotations = null;
 
               classWrapper
                   .methods()

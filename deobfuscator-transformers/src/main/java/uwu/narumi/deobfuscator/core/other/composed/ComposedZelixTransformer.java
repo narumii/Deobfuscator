@@ -7,7 +7,7 @@ import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.UselessPopCleanTra
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.RecoverSyntheticsTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
-import uwu.narumi.deobfuscator.core.other.impl.zkm.ZelixLongEncryptionTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.zkm.ZelixLongEncryptionMPCTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.zkm.ZelixUselessTryCatchRemoverTransformer;
 
 /**
@@ -22,7 +22,7 @@ public class ComposedZelixTransformer extends ComposedTransformer {
         // Fixes flow a bit
         ZelixUselessTryCatchRemoverTransformer::new,
 
-        ZelixLongEncryptionTransformer::new,
+        ZelixLongEncryptionMPCTransformer::new,
         InlineStaticFieldTransformer::new,
         UniversalNumberTransformer::new,
 

@@ -15,7 +15,7 @@ public class DeadCodeCleanTransformer extends Transformer {
   @Override
   protected void transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
-      Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = AsmHelper.analyzeSource(classWrapper.getClassNode(), methodNode);
+      Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = AsmHelper.analyzeSource(classWrapper.classNode(), methodNode);
 
       for (var entry : frames.entrySet()) {
         AbstractInsnNode insn = entry.getKey();

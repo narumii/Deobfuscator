@@ -25,8 +25,8 @@ public record MethodContext(
   /**
    * Creates new {@link MethodContext} and computes its frames
    */
-  public static MethodContext compute(ClassWrapper classWrapper, MethodNode methodNode) {
-    Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = AsmHelper.analyzeSource(classWrapper.getClassNode(), methodNode);
+  public static MethodContext framed(ClassWrapper classWrapper, MethodNode methodNode) {
+    Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = AsmHelper.analyzeSource(classWrapper.classNode(), methodNode);
     return new MethodContext(classWrapper, methodNode, frames);
   }
 

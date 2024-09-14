@@ -152,7 +152,7 @@ public class ClassWrapper implements Cloneable {
     return classNode.methods;
   }
 
-  public ClassNode getClassNode() {
+  public ClassNode classNode() {
     return classNode;
   }
 

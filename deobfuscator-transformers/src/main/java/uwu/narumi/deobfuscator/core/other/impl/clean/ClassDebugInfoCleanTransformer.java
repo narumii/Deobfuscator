@@ -12,8 +12,8 @@ public class ClassDebugInfoCleanTransformer extends Transformer {
         .classes(scope)
         .forEach(
             classWrapper -> {
-              classWrapper.getClassNode().sourceDebug = null;
-              classWrapper.getClassNode().sourceFile = null;
+              classWrapper.classNode().sourceDebug = null;
+              classWrapper.classNode().sourceFile = null;
             });
 
     // There is always a change

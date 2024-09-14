@@ -62,7 +62,7 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
         // Check instructions
         if (methodNode.instructions.size() == 2 && INSTANT_RETURN_EXCEPTION.matches(framelessContext.newInsnContext(methodNode.instructions.getFirst()))) {
           // Add it to list
-          instantReturnExceptionMethods.add(MethodRef.of(classWrapper.getClassNode(), methodNode));
+          instantReturnExceptionMethods.add(MethodRef.of(classWrapper.classNode(), methodNode));
         }
       });
 
@@ -91,7 +91,7 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
       });
 
       // Remove instant return exception methods
-      classWrapper.methods().removeIf(methodNode -> toRemove.contains(MethodRef.of(classWrapper.getClassNode(), methodNode)));
+      classWrapper.methods().removeIf(methodNode -> toRemove.contains(MethodRef.of(classWrapper.classNode(), methodNode)));
     });
   }
 }

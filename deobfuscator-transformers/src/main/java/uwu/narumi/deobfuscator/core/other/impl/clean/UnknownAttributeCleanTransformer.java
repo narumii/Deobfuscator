@@ -15,7 +15,7 @@ public class UnknownAttributeCleanTransformer extends Transformer {
         .classes(scope)
         .forEach(
             classWrapper -> {
-              changed |= classWrapper.getClassNode().attrs.removeIf(Attribute::isUnknown);
+              changed |= classWrapper.classNode().attrs.removeIf(Attribute::isUnknown);
               classWrapper
                   .methods()
                   .forEach(methodNode -> changed |= methodNode.attrs.removeIf(Attribute::isUnknown));

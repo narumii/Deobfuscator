@@ -27,8 +27,8 @@ public class InlineStaticFieldTransformer extends Transformer {
     Map<FieldRef, AbstractInsnNode> staticConstantFields = new HashMap<>();
 
     // Find all static constant fields
-    context.classes(scope).forEach(classWrapper -> findClInit(classWrapper.getClassNode()).ifPresent(clInit -> {
-      var frames = AsmHelper.analyzeSource(classWrapper.getClassNode(), clInit);
+    context.classes(scope).forEach(classWrapper -> findClInit(classWrapper.classNode()).ifPresent(clInit -> {
+      var frames = AsmHelper.analyzeSource(classWrapper.classNode(), clInit);
 
       Arrays.stream(clInit.instructions.toArray())
           .filter(insn -> insn.getOpcode() == PUTSTATIC)
@@ -61,9 +61,9 @@ public class InlineStaticFieldTransformer extends Transformer {
 
     // Also account for FieldNode#value
     context.classes(scope).forEach(classWrapper -> {
-      classWrapper.getClassNode().fields.forEach(fieldNode -> {
+      classWrapper.classNode().fields.forEach(fieldNode -> {
         if (fieldNode.value != null) {
-          FieldRef fieldRef = FieldRef.of(classWrapper.getClassNode(), fieldNode);
+          FieldRef fieldRef = FieldRef.of(classWrapper.classNode(), fieldNode);
 
           if (!staticConstantFields.containsKey(fieldRef)) {
             // Add it to static constant fields

@@ -87,14 +87,14 @@ public class AccessRepairTransformer extends Transformer {
         .classes(scope)
         .forEach(
             classWrapper -> {
-              int classAccess = classWrapper.getClassNode().access;
+              int classAccess = classWrapper.classNode().access;
               for (int access : CLASS) {
                 if (isAccess(classAccess, access)) {
                   classAccess &= ~access;
                   this.markChange();
                 }
               }
-              classWrapper.getClassNode().access = classAccess;
+              classWrapper.classNode().access = classAccess;
 
               classWrapper
                   .methods()

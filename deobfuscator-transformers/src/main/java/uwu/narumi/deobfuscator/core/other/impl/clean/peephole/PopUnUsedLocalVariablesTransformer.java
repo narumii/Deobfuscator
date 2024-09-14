@@ -19,7 +19,7 @@ public class PopUnUsedLocalVariablesTransformer extends Transformer {
   @Override
   protected void transform(ClassWrapper scope, Context context) throws Exception {
     context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
-      MethodContext methodContext = MethodContext.compute(classWrapper, methodNode);
+      MethodContext methodContext = MethodContext.framed(classWrapper, methodNode);
 
       List<VarInsnNode> varStoresInUse = new ArrayList<>();
 

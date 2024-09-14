@@ -9,5 +9,5 @@ public interface ILongDecrypter {
 
   void setKey(long key);
 
-  boolean equals(ILongDecrypter other);
+  boolean lessThanOrEqual(ILongDecrypter other);
 }

@@ -12,7 +12,7 @@ public class SignatureCleanTransformer extends Transformer {
         .classes(scope)
         .forEach(
             classWrapper -> {
-              classWrapper.getClassNode().signature = null;
+              classWrapper.classNode().signature = null;
               classWrapper.methods().forEach(methodNode -> methodNode.signature = null);
               classWrapper.fields().forEach(fieldNode -> fieldNode.signature = null);
             });

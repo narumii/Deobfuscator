@@ -58,7 +58,7 @@ public abstract class FramedInstructionsTransformer extends Transformer {
           if (buildInstructionsStream(Arrays.stream(methodNode.instructions.toArray())).findAny().isEmpty()) return;
 
           // Get frames of the method
-          MethodContext methodContext = MethodContext.compute(classWrapper, methodNode);
+          MethodContext methodContext = MethodContext.framed(classWrapper, methodNode);
 
           // Iterate over instructions
           buildInstructionsStream(Arrays.stream(methodNode.instructions.toArray())).forEach(insn -> {

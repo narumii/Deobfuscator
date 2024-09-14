@@ -27,14 +27,14 @@ public class AnnotationFilterTransformer extends Transformer {
         .classes(scope)
         .forEach(
             classWrapper -> {
-              if (classWrapper.getClassNode().invisibleAnnotations != null)
+              if (classWrapper.classNode().invisibleAnnotations != null)
                 changed |= classWrapper
-                    .getClassNode()
+                    .classNode()
                     .invisibleAnnotations
                     .removeIf(ANNOTATION_NODE_PREDICATE);
 
-              if (classWrapper.getClassNode().visibleAnnotations != null)
-                changed |= classWrapper.getClassNode().visibleAnnotations.removeIf(ANNOTATION_NODE_PREDICATE);
+              if (classWrapper.classNode().visibleAnnotations != null)
+                changed |= classWrapper.classNode().visibleAnnotations.removeIf(ANNOTATION_NODE_PREDICATE);
 
               classWrapper
                   .methods()
