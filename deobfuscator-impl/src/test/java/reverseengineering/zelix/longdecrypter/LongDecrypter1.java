@@ -224,18 +224,18 @@ public class LongDecrypter1 implements ILongDecrypter {
     }
 
     byte var13 = 64;
-    long var14 = var6;
+    long result = var6;
     int var11 = var13 - 1 - const2;
     if (var11 > 0) {
-      var14 = var6 << var11;
+      result = var6 << var11;
     }
 
     long var15 = const1 + var13 - 1 - const2;
     if (var15 > 0) {
-      var14 >>>= var15;
+      result >>>= var15;
     }
 
-    return var14;
+    return result;
   }
 
   private static void fillRestLongDecrypters() {
@@ -243,12 +243,12 @@ public class LongDecrypter1 implements ILongDecrypter {
     a(0, cachedLongDecrypters.size() - 1, cachedLongDecrypters, new ArrayList<>(cachedLongDecrypters), var0);
   }
 
-  private static void a(int startIdx, int endIdx, ArrayList<ILongDecrypter> mutableLongDecrypters, ArrayList<ILongDecrypter> longDecryptersClone, int var4) {
+  private static void a(int startIdx, int endIdx, ArrayList<ILongDecrypter> mutableLongDecrypters, ArrayList<ILongDecrypter> longDecryptersClone, int iteration) {
     if (startIdx < endIdx) {
       int half = startIdx + (endIdx - startIdx) / 2;
-      if (++var4 < CONST_17) {
-        a(startIdx, half, mutableLongDecrypters, longDecryptersClone, var4);
-        a(half + 1, endIdx, mutableLongDecrypters, longDecryptersClone, var4);
+      if (++iteration < CONST_17) {
+        a(startIdx, half, mutableLongDecrypters, longDecryptersClone, iteration);
+        a(half + 1, endIdx, mutableLongDecrypters, longDecryptersClone, iteration);
       }
 
       a(startIdx, half, endIdx, mutableLongDecrypters, longDecryptersClone);

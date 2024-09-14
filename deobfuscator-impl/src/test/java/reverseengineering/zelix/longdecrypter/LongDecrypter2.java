@@ -84,17 +84,17 @@ public class LongDecrypter2 implements ILongDecrypter {
     e = var0;
   }
 
-  static ILongDecrypter getPairStatic(ILongDecrypter first, ILongDecrypter second) {
-    return INSTANCE.getPair(first, second);
+  static ILongDecrypter getPairStatic(ILongDecrypter key, ILongDecrypter value) {
+    return INSTANCE.getPair(key, value);
   }
 
-  private ILongDecrypter getPair(ILongDecrypter firstDecryptor, ILongDecrypter secondDecryptor) {
-    Object result = this.decrypterToDecrypterMap.get(firstDecryptor);
+  private ILongDecrypter getPair(ILongDecrypter key, ILongDecrypter value) {
+    Object result = this.decrypterToDecrypterMap.get(key);
     if (result == null) {
       result = this;
     }
 
-    Object var4 = this.decrypterToDecrypterMap.put(secondDecryptor, firstDecryptor);
+    Object var4 = this.decrypterToDecrypterMap.put(value, key);
     return (ILongDecrypter)result;
   }
 

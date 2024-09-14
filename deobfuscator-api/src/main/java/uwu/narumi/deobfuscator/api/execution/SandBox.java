@@ -19,9 +19,6 @@ import dev.xdark.ssvm.symbol.Symbols;
 import dev.xdark.ssvm.thread.ThreadManager;
 import dev.xdark.ssvm.util.Reflection;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.List;
 
 import dev.xdark.ssvm.value.InstanceValue;
@@ -59,12 +56,14 @@ public class SandBox {
       this.helper = SupplyingClassLoaderInstaller.install(vm, new ClassLoaderDataSupplier(context.getLibraryLoader()));
       this.invocationUtil = InvocationUtil.create(vm);
       patchVm();
-    } catch (VMException ex) {
+    } catch (Exception ex) {
       LOGGER.error("SSVM bootstrap failed. Make sure that you run this deobfuscator on java 17");
-      SandBox.logVMException(ex, vm);
+      if (ex instanceof VMException vmException) {
+        SandBox.logVMException(vmException, vm);
+      } else if (ex.getCause() instanceof VMException vmException) {
+        SandBox.logVMException(vmException, vm);
+      }
 
-      throw new RuntimeException(ex);
-    } catch (IOException ex) {
       throw new RuntimeException(ex);
     }
     LOGGER.info("Initialized SSVM sandbox");
@@ -100,14 +99,10 @@ public class SandBox {
    * Converts {@link VMException} into readable java exception
    */
   public static void logVMException(VMException ex, VirtualMachine vm) {
-    InstanceValue oop = ex.getOop();
-    if (oop.getJavaClass() == vm.getSymbols().java_lang_ExceptionInInitializerError()) {
-      oop = (InstanceValue) vm.getOperations().getReference(oop, "exception", "Ljava/lang/Throwable;");
-    }
+    InstanceValue exceptionInstance = ex.getOop();
 
     // Print pretty exception
-    LOGGER.error(oop);
-    LOGGER.error(vm.getOperations().toJavaException(oop));
+    LOGGER.error("VM thrown an exception", WrappedVMException.wrap(exceptionInstance, vm));
   }
 
   public VirtualMachine vm() {
