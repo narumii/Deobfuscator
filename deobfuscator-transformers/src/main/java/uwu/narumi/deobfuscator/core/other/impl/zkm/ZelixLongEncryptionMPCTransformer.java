@@ -72,8 +72,8 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
    * Example: key="mypackage.Class0", value="mypackage.Class1" - You guarantee Class0 always initialized before Class1
    *
    * <ul>
-   * <li>key Class that will always be initialized BEFORE {@code value}. It is an internal name
-   * <li>value Class that will always be initialized AFTER {@code key}. It is an internal name
+   * <li>key - Class that will always be initialized BEFORE {@code value}. It is an internal name
+   * <li>value - Class that will always be initialized AFTER {@code key}. It is an internal name
    * </ul>
    */
   private final Map<String, String> classInitOrder;

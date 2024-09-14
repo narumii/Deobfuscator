@@ -31,7 +31,7 @@ public class SimpleLongDecrypter implements ILongDecrypter {
     ILongDecrypter second = createNumberDecryptor(key2);
     ILongDecrypter var7 = FallbackLongDecrypter.getPairStatic(first, second);
     if (lookupClass != null) {
-      // Seems like it should do checks if in sandbox, but this list is never queried. Who knows ¯\_(ツ)_/¯
+      // Unused
       lookupClasses.add(lookupClass);
     }
 
