@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
  * the {@code classInitializationOrderStatement} option then you also need to pass it to the constructor. But don't worry.
  * The deobfuscator will tell you if this will be needed.
  *
+ * <p>ZKM version: 22.0.3
+ *
  * <p>References:
  * <ul>
  * <li>https://www.zelix.com/klassmaster/featuresLongEncryption.html</li>
