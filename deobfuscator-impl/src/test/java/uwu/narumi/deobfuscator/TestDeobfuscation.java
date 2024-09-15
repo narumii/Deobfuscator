@@ -43,6 +43,24 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         Source.of("zkm/sample1/ByteBufUtil_7", false),
         Source.of("zkm/sample1/ByteBufUtil_8", false)
     );
+    // Obfuscated using this ZKM config:
+    /*
+    obfuscate   changeLogFileIn=""
+                changeLogFileOut="ChangeLog.txt"
+                obfuscateFlow=aggressive
+                exceptionObfuscation=heavy
+                encryptStringLiterals=enhanced
+                encryptIntegerConstants=aggressive
+                encryptLongConstants=normal
+                mixedCaseClassNames=false
+                aggressiveMethodRenaming=true
+                localVariables=delete
+                lineNumbers=delete
+                autoReflectionHandling=normal
+                obfuscateReferences=none
+                methodParameterChanges=flowObfuscate
+                obfuscateParameters=normal;
+     */
     register("Zelix (22.0.3) Sample 2 - Class initialization order", InputType.CUSTOM_CLASS, List.of(
             () -> new ComposedZelixTransformer(Map.of("a.a.a.a.a4", "a.a.a.a.bc"))
         ),
