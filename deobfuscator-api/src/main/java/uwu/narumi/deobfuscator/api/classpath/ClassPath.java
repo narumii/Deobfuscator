@@ -1,8 +1,7 @@
-package uwu.narumi.deobfuscator.api.library;
+package uwu.narumi.deobfuscator.api.classpath;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,7 +21,7 @@ public class ClassPath {
   private static final Logger LOGGER = LogManager.getLogger(ClassPath.class);
 
   private final Map<String, byte[]> files = new ConcurrentHashMap<>();
-  private final Map<String, byte[]> classFiles = new ConcurrentHashMap<>();
+  private final Map<String, byte[]> classes = new ConcurrentHashMap<>();
 
   private final int classWriterFlags;
 
@@ -52,13 +51,13 @@ public class ClassPath {
                 classWriterFlags
             ).name();
 
-            classFiles.putIfAbsent(className, bytes);
+            classes.putIfAbsent(className, bytes);
           } catch (Exception e) {
             LOGGER.error("Could not load {} class from {} library", classPath, jarPath, e);
           }
         });
 
-    LOGGER.info("Loaded {} classes from {}", classFiles.size(), jarPath.getFileName());
+    LOGGER.info("Loaded {} classes from {}", classes.size(), jarPath.getFileName());
   }
 
   /**
@@ -77,7 +76,7 @@ public class ClassPath {
       ).name();
 
       // Add class to classpath
-      classFiles.putIfAbsent(className, classBytes);
+      classes.putIfAbsent(className, classBytes);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -87,7 +86,7 @@ public class ClassPath {
     return this.files;
   }
 
-  public Map<String, byte[]> getClassFiles() {
-    return this.classFiles;
+  public Map<String, byte[]> getClasses() {
+    return this.classes;
   }
 }

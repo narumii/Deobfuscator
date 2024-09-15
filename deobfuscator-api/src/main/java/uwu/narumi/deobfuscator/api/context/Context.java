@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.execution.SandBox;
-import uwu.narumi.deobfuscator.api.library.ClassPathClassLoader;
+import uwu.narumi.deobfuscator.api.classpath.ClassPath;
 
 public class Context {
 
@@ -20,13 +20,13 @@ public class Context {
   private final Map<String, byte[]> files = new ConcurrentHashMap<>();
 
   private final DeobfuscatorOptions options;
-  private final ClassPathClassLoader classPathLoader;
+  private final ClassPath classPath;
 
   private SandBox globalSandBox = null;
 
-  public Context(DeobfuscatorOptions options, ClassPathClassLoader classPathLoader) {
+  public Context(DeobfuscatorOptions options, ClassPath classPath) {
     this.options = options;
-    this.classPathLoader = classPathLoader;
+    this.classPath = classPath;
   }
 
   /**
@@ -44,8 +44,8 @@ public class Context {
     return options;
   }
 
-  public ClassPathClassLoader getClassPathLoader() {
-    return classPathLoader;
+  public ClassPath getClassPath() {
+    return classPath;
   }
 
   public Collection<ClassWrapper> classes() {

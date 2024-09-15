@@ -17,8 +17,7 @@ import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.context.DeobfuscatorOptions;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
 import uwu.narumi.deobfuscator.api.helper.FileHelper;
-import uwu.narumi.deobfuscator.api.library.ClassPath;
-import uwu.narumi.deobfuscator.api.library.ClassPathClassLoader;
+import uwu.narumi.deobfuscator.api.classpath.ClassPath;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 public class Deobfuscator {
@@ -46,12 +45,9 @@ public class Deobfuscator {
       LOGGER.warn("Output file already exist, data will be overwritten");
     }
 
-    ClassPathClassLoader classPathLoader = new ClassPathClassLoader(
-        this.getClass().getClassLoader(),
-        this.buildClassPath()
-    );
+    ClassPath classPath = this.buildClassPath();
 
-    this.context = new Context(options, classPathLoader);
+    this.context = new Context(options, classPath);
   }
 
   private ClassPath buildClassPath() {
