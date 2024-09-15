@@ -17,8 +17,8 @@ import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.context.DeobfuscatorOptions;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
 import uwu.narumi.deobfuscator.api.helper.FileHelper;
-import uwu.narumi.deobfuscator.api.library.Library;
-import uwu.narumi.deobfuscator.api.library.LibraryClassLoader;
+import uwu.narumi.deobfuscator.api.library.ClassPath;
+import uwu.narumi.deobfuscator.api.library.ClassPathClassLoader;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 public class Deobfuscator {
@@ -36,6 +36,8 @@ public class Deobfuscator {
   private final Context context;
 
   private Deobfuscator(DeobfuscatorOptions options) {
+    this.options = options;
+
     if (options.inputJar() != null && Files.notExists(options.inputJar())) {
       throw new IllegalArgumentException("Input jar does not exist");
     }
@@ -44,26 +46,29 @@ public class Deobfuscator {
       LOGGER.warn("Output file already exist, data will be overwritten");
     }
 
-    this.options = options;
+    ClassPathClassLoader classPathLoader = new ClassPathClassLoader(
+        this.getClass().getClassLoader(),
+        this.buildClassPath()
+    );
 
-    List<Library> libraries = new ArrayList<>();
+    this.context = new Context(options, classPathLoader);
+  }
+
+  private ClassPath buildClassPath() {
+    ClassPath classPath = new ClassPath(this.options.classWriterFlags());
+
     // Add libraries
-    libraries.addAll(options.libraries().stream().map(path -> new Library(path, options.classWriterFlags())).toList());
+    options.libraries().forEach(classPath::addJar);
     // Add input jar as a library
     if (options.inputJar() != null) {
-      libraries.add(new Library(options.inputJar(), options.classWriterFlags()));
+      classPath.addJar(options.inputJar());
     }
     // Add raw classes as a library
     if (!options.classes().isEmpty()) {
-      libraries.add(new Library(options.classes(), options.classWriterFlags()));
+      options.classes().forEach(classPath::addExternalClass);
     }
 
-    LibraryClassLoader libraryClassLoader = new LibraryClassLoader(
-        this.getClass().getClassLoader(),
-        libraries
-    );
-
-    this.context = new Context(options, libraryClassLoader);
+    return classPath;
   }
 
   public void start() {

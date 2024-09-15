@@ -3,16 +3,16 @@ package uwu.narumi.deobfuscator.api.library;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 
-public class LibraryClassWriter extends ClassWriter {
+public class ClassPathClassWriter extends ClassWriter {
 
-  private final LibraryClassLoader loader;
+  private final ClassPathClassLoader loader;
 
-  public LibraryClassWriter(int flags, LibraryClassLoader loader) {
+  public ClassPathClassWriter(int flags, ClassPathClassLoader loader) {
     super(flags);
     this.loader = loader;
   }
 
-  public LibraryClassWriter(ClassReader classReader, int flags, LibraryClassLoader loader) {
+  public ClassPathClassWriter(ClassReader classReader, int flags, ClassPathClassLoader loader) {
     super(classReader, flags);
     this.loader = loader;
   }

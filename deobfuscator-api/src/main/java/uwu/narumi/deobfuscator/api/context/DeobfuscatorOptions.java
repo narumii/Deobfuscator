@@ -1,6 +1,5 @@
 package uwu.narumi.deobfuscator.api.context;
 
-import dev.xdark.ssvm.VirtualMachine;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.ClassReader;

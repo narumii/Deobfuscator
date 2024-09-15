@@ -9,29 +9,33 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.ClassReader;
 import uwu.narumi.deobfuscator.api.context.DeobfuscatorOptions;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
 import uwu.narumi.deobfuscator.api.helper.FileHelper;
 
-public class Library {
+/**
+ * All sources for deobfuscated jar
+ */
+public class ClassPath {
 
-  private static final Logger LOGGER = LogManager.getLogger(Library.class);
+  private static final Logger LOGGER = LogManager.getLogger(ClassPath.class);
 
   private final Map<String, byte[]> files = new ConcurrentHashMap<>();
   private final Map<String, byte[]> classFiles = new ConcurrentHashMap<>();
-  @Nullable
-  private final Path path;
+
+  private final int classWriterFlags;
+
+  public ClassPath(int classWriterFlags) {
+    this.classWriterFlags = classWriterFlags;
+  }
 
   /**
-   * Create {@link Library} from jar
+   * Adds jar to classpath
    *
    * @param jarPath Jar path
-   * @param classWriterFlags Class writer flags
    */
-  public Library(@NotNull Path jarPath, int classWriterFlags) {
-    this.path = jarPath;
+  public void addJar(@NotNull Path jarPath) {
     FileHelper.loadFilesFromZip(
         jarPath,
         (classPath, bytes) -> {
@@ -58,41 +62,32 @@ public class Library {
   }
 
   /**
-   * Create {@link Library} from external classes
+   * Adds {@link DeobfuscatorOptions.ExternalClass} to classpath
    *
-   * @param externalClasses External classes
-   * @param classWriterFlags Class writer flags
+   * @param externalClass External class
    */
-  public Library(List<DeobfuscatorOptions.ExternalClass> externalClasses, int classWriterFlags) {
-    this.path = null;
-    for (DeobfuscatorOptions.ExternalClass externalClass : externalClasses) {
-      try {
-        byte[] classBytes = Files.readAllBytes(externalClass.path());
-        String className = ClassHelper.loadClass(
-            externalClass.relativePath(),
-            classBytes,
-            ClassReader.SKIP_CODE | ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG,
-            classWriterFlags
-        ).name();
+  public void addExternalClass(DeobfuscatorOptions.ExternalClass externalClass) {
+    try {
+      byte[] classBytes = Files.readAllBytes(externalClass.path());
+      String className = ClassHelper.loadClass(
+          externalClass.relativePath(),
+          classBytes,
+          ClassReader.SKIP_CODE | ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG,
+          classWriterFlags
+      ).name();
 
-        // Add class to lib
-        classFiles.putIfAbsent(className, classBytes);
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
+      // Add class to classpath
+      classFiles.putIfAbsent(className, classBytes);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 
   public Map<String, byte[]> getFiles() {
-    return files;
+    return this.files;
   }
 
   public Map<String, byte[]> getClassFiles() {
-    return classFiles;
-  }
-
-  @Nullable
-  public Path getPath() {
-    return path;
+    return this.classFiles;
   }
 }
