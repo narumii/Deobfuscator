@@ -43,7 +43,7 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         Source.of("zkm/sample1/ByteBufUtil_7", false),
         Source.of("zkm/sample1/ByteBufUtil_8", false)
     );
-    // Obfuscated using this ZKM config:
+    // Obfuscated using this ZKM config (https://www.zelix.com/klassmaster/docs/langZKMScript.html):
     /*
     obfuscate   changeLogFileIn=""
                 changeLogFileOut="ChangeLog.txt"
