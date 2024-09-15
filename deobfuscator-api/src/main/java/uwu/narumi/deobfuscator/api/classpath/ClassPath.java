@@ -35,6 +35,8 @@ public class ClassPath {
    * @param jarPath Jar path
    */
   public void addJar(@NotNull Path jarPath) {
+    int prevSize = classes.size();
+
     FileHelper.loadFilesFromZip(
         jarPath,
         (classPath, bytes) -> {
@@ -57,7 +59,7 @@ public class ClassPath {
           }
         });
 
-    LOGGER.info("Loaded {} classes from {}", classes.size(), jarPath.getFileName());
+    LOGGER.info("Loaded {} classes from {}", classes.size() - prevSize, jarPath.getFileName());
   }
 
   /**

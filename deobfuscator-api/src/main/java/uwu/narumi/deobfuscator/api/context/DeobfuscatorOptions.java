@@ -6,7 +6,12 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -109,7 +114,24 @@ public record DeobfuscatorOptions(
 
     @Contract("_ -> this")
     public DeobfuscatorOptions.Builder libraries(Path... paths) {
-      this.libraries.addAll(List.of(paths));
+      for (Path path : paths) {
+        if (Files.isDirectory(path)) {
+          try {
+            // Walk through directory
+            Files.walkFileTree(path, new SimpleFileVisitor<>() {
+              @Override
+              public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                libraries.add(file);
+                return FileVisitResult.CONTINUE;
+              }
+            });
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
+        } else {
+          this.libraries.add(path);
+        }
+      }
       return this;
     }
 
