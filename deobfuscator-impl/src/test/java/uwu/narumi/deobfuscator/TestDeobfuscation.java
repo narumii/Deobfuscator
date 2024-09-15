@@ -62,7 +62,11 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
                 obfuscateParameters=normal;
      */
     register("Zelix (22.0.3) Sample 2 - Class initialization order", InputType.CUSTOM_CLASS, List.of(
-            () -> new ComposedZelixTransformer(Map.of("a.a.a.a.a4", "a.a.a.a.bc"))
+            () -> new ComposedZelixTransformer(
+                // During obfuscation was specified classInitializationOrder option,
+                // so we need to also pass it here for correct decrypted values
+                Map.of("a.a.a.a.a4", "a.a.a.a.bc")
+            )
         ),
         Source.of("zkm/sample2/bc"),
         Source.of("zkm/sample2/a4"),
