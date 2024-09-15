@@ -26,7 +26,7 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
     register("Inline static fields", InputType.JAVA_CODE, List.of(InlineStaticFieldTransformer::new), Source.of("TestInlineStaticFields"));
     register("Inline static fields with modification", InputType.JAVA_CODE, List.of(InlineStaticFieldTransformer::new), Source.of("TestInlineStaticFieldsWithModification"));
 
-    // Sandbox security. Should throw
+    // Test sandbox security (e.g. not allowing dangerous calls)
     register("Sandbox security", InputType.JAVA_CODE, List.of(TestSandboxSecurityTransformer::new), Source.of("sandbox/TestSandboxSecurity", false));
 
     // Samples
