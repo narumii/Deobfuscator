@@ -10,6 +10,7 @@ import uwu.narumi.deobfuscator.base.TestDeobfuscationBase;
 import uwu.narumi.deobfuscator.transformer.TestSandboxSecurityTransformer;
 
 import java.util.List;
+import java.util.Map;
 
 public class TestDeobfuscation extends TestDeobfuscationBase {
 
@@ -32,15 +33,26 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
     register("Some flow obf sample", InputType.CUSTOM_CLASS, List.of(ComposedGeneralFlowTransformer::new), Source.of("FlowObfSample"));
 
     // Zelix
-    register("Zelix", InputType.CUSTOM_CLASS, List.of(ComposedZelixTransformer::new),
-        Source.of("zkm/ExampleClass"),
-        Source.of("zkm/ILongDecrypter", false),
-        Source.of("zkm/LongDecrypter1", false),
-        Source.of("zkm/LongDecrypter2", false),
+    register("Zelix (22.0.3) Sample 1", InputType.CUSTOM_CLASS, List.of(ComposedZelixTransformer::new),
+        Source.of("zkm/sample1/ExampleClass"),
+        Source.of("zkm/sample1/ILongDecrypter", false),
+        Source.of("zkm/sample1/LongDecrypter1", false),
+        Source.of("zkm/sample1/LongDecrypter2", false),
         // These are required to compute frames
-        Source.of("zkm/ByteBufUtil", false),
-        Source.of("zkm/ByteBufUtil_7", false),
-        Source.of("zkm/ByteBufUtil_8", false)
+        Source.of("zkm/sample1/ByteBufUtil", false),
+        Source.of("zkm/sample1/ByteBufUtil_7", false),
+        Source.of("zkm/sample1/ByteBufUtil_8", false)
+    );
+    register("Zelix (22.0.3) Sample 2 - Class initialization order", InputType.CUSTOM_CLASS, List.of(
+            () -> new ComposedZelixTransformer(Map.of("a.a.a.a.a4", "a.a.a.a.bc"))
+        ),
+        Source.of("zkm/sample2/bc"),
+        Source.of("zkm/sample2/a4"),
+        Source.of("zkm/sample2/ba"),
+        Source.of("zkm/sample2/a_"),
+        Source.of("zkm/sample2/ILongDecrypter", false),
+        Source.of("zkm/sample2/SimpleLongDecrypter", false),
+        Source.of("zkm/sample2/FallbackLongDecrypter", false)
     );
   }
 }
