@@ -17,7 +17,7 @@ import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.context.DeobfuscatorOptions;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
 import uwu.narumi.deobfuscator.api.helper.FileHelper;
-import uwu.narumi.deobfuscator.api.classpath.ClassPath;
+import uwu.narumi.deobfuscator.api.classpath.Classpath;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 public class Deobfuscator {
@@ -45,26 +45,26 @@ public class Deobfuscator {
       LOGGER.warn("Output file already exist, data will be overwritten");
     }
 
-    ClassPath classPath = this.buildClassPath();
+    Classpath classpath = this.buildClasspath();
 
-    this.context = new Context(options, classPath);
+    this.context = new Context(options, classpath);
   }
 
-  private ClassPath buildClassPath() {
-    ClassPath classPath = new ClassPath(this.options.classWriterFlags());
+  private Classpath buildClasspath() {
+    Classpath classpath = new Classpath(this.options.classWriterFlags());
 
     // Add libraries
-    options.libraries().forEach(classPath::addJar);
+    options.libraries().forEach(classpath::addJar);
     // Add input jar as a library
     if (options.inputJar() != null) {
-      classPath.addJar(options.inputJar());
+      classpath.addJar(options.inputJar());
     }
     // Add raw classes as a library
     if (!options.classes().isEmpty()) {
-      options.classes().forEach(classPath::addExternalClass);
+      options.classes().forEach(classpath::addExternalClass);
     }
 
-    return classPath;
+    return classpath;
   }
 
   public void start() {

@@ -53,7 +53,7 @@ public class SandBox {
       this.vm.bootstrap();
       this.memoryManager = vm.getMemoryManager();
       // Install all classes from deobfuscator context
-      this.helper = SupplyingClassLoaderInstaller.install(vm, new ClassPathDataSupplier(context.getClassPath()));
+      this.helper = SupplyingClassLoaderInstaller.install(vm, new ClasspathDataSupplier(context.getClasspath()));
       this.invocationUtil = InvocationUtil.create(vm);
       patchVm();
     } catch (Exception ex) {

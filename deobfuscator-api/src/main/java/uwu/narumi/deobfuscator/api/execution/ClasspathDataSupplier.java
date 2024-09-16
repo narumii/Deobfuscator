@@ -1,14 +1,14 @@
 package uwu.narumi.deobfuscator.api.execution;
 
 import dev.xdark.ssvm.classloading.SupplyingClassLoaderInstaller;
-import uwu.narumi.deobfuscator.api.classpath.ClassPath;
+import uwu.narumi.deobfuscator.api.classpath.Classpath;
 
-public class ClassPathDataSupplier implements SupplyingClassLoaderInstaller.DataSupplier {
+public class ClasspathDataSupplier implements SupplyingClassLoaderInstaller.DataSupplier {
 
-  private final ClassPath classPath;
+  private final Classpath classPath;
 
-  public ClassPathDataSupplier(ClassPath classPath) {
-    this.classPath = classPath;
+  public ClasspathDataSupplier(Classpath classpath) {
+    this.classPath = classpath;
   }
 
   @Override

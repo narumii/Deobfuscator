@@ -3,11 +3,11 @@ package uwu.narumi.deobfuscator.api.classpath;
 /**
  * A {@link ClassLoader} that holds all classpath of the current deobfuscation context
  */
-public class ClassPathClassLoader extends ClassLoader {
-  private final ClassPath classPath;
+public class ClasspathClassLoader extends ClassLoader {
+  private final Classpath classpath;
 
-  public ClassPathClassLoader(ClassPath classPath) {
-    this.classPath = classPath;
+  public ClasspathClassLoader(Classpath classpath) {
+    this.classpath = classpath;
   }
 
   @Override
@@ -16,9 +16,9 @@ public class ClassPathClassLoader extends ClassLoader {
 
     // Find class in classPath
     byte[] classBytes = null;
-    if (this.classPath.getClasses().containsKey(internalName)) {
+    if (this.classpath.getClasses().containsKey(internalName)) {
       // Find in normal classes
-      classBytes = this.classPath.getClasses().get(internalName);
+      classBytes = this.classpath.getClasses().get(internalName);
     }
 
     if (classBytes != null) {

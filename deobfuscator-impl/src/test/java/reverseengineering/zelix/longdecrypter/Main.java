@@ -6,6 +6,8 @@ public class Main {
   // Usage
 
   public static void main(String[] args) {
+    // decrypterA must be decrypted first for decrypterB to be decrypted correctly. So there is specific decryption order:
+    // decrypterA -> decrypterB
     ILongDecrypter decrypterA = SimpleLongDecrypter.buildNumberDecryptor(273921918217628048L, -8431841081763909460L, MethodHandles.lookup().lookupClass());
     System.out.println(decrypterA);
     long a = decrypterA.decrypt(36730249601911L);

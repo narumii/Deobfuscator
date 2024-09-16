@@ -12,7 +12,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
-import uwu.narumi.deobfuscator.api.classpath.ClassPathClassWriter;
+import uwu.narumi.deobfuscator.api.classpath.ClasspathClassWriter;
 
 public class ClassWrapper implements Cloneable {
 
@@ -131,7 +131,7 @@ public class ClassWrapper implements Cloneable {
    */
   public byte[] compileToBytes(Context context) {
     try {
-      ClassWriter classWriter = new ClassPathClassWriter(this.classWriterFlags, context.getClassPath());
+      ClassWriter classWriter = new ClasspathClassWriter(this.classWriterFlags, context.getClasspath());
       this.classNode.accept(classWriter);
 
       return classWriter.toByteArray();

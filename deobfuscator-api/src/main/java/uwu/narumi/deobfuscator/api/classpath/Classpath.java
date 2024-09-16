@@ -16,16 +16,16 @@ import uwu.narumi.deobfuscator.api.helper.FileHelper;
 /**
  * All sources for deobfuscated jar
  */
-public class ClassPath {
+public class Classpath {
 
-  private static final Logger LOGGER = LogManager.getLogger(ClassPath.class);
+  private static final Logger LOGGER = LogManager.getLogger(Classpath.class);
 
   private final Map<String, byte[]> files = new ConcurrentHashMap<>();
   private final Map<String, byte[]> classes = new ConcurrentHashMap<>();
 
   private final int classWriterFlags;
 
-  public ClassPath(int classWriterFlags) {
+  public Classpath(int classWriterFlags) {
     this.classWriterFlags = classWriterFlags;
   }
 
