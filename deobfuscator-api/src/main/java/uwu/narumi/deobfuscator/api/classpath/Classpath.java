@@ -71,7 +71,7 @@ public class Classpath {
     try {
       byte[] classBytes = Files.readAllBytes(externalClass.path());
       String className = ClassHelper.loadClass(
-          externalClass.relativePath(),
+          externalClass.pathInJar(),
           classBytes,
           ClassReader.SKIP_CODE | ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG,
           classWriterFlags

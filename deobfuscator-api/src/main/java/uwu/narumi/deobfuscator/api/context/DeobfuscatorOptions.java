@@ -42,7 +42,11 @@ public record DeobfuscatorOptions(
     return new DeobfuscatorOptions.Builder();
   }
 
-  public record ExternalClass(Path path, String relativePath) {
+  /**
+   * @param path Path to the raw .class file
+   * @param pathInJar Relative path to .class file if it were in .jar
+   */
+  public record ExternalClass(Path path, String pathInJar) {
   }
 
   /**

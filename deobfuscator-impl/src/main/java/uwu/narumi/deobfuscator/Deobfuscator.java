@@ -86,38 +86,38 @@ public class Deobfuscator {
     }
 
     for (DeobfuscatorOptions.ExternalClass clazz : this.options.classes()) {
-      LOGGER.info("Loading class: {}", clazz.relativePath());
+      LOGGER.info("Loading class: {}", clazz.pathInJar());
 
       try (InputStream inputStream = new FileInputStream(clazz.path().toFile())) {
         // Load class
-        this.loadClass(clazz.relativePath(), inputStream.readAllBytes());
+        this.loadClass(clazz.pathInJar(), inputStream.readAllBytes());
 
-        LOGGER.info("Loaded class: {}", clazz.relativePath());
+        LOGGER.info("Loaded class: {}", clazz.pathInJar());
       } catch (IOException e) {
-        LOGGER.error("Could not load class: {}", clazz.relativePath(), e);
+        LOGGER.error("Could not load class: {}", clazz.pathInJar(), e);
       }
     }
   }
 
-  private void loadClass(String path, byte[] bytes) {
+  private void loadClass(String pathInJar, byte[] bytes) {
     try {
       if (ClassHelper.isClass(bytes)) {
         ClassWrapper classWrapper = ClassHelper.loadClass(
-            path,
+            pathInJar,
             bytes,
             this.options.classReaderFlags(),
             this.options.classWriterFlags(),
             true
         );
         context.getClasses().putIfAbsent(classWrapper.name(), classWrapper);
-      } else if (!context.getFiles().containsKey(path)) {
-        context.getFiles().put(path, bytes);
+      } else if (!context.getFiles().containsKey(pathInJar)) {
+        context.getFiles().put(pathInJar, bytes);
       }
     } catch (Exception e) {
-      LOGGER.error("Could not load class: {}, adding as file", path);
+      LOGGER.error("Could not load class: {}, adding as file", pathInJar);
       if (this.options.printStacktraces()) LOGGER.throwing(e);
 
-      context.getFiles().putIfAbsent(path, bytes);
+      context.getFiles().putIfAbsent(pathInJar, bytes);
     }
   }
 
@@ -150,7 +150,7 @@ public class Deobfuscator {
           try {
             byte[] data = classWrapper.compileToBytes(this.context);
 
-            Path path = this.options.outputDir().resolve(classWrapper.getPath() + ".class");
+            Path path = this.options.outputDir().resolve(classWrapper.getPathInJar() + ".class");
             Files.createDirectories(path.getParent());
             Files.write(path, data);
           } catch (Exception e) {

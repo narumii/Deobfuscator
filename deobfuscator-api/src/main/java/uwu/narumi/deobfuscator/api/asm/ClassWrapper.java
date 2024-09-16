@@ -19,16 +19,16 @@ public class ClassWrapper implements Cloneable {
   protected static final Logger LOGGER = LogManager.getLogger(ClassWrapper.class);
 
   /**
-   * Path for saving purposes.
+   * Relative path inside jar. Mainly for saving purposes.
    */
-  private final String path;
+  private final String pathInJar;
   private final ClassNode classNode;
   private final FieldCache fieldCache;
   private final ConstantPool constantPool;
   private final int classWriterFlags;
 
-  public ClassWrapper(String path, ClassReader classReader, int classReaderFlags, int classWriterFlags) throws Exception {
-    this.path = path;
+  public ClassWrapper(String pathInJar, ClassReader classReader, int classReaderFlags, int classWriterFlags) throws Exception {
+    this.pathInJar = pathInJar;
     this.classNode = new ClassNode();
     this.constantPool = new ConstantPool(classReader);
     this.fieldCache = new FieldCache();
@@ -37,8 +37,8 @@ public class ClassWrapper implements Cloneable {
     classReader.accept(this.classNode, classReaderFlags);
   }
 
-  private ClassWrapper(String path, ClassNode classNode, FieldCache fieldCache, ConstantPool constantPool, int classWriterFlags) {
-    this.path = path;
+  private ClassWrapper(String pathInJar, ClassNode classNode, FieldCache fieldCache, ConstantPool constantPool, int classWriterFlags) {
+    this.pathInJar = pathInJar;
     this.classNode = classNode;
     this.fieldCache = fieldCache;
     this.constantPool = constantPool;
@@ -140,8 +140,8 @@ public class ClassWrapper implements Cloneable {
     }
   }
 
-  public String getPath() {
-    return path;
+  public String getPathInJar() {
+    return pathInJar;
   }
 
   public List<FieldNode> fields() {
@@ -166,6 +166,6 @@ public class ClassWrapper implements Cloneable {
 
   @Override
   public ClassWrapper clone() {
-    return new ClassWrapper(this.path, ClassHelper.copy(classNode), fieldCache.clone(), constantPool.clone(), this.classWriterFlags);
+    return new ClassWrapper(this.pathInJar, ClassHelper.copy(classNode), fieldCache.clone(), constantPool.clone(), this.classWriterFlags);
   }
 }
