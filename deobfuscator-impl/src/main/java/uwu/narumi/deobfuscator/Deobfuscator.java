@@ -110,7 +110,6 @@ public class Deobfuscator {
             true
         );
         context.getClasses().putIfAbsent(classWrapper.name(), classWrapper);
-        context.getOriginalClasses().putIfAbsent(classWrapper.name(), bytes);
       } else if (!context.getFiles().containsKey(path)) {
         context.getFiles().put(path, bytes);
       }
@@ -158,7 +157,6 @@ public class Deobfuscator {
             LOGGER.error("Could not save class: {}", classWrapper.name(), e);
           }
 
-          context.getOriginalClasses().remove(classWrapper.name());
           context.getClasses().remove(classWrapper.name());
         });
   }
@@ -193,7 +191,7 @@ public class Deobfuscator {
 
                   try {
                     // Save original class as a fallback
-                    byte[] data = context.getOriginalClasses().get(classWrapper.name());
+                    byte[] data = context.getClasspath().getClasses().get(classWrapper.name());
 
                     zipOutputStream.putNextEntry(new ZipEntry(classWrapper.name() + ".class"));
                     zipOutputStream.write(data);
@@ -203,7 +201,6 @@ public class Deobfuscator {
                   }
                 }
 
-                context.getOriginalClasses().remove(classWrapper.name());
                 context.getClasses().remove(classWrapper.name());
               });
 

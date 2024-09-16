@@ -16,7 +16,6 @@ public class Context {
   private static final Logger LOGGER = LogManager.getLogger(Context.class);
 
   private final Map<String, ClassWrapper> classes = new ConcurrentHashMap<>();
-  private final Map<String, byte[]> originalClasses = new ConcurrentHashMap<>();
   private final Map<String, byte[]> files = new ConcurrentHashMap<>();
 
   private final DeobfuscatorOptions options;
@@ -81,10 +80,6 @@ public class Context {
 
   public Map<String, ClassWrapper> getClasses() {
     return classes;
-  }
-
-  public Map<String, byte[]> getOriginalClasses() {
-    return originalClasses;
   }
 
   public Map<String, byte[]> getFiles() {
