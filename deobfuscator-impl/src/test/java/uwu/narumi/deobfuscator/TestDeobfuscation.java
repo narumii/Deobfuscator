@@ -61,7 +61,8 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
                 methodParameterChanges=flowObfuscate
                 obfuscateParameters=normal;
      */
-    register("Zelix (22.0.3) Sample 2 - Class initialization order", InputType.CUSTOM_CLASS, List.of(
+    register("Zelix (22.0.3) Sample 2 - Class initialization order", InputType.CUSTOM_CLASS,
+        List.of(
             () -> new ComposedZelixTransformer(
                 // During obfuscation was specified classInitializationOrder option,
                 // so we need to also pass it here for correct decrypted values

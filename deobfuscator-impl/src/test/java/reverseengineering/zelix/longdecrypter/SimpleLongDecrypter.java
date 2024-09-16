@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 public class SimpleLongDecrypter implements ILongDecrypter {
-  private long input;
+  private long inputKey;
   private int[] encryptionInts;
-  private ILongDecrypter parent;
+  private ILongDecrypter child;
   private long key;
   private long[] longNumberPool;
   // It holds all 64 powers of two: 1, 2, 4, 8, 16, 32, 64, 128, 256...
@@ -25,11 +25,11 @@ public class SimpleLongDecrypter implements ILongDecrypter {
   }
 
   // a
-  public static ILongDecrypter buildNumberDecryptor(long key1, long key2, Class<?> lookupClass) {
-    FallbackLongDecrypter.a(key1 > 0L); // ??
-    ILongDecrypter first = createNumberDecryptor(key1);
-    ILongDecrypter second = createNumberDecryptor(key2);
-    ILongDecrypter var7 = FallbackLongDecrypter.getPairStatic(first, second);
+  public static ILongDecrypter buildNumberDecryptor(long mainKey, long fallbackKey, Class<?> lookupClass) {
+    FallbackLongDecrypter.a(mainKey > 0L); // ??
+    ILongDecrypter mainDecrypter = createNumberDecryptor(mainKey);
+    ILongDecrypter fallbackDecrypter = createNumberDecryptor(fallbackKey);
+    ILongDecrypter var7 = FallbackLongDecrypter.getPairStatic(mainDecrypter, fallbackDecrypter);
     if (lookupClass != null) {
       // Unused
       lookupClasses.add(lookupClass);
@@ -133,8 +133,8 @@ public class SimpleLongDecrypter implements ILongDecrypter {
     sharedDecrypter.prepareCachedDecrypters();
   }
 
-  private SimpleLongDecrypter(long input) {
-    this.input = input;
+  private SimpleLongDecrypter(long inputKey) {
+    this.inputKey = inputKey;
     this.encryptionInts = mutableEncryptionInts;
     this.longNumberPool = POWERS_OF_TWO;
   }
@@ -142,11 +142,15 @@ public class SimpleLongDecrypter implements ILongDecrypter {
   // a
   @Override
   public long decrypt(long decryptKey) {
-    long var3 = this.decryptNumber(8, 55);
-    long var5 = this.input ^ decryptKey ^ this.key;
-    this.input = var5;
-    if (this.parent != null) {
-      this.parent.decrypt(decryptKey);
+    long var3 = this.decryptNumberUsingThisKey(8, 55);
+    // Generate new input key
+    long var5 = this.inputKey ^ decryptKey ^ this.key;
+    this.inputKey = var5;
+
+    if (this.child != null) {
+      // Update input key of children accordingly
+      System.out.println("child: "+ child);
+      this.child.decrypt(decryptKey);
     }
 
     return var3;
@@ -157,13 +161,16 @@ public class SimpleLongDecrypter implements ILongDecrypter {
     this.key = key;
   }
 
+  /**
+   * Set child that will be decrypted AFTER this decrypter being decrypted
+   */
   @Override
-  public void setParent(ILongDecrypter parent) {
-    if (this != parent) {
-      if (this.parent == null) {
-        this.parent = parent;
+  public void setChild(ILongDecrypter child) {
+    if (this != child) {
+      if (this.child == null) {
+        this.child = child;
       } else {
-        this.parent.setParent(parent);
+        this.child.setChild(child);
       }
     }
   }
@@ -188,8 +195,8 @@ public class SimpleLongDecrypter implements ILongDecrypter {
       return true;
     } else {
       if (other instanceof SimpleLongDecrypter) {
-        long thisLong = this.decryptNumber(56, 63);
-        long otherLong = ((SimpleLongDecrypter) other).decryptNumber(56, 63);
+        long thisLong = this.decryptNumberUsingThisKey(56, 63);
+        long otherLong = ((SimpleLongDecrypter) other).decryptNumberUsingThisKey(56, 63);
         long diff = thisLong - otherLong;
         return diff <= 0L;
       } else {
@@ -204,11 +211,11 @@ public class SimpleLongDecrypter implements ILongDecrypter {
   }
 
   private long hashCodeFromDecrypted(int var1) {
-    return this.decryptNumber(0, var1 - 1);
+    return this.decryptNumberUsingThisKey(0, var1 - 1);
   }
 
-  private long decryptNumber(int skipRightShift, int skipLeftShift) {
-    return decryptNumber(this.input, skipRightShift, skipLeftShift, this.encryptionInts, this.longNumberPool);
+  private long decryptNumberUsingThisKey(int skipRightShift, int skipLeftShift) {
+    return decryptNumber(this.inputKey, skipRightShift, skipLeftShift, this.encryptionInts, this.longNumberPool);
   }
 
   private static long decryptNumber(long key, int rightShiftSkip, int leftShiftSkip, int[] encryptionInts, long[] unusedArray) {

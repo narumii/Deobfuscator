@@ -1,7 +1,7 @@
 package reverseengineering.zelix.longdecrypter;
 
 public interface ILongDecrypter {
-  void setParent(ILongDecrypter parent);
+  void setChild(ILongDecrypter parent);
 
   int[] getEncryptionInts();
 
