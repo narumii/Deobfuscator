@@ -52,7 +52,7 @@ public abstract class FramedInstructionsTransformer extends Transformer {
 
   @Override
   protected void transform(ClassWrapper scope, Context context) throws Exception {
-    buildClassesStream(context.classes(scope).stream()).forEach(classWrapper -> buildMethodsStream(classWrapper.methods().stream())
+    buildClassesStream(context.classes(scope).parallelStream()).forEach(classWrapper -> buildMethodsStream(classWrapper.methods().parallelStream())
         .forEach(methodNode -> {
           // Skip if no instructions
           if (buildInstructionsStream(Arrays.stream(methodNode.instructions.toArray())).findAny().isEmpty()) return;

@@ -1,5 +1,6 @@
 package uwu.narumi.deobfuscator.api.asm;
 
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -19,7 +20,7 @@ import java.util.Map;
 public record MethodContext(
     ClassWrapper classWrapper,
     MethodNode methodNode,
-    @Unmodifiable Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames
+    @Nullable @Unmodifiable Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames
 ) {
 
   /**
