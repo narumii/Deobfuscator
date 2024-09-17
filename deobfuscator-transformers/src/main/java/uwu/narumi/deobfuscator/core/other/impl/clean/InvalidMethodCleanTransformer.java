@@ -15,7 +15,7 @@ public class InvalidMethodCleanTransformer extends Transformer {
 
   @Override
   protected void transform(ClassWrapper scope, Context context) throws Exception {
-    context.classes(scope).forEach(classWrapper -> {
+    context.classes(scope).parallelStream().forEach(classWrapper -> {
       var iterator = classWrapper.methods().iterator();
       while (iterator.hasNext()) {
         MethodNode methodNode = iterator.next();

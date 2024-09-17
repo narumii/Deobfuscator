@@ -111,6 +111,7 @@ public abstract class Transformer extends AsmHelper implements Opcodes {
 
     boolean changed = transformer.isChanged();
 
+    LOGGER.info("Made {} changes", transformer.getChangesCount());
     LOGGER.info("Ended {} transformer in {} ms", transformer.name(), (System.currentTimeMillis() - start));
 
     if (changed && transformer.shouldRerunOnChange()) {
