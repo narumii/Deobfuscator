@@ -11,12 +11,12 @@ public class UniversalFlowTransformer extends ComposedTransformer {
         // Resolve all number operations in the first place
         UniversalNumberTransformer::new,
 
-        // JumpPredictingAnalyzer is so smart that predicted jumps can be removed just by DeadCodeCleanTransformer.
-        DeadCodeCleanTransformer::new,
-
-        // Just need to clean up those ifs and switches by those transformers below
+        // Clean up redundant ifs and switches
         CleanRedundantJumpsTransformer::new,
-        CleanRedundantSwitchesTransformer::new
+        CleanRedundantSwitchesTransformer::new,
+
+        // Last thing will be to clean up all dead code that is unreachable
+        DeadCodeCleanTransformer::new
     );
   }
 }
