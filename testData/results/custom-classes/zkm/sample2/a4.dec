@@ -235,17 +235,17 @@ public class a4 {
         }
 
         int var8;
-        label158: {
+        label125: {
             var8 = var13;
             var14 = var8;
             var16 = b<"f">(28702, 2493314406039607699L ^ var1);
-            label148:
+            label115:
             if (var6 == null) {
                 if (var8 != var16) {
                     var14 = var8;
                     var16 = b<"f">(32635, 5718631925737903858L ^ var1);
                     if (var1 <= 0L || var6 != null) {
-                        break label148;
+                        break label115;
                     }
 
                     if (var8 != var16) {
@@ -255,7 +255,7 @@ public class a4 {
 
                 var14 = var7;
                 if (var6 != null) {
-                    break label158;
+                    break label125;
                 }
 
                 var16 = 3;
@@ -268,7 +268,7 @@ public class a4 {
             var14 = var3.charAt(1);
         }
 
-        label135: {
+        label102: {
             int var9 = var14;
             char var10 = var3.charAt(2);
             var15 = Character.isUpperCase((char)var9);
@@ -283,7 +283,7 @@ public class a4 {
                 }
 
                 if (var1 <= 0L) {
-                    break label135;
+                    break label102;
                 }
 
                 var10001 = var6;
@@ -298,7 +298,7 @@ public class a4 {
             }
         }
 
-        label120: {
+        label87: {
             var18 = 3;
             int[] var10002 = var6;
             if (var1 >= 0L) {
@@ -312,7 +312,7 @@ public class a4 {
                 }
 
                 if (var1 <= 0L) {
-                    break label120;
+                    break label87;
                 }
 
                 var10002 = var6;

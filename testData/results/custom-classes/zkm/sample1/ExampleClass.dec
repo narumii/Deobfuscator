@@ -136,7 +136,7 @@ public final class PacketEvents implements Listener, EventManager {
         long var15;
         int var17;
         PacketEvents var24;
-        label108: {
+        label89: {
             long var1 = 37314761108082L;
             var3 = 100924278520616L;
             var5 = 26099128416120L;
@@ -154,7 +154,7 @@ public final class PacketEvents implements Listener, EventManager {
 
                 var24 = this;
                 if (var17 == 0) {
-                    break label108;
+                    break label89;
                 }
 
                 var10000 = this.loading;
@@ -175,7 +175,7 @@ public final class PacketEvents implements Listener, EventManager {
         this.handlerName = "pe-" + plugin.getName();
 
         try {
-            label91: {
+            label72: {
                 NMSUtils.Vulcan_S(new Object[]{var15});
                 PacketTypeClasses.Vulcan_Y(new Object[]{var13});
                 PacketType.Vulcan_R(new Object[]{var7});
@@ -192,7 +192,7 @@ public final class PacketEvents implements Listener, EventManager {
                             var22.id = (byte)var22.ordinal();
                             var21++;
                             if (var17 == 0) {
-                                break label91;
+                                break label72;
                             }
 
                             if (var17 == 0) {
@@ -201,7 +201,7 @@ public final class PacketEvents implements Listener, EventManager {
                         }
 
                         if (var17 != 0) {
-                            break label91;
+                            break label72;
                         }
                     }
 
@@ -301,23 +301,23 @@ public final class PacketEvents implements Listener, EventManager {
             var7 = this.settings.Vulcan_o(new Object[0]);
         }
 
-        label62: {
+        label47: {
             if (var4 != 0) {
                 if (var7) {
                     Metrics var5 = new Metrics((JavaPlugin)this.Vulcan_a(), 11327);
                     var5.addCustomChart(new SimplePie("packetevents_version", () -> this.Vulcan_x().toString()));
                 }
             } else if (var7) {
-                break label62;
+                break label47;
             }
 
             while (!this.injectorReady.get()) {
             }
         }
 
-        label53: {
+        label38: {
             Runnable var6;
-            label52: {
+            label37: {
                 var6 = () -> {
                     long var1x = 66876338785522L;
                     long var3 = 119084676127620L;
@@ -344,7 +344,7 @@ public final class PacketEvents implements Listener, EventManager {
                 };
                 if (var4 != 0) {
                     if (!this.lateBind) {
-                        break label52;
+                        break label37;
                     }
 
                     Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, this.injector::Vulcan_B);
@@ -352,7 +352,7 @@ public final class PacketEvents implements Listener, EventManager {
                 }
 
                 if (var4 != 0) {
-                    break label53;
+                    break label38;
                 }
             }
 
@@ -388,11 +388,11 @@ public final class PacketEvents implements Listener, EventManager {
         }
 
         if (!var10000) {
-            label28: {
+            label24: {
                 for (Player var9 : Bukkit.getOnlinePlayers()) {
                     this.injector.Vulcan_Q(new Object[]{var5, var9});
                     if (var7 == 0) {
-                        break label28;
+                        break label24;
                     }
 
                     if (var7 == 0) {
@@ -484,12 +484,12 @@ public final class PacketEvents implements Listener, EventManager {
     }
 
     private void Vulcan_H() {
-        label16: {
+        label13: {
             int var3 = Vulcan_Q();
             PacketEvents var10000 = this;
             if (var3 != 0) {
                 if (this.updateChecker != null) {
-                    break label16;
+                    break label13;
                 }
 
                 var10000 = this;

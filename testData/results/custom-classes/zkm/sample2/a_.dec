@@ -252,8 +252,8 @@ public class a_<T> implements Serializable {
             var10000 = this.equals(var2);
         }
 
-        label55: {
-            label59: {
+        label44: {
+            label48: {
                 if (var3 >= 0L && var10 == null) {
                     if (var10000 != 0) {
                         return this;
@@ -261,7 +261,7 @@ public class a_<T> implements Serializable {
 
                     var14 = this;
                     if (var10 != null) {
-                        break label59;
+                        break label48;
                     }
 
                     var10000 = this.a(new Object[0]).compare(this.d, var2.d);
@@ -269,7 +269,7 @@ public class a_<T> implements Serializable {
 
                 if (var10000 < 0) {
                     var15 = var2.d;
-                    break label55;
+                    break label44;
                 }
 
                 var14 = this;
@@ -279,13 +279,13 @@ public class a_<T> implements Serializable {
         }
 
         Object var11;
-        label43: {
+        label32: {
             var11 = var15;
             a_ var16 = this;
             if (var10 == null) {
                 if (this.a(new Object[0]).compare(this.c, var2.c) < 0) {
                     var17 = this.c;
-                    break label43;
+                    break label32;
                 }
 
                 var16 = var2;
