@@ -5,19 +5,19 @@ import uwu.narumi.deobfuscator.api.classpath.Classpath;
 
 public class ClasspathDataSupplier implements SupplyingClassLoaderInstaller.DataSupplier {
 
-  private final Classpath classPath;
+  private final Classpath classpath;
 
   public ClasspathDataSupplier(Classpath classpath) {
-    this.classPath = classpath;
+    this.classpath = classpath;
   }
 
   @Override
   public byte[] getClass(String className) {
-    return classPath.getClasses().get(className.replace('.', '/'));
+    return classpath.getClasses().get(className.replace('.', '/'));
   }
 
   @Override
   public byte[] getResource(String resourcePath) {
-    return classPath.getFiles().get(resourcePath);
+    return classpath.getFiles().get(resourcePath);
   }
 }
