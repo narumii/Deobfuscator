@@ -3,32 +3,29 @@ package uwu.narumi.deobfuscator.core.other.impl.clean.peephole;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
+import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.InstructionContext;
 import uwu.narumi.deobfuscator.api.context.Context;
-import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
+import uwu.narumi.deobfuscator.api.helper.FramedInstructionsStream;
+import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.util.stream.Stream;
-
-public class UselessPopCleanTransformer extends FramedInstructionsTransformer {
+public class UselessPopCleanTransformer extends Transformer {
   public UselessPopCleanTransformer() {
     this.rerunOnChange = true;
   }
 
   @Override
-  protected Stream<AbstractInsnNode> buildInstructionsStream(Stream<AbstractInsnNode> stream) {
-    return stream
-        .filter(insn -> insn.getOpcode() == POP || insn.getOpcode() == POP2);
-  }
+  protected void transform(ClassWrapper scope, Context context) throws Exception {
+    FramedInstructionsStream.of(scope, context)
+        .editInstructionsStream(stream -> stream.filter(insn -> insn.getOpcode() == POP || insn.getOpcode() == POP2))
+        .forEach(insnContext -> {
+          boolean success = tryRemovePop(insnContext);
 
-  @Override
-  protected boolean transformInstruction(Context context, InstructionContext insnContext) {
-    boolean success = tryRemovePop(insnContext);
-
-    if (success) {
-      insnContext.methodNode().instructions.remove(insnContext.insn());
-    }
-
-    return success;
+          if (success) {
+            insnContext.methodNode().instructions.remove(insnContext.insn());
+            markChange();
+          }
+        });
   }
 
   /**

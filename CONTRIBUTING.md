@@ -27,7 +27,6 @@ Whole deobfuscation process is based on transformers. Transformers are smaller p
 1. Create a new class in [`deobfuscator-transformers`](./deobfuscator-transformers) module.
 2. Pick `Transformer`-like class you would like to implement:
    - `Transformer` - Basic transformer that transforms classes.
-   - `FramedInstructionsTransformer` - Transformer that mainly transforms instructions in methods. If you need you can also access values from the stack.
    - `ComposedTransformer` - Transformer that consists of multiple transformers.
 3. You can start coding!
 

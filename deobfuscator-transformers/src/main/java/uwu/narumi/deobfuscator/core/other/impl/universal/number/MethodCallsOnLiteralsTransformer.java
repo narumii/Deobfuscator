@@ -1,28 +1,29 @@
 package uwu.narumi.deobfuscator.core.other.impl.universal.number;
 
-import uwu.narumi.deobfuscator.api.asm.InstructionContext;
+import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
-import uwu.narumi.deobfuscator.api.transformer.FramedInstructionsTransformer;
+import uwu.narumi.deobfuscator.api.helper.FramedInstructionsStream;
+import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 /**
  * Simplifies method calls on constant literals.
  */
-public class MethodCallsOnLiteralsTransformer extends FramedInstructionsTransformer {
+public class MethodCallsOnLiteralsTransformer extends Transformer {
 
   @Override
-  protected boolean transformInstruction(Context context, InstructionContext insnContext) {
-    // Transform method calls on literals
-    for (Match mathMatch : AsmMathHelper.METHOD_CALLS_ON_LITERALS) {
-      if (mathMatch.matches(insnContext)) {
-        boolean success = mathMatch.transformation().transform(insnContext);
-        if (success) {
-          return true;
+  protected void transform(ClassWrapper scope, Context context) throws Exception {
+    FramedInstructionsStream.of(scope, context).forEach(insnContext -> {
+      // Transform method calls on literals
+      for (Match mathMatch : AsmMathHelper.METHOD_CALLS_ON_LITERALS) {
+        if (mathMatch.matches(insnContext)) {
+          boolean success = mathMatch.transformation().transform(insnContext);
+          if (success) {
+            markChange();
+          }
         }
       }
-    }
-
-    return false;
+    });
   }
 }
