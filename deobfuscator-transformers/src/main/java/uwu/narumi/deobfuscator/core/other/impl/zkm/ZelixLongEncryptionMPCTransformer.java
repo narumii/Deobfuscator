@@ -13,8 +13,9 @@ import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.FieldMatch;
-import uwu.narumi.deobfuscator.api.asm.matcher.impl.LongMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.MethodMatch;
+import uwu.narumi.deobfuscator.api.asm.matcher.impl.NumberMatch;
+import uwu.narumi.deobfuscator.api.asm.matcher.impl.StackMatch;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.execution.SandBox;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
@@ -60,14 +61,18 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
 
   private static final Match DECRYPT_LONG_MATCHER = FieldMatch.putStatic().desc("J")
       // Decrypt
-      .stack(MethodMatch.invokeInterface().desc("(J)J").save("decrypt-method")
-          .stack(LongMatch.of().save("decrypt-key")) // Decrypt key
+      .and(StackMatch.of(0, MethodMatch.invokeInterface().desc("(J)J")
+          .and(StackMatch.of(0, NumberMatch.numLong().save("decrypt-key"))) // Decrypt key
           // Create decrypter
-          .stack(MethodMatch.invokeStatic().and(Match.predicate((context -> ((MethodInsnNode) context.insn()).desc.startsWith("(JJLjava/lang/Object;)")))).save("create-decrypter-method")
-              .stack(MethodMatch.invokeVirtual().stack(MethodMatch.invokeStatic())) // Class lookup
-              .stack(LongMatch.of().save("key-2")) // Key 2
-              .stack(LongMatch.of().save("key-1")) // Key 1
-          ));
+          .and(StackMatch.of(1, MethodMatch.invokeStatic().and(Match.predicate(context ->
+                  ((MethodInsnNode) context.insn()).desc.startsWith("(JJLjava/lang/Object;)"))).save("create-decrypter-method")
+
+              .and(StackMatch.of(0, MethodMatch.invokeVirtual().and(StackMatch.of(0, MethodMatch.invokeStatic())))) // Class lookup
+              .and(StackMatch.of(1, NumberMatch.numLong().save("key-2"))) // Key 2
+              .and(StackMatch.of(2, NumberMatch.numLong().save("key-1"))) // Key 1
+          ))
+          .save("decrypt-method")
+      ));
 
   // Config
   /**

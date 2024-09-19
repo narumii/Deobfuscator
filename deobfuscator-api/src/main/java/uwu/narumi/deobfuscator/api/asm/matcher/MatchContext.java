@@ -32,9 +32,11 @@ public record MatchContext(
   }
 
   /**
-   * Merges other {@link MatchContext} into this {@link MatchContext}
+   * Merges other {@link MatchContext} into this {@link MatchContext}.
+   *
+   * @see Match#matchAndMerge(InstructionContext, MatchContext)
    */
-  public void merge(MatchContext other) {
+  void merge(MatchContext other) {
     this.storage.putAll(other.storage);
     for (AbstractInsnNode insn : other.collectedInsns) {
       // Don't allow duplicates
