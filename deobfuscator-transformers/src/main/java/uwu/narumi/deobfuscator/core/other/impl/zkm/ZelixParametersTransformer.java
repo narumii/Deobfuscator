@@ -18,6 +18,7 @@ import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.StackMatch;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
+import uwu.narumi.deobfuscator.api.helper.MethodHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.ArrayList;
@@ -63,7 +64,7 @@ public class ZelixParametersTransformer extends Transformer {
                   .and(StackMatch.of(0, OpcodeMatch.of(ALOAD).and(
                       // The object array is always the first argument to method
                       Match.predicate(context -> {
-                        return ((VarInsnNode) context.insn()).var == AsmHelper.getFirstParameterIdx(context.insnContext().methodNode());
+                        return ((VarInsnNode) context.insn()).var == MethodHelper.getFirstParameterIdx(context.insnContext().methodNode());
                       })
                   ).save("load-array")))
               ))
@@ -92,7 +93,7 @@ public class ZelixParametersTransformer extends Transformer {
           VarInsnNode loadArrayInsn = null;
 
           Map<Integer, Integer> newVarIndexes = new HashMap<>(); // old var index -> new var index
-          int nextVarIndex = AsmHelper.getFirstParameterIdx(methodNode);
+          int nextVarIndex = MethodHelper.getFirstParameterIdx(methodNode);
 
           // Find all casts from that Object array
           for (AbstractInsnNode insn : methodNode.instructions.toArray()) {

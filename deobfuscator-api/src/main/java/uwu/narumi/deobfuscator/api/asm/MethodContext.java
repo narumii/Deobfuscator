@@ -7,6 +7,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
+import uwu.narumi.deobfuscator.api.helper.MethodHelper;
 
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public record MethodContext(
    * Creates new {@link MethodContext} and computes its frames
    */
   public static MethodContext framed(ClassWrapper classWrapper, MethodNode methodNode) {
-    Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = AsmHelper.analyzeSource(classWrapper.classNode(), methodNode);
+    Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = MethodHelper.analyzeSource(classWrapper.classNode(), methodNode);
     return new MethodContext(classWrapper, methodNode, frames);
   }
 

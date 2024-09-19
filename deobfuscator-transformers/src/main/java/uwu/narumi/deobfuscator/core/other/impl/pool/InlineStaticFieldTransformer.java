@@ -8,6 +8,7 @@ import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.FieldRef;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
+import uwu.narumi.deobfuscator.api.helper.MethodHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class InlineStaticFieldTransformer extends Transformer {
 
     // Find all static constant fields
     context.classes(scope).forEach(classWrapper -> findClInit(classWrapper.classNode()).ifPresent(clInit -> {
-      var frames = AsmHelper.analyzeSource(classWrapper.classNode(), clInit);
+      var frames = MethodHelper.analyzeSource(classWrapper.classNode(), clInit);
 
       Arrays.stream(clInit.instructions.toArray())
           .filter(insn -> insn.getOpcode() == PUTSTATIC)
