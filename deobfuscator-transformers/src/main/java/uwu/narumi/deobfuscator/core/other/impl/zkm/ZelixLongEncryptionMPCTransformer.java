@@ -199,7 +199,7 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
           decryptContext.removeAll();
 
           // Set field to decrypted long value!
-          insnContext.methodNode().instructions.insertBefore(insnContext.insn(), AsmHelper.getNumber(value));
+          insnContext.methodNode().instructions.insertBefore(insnContext.insn(), AsmHelper.numberInsn(value));
           markChange();
         } catch (VMException ex) {
           sandBox.logVMException(ex);

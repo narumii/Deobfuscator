@@ -133,7 +133,7 @@ public final class AsmMathHelper {
             context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
-                AsmHelper.getNumber(originalInsn.asString().length())
+                AsmHelper.numberInsn(originalInsn.asString().length())
             );
             return true;
           });
@@ -155,7 +155,7 @@ public final class AsmMathHelper {
             context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
-                AsmHelper.getNumber(originalInsn.asString().hashCode())
+                AsmHelper.numberInsn(originalInsn.asString().hashCode())
             );
             return true;
           });
@@ -178,7 +178,7 @@ public final class AsmMathHelper {
             context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
-                AsmHelper.getNumber(Integer.parseInt(originalInsn.asString()))
+                AsmHelper.numberInsn(Integer.parseInt(originalInsn.asString()))
             );
             return true;
           });
@@ -205,7 +205,7 @@ public final class AsmMathHelper {
             context.pop(2);
             context.methodNode().instructions.set(
                 context.insn(),
-                AsmHelper.getNumber(
+                AsmHelper.numberInsn(
                     Integer.parseInt(originalFirstInsn.asString(), originalSecondInsn.asInteger())
                 )
             );
@@ -230,7 +230,7 @@ public final class AsmMathHelper {
             context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
-                AsmHelper.getNumber(Integer.reverse(originalInsn.asInteger()))
+                AsmHelper.numberInsn(Integer.reverse(originalInsn.asInteger()))
             );
             return true;
           });
@@ -253,7 +253,7 @@ public final class AsmMathHelper {
             context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
-                AsmHelper.getNumber(Long.reverse(originalInsn.asLong()))
+                AsmHelper.numberInsn(Long.reverse(originalInsn.asLong()))
             );
             return true;
           });
@@ -276,7 +276,7 @@ public final class AsmMathHelper {
             context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
-                AsmHelper.getNumber(Float.floatToIntBits(originalInsn.asFloat()))
+                AsmHelper.numberInsn(Float.floatToIntBits(originalInsn.asFloat()))
             );
             return true;
           });
@@ -299,7 +299,7 @@ public final class AsmMathHelper {
             context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
-                AsmHelper.getNumber(Float.intBitsToFloat(originalInsn.asInteger()))
+                AsmHelper.numberInsn(Float.intBitsToFloat(originalInsn.asInteger()))
             );
             return true;
           });
@@ -322,7 +322,7 @@ public final class AsmMathHelper {
             context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
-                AsmHelper.getNumber(Double.doubleToLongBits(originalInsn.asDouble()))
+                AsmHelper.numberInsn(Double.doubleToLongBits(originalInsn.asDouble()))
             );
             return true;
           });
@@ -345,7 +345,7 @@ public final class AsmMathHelper {
             context.pop(1);
             context.methodNode().instructions.set(
                 context.insn(),
-                AsmHelper.getNumber(Double.longBitsToDouble(originalInsn.asLong()))
+                AsmHelper.numberInsn(Double.longBitsToDouble(originalInsn.asLong()))
             );
             return true;
           });

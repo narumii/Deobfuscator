@@ -29,7 +29,7 @@ public class MathUnaryOperationsTransformer extends Transformer {
             Number castedNumber = AsmMathHelper.mathUnaryOperation(valueInsn.asNumber(), insnContext.insn().getOpcode());
 
             insnContext.pop(1);
-            insnContext.methodNode().instructions.set(insnContext.insn(), AsmHelper.getNumber(castedNumber));
+            insnContext.methodNode().instructions.set(insnContext.insn(), AsmHelper.numberInsn(castedNumber));
 
             markChange();
           }

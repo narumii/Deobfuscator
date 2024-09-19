@@ -9,13 +9,15 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import uwu.narumi.deobfuscator.api.context.Context;
 
-/**
- * Used:
- * https://github.com/ItzSomebody/radon/blob/master/src/main/java/me/itzsomebody/radon/utils/ASMUtils.java
- */
 public class AsmHelper implements Opcodes {
 
-  public static AbstractInsnNode getNumber(int number) {
+  /**
+   * Very useful utility that converts number to corresponding ASM instruction.
+   *
+   * @param number The number
+   * @return An ASM instruction that represents this number
+   */
+  public static AbstractInsnNode numberInsn(int number) {
     if (number >= -1 && number <= 5) {
       return new InsnNode(number + 3);
     } else if (number >= -128 && number <= 127) {
@@ -27,7 +29,7 @@ public class AsmHelper implements Opcodes {
     }
   }
 
-  public static AbstractInsnNode getNumber(long number) {
+  public static AbstractInsnNode numberInsn(long number) {
     if (number >= 0 && number <= 1) {
       return new InsnNode((int) (number + 9));
     } else {
@@ -35,7 +37,7 @@ public class AsmHelper implements Opcodes {
     }
   }
 
-  public static AbstractInsnNode getNumber(float number) {
+  public static AbstractInsnNode numberInsn(float number) {
     if (number == 0 || number == 1 || number == 2) {
       return new InsnNode((int) (number + 11));
     } else {
@@ -43,7 +45,7 @@ public class AsmHelper implements Opcodes {
     }
   }
 
-  public static AbstractInsnNode getNumber(double number) {
+  public static AbstractInsnNode numberInsn(double number) {
     if (number == 0 || number == 1) {
       return new InsnNode((int) (number + 14));
     } else {
@@ -51,15 +53,15 @@ public class AsmHelper implements Opcodes {
     }
   }
 
-  public static AbstractInsnNode getNumber(Number number) {
+  public static AbstractInsnNode numberInsn(Number number) {
     if (number instanceof Integer || number instanceof Byte || number instanceof Short) {
-      return getNumber(number.intValue());
+      return numberInsn(number.intValue());
     } else if (number instanceof Long) {
-      return getNumber(number.longValue());
+      return numberInsn(number.longValue());
     } else if (number instanceof Float) {
-      return getNumber(number.floatValue());
+      return numberInsn(number.floatValue());
     } else if (number instanceof Double) {
-      return getNumber(number.doubleValue());
+      return numberInsn(number.doubleValue());
     }
 
     throw new IllegalArgumentException();
@@ -148,11 +150,11 @@ public class AsmHelper implements Opcodes {
     if (value instanceof String || value instanceof Type)
       return new LdcInsnNode(value);
     if (value instanceof Number number)
-      return getNumber(number);
+      return numberInsn(number);
     if (value instanceof Boolean bool)
-      return getNumber(bool ? 1 : 0);
+      return numberInsn(bool ? 1 : 0);
     if (value instanceof Character character)
-      return getNumber(character);
+      return numberInsn(character);
 
     throw new IllegalArgumentException("Not a constant");
   }
