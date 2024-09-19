@@ -33,59 +33,47 @@ public class a_<T> implements Serializable {
     private static final Map n;
 
     @Deprecated
-    public static a_ a(Object[] var0) {
-        Comparable var2 = (Comparable)var0[0];
-        Comparable var1 = (Comparable)var0[1];
-        long var3 = (Long)var0[2];
-        var3 = 104039320445854L ^ var3;
-        long var10001 = var3 ^ 126902786326681L;
-        int var5 = (int)((var3 ^ 126902786326681L) >>> 48);
-        int var6 = (int)((var3 ^ 126902786326681L) << 16 >>> 32);
+    public static a_ a(Comparable var0, Comparable var1, long var2) {
+        var2 = 104039320445854L ^ var2;
+        long var10001 = var2 ^ 126902786326681L;
+        int var5 = (int)((var2 ^ 126902786326681L) >>> 48);
+        int var6 = (int)((var2 ^ 126902786326681L) << 16 >>> 32);
         int var7 = (int)(var10001 << 48 >>> 48);
         char var10000 = (char)var5;
         Object[] var10007 = new Object[]{null, null, null, null, null, var7};
         var10007[4] = var6;
         var10007[3] = null;
         var10007[2] = var1;
-        var10007[1] = var2;
+        var10007[1] = var0;
         var10007[0] = Integer.valueOf(var10000);
         return f(var10007);
     }
 
     @Deprecated
-    public static a_ b(Object[] var0) {
-        Object var3 = var0[0];
-        long var1 = (Long)var0[1];
-        Object var4 = var0[2];
-        Comparator var5 = (Comparator)var0[3];
+    public static a_ b(Object var0, long var1, Object var3, Comparator var4) {
         var1 = 104039320445854L ^ var1;
         int var6 = (int)((var1 ^ 5324234304270L) >>> 32);
         long var7 = (var1 ^ 5324234304270L) << 32 >>> 32;
-        return new a_(var3, var4, var6, var7, var5);
+        return new a_(var0, var3, var6, var7, var4);
     }
 
-    public static a_ c(Object[] var0) {
-        long var1 = (Long)var0[0];
-        Comparable var3 = (Comparable)var0[1];
-        var1 = 104039320445854L ^ var1;
-        long var10001 = var1 ^ 18483036967427L;
-        int var4 = (int)((var1 ^ 18483036967427L) >>> 48);
-        int var5 = (int)((var1 ^ 18483036967427L) << 16 >>> 32);
+    public static a_ c(long var0, Comparable var2) {
+        var0 = 104039320445854L ^ var0;
+        long var10001 = var0 ^ 18483036967427L;
+        int var4 = (int)((var0 ^ 18483036967427L) >>> 48);
+        int var5 = (int)((var0 ^ 18483036967427L) << 16 >>> 32);
         int var6 = (int)(var10001 << 48 >>> 48);
         char var10000 = (char)var4;
         Object[] var10007 = new Object[]{null, null, null, null, null, var6};
         var10007[4] = var5;
         var10007[3] = null;
-        var10007[2] = var3;
-        var10007[1] = var3;
+        var10007[2] = var2;
+        var10007[1] = var2;
         var10007[0] = Integer.valueOf(var10000);
         return f(var10007);
     }
 
-    public static a_ d(Object[] var0) {
-        Object var4 = var0[0];
-        long var1 = (Long)var0[1];
-        Comparator var3 = (Comparator)var0[2];
+    public static a_ d(Object var0, long var1, Comparator var3) {
         var1 = 104039320445854L ^ var1;
         long var10001 = var1 ^ 21537914483950L;
         int var5 = (int)((var1 ^ 21537914483950L) >>> 48);
@@ -95,42 +83,33 @@ public class a_<T> implements Serializable {
         Object[] var10007 = new Object[]{null, null, null, null, null, var7};
         var10007[4] = var6;
         var10007[3] = var3;
-        var10007[2] = var4;
-        var10007[1] = var4;
+        var10007[2] = var0;
+        var10007[1] = var0;
         var10007[0] = Integer.valueOf(var10000);
         return f(var10007);
     }
 
-    public static a_ e(Object[] var0) {
-        long var2 = (Long)var0[0];
-        Comparable var4 = (Comparable)var0[1];
-        Comparable var1 = (Comparable)var0[2];
-        var2 = 104039320445854L ^ var2;
-        long var10001 = var2 ^ 30036545302711L;
-        int var5 = (int)((var2 ^ 30036545302711L) >>> 48);
-        int var6 = (int)((var2 ^ 30036545302711L) << 16 >>> 32);
+    public static a_ e(long var0, Comparable var2, Comparable var3) {
+        var0 = 104039320445854L ^ var0;
+        long var10001 = var0 ^ 30036545302711L;
+        int var5 = (int)((var0 ^ 30036545302711L) >>> 48);
+        int var6 = (int)((var0 ^ 30036545302711L) << 16 >>> 32);
         int var7 = (int)(var10001 << 48 >>> 48);
         char var10000 = (char)var5;
         Object[] var10007 = new Object[]{null, null, null, null, null, var7};
         var10007[4] = var6;
         var10007[3] = null;
-        var10007[2] = var1;
-        var10007[1] = var4;
+        var10007[2] = var3;
+        var10007[1] = var2;
         var10007[0] = Integer.valueOf(var10000);
         return f(var10007);
     }
 
-    public static a_ f(Object[] var0) {
-        int var5 = (Integer)var0[0];
-        Object var1 = var0[1];
-        Object var2 = var0[2];
-        Comparator var4 = (Comparator)var0[3];
-        int var3 = (Integer)var0[4];
-        int var6 = (Integer)var0[5];
-        long var7 = ((long)var5 << 48 | (long)var3 << 32 >>> 16 | (long)var6 << 48 >>> 48) ^ 104039320445854L;
+    public static a_ f(int var0, Object var1, Object var2, Comparator var3, int var4, int var5) {
+        long var7 = ((long)var0 << 48 | (long)var4 << 32 >>> 16 | (long)var5 << 48 >>> 48) ^ 104039320445854L;
         int var9 = (int)((var7 ^ 42314764531343L) >>> 32);
         long var10 = (var7 ^ 42314764531343L) << 32 >>> 32;
-        return new a_(var1, var2, var9, var10, var4);
+        return new a_(var1, var2, var9, var10, var3);
     }
 
     a_(Object var1, Object var2, int var3, long var4, Comparator var6) {
@@ -153,32 +132,26 @@ public class a_<T> implements Serializable {
         }
     }
 
-    public boolean a(Object[] var1) {
-        Object var2 = var1[0];
-        long var3 = (Long)var1[1];
-        long var10000 = 104039320445854L ^ var3;
-        return var2 == null ? false : this.a.compare(var2, this.d) > -1 && this.a.compare(var2, this.c) < 1;
+    public boolean a(Object var1, long var2) {
+        long var10000 = 104039320445854L ^ var2;
+        return var1 == null ? false : this.a.compare(var1, this.d) > -1 && this.a.compare(var1, this.c) < 1;
     }
 
-    public boolean b(Object[] var1) {
-        a_ var2 = (a_)var1[0];
-        long var3 = (Long)var1[1];
-        var3 = 104039320445854L ^ var3;
-        long var5 = var3 ^ 32980145495734L;
-        return var2 == null ? false : this.a(new Object[]{var2.d, var5}) && this.a(new Object[]{var2.c, var5});
+    public boolean b(a_ var1, long var2) {
+        var2 = 104039320445854L ^ var2;
+        long var5 = var2 ^ 32980145495734L;
+        return var1 == null ? false : this.a(new Object[]{var1.d, var5}) && this.a(new Object[]{var1.c, var5});
     }
 
-    public int a(Object[] var1) {
-        Object var2 = var1[0];
-        long var3 = (Long)var1[1];
-        var3 = 104039320445854L ^ var3;
-        long var5 = var3 ^ 92272217773657L;
-        long var7 = var3 ^ 1915727574734L;
-        Objects.requireNonNull(var2, a<"c">(18631, 981500437573127396L ^ var3));
-        if (this.c(new Object[]{var7, var2})) {
+    public int a(Object var1, long var2) {
+        var2 = 104039320445854L ^ var2;
+        long var5 = var2 ^ 92272217773657L;
+        long var7 = var2 ^ 1915727574734L;
+        Objects.requireNonNull(var1, a<"c">(18631, 981500437573127396L ^ var2));
+        if (this.c(new Object[]{var7, var1})) {
             return -1;
         } else {
-            return this.e(new Object[]{var2, var5}) ? 1 : 0;
+            return this.e(new Object[]{var1, var5}) ? 1 : 0;
         }
     }
 
@@ -193,17 +166,15 @@ public class a_<T> implements Serializable {
         }
     }
 
-    public Object a(Object[] var1) {
-        long var3 = (Long)var1[0];
-        Object var2 = var1[1];
-        var3 = 104039320445854L ^ var3;
-        long var5 = var3 ^ 2349512232429L;
-        long var7 = var3 ^ 88471214894458L;
-        Objects.requireNonNull(var2, a<"c">(19426, 4519817850676745331L ^ var3));
-        if (this.c(new Object[]{var7, var2})) {
+    public Object a(long var1, Object var3) {
+        var1 = 104039320445854L ^ var1;
+        long var5 = var1 ^ 2349512232429L;
+        long var7 = var1 ^ 88471214894458L;
+        Objects.requireNonNull(var3, a<"c">(19426, 4519817850676745331L ^ var1));
+        if (this.c(new Object[]{var7, var3})) {
             return this.d;
         } else {
-            return this.e(new Object[]{var2, var5}) ? this.c : var2;
+            return this.e(new Object[]{var3, var5}) ? this.c : var3;
         }
     }
 
@@ -233,28 +204,26 @@ public class a_<T> implements Serializable {
         return var3;
     }
 
-    public a_ g(Object[] var1) {
-        a_ var2 = (a_)var1[0];
-        long var3 = (Long)var1[1];
-        var3 = 104039320445854L ^ var3;
-        long var10001 = var3 ^ 67044076869465L;
-        int var5 = (int)((var3 ^ 67044076869465L) >>> 48);
-        int var6 = (int)((var3 ^ 67044076869465L) << 16 >>> 32);
+    public a_ g(a_ var1, long var2) {
+        var2 = 104039320445854L ^ var2;
+        long var10001 = var2 ^ 67044076869465L;
+        int var5 = (int)((var2 ^ 67044076869465L) >>> 48);
+        int var6 = (int)((var2 ^ 67044076869465L) << 16 >>> 32);
         int var7 = (int)(var10001 << 48 >>> 48);
-        long var8 = var3 ^ 47154949516185L;
+        long var8 = var2 ^ 47154949516185L;
         int[] var10 = aa.b();
-        int var10000 = this.i(new Object[]{var2, var8});
+        int var10000 = this.i(new Object[]{var1, var8});
         if (var10 == null) {
             if (var10000 == 0) {
-                throw new IllegalArgumentException(String.format(a<"c">(3324, 4697416246332586316L ^ var3), var2));
+                throw new IllegalArgumentException(String.format(a<"c">(3324, 4697416246332586316L ^ var2), var1));
             }
 
-            var10000 = this.equals(var2);
+            var10000 = this.equals(var1);
         }
 
         label44: {
             label48: {
-                if (var3 >= 0L && var10 == null) {
+                if (var2 >= 0L && var10 == null) {
                     if (var10000 != 0) {
                         return this;
                     }
@@ -264,11 +233,11 @@ public class a_<T> implements Serializable {
                         break label48;
                     }
 
-                    var10000 = this.a(new Object[0]).compare(this.d, var2.d);
+                    var10000 = this.a(new Object[0]).compare(this.d, var1.d);
                 }
 
                 if (var10000 < 0) {
-                    var15 = var2.d;
+                    var15 = var1.d;
                     break label44;
                 }
 
@@ -283,12 +252,12 @@ public class a_<T> implements Serializable {
             var11 = var15;
             a_ var16 = this;
             if (var10 == null) {
-                if (this.a(new Object[0]).compare(this.c, var2.c) < 0) {
+                if (this.a(new Object[0]).compare(this.c, var1.c) < 0) {
                     var17 = this.c;
                     break label32;
                 }
 
-                var16 = var2;
+                var16 = var1;
             }
 
             var17 = var16.c;
@@ -306,71 +275,58 @@ public class a_<T> implements Serializable {
         return f(var10007);
     }
 
-    public boolean c(Object[] var1) {
-        long var2 = (Long)var1[0];
-        Object var4 = var1[1];
-        long var10000 = 104039320445854L ^ var2;
-        return var4 == null ? false : this.a.compare(var4, this.d) < 0;
+    public boolean c(long var1, Object var3) {
+        long var10000 = 104039320445854L ^ var1;
+        return var3 == null ? false : this.a.compare(var3, this.d) < 0;
     }
 
-    public boolean d(Object[] var1) {
-        long var3 = (Long)var1[0];
-        a_ var2 = (a_)var1[1];
-        var3 = 104039320445854L ^ var3;
-        long var5 = var3 ^ 105199813704059L;
-        if (var2 == null) {
+    public boolean d(long var1, a_ var3) {
+        var1 = 104039320445854L ^ var1;
+        long var5 = var1 ^ 105199813704059L;
+        if (var3 == null) {
             return false;
         } else {
-            Object var10002 = var2.c;
+            Object var10002 = var3.c;
             return this.c(new Object[]{var5, var10002});
         }
     }
 
-    public boolean e(Object[] var1) {
-        Object var4 = var1[0];
-        long var2 = (Long)var1[1];
+    public boolean e(Object var1, long var2) {
         long var10000 = 104039320445854L ^ var2;
-        return var4 == null ? false : this.a.compare(var4, this.c) > 0;
+        return var1 == null ? false : this.a.compare(var1, this.c) > 0;
     }
 
-    public boolean f(Object[] var1) {
-        long var3 = (Long)var1[0];
-        a_ var2 = (a_)var1[1];
-        var3 = 104039320445854L ^ var3;
-        long var5 = var3 ^ 114263133395304L;
-        return var2 == null ? false : this.e(new Object[]{var2.d, var5});
+    public boolean f(long var1, a_ var3) {
+        var1 = 104039320445854L ^ var1;
+        long var5 = var1 ^ 114263133395304L;
+        return var3 == null ? false : this.e(new Object[]{var3.d, var5});
     }
 
-    public boolean g(Object[] var1) {
-        Object var2 = var1[0];
-        long var3 = (Long)var1[1];
-        long var10000 = 104039320445854L ^ var3;
-        return var2 == null ? false : this.a.compare(var2, this.c) == 0;
-    }
-
-    public boolean h(Object[] var1) {
-        long var2 = (Long)var1[0];
+    public boolean g(Object var1, long var2) {
         long var10000 = 104039320445854L ^ var2;
+        return var1 == null ? false : this.a.compare(var1, this.c) == 0;
+    }
+
+    public boolean h(long var1) {
+        long var10000 = 104039320445854L ^ var1;
         return this.a == s.INSTANCE;
     }
 
-    public boolean i(Object[] var1) {
-        a_ var2 = (a_)var1[0];
-        long var3 = (Long)var1[1];
-        var3 = 104039320445854L ^ var3;
-        long var5 = var3 ^ 9050573107348L;
-        if (var2 == null) {
+    public boolean i(a_ var1, long var2) {
+        var2 = 104039320445854L ^ var2;
+        long var5 = var2 ^ 9050573107348L;
+        if (var1 == null) {
             return false;
         } else {
-            boolean var10000 = var2.a(new Object[]{this.d, var5});
-            if (var3 >= 0L) {
+            boolean var10000 = var1.a(new Object[]{this.d, var5});
+            if (var2 >= 0L) {
                 if (!var10000) {
-                    var10000 = var2.a(new Object[]{this.c, var5});
-                    if (var3 < 0L) {
+                    var10000 = var1.a(new Object[]{this.c, var5});
+                    if (var2 < 0L) {
                         return var10000;
                     }
 
-                    if (!var10000 && !this.a(new Object[]{var2.d, var5})) {
+                    if (!var10000 && !this.a(new Object[]{var1.d, var5})) {
                         return false;
                     }
                 }
@@ -382,11 +338,9 @@ public class a_<T> implements Serializable {
         }
     }
 
-    public boolean j(Object[] var1) {
-        long var3 = (Long)var1[0];
-        Object var2 = var1[1];
-        long var10000 = 104039320445854L ^ var3;
-        return var2 == null ? false : this.a.compare(var2, this.d) == 0;
+    public boolean j(long var1, Object var3) {
+        long var10000 = 104039320445854L ^ var1;
+        return var3 == null ? false : this.a.compare(var3, this.d) == 0;
     }
 
     public String toString() {
@@ -398,9 +352,8 @@ public class a_<T> implements Serializable {
         return this.e;
     }
 
-    public String a(Object[] var1) {
-        String var2 = (String)var1[0];
-        return String.format(var2, this.d, this.c, this.a);
+    public String a(String var1) {
+        return String.format(var1, this.d, this.c, this.a);
     }
 
     static {

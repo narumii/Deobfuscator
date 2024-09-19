@@ -174,6 +174,37 @@ public class AsmHelper implements Opcodes {
   }
 
   /**
+   * Gets local variable table of the method. Sorted ascending
+   */
+  public static List<Integer> getLocalVariableTable(MethodNode methodNode) {
+    List<Integer> localVariableTable = new ArrayList<>();
+    for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+      if (insn instanceof VarInsnNode varInsn) {
+        if (!localVariableTable.contains(varInsn.var)) {
+          localVariableTable.add(varInsn.var);
+        }
+      } else if (insn instanceof IincInsnNode iincInsn) {
+        if (!localVariableTable.contains(iincInsn.var)) {
+          localVariableTable.add(iincInsn.var);
+        }
+      }
+    }
+
+    // Sort ascending
+    localVariableTable.sort(Comparator.naturalOrder());
+
+    return localVariableTable;
+  }
+
+  /**
+   * Gets var index of the first parameter of the passed method
+   */
+  public static int getFirstParameterIdx(MethodNode methodNode) {
+    // When method is static, then the first var index is actually a reference to "this"
+    return (methodNode.access & ACC_STATIC) != 0 ? 0 : 1;
+  }
+
+  /**
    * Convert constant value to instruction that represents this constant
    *
    * @param value A constant value

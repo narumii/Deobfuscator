@@ -1,0 +1,112 @@
+package io.github.repooper.packetevents.utils.netty.bytebuf;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.util.internal.EmptyArrays;
+import me.frep.vulcan.spigot.check.AbstractCheck;
+
+public final class ByteBufUtil_8 implements ByteBufUtil {
+    private static String[] Vulcan_n;
+
+    @Override
+    public Object Vulcan_y(Object[] var1) {
+        return Unpooled.buffer();
+    }
+
+    public Object Vulcan_u(byte[] var1) {
+        return Unpooled.wrappedBuffer(var1);
+    }
+
+    public void Vulcan_G(Object var1) {
+        ((ByteBuf)var1).retain();
+    }
+
+    public void Vulcan_u(Object var1) {
+        ((ByteBuf)var1).release();
+    }
+
+    public byte[] Vulcan_S(Object var1, long var2) {
+        String[] var10000 = Vulcan_O();
+        ByteBuf var6 = (ByteBuf)var1;
+        String[] var5 = var10000;
+        int var8 = var6.refCnt();
+        String[] var10001 = var5;
+        if (var2 > 0L) {
+            if (var5 != null) {
+                if (var8 < 1) {
+                    return EmptyArrays.EMPTY_BYTES;
+                }
+
+                var8 = var6.hasArray();
+            }
+
+            var10001 = var5;
+        }
+
+        byte[] var7;
+        label39: {
+            if (var10001 != null) {
+                if (var8 != 0) {
+                    var7 = var6.array();
+                    if (var2 < 0L || var5 != null) {
+                        break label39;
+                    }
+                }
+
+                var8 = var6.readableBytes();
+            }
+
+            var7 = new byte[var8];
+            var6.getBytes(var6.readerIndex(), var7);
+        }
+
+        byte var9 = AbstractCheck.Vulcan_l();
+        if (var2 >= 0L) {
+            if (var9 == 0) {
+                return var7;
+            }
+
+            var9 = 1;
+        }
+
+        Vulcan_L(new String[var9]);
+        return var7;
+    }
+
+    public void Vulcan_S(Object var1, byte[] var2, long var3) {
+        String[] var10000 = Vulcan_O();
+        ByteBuf var7 = (ByteBuf)var1;
+        String[] var6 = var10000;
+        int var9 = var7.refCnt();
+        if (var6 != null) {
+            if (var9 < 1) {
+                return;
+            }
+
+            var9 = var2.length;
+        }
+
+        int var8 = var9;
+        if (var3 > 0L && var6 != null) {
+            if (var7.capacity() < var8) {
+                var7.capacity(var8);
+            }
+
+            var7.setBytes(0, var2);
+        }
+    }
+
+    public static void Vulcan_L(String[] var0) {
+        Vulcan_n = var0;
+    }
+
+    public static String[] Vulcan_O() {
+        return Vulcan_n;
+    }
+
+    static {
+        if (Vulcan_O() == null) {
+            Vulcan_L(new String[5]);
+        }
+    }
+}

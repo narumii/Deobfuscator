@@ -39,9 +39,9 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         Source.of("zkm/sample1/LongDecrypter1", false),
         Source.of("zkm/sample1/LongDecrypter2", false),
         // These are required to compute frames
-        Source.of("zkm/sample1/ByteBufUtil", false),
-        Source.of("zkm/sample1/ByteBufUtil_7", false),
-        Source.of("zkm/sample1/ByteBufUtil_8", false)
+        Source.of("zkm/sample1/ByteBufUtil", true),
+        Source.of("zkm/sample1/ByteBufUtil_7", true),
+        Source.of("zkm/sample1/ByteBufUtil_8", true)
     );
     // Obfuscated using this ZKM config (https://www.zelix.com/klassmaster/docs/langZKMScript.html):
     /*

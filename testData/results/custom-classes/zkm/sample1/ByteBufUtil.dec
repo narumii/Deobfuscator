@@ -1,0 +1,15 @@
+package io.github.repooper.packetevents.utils.netty.bytebuf;
+
+public interface ByteBufUtil {
+    Object Vulcan_y(Object[] var1);
+
+    Object Vulcan_u(Object[] var1);
+
+    void Vulcan_G(Object[] var1);
+
+    void Vulcan_u(Object[] var1);
+
+    byte[] Vulcan_S(Object[] var1);
+
+    void Vulcan_S(Object[] var1);
+}

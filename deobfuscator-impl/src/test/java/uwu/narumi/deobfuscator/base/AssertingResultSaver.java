@@ -50,6 +50,9 @@ public class AssertingResultSaver implements IResultSaver {
       if (Files.exists(saveTo)) {
         // Assert decompiled code
         String oldCode = Files.readString(saveTo);
+        // Replace CRLF with LF
+        oldCode = oldCode.replace("\r\n", "\n");
+
         assertEquals(oldCode, content);
       } else {
         // Save content
