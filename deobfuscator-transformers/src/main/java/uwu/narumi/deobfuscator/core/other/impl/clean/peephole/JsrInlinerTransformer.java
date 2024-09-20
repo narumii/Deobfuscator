@@ -21,26 +21,15 @@ public class JsrInlinerTransformer extends Transformer {
         boolean isJsr = Arrays.stream(methodNode.instructions.toArray()).anyMatch(insn -> insn.getOpcode() == JSR);
 
         if (isJsr) {
-          MethodNode clonedMethodNode = new MethodNode(
-              methodNode.access,
-              methodNode.name,
-              methodNode.desc,
-              methodNode.signature,
-              methodNode.exceptions.toArray(new String[0])
-          );
-
           // Inline JSR instructions
           methodNode.accept(new JSRInlinerAdapter(
-              clonedMethodNode,
+              methodNode,
               methodNode.access,
               methodNode.name,
               methodNode.desc,
               methodNode.signature,
               methodNode.exceptions.toArray(new String[0])
           ));
-
-          // Replace method with the jsr inlined version
-          classWrapper.methods().set(i, clonedMethodNode);
 
           markChange();
         }
