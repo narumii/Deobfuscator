@@ -16,8 +16,13 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <!-- Snapshot -->
-        <asm.version>9.8-20240908.112439-20</asm.version>
+        <!--
+        We need to use a snapshot version of asm lib as there are some recent important changes to it
+         that are not in release version yet:
+          - https://gitlab.ow2.org/asm/asm/-/merge_requests/414
+          - https://gitlab.ow2.org/asm/asm/-/merge_requests/415
+        -->
+        <asm.version>9.8-SNAPSHOT</asm.version>
 
         <log4j.version>2.23.1</log4j.version>
         <slf4j.version>2.0.13</slf4j.version>
