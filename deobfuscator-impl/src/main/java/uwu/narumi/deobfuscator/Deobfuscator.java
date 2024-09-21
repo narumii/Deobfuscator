@@ -150,7 +150,7 @@ public class Deobfuscator {
           try {
             byte[] data = classWrapper.compileToBytes(this.context);
 
-            Path path = this.options.outputDir().resolve(classWrapper.getPathInJar() + ".class");
+            Path path = this.options.outputDir().resolve(classWrapper.getPathInJar());
             Files.createDirectories(path.getParent());
             Files.write(path, data);
           } catch (Exception e) {

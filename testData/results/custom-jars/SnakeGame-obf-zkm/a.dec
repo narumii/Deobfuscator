@@ -1,0 +1,83 @@
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+
+public class a extends KeyAdapter {
+    public void keyPressed(KeyEvent var1) {
+        boolean var4;
+        label60: {
+            label61: {
+                label62: {
+                    var4 = d.h;
+                    int var10000 = var1.getKeyCode();
+                    if (!var4) {
+                        switch (var10000) {
+                            case 37:
+                                break label61;
+                            case 38:
+                                break label62;
+                            case 39:
+                                var10000 = d.e;
+                                break;
+                            case 40:
+                                break label60;
+                            default:
+                                return;
+                        }
+                    }
+
+                    if (!var4) {
+                        if (var10000 == 2) {
+                            return;
+                        }
+
+                        var10000 = 1;
+                    }
+
+                    d.e = var10000;
+                    if (!var4) {
+                        return;
+                    }
+                }
+
+                int var5 = d.e;
+                if (!var4) {
+                    if (d.e == 4) {
+                        return;
+                    }
+
+                    var5 = 3;
+                }
+
+                d.e = var5;
+                if (!var4) {
+                    return;
+                }
+            }
+
+            int var6 = d.e;
+            if (!var4) {
+                if (d.e == 1) {
+                    return;
+                }
+
+                var6 = 2;
+            }
+
+            d.e = var6;
+            if (!var4) {
+                return;
+            }
+        }
+
+        int var7 = d.e;
+        if (!var4) {
+            if (d.e == 3) {
+                return;
+            }
+
+            var7 = 4;
+        }
+
+        d.e = var7;
+    }
+}
