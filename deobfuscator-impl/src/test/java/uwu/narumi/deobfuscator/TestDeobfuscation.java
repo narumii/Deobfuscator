@@ -81,5 +81,10 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         Source.of("zkm/sample2/SimpleLongDecrypter", false),
         Source.of("zkm/sample2/FallbackLongDecrypter", false)
     );
+
+    register("Zelix (21) Snake Game", InputType.CUSTOM_JAR,
+        List.of(ComposedZelixTransformer::new),
+        Source.of("SnakeGame-obf-zkm")
+    );
   }
 }
