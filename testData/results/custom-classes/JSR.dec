@@ -1,0 +1,13 @@
+import java.io.PrintStream;
+
+public class TestJSR {
+    public static void main(String[] var0) {
+        test(System.out);
+    }
+
+    public static void test(PrintStream var0) {
+        var0.println("In");
+        Object var1 = null;
+        var0.println("Out");
+    }
+}

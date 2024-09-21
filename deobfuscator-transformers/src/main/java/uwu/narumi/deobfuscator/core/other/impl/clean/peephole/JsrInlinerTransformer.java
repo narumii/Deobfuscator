@@ -22,14 +22,17 @@ public class JsrInlinerTransformer extends Transformer {
 
         if (isJsr) {
           // Inline JSR instructions
-          methodNode.accept(new JSRInlinerAdapter(
+          final JSRInlinerAdapter adapter = new JSRInlinerAdapter(
               methodNode,
               methodNode.access,
               methodNode.name,
               methodNode.desc,
               methodNode.signature,
               methodNode.exceptions.toArray(new String[0])
-          ));
+          );
+
+          methodNode.accept(adapter);
+          classWrapper.methods().set(i, adapter);
 
           markChange();
         }
