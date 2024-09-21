@@ -3,6 +3,7 @@ package uwu.narumi.deobfuscator;
 import uwu.narumi.deobfuscator.core.other.composed.ComposedZelixTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedGeneralFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.PeepholeCleanTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.JsrInlinerTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineLocalVariablesTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
@@ -28,6 +29,9 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
 
     // Test sandbox security (e.g. not allowing dangerous calls)
     register("Sandbox security", InputType.JAVA_CODE, List.of(TestSandboxSecurityTransformer::new), Source.of("sandbox/TestSandboxSecurity", false));
+
+    // JSR Inlining
+    register("JSR Inlining", InputType.CUSTOM_CLASS, List.of(JsrInlinerTransformer::new), Source.of("JSR"));
 
     // Samples
     register("Some flow obf sample", InputType.CUSTOM_CLASS, List.of(ComposedGeneralFlowTransformer::new), Source.of("FlowObfSample"));
