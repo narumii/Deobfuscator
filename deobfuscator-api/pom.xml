@@ -22,7 +22,7 @@
           - https://gitlab.ow2.org/asm/asm/-/merge_requests/414
           - https://gitlab.ow2.org/asm/asm/-/merge_requests/415
         -->
-        <asm.version>9.8-SNAPSHOT</asm.version>
+        <asm.version>9.8-20240915.100933-24</asm.version>
 
         <log4j.version>2.23.1</log4j.version>
         <slf4j.version>2.0.13</slf4j.version>
