@@ -1,6 +1,8 @@
 # Diobfuscator
 A deobfuscator for java
 
+placek
+
 > [!IMPORTANT]
 > **This is dev(v2) version of diobfuscator version and it's not completed yet, if you are willing to help there is a list of things that needs to be completed. The old diobfuscator was moved to [v1 branch](https://github.com/narumii/Deobfuscator/tree/v1).**<br>
 > 
