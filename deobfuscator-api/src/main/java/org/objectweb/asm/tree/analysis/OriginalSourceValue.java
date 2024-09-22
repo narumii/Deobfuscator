@@ -1,5 +1,6 @@
 package org.objectweb.asm.tree.analysis;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -49,6 +50,7 @@ public class OriginalSourceValue extends SourceValue {
    * instructions (DUP, ILOAD) and jumps to get the original source value of this instruction at line 6.
    * In this example, it will return source value of instruction at line 2.
    */
+  @NotNull
   public final OriginalSourceValue originalSource;
 
   /**
@@ -81,11 +83,16 @@ public class OriginalSourceValue extends SourceValue {
   @Nullable
   private ConstantValue constantValue = null;
 
+  /**
+   * If a source value is a method parameter.
+   */
   private final boolean isMethodParameter;
 
   public OriginalSourceValue(int size, boolean isMethodParameter) {
     super(size, new SmallSet<>());
     this.isMethodParameter = isMethodParameter;
+
+    // Fill single-producer-only fields with empty
     this.copiedFrom = null;
     this.originalSource = this;
   }
@@ -103,6 +110,8 @@ public class OriginalSourceValue extends SourceValue {
   public OriginalSourceValue(int size, Set<AbstractInsnNode> insnSet) {
     super(size, insnSet);
     this.isMethodParameter = false;
+
+    // Fill single-producer-only fields with empty
     this.copiedFrom = null;
     this.originalSource = this;
   }
