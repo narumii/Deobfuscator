@@ -11,29 +11,27 @@ import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransfor
 
 public class ComposedHP888Transformer extends ComposedTransformer {
 
-    public ComposedHP888Transformer(String packedEndOfFile) {
-        super(
-                HP888StringTransformer::new,
-                () -> new HP888PackerTransformer(packedEndOfFile),
-                HP888StringTransformer::new,
-                ComposedGeneralCleanTransformer::new,
-                ComposedGeneralRepairTransformer::new,
-                HP888StringTransformer::new,
-                UniversalNumberTransformer::new,
-                ComposedGeneralFlowTransformer::new,
-                DeadCodeCleanTransformer::new
-        );
-    }
+  public ComposedHP888Transformer(String packedEndOfFile) {
+    super(
+        HP888StringTransformer::new,
+        () -> new HP888PackerTransformer(packedEndOfFile),
+        HP888StringTransformer::new,
+        ComposedGeneralCleanTransformer::new,
+        ComposedGeneralRepairTransformer::new,
+        UniversalNumberTransformer::new,
+        ComposedGeneralFlowTransformer::new,
+        DeadCodeCleanTransformer::new
+    );
+  }
 
-    public ComposedHP888Transformer() {
-        super(
-                HP888StringTransformer::new,
-                ComposedGeneralCleanTransformer::new,
-                ComposedGeneralRepairTransformer::new,
-                HP888StringTransformer::new,
-                UniversalNumberTransformer::new,
-                ComposedGeneralFlowTransformer::new,
-                DeadCodeCleanTransformer::new
-        );
-    }
+  public ComposedHP888Transformer() {
+    super(
+        HP888StringTransformer::new,
+        ComposedGeneralCleanTransformer::new,
+        ComposedGeneralRepairTransformer::new,
+        UniversalNumberTransformer::new,
+        ComposedGeneralFlowTransformer::new,
+        DeadCodeCleanTransformer::new
+    );
+  }
 }
