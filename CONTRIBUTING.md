@@ -3,7 +3,7 @@ Welcome! We are glad that you want to contribute to our deobfuscator.
 
 ## ✨ Best practises
 - Add comments in complex areas. ASM is hard, so let's make it easier for others to understand what is happening in code (especially inside transformers).
-- Upload obfuscated test class sample. Tests for your transformers are crucial. When someone wants to rewrite some part of the code, then these tests are helping us that we won't break anything.
+- Upload obfuscated test class sample. We highly recommend tests for your transformers. When someone wants to rewrite some part of the code, then these tests are helping us that we won't break anything.
 
 ## 🪜 Project structure
 The project is structured as follows:
