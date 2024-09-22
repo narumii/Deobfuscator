@@ -37,6 +37,7 @@ import java.util.function.Predicate;
 
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.NamedOpcodes;
 import org.objectweb.asm.Type;
 
 /**
@@ -641,6 +642,15 @@ public abstract class AbstractInsnNode {
     }
 
     return current;
+  }
+
+  public String namedOpcode() {
+    return NamedOpcodes.map(this.getOpcode());
+  }
+
+  @Override
+  public String toString() {
+    return "(" + namedOpcode() + ") " + super.toString();
   }
   // Narumii end
 }

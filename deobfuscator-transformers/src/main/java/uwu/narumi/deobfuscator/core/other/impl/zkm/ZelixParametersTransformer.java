@@ -61,7 +61,7 @@ public class ZelixParametersTransformer extends Transformer {
       .and(StackMatch.of(0, OpcodeMatch.of(AALOAD)
           .and(StackMatch.of(0, NumberMatch.numInteger().save("index")
               .and(StackMatch.of(0, OpcodeMatch.of(DUP)
-                  .and(StackMatch.of(0, OpcodeMatch.of(ALOAD).and(
+                  .and(StackMatch.ofOriginal(0, OpcodeMatch.of(ALOAD).and(
                       // The object array is always the first argument to method
                       Match.predicate(context -> {
                         return ((VarInsnNode) context.insn()).var == MethodHelper.getFirstParameterIdx(context.insnContext().methodNode());
@@ -145,7 +145,7 @@ public class ZelixParametersTransformer extends Transformer {
               InstructionContext insnContext = methodContext.newInsnContext(insn);
 
               OriginalSourceValue arrayAccess = insnContext.frame().getStack(insnContext.frame().getStackSize() - 1);
-              if (arrayAccess.getProducer().equals(loadArrayInsn)) {
+              if (arrayAccess.originalSource.isOneWayProduced() && arrayAccess.originalSource.getProducer().equals(loadArrayInsn)) {
                 methodNode.instructions.remove(loadArrayInsn); // ALOAD
                 methodNode.instructions.remove(insn); // POP
                 markChange();

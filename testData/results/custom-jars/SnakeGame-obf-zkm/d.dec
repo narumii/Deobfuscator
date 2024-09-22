@@ -50,9 +50,7 @@ public class d extends Thread {
         long var3 = 12972172530972L;
         long var5 = 121593940001805L;
         long var7 = 41896598891982L;
-        long var10002 = 78566231858904L;
         short var9 = 18292;
-        var10002 = 78566231858904L;
         int var10 = -1604886824;
 
         while (true) {

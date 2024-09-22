@@ -29,11 +29,11 @@ public class ComposedZelixTransformer extends ComposedTransformer {
         // Fixes flow a bit
         ZelixUselessTryCatchRemoverTransformer::new,
 
+        ZelixParametersTransformer::new,
+
         () -> new ZelixLongEncryptionMPCTransformer(classInitializationOrder),
         InlineStaticFieldTransformer::new,
         UniversalNumberTransformer::new,
-
-        ZelixParametersTransformer::new,
 
         // Cleanup
         PeepholeCleanTransformer::new
