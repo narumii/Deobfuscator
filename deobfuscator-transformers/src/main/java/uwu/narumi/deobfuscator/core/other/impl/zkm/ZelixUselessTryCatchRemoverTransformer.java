@@ -78,6 +78,9 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
           if (result != null) {
             MethodRef methodRef = MethodRef.of((MethodInsnNode) result.insn());
 
+            // Check if method is returning an exception instantly
+            if (!instantReturnExceptionMethods.contains(methodRef)) return false;
+
             if (!toRemove.contains(methodRef)) {
               toRemove.add(methodRef);
             }
