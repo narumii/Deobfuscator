@@ -7,6 +7,9 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
+import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.asm.MethodContext;
+import uwu.narumi.deobfuscator.api.asm.MethodRef;
 import uwu.narumi.deobfuscator.api.context.Context;
 
 public class AsmHelper implements Opcodes {
@@ -91,53 +94,6 @@ public class AsmHelper implements Opcodes {
     return (access & opcode) != 0;
   }
 
-  public static Optional<MethodNode> findMethod(
-      ClassNode classNode, MethodInsnNode methodInsnNode) {
-    return classNode == null || classNode.methods == null
-        ? Optional.empty()
-        : classNode.methods.stream()
-            .filter(methodNode -> methodNode.name.equals(methodInsnNode.name))
-            .filter(methodNode -> methodNode.desc.equals(methodInsnNode.desc))
-            .findFirst();
-  }
-
-  public static Optional<MethodNode> findMethod(
-      ClassNode classNode, Predicate<MethodNode> predicate) {
-    return classNode.methods == null
-        ? Optional.empty()
-        : classNode.methods.stream().filter(predicate).findFirst();
-  }
-
-  public static Optional<FieldNode> findField(ClassNode classNode, Predicate<FieldNode> predicate) {
-    return classNode.methods == null
-        ? Optional.empty()
-        : classNode.fields.stream().filter(predicate).findFirst();
-  }
-
-  public static Optional<MethodNode> findClInit(ClassNode classNode) {
-    return findMethod(classNode, methodNode -> methodNode.name.equals("<clinit>"));
-  }
-
-  public static List<AbstractInsnNode> getInstructionsBetween(
-      AbstractInsnNode start, AbstractInsnNode end) {
-    return getInstructionsBetween(start, end, true, true);
-  }
-
-  public static List<AbstractInsnNode> getInstructionsBetween(
-      AbstractInsnNode start, AbstractInsnNode end, boolean includeStart, boolean includeEnd) {
-    List<AbstractInsnNode> instructions = new ArrayList<>();
-
-    if (includeStart) instructions.add(start);
-
-    while ((start = start.getNext()) != null && start != end) {
-      instructions.add(start);
-    }
-
-    if (includeEnd) instructions.add(end);
-
-    return instructions;
-  }
-
   /**
    * Convert constant value to instruction that represents this constant
    *
@@ -170,6 +126,54 @@ public class AsmHelper implements Opcodes {
     if (insn.owner.equals("java/lang/Float") && insn.name.equals("floatValue")) return Type.FLOAT_TYPE;
 
     throw new IllegalStateException("Unexpected value: " + insn.owner+"."+insn.name+insn.desc);
+  }
+
+  /**
+   * Update method descriptor in the current class, a superclass and interfaces
+   *
+   * @param context Deobfuscator context
+   * @param methodContext Method context
+   * @param desc New method descriptor
+   */
+  public static void updateMethodDescriptor(Context context, MethodContext methodContext, String desc) {
+    ClassWrapper classWrapper = methodContext.classWrapper();
+    MethodNode methodNode = methodContext.methodNode();
+
+    tryUpdateMethodDescriptor(context, classWrapper, methodNode.name, methodNode.desc, desc);
+  }
+
+  /**
+   * Tries to update method descriptor in the current class, a superclass and interfaces
+   *
+   * @param context Deobfuscator context
+   * @param classWrapper A class to check
+   * @param name Method name
+   * @param oldDesc Old method descriptor
+   * @param newDesc New method descriptor
+   */
+  private static void tryUpdateMethodDescriptor(Context context, ClassWrapper classWrapper, String name, String oldDesc, String newDesc) {
+    // Search superclass
+    if (classWrapper.classNode().superName != null) {
+      ClassWrapper superClass = context.getClasses().get(classWrapper.classNode().superName);
+      if (superClass != null) {
+        tryUpdateMethodDescriptor(context, superClass, name, oldDesc, newDesc);
+      }
+    }
+
+    // Search interfaces
+    classWrapper.classNode().interfaces.forEach(interfaceName -> {
+      ClassWrapper interfaceClass = context.getClasses().get(interfaceName);
+      if (interfaceClass != null) {
+        tryUpdateMethodDescriptor(context, interfaceClass, name, oldDesc, newDesc);
+      }
+    });
+
+    Optional<MethodNode> optMethodNode = classWrapper.classNode().methods.stream()
+        .filter(method -> method.name.equals(name) && method.desc.equals(oldDesc))
+        .findFirst();
+
+    // Update method descriptor
+    optMethodNode.ifPresent(methodNode -> methodNode.desc = newDesc);
   }
 
   public static InsnList from(AbstractInsnNode... nodes) {
@@ -213,5 +217,52 @@ public class AsmHelper implements Opcodes {
             fieldNode ->
                 fieldNode.name.equals(fieldInsnNode.name)
                     && fieldNode.desc.equals(fieldInsnNode.desc));
+  }
+
+  public static Optional<MethodNode> findMethod(
+      ClassNode classNode, MethodInsnNode methodInsnNode) {
+    return classNode == null || classNode.methods == null
+        ? Optional.empty()
+        : classNode.methods.stream()
+        .filter(methodNode -> methodNode.name.equals(methodInsnNode.name))
+        .filter(methodNode -> methodNode.desc.equals(methodInsnNode.desc))
+        .findFirst();
+  }
+
+  public static Optional<MethodNode> findMethod(
+      ClassNode classNode, Predicate<MethodNode> predicate) {
+    return classNode.methods == null
+        ? Optional.empty()
+        : classNode.methods.stream().filter(predicate).findFirst();
+  }
+
+  public static Optional<FieldNode> findField(ClassNode classNode, Predicate<FieldNode> predicate) {
+    return classNode.methods == null
+        ? Optional.empty()
+        : classNode.fields.stream().filter(predicate).findFirst();
+  }
+
+  public static Optional<MethodNode> findClInit(ClassNode classNode) {
+    return findMethod(classNode, methodNode -> methodNode.name.equals("<clinit>"));
+  }
+
+  public static List<AbstractInsnNode> getInstructionsBetween(
+      AbstractInsnNode start, AbstractInsnNode end) {
+    return getInstructionsBetween(start, end, true, true);
+  }
+
+  public static List<AbstractInsnNode> getInstructionsBetween(
+      AbstractInsnNode start, AbstractInsnNode end, boolean includeStart, boolean includeEnd) {
+    List<AbstractInsnNode> instructions = new ArrayList<>();
+
+    if (includeStart) instructions.add(start);
+
+    while ((start = start.getNext()) != null && start != end) {
+      instructions.add(start);
+    }
+
+    if (includeEnd) instructions.add(end);
+
+    return instructions;
   }
 }

@@ -17,6 +17,7 @@ import uwu.narumi.deobfuscator.api.asm.matcher.impl.NumberMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.StackMatch;
 import uwu.narumi.deobfuscator.api.context.Context;
+import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.helper.MethodHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
@@ -26,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Decomposes array params ({@code foo(Object[] args)}) into a readable params like: {@code foo(String arg1, int arg2)}.
+ * Decomposes object array param ({@code foo(Object[] args)}) into a readable params like: {@code foo(String arg1, int arg2)}.
  *
  * <p>References:
  * <ul>
@@ -51,8 +52,6 @@ import java.util.Map;
  * pop
  * </pre>
  */
-// TODO: If class extends another class and descriptor update happens on overwritten method, then also update that method
-//  in the super class and interfaces.
 // TODO: Remove object array creation and replace it with corresponding params
 public class ZelixParametersTransformer extends Transformer {
 
@@ -101,7 +100,8 @@ public class ZelixParametersTransformer extends Transformer {
 
           if (shouldReplaceArgumentTypes) {
             // Update method arguments
-            methodNode.desc = Type.getMethodDescriptor(Type.getReturnType(methodNode.desc), newArgumentTypes.toArray(new Type[0]));
+            String desc = Type.getMethodDescriptor(Type.getReturnType(methodNode.desc), newArgumentTypes.toArray(new Type[0]));
+            AsmHelper.updateMethodDescriptor(context, methodContext, desc);
 
             // Replace local variables indexes with the corresponding ones
             fixLocalVariableIndexes(methodNode, newVarIndexes);
