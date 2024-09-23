@@ -13,16 +13,18 @@ import java.util.Map;
 
 /**
  * Immutable match context. After matching process, the context is frozen by {@link MatchContext#freeze()}
- *
- * @param insnContext Instruction context
- * @param storage Storage for saving some instructions in matching process. id -> match context
- * @param collectedInsns Collected instructions that matches this match and children matches
  */
-public record MatchContext(
-    InstructionContext insnContext,
-    Map<String, MatchContext> storage,
-    List<AbstractInsnNode> collectedInsns
-) {
+public class MatchContext {
+  private final InstructionContext insnContext;
+  private final Map<String, MatchContext> storage;
+  private final List<AbstractInsnNode> collectedInsns;
+
+  private MatchContext(InstructionContext insnContext, Map<String, MatchContext> storage, List<AbstractInsnNode> collectedInsns) {
+    this.insnContext = insnContext;
+    this.storage = storage;
+    this.collectedInsns = collectedInsns;
+  }
+
   public static MatchContext of(InstructionContext insnContext) {
     return new MatchContext(insnContext, new HashMap<>(), new ArrayList<>());
   }
@@ -58,6 +60,27 @@ public record MatchContext(
    */
   public Frame<OriginalSourceValue> frame() {
     return this.insnContext.frame();
+  }
+
+  /**
+   * Instruction context
+   */
+  public InstructionContext insnContext() {
+    return insnContext;
+  }
+
+  /**
+   * Storage for saving some instructions in matching process. id -> match context
+   */
+  public Map<String, MatchContext> storage() {
+    return storage;
+  }
+
+  /**
+   * Collected instructions that matches this match and children matches
+   */
+  public List<AbstractInsnNode> collectedInsns() {
+    return collectedInsns;
   }
 
   /**
