@@ -16,12 +16,12 @@ import java.util.Map;
  */
 public class MatchContext {
   private final InstructionContext insnContext;
-  private final Map<String, MatchContext> storage;
+  private final Map<String, MatchContext> captures;
   private final List<AbstractInsnNode> collectedInsns;
 
-  private MatchContext(InstructionContext insnContext, Map<String, MatchContext> storage, List<AbstractInsnNode> collectedInsns) {
+  private MatchContext(InstructionContext insnContext, Map<String, MatchContext> captures, List<AbstractInsnNode> collectedInsns) {
     this.insnContext = insnContext;
-    this.storage = storage;
+    this.captures = captures;
     this.collectedInsns = collectedInsns;
   }
 
@@ -30,7 +30,7 @@ public class MatchContext {
   }
 
   public MatchContext freeze() {
-    return new MatchContext(this.insnContext, Collections.unmodifiableMap(this.storage), Collections.unmodifiableList(this.collectedInsns));
+    return new MatchContext(this.insnContext, Collections.unmodifiableMap(this.captures), Collections.unmodifiableList(this.collectedInsns));
   }
 
   /**
@@ -39,7 +39,7 @@ public class MatchContext {
    * @see Match#matchAndMerge(InstructionContext, MatchContext)
    */
   void merge(MatchContext other) {
-    this.storage.putAll(other.storage);
+    this.captures.putAll(other.captures);
     for (AbstractInsnNode insn : other.collectedInsns) {
       // Don't allow duplicates
       if (this.collectedInsns.contains(insn)) continue;
@@ -70,10 +70,12 @@ public class MatchContext {
   }
 
   /**
-   * Storage for saving some instructions in matching process. id -> match context
+   * Captured instructions in a matching process. id -> match context
+   *
+   * @see Match#capture(String)
    */
-  public Map<String, MatchContext> storage() {
-    return storage;
+  public Map<String, MatchContext> captures() {
+    return captures;
   }
 
   /**

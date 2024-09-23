@@ -61,26 +61,26 @@ public class ZelixParametersTransformer extends Transformer {
         return ((VarInsnNode) context.insn()).var == MethodHelper.getFirstParameterIdx(context.insnContext().methodNode());
       }));
 
-  private static final Match OBJECT_ARRAY_ACCESS = StackMatch.of(0, OpcodeMatch.of(CHECKCAST).save("cast")
+  private static final Match OBJECT_ARRAY_ACCESS = StackMatch.of(0, OpcodeMatch.of(CHECKCAST).capture("cast")
       .and(StackMatch.of(0, OpcodeMatch.of(AALOAD)
-          .and(StackMatch.of(0, NumberMatch.numInteger().save("index")
+          .and(StackMatch.of(0, NumberMatch.numInteger().capture("index")
               .and(StackMatch.of(0, OpcodeMatch.of(DUP)
-                  .and(StackMatch.ofOriginal(0, OBJECT_ARRAY_ALOAD.save("load-array")))
+                  .and(StackMatch.ofOriginal(0, OBJECT_ARRAY_ALOAD.capture("load-array")))
               ))
           ))
       ))
   );
 
-  private static final Match OBJECT_ARRAY_VAR_USAGE = Match.predicate(ctx -> ctx.insn().isVarStore()).save("var-store")
+  private static final Match OBJECT_ARRAY_VAR_USAGE = Match.predicate(ctx -> ctx.insn().isVarStore()).capture("var-store")
       .and(
-          StackMatch.of(0, MethodMatch.invokeVirtual().save("to-primitive") // Converting to a primitive type
+          StackMatch.of(0, MethodMatch.invokeVirtual().capture("to-primitive") // Converting to a primitive type
               .and(OBJECT_ARRAY_ACCESS)
           ).or(OBJECT_ARRAY_ACCESS)
       );
 
   private static final Match OBJECT_ARRAY_POP = OpcodeMatch.of(POP)
       .and(
-          StackMatch.ofOriginal(0, OBJECT_ARRAY_ALOAD.save("load-array"))
+          StackMatch.ofOriginal(0, OBJECT_ARRAY_ALOAD.capture("load-array"))
       );
 
   @Override
@@ -129,14 +129,14 @@ public class ZelixParametersTransformer extends Transformer {
       if (matchContext == null) continue;
 
       // Found argument!
-      VarInsnNode varStore = (VarInsnNode) matchContext.storage().get("var-store").insn();
-      TypeInsnNode typeInsn = (TypeInsnNode) matchContext.storage().get("cast").insn();
-      int index = matchContext.storage().get("index").insn().asInteger();
+      VarInsnNode varStore = (VarInsnNode) matchContext.captures().get("var-store").insn();
+      TypeInsnNode typeInsn = (TypeInsnNode) matchContext.captures().get("cast").insn();
+      int index = matchContext.captures().get("index").insn().asInteger();
 
       Type type = Type.getObjectType(typeInsn.desc);
       // If value is cast to primitive, then pass primitive
-      if (matchContext.storage().containsKey("to-primitive")) {
-        MethodInsnNode primitiveCastInsn = (MethodInsnNode) matchContext.storage().get("to-primitive").insn();
+      if (matchContext.captures().containsKey("to-primitive")) {
+        MethodInsnNode primitiveCastInsn = (MethodInsnNode) matchContext.captures().get("to-primitive").insn();
         type = getTypeFromPrimitiveCast(primitiveCastInsn);
       }
 
@@ -149,7 +149,7 @@ public class ZelixParametersTransformer extends Transformer {
       nextVarIndex = nextVarIndex + type.getSize();
 
       // Clean up array access
-      VarInsnNode loadArrayInsn = (VarInsnNode) matchContext.storage().get("load-array").insn();
+      VarInsnNode loadArrayInsn = (VarInsnNode) matchContext.captures().get("load-array").insn();
       for (AbstractInsnNode collectedInsn : matchContext.collectedInsns()) {
         if (collectedInsn.equals(loadArrayInsn)) continue;
 
@@ -175,7 +175,7 @@ public class ZelixParametersTransformer extends Transformer {
       MatchContext matchContext = OBJECT_ARRAY_POP.matchResult(insnContext);
       if (matchContext == null) continue;
 
-      AbstractInsnNode loadArrayInsn = matchContext.storage().get("load-array").insn();
+      AbstractInsnNode loadArrayInsn = matchContext.captures().get("load-array").insn();
 
       // Remove those instructions
       methodContext.methodNode().instructions.remove(loadArrayInsn); // ALOAD

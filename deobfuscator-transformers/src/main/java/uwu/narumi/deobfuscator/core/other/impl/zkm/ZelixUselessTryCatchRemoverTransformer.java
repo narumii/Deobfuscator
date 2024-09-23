@@ -46,7 +46,7 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
 
   private static final Match INVOKE_AND_RETURN =
       SequenceMatch.of(
-          MethodMatch.invokeStatic().save("invocation"),
+          MethodMatch.invokeStatic().capture("invocation"),
           OpcodeMatch.of(ATHROW)
       );
 
