@@ -8,8 +8,7 @@ import me.frep.vulcan.spigot.check.AbstractCheck;
 public final class ByteBufUtil_8 implements ByteBufUtil {
     private static String[] Vulcan_n;
 
-    @Override
-    public Object Vulcan_y(Object[] var1) {
+    public Object Vulcan_y() {
         return Unpooled.buffer();
     }
 

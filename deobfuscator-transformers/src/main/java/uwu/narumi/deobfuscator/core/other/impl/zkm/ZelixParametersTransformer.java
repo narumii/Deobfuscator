@@ -4,9 +4,9 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.IincInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
-import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.InstructionContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
@@ -17,7 +17,6 @@ import uwu.narumi.deobfuscator.api.asm.matcher.impl.NumberMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.StackMatch;
 import uwu.narumi.deobfuscator.api.context.Context;
-import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.helper.MethodHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
@@ -35,7 +34,7 @@ import java.util.Map;
  * </ul>
  *
  * <p>
- * Example instruction set:
+ * Object array destructuring example:
  * <pre>
  * aload p0
  * dup
@@ -57,26 +56,32 @@ import java.util.Map;
 // TODO: Remove object array creation and replace it with corresponding params
 public class ZelixParametersTransformer extends Transformer {
 
-  private static final Match ARRAY_ACCESS = StackMatch.of(0, OpcodeMatch.of(CHECKCAST).save("cast")
+  private static final Match OBJECT_ARRAY_ALOAD = OpcodeMatch.of(ALOAD).and(
+      Match.predicate(context -> {
+        // The object array is always the first argument to method
+        return ((VarInsnNode) context.insn()).var == MethodHelper.getFirstParameterIdx(context.insnContext().methodNode());
+      }));
+
+  private static final Match OBJECT_ARRAY_ACCESS = StackMatch.of(0, OpcodeMatch.of(CHECKCAST).save("cast")
       .and(StackMatch.of(0, OpcodeMatch.of(AALOAD)
           .and(StackMatch.of(0, NumberMatch.numInteger().save("index")
               .and(StackMatch.of(0, OpcodeMatch.of(DUP)
-                  .and(StackMatch.ofOriginal(0, OpcodeMatch.of(ALOAD).and(
-                      // The object array is always the first argument to method
-                      Match.predicate(context -> {
-                        return ((VarInsnNode) context.insn()).var == MethodHelper.getFirstParameterIdx(context.insnContext().methodNode());
-                      })
-                  ).save("load-array")))
+                  .and(StackMatch.ofOriginal(0, OBJECT_ARRAY_ALOAD.save("load-array")))
               ))
           ))
       ))
   );
 
-  private static final Match ARRAY_VAR_USAGE = Match.predicate(ctx -> ctx.insn().isVarStore()).save("var-store")
+  private static final Match OBJECT_ARRAY_VAR_USAGE = Match.predicate(ctx -> ctx.insn().isVarStore()).save("var-store")
       .and(
-          StackMatch.of(0, MethodMatch.invokeVirtual().save("to-primitive") // Converting to primitive type
-              .and(ARRAY_ACCESS)
-          ).or(ARRAY_ACCESS)
+          StackMatch.of(0, MethodMatch.invokeVirtual().save("to-primitive") // Converting to a primitive type
+              .and(OBJECT_ARRAY_ACCESS)
+          ).or(OBJECT_ARRAY_ACCESS)
+      );
+
+  private static final Match OBJECT_ARRAY_POP = OpcodeMatch.of(POP)
+      .and(
+          StackMatch.ofOriginal(0, OBJECT_ARRAY_ALOAD.save("load-array"))
       );
 
   @Override
@@ -86,103 +91,123 @@ public class ZelixParametersTransformer extends Transformer {
         .forEach(methodNode -> {
           MethodContext methodContext = MethodContext.framed(classWrapper, methodNode);
 
-          boolean decomposeArgs = false;
-          List<Type> newArgumentTypes = new ArrayList<>();
-
-          // ALOAD
-          VarInsnNode loadArrayInsn = null;
-
           Map<Integer, Integer> newVarIndexes = new HashMap<>(); // old var index -> new var index
-          int nextVarIndex = MethodHelper.getFirstParameterIdx(methodNode);
 
-          // Find all casts from that Object array
-          for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-            InstructionContext insnContext = methodContext.newInsnContext(insn);
+          // Decompose object array to argument types
+          List<Type> newArgumentTypes = decomposeObjectArrayToTypes(methodContext, newVarIndexes);
 
-            MatchContext matchContext = ARRAY_VAR_USAGE.matchResult(insnContext);
-            if (matchContext == null) continue;
+          // This flag is used to determine if we need to decompose arguments
+          boolean shouldReplaceArgumentTypes = removeObjectArrayAccess(methodContext);
 
-            // Found argument!
-            VarInsnNode varStore = (VarInsnNode) matchContext.storage().get("var-store").insn();
-            TypeInsnNode typeInsn = (TypeInsnNode) matchContext.storage().get("cast").insn();
-            int index = matchContext.storage().get("index").insn().asInteger();
-
-            Type type = Type.getObjectType(typeInsn.desc);
-            // If value is cast to primitive, then pass primitive
-            if (matchContext.storage().containsKey("to-primitive")) {
-              MethodInsnNode primitiveCastInsn = (MethodInsnNode) matchContext.storage().get("to-primitive").insn();
-              type = getTypeFromPrimitiveCast(primitiveCastInsn);
-            }
-
-            // Add new argument
-            newArgumentTypes.add(index, type);
-            //System.out.println(index + " -> " + type);
-
-            // Append new var index
-            newVarIndexes.put(varStore.var, nextVarIndex);
-            nextVarIndex = nextVarIndex + type.getSize();
-
-            // Clean up array access
-            loadArrayInsn = (VarInsnNode) matchContext.storage().get("load-array").insn();
-            for (AbstractInsnNode collectedInsn : matchContext.collectedInsns()) {
-              if (collectedInsn.equals(loadArrayInsn)) continue;
-
-              methodNode.instructions.remove(collectedInsn);
-            }
-            markChange();
-
-            decomposeArgs = true;
-          }
-
-          if (decomposeArgs) {
+          if (shouldReplaceArgumentTypes) {
             // Update method arguments
             methodNode.desc = Type.getMethodDescriptor(Type.getReturnType(methodNode.desc), newArgumentTypes.toArray(new Type[0]));
 
-            // Remove array access and pop
-            for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-              if (insn.getOpcode() != POP) continue;
-
-              InstructionContext insnContext = methodContext.newInsnContext(insn);
-
-              OriginalSourceValue arrayAccess = insnContext.frame().getStack(insnContext.frame().getStackSize() - 1);
-              if (arrayAccess.originalSource.isOneWayProduced() && arrayAccess.originalSource.getProducer().equals(loadArrayInsn)) {
-                methodNode.instructions.remove(loadArrayInsn); // ALOAD
-                methodNode.instructions.remove(insn); // POP
-                markChange();
-                break;
-              }
-            }
-
             // Replace local variables indexes with the corresponding ones
-            for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-              if (insn instanceof VarInsnNode varInsn) {
-                if (newVarIndexes.containsKey(varInsn.var)) {
-                  // Replace it!
-                  varInsn.var = newVarIndexes.get(varInsn.var);
-                  markChange();
-                }
-              } else if (insn instanceof IincInsnNode iincInsn) {
-                if (newVarIndexes.containsKey(iincInsn.var)) {
-                  // Replace it!
-                  iincInsn.var = newVarIndexes.get(iincInsn.var);
-                  markChange();
-                }
-              }
-            }
+            fixLocalVariableIndexes(methodNode, newVarIndexes);
           }
         }));
   }
 
-  private static Type getTypeFromPrimitiveCast(MethodInsnNode insn) {
-    if (insn.getOpcode() != INVOKEVIRTUAL) throw new IllegalArgumentException("Instruction is not an INVOKEVIRTUAL");
+  /**
+   * Decomposes object array to argument types.
+   *
+   * @param methodContext Method context
+   * @param newVarIndexes New var indexes to fill
+   * @return Argument types
+   */
+  private List<Type> decomposeObjectArrayToTypes(MethodContext methodContext, Map<Integer, Integer> newVarIndexes) {
+    List<Type> newArgumentTypes = new ArrayList<>();
 
-    if (insn.owner.equals("java/lang/Byte") && insn.name.equals("byteValue")) return Type.BYTE_TYPE;
-    if (insn.owner.equals("java/lang/Short") && insn.name.equals("shortValue")) return Type.SHORT_TYPE;
-    if (insn.owner.equals("java/lang/Integer") && insn.name.equals("intValue")) return Type.INT_TYPE;
-    if (insn.owner.equals("java/lang/Long") && insn.name.equals("longValue")) return Type.LONG_TYPE;
-    if (insn.owner.equals("java/lang/Double") && insn.name.equals("doubleValue")) return Type.DOUBLE_TYPE;
-    if (insn.owner.equals("java/lang/Float") && insn.name.equals("floatValue")) return Type.FLOAT_TYPE;
+    int nextVarIndex = MethodHelper.getFirstParameterIdx(methodContext.methodNode());
 
-    throw new IllegalStateException("Unexpected value: " + insn.owner+"."+insn.name+insn.desc);
+    // Find all casts from that Object array
+    for (AbstractInsnNode insn : methodContext.methodNode().instructions.toArray()) {
+      InstructionContext insnContext = methodContext.newInsnContext(insn);
+
+      MatchContext matchContext = OBJECT_ARRAY_VAR_USAGE.matchResult(insnContext);
+      if (matchContext == null) continue;
+
+      // Found argument!
+      VarInsnNode varStore = (VarInsnNode) matchContext.storage().get("var-store").insn();
+      TypeInsnNode typeInsn = (TypeInsnNode) matchContext.storage().get("cast").insn();
+      int index = matchContext.storage().get("index").insn().asInteger();
+
+      Type type = Type.getObjectType(typeInsn.desc);
+      // If value is cast to primitive, then pass primitive
+      if (matchContext.storage().containsKey("to-primitive")) {
+        MethodInsnNode primitiveCastInsn = (MethodInsnNode) matchContext.storage().get("to-primitive").insn();
+        type = getTypeFromPrimitiveCast(primitiveCastInsn);
+      }
+
+      // Add new argument
+      newArgumentTypes.add(index, type);
+      //System.out.println(index + " -> " + type);
+
+      // Append new var index
+      newVarIndexes.put(varStore.var, nextVarIndex);
+      nextVarIndex = nextVarIndex + type.getSize();
+
+      // Clean up array access
+      VarInsnNode loadArrayInsn = (VarInsnNode) matchContext.storage().get("load-array").insn();
+      for (AbstractInsnNode collectedInsn : matchContext.collectedInsns()) {
+        if (collectedInsn.equals(loadArrayInsn)) continue;
+
+        methodContext.methodNode().instructions.remove(collectedInsn);
+      }
+
+      markChange();
+    }
+
+    return newArgumentTypes;
+  }
+
+  /**
+   * Removes object array access. Removes its ALOAD and POP instructions.
+   *
+   * @return {@code true} if any object array access was removed
+   */
+  private boolean removeObjectArrayAccess(MethodContext methodContext) {
+    // Remove all object array accesses
+    for (AbstractInsnNode insn : methodContext.methodNode().instructions.toArray()) {
+      InstructionContext insnContext = methodContext.newInsnContext(insn);
+
+      MatchContext matchContext = OBJECT_ARRAY_POP.matchResult(insnContext);
+      if (matchContext == null) continue;
+
+      AbstractInsnNode loadArrayInsn = matchContext.storage().get("load-array").insn();
+
+      // Remove those instructions
+      methodContext.methodNode().instructions.remove(loadArrayInsn); // ALOAD
+      methodContext.methodNode().instructions.remove(insn); // POP
+
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Replace local variables indexes with the corresponding ones
+   *
+   * @param methodNode Method node
+   * @param newVarIndexes New var indexes to use to replace the old ones
+   */
+  private void fixLocalVariableIndexes(MethodNode methodNode, Map<Integer, Integer> newVarIndexes) {
+    for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+      if (insn instanceof VarInsnNode varInsn) {
+        if (newVarIndexes.containsKey(varInsn.var)) {
+          // Replace it!
+          varInsn.var = newVarIndexes.get(varInsn.var);
+          markChange();
+        }
+      } else if (insn instanceof IincInsnNode iincInsn) {
+        if (newVarIndexes.containsKey(iincInsn.var)) {
+          // Replace it!
+          iincInsn.var = newVarIndexes.get(iincInsn.var);
+          markChange();
+        }
+      }
+    }
   }
 }

@@ -23,14 +23,17 @@ public class ComposedZelixTransformer extends ComposedTransformer {
 
   public ComposedZelixTransformer(Map<String, String> classInitializationOrder) {
     super(
+        // Initial cleanup
         JsrInlinerTransformer::new,
         RecoverSyntheticsTransformer::new,
 
         // Fixes flow a bit
         ZelixUselessTryCatchRemoverTransformer::new,
 
+        // Decompose method parameters
         ZelixParametersTransformer::new,
 
+        // Decrypt longs
         () -> new ZelixLongEncryptionMPCTransformer(classInitializationOrder),
         InlineStaticFieldTransformer::new,
         UniversalNumberTransformer::new,

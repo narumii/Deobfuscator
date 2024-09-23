@@ -67,7 +67,7 @@ public class d extends Thread {
         }
     }
 
-    private void a(Object[] var1) {
+    private void a() {
         try {
             sleep(this.d);
         } catch (InterruptedException var3) {

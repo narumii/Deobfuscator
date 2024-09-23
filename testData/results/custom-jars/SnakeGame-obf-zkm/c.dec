@@ -13,11 +13,11 @@ public class c {
         this.b = var2;
     }
 
-    public int a(Object[] var1) {
+    public int a() {
         return this.a;
     }
 
-    public int b(Object[] var1) {
+    public int b() {
         return this.b;
     }
 }

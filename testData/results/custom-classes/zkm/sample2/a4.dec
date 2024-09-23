@@ -37,7 +37,7 @@ public class a4 {
     private static final Integer[] k;
     private static final Map l;
 
-    public static List a(Object[] var0) {
+    public static List a() {
         return a5.a(new Object[0]);
     }
 
@@ -45,7 +45,7 @@ public class a4 {
         return (List)a(new Object[0]).stream().filter(var0).collect(Collectors.toList());
     }
 
-    public static Set a(Object[] var0) {
+    public static Set a() {
         return a5.a(new Object[0]);
     }
 

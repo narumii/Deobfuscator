@@ -159,6 +159,19 @@ public class AsmHelper implements Opcodes {
     throw new IllegalArgumentException("Not a constant");
   }
 
+  public static Type getTypeFromPrimitiveCast(MethodInsnNode insn) {
+    if (insn.getOpcode() != INVOKEVIRTUAL) throw new IllegalArgumentException("Instruction is not an INVOKEVIRTUAL");
+
+    if (insn.owner.equals("java/lang/Byte") && insn.name.equals("byteValue")) return Type.BYTE_TYPE;
+    if (insn.owner.equals("java/lang/Short") && insn.name.equals("shortValue")) return Type.SHORT_TYPE;
+    if (insn.owner.equals("java/lang/Integer") && insn.name.equals("intValue")) return Type.INT_TYPE;
+    if (insn.owner.equals("java/lang/Long") && insn.name.equals("longValue")) return Type.LONG_TYPE;
+    if (insn.owner.equals("java/lang/Double") && insn.name.equals("doubleValue")) return Type.DOUBLE_TYPE;
+    if (insn.owner.equals("java/lang/Float") && insn.name.equals("floatValue")) return Type.FLOAT_TYPE;
+
+    throw new IllegalStateException("Unexpected value: " + insn.owner+"."+insn.name+insn.desc);
+  }
+
   public static InsnList from(AbstractInsnNode... nodes) {
     InsnList insnList = new InsnList();
     for (AbstractInsnNode node : nodes) {
@@ -189,7 +202,7 @@ public class AsmHelper implements Opcodes {
     return copyMethod;
   }
 
-  public void removeField(FieldInsnNode fieldInsnNode, Context context) {
+  public static void removeField(FieldInsnNode fieldInsnNode, Context context) {
     if (!context.getClasses().containsKey(fieldInsnNode.owner)) return;
 
     context
