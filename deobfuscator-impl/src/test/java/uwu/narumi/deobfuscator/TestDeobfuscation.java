@@ -81,7 +81,25 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         Source.of("zkm/sample2/SimpleLongDecrypter", false),
         Source.of("zkm/sample2/FallbackLongDecrypter", false)
     );
-
+    // Obfuscated using the following ZKM config (https://www.zelix.com/klassmaster/docs/langZKMScript.html):
+    /*
+    obfuscate   changeLogFileIn=""
+            changeLogFileOut="ChangeLog.txt"
+            obfuscateFlow=aggressive
+            exceptionObfuscation=heavy
+            encryptStringLiterals=enhanced
+            encryptIntegerConstants=aggressive
+            encryptLongConstants=normal
+            mixedCaseClassNames=ifInArchive
+            aggressiveMethodRenaming=true
+            collapsePackagesWithDefault=""
+            localVariables=delete
+            lineNumbers=delete
+            autoReflectionHandling=normal
+            obfuscateReferences=none
+            methodParameterChanges=flowObfuscate
+            obfuscateParameters=normal;
+     */
     register("Zelix (21) Snake Game", InputType.CUSTOM_JAR,
         List.of(ComposedZelixTransformer::new),
         Source.of("SnakeGame-obf-zkm")
