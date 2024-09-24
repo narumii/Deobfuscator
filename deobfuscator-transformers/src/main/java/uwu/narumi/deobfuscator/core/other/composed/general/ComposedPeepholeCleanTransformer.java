@@ -1,4 +1,4 @@
-package uwu.narumi.deobfuscator.core.other.impl.clean;
+package uwu.narumi.deobfuscator.core.other.composed.general;
 
 import uwu.narumi.deobfuscator.api.transformer.ComposedTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.DeadCodeCleanTransformer;
@@ -11,9 +11,9 @@ import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.UselessPopCleanTra
 /**
  * A transformer that cleans up garbage instructions.
  */
-public class PeepholeCleanTransformer extends ComposedTransformer {
+public class ComposedPeepholeCleanTransformer extends ComposedTransformer {
 
-  public PeepholeCleanTransformer() {
+  public ComposedPeepholeCleanTransformer() {
     super(
         // Remove dead code
         DeadCodeCleanTransformer::new,

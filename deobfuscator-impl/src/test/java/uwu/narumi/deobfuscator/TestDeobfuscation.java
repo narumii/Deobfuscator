@@ -2,7 +2,7 @@ package uwu.narumi.deobfuscator;
 
 import uwu.narumi.deobfuscator.core.other.composed.ComposedZelixTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedGeneralFlowTransformer;
-import uwu.narumi.deobfuscator.core.other.impl.clean.PeepholeCleanTransformer;
+import uwu.narumi.deobfuscator.core.other.composed.general.ComposedPeepholeCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.JsrInlinerTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineLocalVariablesTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
@@ -19,7 +19,7 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
   protected void registerAll() {
     register("Inlining local variables", InputType.JAVA_CODE, List.of(
         InlineLocalVariablesTransformer::new,
-        PeepholeCleanTransformer::new
+        ComposedPeepholeCleanTransformer::new
     ), Source.of("TestInlineLocalVariables"));
     register("Simple flow obfuscation", InputType.JAVA_CODE, List.of(ComposedGeneralFlowTransformer::new), Source.of("TestSimpleFlowObfuscation"));
     register("Universal Number Transformer", InputType.JAVA_CODE, List.of(UniversalNumberTransformer::new), Source.of("TestUniversalNumberTransformer"));
