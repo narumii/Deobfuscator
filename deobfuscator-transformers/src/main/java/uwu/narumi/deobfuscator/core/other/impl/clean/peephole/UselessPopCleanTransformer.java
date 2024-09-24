@@ -9,10 +9,15 @@ import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.FramedInstructionsStream;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class UselessPopCleanTransformer extends Transformer {
   public UselessPopCleanTransformer() {
     this.rerunOnChange = true;
   }
+
+  private final List<AbstractInsnNode> poppedDups = new ArrayList<>();
 
   @Override
   protected void transform(ClassWrapper scope, Context context) throws Exception {
@@ -76,22 +81,25 @@ public class UselessPopCleanTransformer extends Transformer {
       // Nothing to remove. Probably a local variable
       return false;
     }
-    if (!sourceValue.getChildren().isEmpty()) {
-      // Other source values depends on this source value
-      return false;
-    }
 
     // Check if all producers of the source value are constants
     for (AbstractInsnNode producer : sourceValue.insns) {
-      if (!(producer.isConstant() || producer.getOpcode() == DUP)) {
-        return false;
-      }
+      // Can be popped if the value is constant
+      if (producer.isConstant()) continue;
+      // Can be popped if the value is DUP, and it wasn't popped yet
+      if (producer.getOpcode() == DUP && !poppedDups.contains(producer)) continue;
+
+      return false;
     }
     return true;
   }
 
   private void popSourceValue(OriginalSourceValue value, MethodNode methodNode) {
     for (AbstractInsnNode producer : value.insns) {
+      if (producer.getOpcode() == DUP) {
+        // Prevent popping DUP twice
+        poppedDups.add(producer);
+      }
       methodNode.instructions.remove(producer);
     }
   }

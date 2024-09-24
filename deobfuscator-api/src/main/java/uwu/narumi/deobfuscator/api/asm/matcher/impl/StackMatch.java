@@ -1,5 +1,6 @@
 package uwu.narumi.deobfuscator.api.asm.matcher.impl;
 
+import org.objectweb.asm.NamedOpcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
@@ -12,18 +13,24 @@ import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 public class StackMatch extends Match {
   private final int stackValueIdx;
   private final Match match;
+  private final boolean originalValue;
 
   /**
    * @param stackValueIdx Index of the value in the stack, starting from the top of the stack, so '0' is the top value.
    * @param match A {@link Match} to match against that stack value
    */
-  private StackMatch(int stackValueIdx, Match match) {
+  private StackMatch(int stackValueIdx, Match match, boolean originalValue) {
     this.stackValueIdx = stackValueIdx;
     this.match = match;
+    this.originalValue = originalValue;
   }
 
   public static StackMatch of(int stackValueIdx, Match match) {
-    return new StackMatch(stackValueIdx, match);
+    return new StackMatch(stackValueIdx, match, false);
+  }
+
+  public static StackMatch ofOriginal(int stackValueIdx, Match match) {
+    return new StackMatch(stackValueIdx, match, true);
   }
 
   @Override
@@ -51,6 +58,10 @@ public class StackMatch extends Match {
 
     Frame<OriginalSourceValue> frame = context.frame();
     OriginalSourceValue sourceValue = frame.getStack(index);
+    if (this.originalValue) {
+      sourceValue = sourceValue.originalSource;
+    }
+
     if (!sourceValue.isOneWayProduced()) {
       // We only want stack values that are one way produced
       return false;

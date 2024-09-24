@@ -41,10 +41,10 @@ public abstract class TestDeobfuscationBase {
   /**
    * Register input files for testing
    *
-   * @param testName Test name
-   * @param inputType Input type. See enum optionsConsumer.
+   * @param testName     Test name
+   * @param inputType    Input type. See enum optionsConsumer.
    * @param transformers Transformers to use
-   * @param sources You can choose one class or multiple classes for testing
+   * @param sources      You can choose one class or multiple classes for testing
    */
   protected void register(String testName, InputType inputType, List<Supplier<Transformer>> transformers, Source... sources) {
     this.registeredTests.add(new RegisteredTest(testName, inputType, transformers, sources));
@@ -90,7 +90,7 @@ public abstract class TestDeobfuscationBase {
       DeobfuscatorOptions.Builder optionsBuilder = DeobfuscatorOptions.builder()
           .transformers(this.transformers.toArray(new Supplier[0]));
 
-      Path inputDir = null;
+      Path decompilerInputDir = DEOBFUSCATED_CLASSES_PATH.resolve(this.inputType.directory());
       String jarSource = null;
 
       // Get sources paths
@@ -101,13 +101,13 @@ public abstract class TestDeobfuscationBase {
 
         jarSource = sources[0].sourceName;
 
-        Path relativePath = Path.of(this.inputType.directory(), sources[0] + ".jar");
+        Path relativePath = Path.of(this.inputType.directory(), jarSource);
 
         // Add jar input
-        Path inputJarPath = COMPILED_CLASSES_PATH.resolve(relativePath);
+        Path inputJarPath = COMPILED_CLASSES_PATH.resolve(relativePath + ".jar");
         optionsBuilder.inputJar(inputJarPath);
 
-        inputDir = DEOBFUSCATED_CLASSES_PATH.resolve(relativePath);
+        decompilerInputDir = decompilerInputDir.resolve(jarSource);
       } else {
         for (Source source : sources) {
           Path compiledClassPath = COMPILED_CLASSES_PATH.resolve(this.inputType.directory()).resolve(source.sourceName + ".class");
@@ -118,14 +118,14 @@ public abstract class TestDeobfuscationBase {
           }
 
           // Add class
-          optionsBuilder.clazz(compiledClassPath, source.sourceName);
+          optionsBuilder.clazz(compiledClassPath, source.sourceName + ".class");
         }
       }
 
       // Last configurations
       optionsBuilder
           .outputJar(null)
-          .outputDir(DEOBFUSCATED_CLASSES_PATH.resolve(this.inputType.directory()));
+          .outputDir(decompilerInputDir);
 
       // Build and run deobfuscator!
       Deobfuscator.from(optionsBuilder.build()).start();
@@ -146,14 +146,14 @@ public abstract class TestDeobfuscationBase {
       }
 
       // Assert output
-      this.assertOutput(contextSources, inputDir, jarSource);
+      this.assertOutput(contextSources, decompilerInputDir, jarSource);
     }
 
     /**
      * Asserts output of a decompilation result
      *
-     * @param contextSources Classes to be decompiled
-     * @param inputDir Optionally you can give a whole directory to decompile.
+     * @param contextSources  Classes to be decompiled
+     * @param inputDir        Optionally you can give a whole directory to decompile.
      * @param jarRelativePath Specifies a relative path in save directory. Only used for jars
      */
     private void assertOutput(List<IContextSource> contextSources, @Nullable Path inputDir, @Nullable String jarRelativePath) {
@@ -208,7 +208,7 @@ public abstract class TestDeobfuscationBase {
 
   /**
    * @param sourceName Class or jar path
-   * @param decompile Should decompile this source. Does not work with {@link InputType#CUSTOM_JAR}
+   * @param decompile  Should decompile this source. Does not work with {@link InputType#CUSTOM_JAR}
    */
   public record Source(String sourceName, boolean decompile) {
     public static Source of(String source, boolean decompile) {

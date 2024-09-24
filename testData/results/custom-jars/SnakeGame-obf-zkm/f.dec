@@ -1,0 +1,15 @@
+import java.awt.Color;
+import javax.swing.JPanel;
+
+public class f extends JPanel {
+    private static final long serialVersionUID = 1L;
+
+    public f(Color var1) {
+        this.setBackground(var1);
+    }
+
+    public void a(Color var1) {
+        this.setBackground(var1);
+        this.repaint();
+    }
+}

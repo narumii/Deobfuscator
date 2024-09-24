@@ -9,14 +9,15 @@ import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 
 /**
  * Instruction context. Holds all information relevant to the current instruction.
- *
- * @param insn Current instruction
- * @param methodContext Method context
  */
-public record InstructionContext(
-    AbstractInsnNode insn,
-    MethodContext methodContext
-) {
+public class InstructionContext {
+  private final AbstractInsnNode insn;
+  private final MethodContext methodContext;
+
+  InstructionContext(AbstractInsnNode insn, MethodContext methodContext) {
+    this.insn = insn;
+    this.methodContext = methodContext;
+  }
 
   public InstructionContext of(AbstractInsnNode insn) {
     return new InstructionContext(insn, this.methodContext);
@@ -31,6 +32,20 @@ public record InstructionContext(
 
   public MethodNode methodNode() {
     return this.methodContext.methodNode();
+  }
+
+  /**
+   * Current instruction
+   */
+  public AbstractInsnNode insn() {
+    return insn;
+  }
+
+  /**
+   * Method context
+   */
+  public MethodContext methodContext() {
+    return methodContext;
   }
 
   /**

@@ -1,0 +1,175 @@
+import java.awt.GridLayout;
+import java.util.ArrayList;
+import javax.swing.JFrame;
+
+class e extends JFrame {
+    private static final long serialVersionUID;
+    public static ArrayList<ArrayList<b>> a;
+    public static int b;
+    public static int c;
+    private static final long[] d;
+    private static final Integer[] e;
+
+    public e() {
+        long var1 = 71224974300475L;
+        long var3 = 61070374780970L;
+        byte var10000 = d.h;
+        super();
+        a = new ArrayList();
+        boolean var5 = (boolean)var10000;
+        int var7 = 0;
+
+        while (true) {
+            if (var7 < b) {
+                ArrayList var6 = new ArrayList();
+                var10000 = 0;
+                if (var5) {
+                    break;
+                }
+
+                int var8 = 0;
+
+                label61: {
+                    while (var8 < c) {
+                        b var9 = new b(2);
+                        var6.add(var9);
+                        var8++;
+                        if (var5) {
+                            break label61;
+                        }
+
+                        if (var5) {
+                            break;
+                        }
+                    }
+
+                    a.add(var6);
+                    var7++;
+                }
+
+                if (!var5) {
+                    continue;
+                }
+            }
+
+            this.getContentPane().setLayout(new GridLayout(a(25254, 3466615061930824381L), a(11993, 4420636720690273987L), 0, 0));
+            var10000 = 0;
+            break;
+        }
+
+        var7 = var10000;
+
+        while (var7 < b) {
+            int var12 = 0;
+
+            while (true) {
+                if (var12 < c) {
+                    this.getContentPane().add(((b)((ArrayList)a.get(var7)).get(var12)).c);
+                    var12++;
+                    if (var5) {
+                        break;
+                    }
+
+                    if (!var5) {
+                        continue;
+                    }
+                }
+
+                var7++;
+                break;
+            }
+
+            if (var5) {
+                break;
+            }
+        }
+
+        c var11 = new c(a(22258, 1025605264567789290L), a(22910, 5940865096142252391L));
+        d var13 = new d(var3, var11);
+        var13.start();
+        this.addKeyListener(new a());
+        if (c.c) {
+            d.h = !var5;
+        }
+    }
+
+    static {
+        long var8 = 116018857672281L;
+        long[] var6 = new long[4];
+        int var3 = 0;
+        String var4 = "2!\u0099\u0007\u008cß\u00174\u0095F7÷\\\u0099\u0018¹";
+        byte var5 = 16;
+        byte var2 = 0;
+
+        label20:
+        while (true) {
+            int var10001 = var2;
+            var2 += 8;
+            byte[] var7 = var4.substring(var10001, var2).getBytes("ISO-8859-1");
+            long[] var10000 = var6;
+            var10001 = var3++;
+            long var10002 = ((long)var7[0] & 255L) << 56
+                | ((long)var7[1] & 255L) << 48
+                | ((long)var7[2] & 255L) << 40
+                | ((long)var7[3] & 255L) << 32
+                | ((long)var7[4] & 255L) << 24
+                | ((long)var7[5] & 255L) << 16
+                | ((long)var7[6] & 255L) << 8
+                | (long)var7[7] & 255L;
+            byte var10003 = -1;
+
+            while (true) {
+                long var17 = var10002 ^ var8;
+                switch (var10003) {
+                    case 0:
+                        var10000[var10001] = var17;
+                        if (var2 >= var5) {
+                            d = var6;
+                            e = new Integer[4];
+                            long var13 = -2542116333815373351L;
+                            byte var14 = -1;
+                            long var0 = -2542001418764869760L;
+                            serialVersionUID = var0;
+                            b = a(11993, 4420636720690273987L);
+                            c = a(11993, 4420636720690273987L);
+                            return;
+                        }
+                        break;
+                    default:
+                        var10000[var10001] = var17;
+                        if (var2 < var5) {
+                            continue label20;
+                        }
+
+                        var4 = "O=pJ\u0095«¬ð³éÃS·\u0006à\u008e";
+                        var5 = 16;
+                        var2 = 0;
+                }
+
+                byte var12 = var2;
+                var2 += 8;
+                var7 = var4.substring(var12, var2).getBytes("ISO-8859-1");
+                var10000 = var6;
+                var10001 = var3++;
+                var10002 = ((long)var7[0] & 255L) << 56
+                    | ((long)var7[1] & 255L) << 48
+                    | ((long)var7[2] & 255L) << 40
+                    | ((long)var7[3] & 255L) << 32
+                    | ((long)var7[4] & 255L) << 24
+                    | ((long)var7[5] & 255L) << 16
+                    | ((long)var7[6] & 255L) << 8
+                    | (long)var7[7] & 255L;
+                var10003 = 0;
+            }
+        }
+    }
+
+    private static int a(int var0, long var1) {
+        int var3 = var0 ^ (int)(var1 & 32767L) ^ 12313;
+        if (e[var3] == null) {
+            e[var3] = (int)(d[var3] ^ var1);
+        }
+
+        return e[var3];
+    }
+}

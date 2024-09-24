@@ -13,22 +13,24 @@ import java.util.Map;
 
 /**
  * Immutable match context. After matching process, the context is frozen by {@link MatchContext#freeze()}
- *
- * @param insnContext Instruction context
- * @param storage Storage for saving some instructions in matching process. id -> match context
- * @param collectedInsns Collected instructions that matches this match and children matches
  */
-public record MatchContext(
-    InstructionContext insnContext,
-    Map<String, MatchContext> storage,
-    List<AbstractInsnNode> collectedInsns
-) {
+public class MatchContext {
+  private final InstructionContext insnContext;
+  private final Map<String, MatchContext> captures;
+  private final List<AbstractInsnNode> collectedInsns;
+
+  private MatchContext(InstructionContext insnContext, Map<String, MatchContext> captures, List<AbstractInsnNode> collectedInsns) {
+    this.insnContext = insnContext;
+    this.captures = captures;
+    this.collectedInsns = collectedInsns;
+  }
+
   public static MatchContext of(InstructionContext insnContext) {
     return new MatchContext(insnContext, new HashMap<>(), new ArrayList<>());
   }
 
   public MatchContext freeze() {
-    return new MatchContext(this.insnContext, Collections.unmodifiableMap(this.storage), Collections.unmodifiableList(this.collectedInsns));
+    return new MatchContext(this.insnContext, Collections.unmodifiableMap(this.captures), Collections.unmodifiableList(this.collectedInsns));
   }
 
   /**
@@ -37,7 +39,7 @@ public record MatchContext(
    * @see Match#matchAndMerge(InstructionContext, MatchContext)
    */
   void merge(MatchContext other) {
-    this.storage.putAll(other.storage);
+    this.captures.putAll(other.captures);
     for (AbstractInsnNode insn : other.collectedInsns) {
       // Don't allow duplicates
       if (this.collectedInsns.contains(insn)) continue;
@@ -58,6 +60,29 @@ public record MatchContext(
    */
   public Frame<OriginalSourceValue> frame() {
     return this.insnContext.frame();
+  }
+
+  /**
+   * Instruction context
+   */
+  public InstructionContext insnContext() {
+    return insnContext;
+  }
+
+  /**
+   * Captured instructions in a matching process. id -> match context
+   *
+   * @see Match#capture(String)
+   */
+  public Map<String, MatchContext> captures() {
+    return captures;
+  }
+
+  /**
+   * Collected instructions that matches this match and children matches
+   */
+  public List<AbstractInsnNode> collectedInsns() {
+    return collectedInsns;
   }
 
   /**

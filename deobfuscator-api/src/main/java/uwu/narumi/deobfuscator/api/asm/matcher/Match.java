@@ -11,9 +11,9 @@ public abstract class Match {
 
   private Transformation transformation;
   /**
-   * @see #save(String)
+   * @see #capture(String)
    */
-  private String saveId = null;
+  private String captureId = null;
 
   /**
    * Tests given instruction if it matches current {@link Match}
@@ -53,9 +53,9 @@ public abstract class Match {
       return null;
     }
 
-    if (this.saveId != null) {
-      // Save to storage
-      context.storage().put(this.saveId, context);
+    if (this.captureId != null) {
+      // Capture this instruction
+      context.captures().put(this.captureId, context);
     }
 
     if (!context.collectedInsns().contains(context.insn())) {
@@ -89,12 +89,12 @@ public abstract class Match {
   }
 
   /**
-   * If matches, then saves instruction to {@link MatchContext#storage()} for further processing
+   * If matches, then captures instruction to {@link MatchContext#captures()} for further processing
    *
-   * @param id Under what id this instruction should be saved in {@link MatchContext#storage()}
+   * @param id Under what id this instruction should be captured to {@link MatchContext#captures()}
    */
-  public Match save(String id) {
-    this.saveId = id;
+  public Match capture(String id) {
+    this.captureId = id;
     return this;
   }
 

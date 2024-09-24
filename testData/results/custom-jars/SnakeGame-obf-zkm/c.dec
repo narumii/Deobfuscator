@@ -1,0 +1,23 @@
+public class c {
+    public int a;
+    public int b;
+    public static boolean c;
+
+    public c(int var1, int var2) {
+        this.a = var1;
+        this.b = var2;
+    }
+
+    public void a(int var1, int var2) {
+        this.a = var1;
+        this.b = var2;
+    }
+
+    public int a() {
+        return this.a;
+    }
+
+    public int b() {
+        return this.b;
+    }
+}

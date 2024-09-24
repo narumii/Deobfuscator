@@ -62,16 +62,16 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
   private static final Match DECRYPT_LONG_MATCHER = FieldMatch.putStatic().desc("J")
       // Decrypt
       .and(StackMatch.of(0, MethodMatch.invokeInterface().desc("(J)J")
-          .and(StackMatch.of(0, NumberMatch.numLong().save("decrypt-key"))) // Decrypt key
+          .and(StackMatch.of(0, NumberMatch.numLong().capture("decrypt-key"))) // Decrypt key
           // Create decrypter
           .and(StackMatch.of(1, MethodMatch.invokeStatic().and(Match.predicate(context ->
-                  ((MethodInsnNode) context.insn()).desc.startsWith("(JJLjava/lang/Object;)"))).save("create-decrypter-method")
+                  ((MethodInsnNode) context.insn()).desc.startsWith("(JJLjava/lang/Object;)"))).capture("create-decrypter-method")
 
               .and(StackMatch.of(0, MethodMatch.invokeVirtual().and(StackMatch.of(0, MethodMatch.invokeStatic())))) // Class lookup
-              .and(StackMatch.of(1, NumberMatch.numLong().save("key-2"))) // Key 2
-              .and(StackMatch.of(2, NumberMatch.numLong().save("key-1"))) // Key 1
+              .and(StackMatch.of(1, NumberMatch.numLong().capture("key-2"))) // Key 2
+              .and(StackMatch.of(2, NumberMatch.numLong().capture("key-1"))) // Key 1
           ))
-          .save("decrypt-method")
+          .capture("decrypt-method")
       ));
 
   // Config
@@ -154,14 +154,14 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
       MatchContext result = DECRYPT_LONG_MATCHER.matchResult(insnContext);
       if (result != null) {
         // Get instructions from storage
-        MethodInsnNode createDecrypterInsn = (MethodInsnNode) result.storage().get("create-decrypter-method").insn();
-        MatchContext decryptContext = result.storage().get("decrypt-method");
+        MethodInsnNode createDecrypterInsn = (MethodInsnNode) result.captures().get("create-decrypter-method").insn();
+        MatchContext decryptContext = result.captures().get("decrypt-method");
         MethodInsnNode decryptInsn = (MethodInsnNode) decryptContext.insn();
 
         // Some keys
-        long key1 = result.storage().get("key-1").insn().asLong();
-        long key2 = result.storage().get("key-2").insn().asLong();
-        long decryptKey = result.storage().get("decrypt-key").insn().asLong();
+        long key1 = result.captures().get("key-1").insn().asLong();
+        long key2 = result.captures().get("key-2").insn().asLong();
+        long decryptKey = result.captures().get("decrypt-key").insn().asLong();
 
         ClassWrapper longDecrypterCreatorClass = context.getClasses().get(createDecrypterInsn.owner);
 

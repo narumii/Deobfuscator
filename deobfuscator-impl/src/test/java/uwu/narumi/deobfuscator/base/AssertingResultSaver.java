@@ -14,14 +14,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class AssertingResultSaver implements IResultSaver {
 
-  private final TestDeobfuscationBase.InputType inputType;
-  private final String jarRelativePath;
+  private final Path root;
 
   private boolean savedContent = false;
 
   public AssertingResultSaver(TestDeobfuscationBase.InputType inputType, String jarRelativePath) {
-    this.inputType = inputType;
-    this.jarRelativePath = jarRelativePath;
+    this.root = inputType == TestDeobfuscationBase.InputType.CUSTOM_JAR
+            ? TestDeobfuscationBase.RESULTS_CLASSES_PATH.resolve(inputType.directory()).resolve(jarRelativePath)
+            : TestDeobfuscationBase.RESULTS_CLASSES_PATH.resolve(inputType.directory());
+
   }
 
   @Override
@@ -42,9 +43,12 @@ public class AssertingResultSaver implements IResultSaver {
     // Replace CRLF with LF
     content = content.replace("\r\n", "\n");
 
-    Path saveTo = this.inputType == TestDeobfuscationBase.InputType.CUSTOM_JAR
-        ? TestDeobfuscationBase.RESULTS_CLASSES_PATH.resolve(inputType.directory()).resolve(this.jarRelativePath).resolve(entryName + ".dec")
-        : TestDeobfuscationBase.RESULTS_CLASSES_PATH.resolve(inputType.directory()).resolve(entryName + ".dec");
+    // The Vineflower implementations of IContextSource append .java
+    if (entryName.endsWith(".java")) {
+      entryName = entryName.substring(0, entryName.length() - 5);
+    }
+
+    Path saveTo = this.root.resolve(entryName + ".dec");
 
     try {
       if (Files.exists(saveTo)) {

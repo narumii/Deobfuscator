@@ -7,6 +7,9 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
+import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.asm.MethodContext;
+import uwu.narumi.deobfuscator.api.asm.MethodRef;
 import uwu.narumi.deobfuscator.api.context.Context;
 
 public class AsmHelper implements Opcodes {
@@ -91,14 +94,139 @@ public class AsmHelper implements Opcodes {
     return (access & opcode) != 0;
   }
 
+  /**
+   * Convert constant value to instruction that represents this constant
+   *
+   * @param value A constant value
+   * @return An instruction that represents this constant
+   */
+  public static AbstractInsnNode toConstantInsn(Object value) {
+    if (value == null)
+      return new InsnNode(ACONST_NULL);
+    if (value instanceof String || value instanceof Type)
+      return new LdcInsnNode(value);
+    if (value instanceof Number number)
+      return numberInsn(number);
+    if (value instanceof Boolean bool)
+      return numberInsn(bool ? 1 : 0);
+    if (value instanceof Character character)
+      return numberInsn(character);
+
+    throw new IllegalArgumentException("Not a constant");
+  }
+
+  public static Type getTypeFromPrimitiveCast(MethodInsnNode insn) {
+    if (insn.getOpcode() != INVOKEVIRTUAL) throw new IllegalArgumentException("Instruction is not an INVOKEVIRTUAL");
+
+    if (insn.owner.equals("java/lang/Byte") && insn.name.equals("byteValue")) return Type.BYTE_TYPE;
+    if (insn.owner.equals("java/lang/Short") && insn.name.equals("shortValue")) return Type.SHORT_TYPE;
+    if (insn.owner.equals("java/lang/Integer") && insn.name.equals("intValue")) return Type.INT_TYPE;
+    if (insn.owner.equals("java/lang/Long") && insn.name.equals("longValue")) return Type.LONG_TYPE;
+    if (insn.owner.equals("java/lang/Double") && insn.name.equals("doubleValue")) return Type.DOUBLE_TYPE;
+    if (insn.owner.equals("java/lang/Float") && insn.name.equals("floatValue")) return Type.FLOAT_TYPE;
+
+    throw new IllegalStateException("Unexpected value: " + insn.owner+"."+insn.name+insn.desc);
+  }
+
+  /**
+   * Update method descriptor in the current class, a superclass and interfaces
+   *
+   * @param context Deobfuscator context
+   * @param methodContext Method context
+   * @param desc New method descriptor
+   */
+  public static void updateMethodDescriptor(Context context, MethodContext methodContext, String desc) {
+    ClassWrapper classWrapper = methodContext.classWrapper();
+    MethodNode methodNode = methodContext.methodNode();
+
+    tryUpdateMethodDescriptor(context, classWrapper, methodNode.name, methodNode.desc, desc);
+  }
+
+  /**
+   * Tries to update method descriptor in the current class, a superclass and interfaces
+   *
+   * @param context Deobfuscator context
+   * @param classWrapper A class to check
+   * @param name Method name
+   * @param oldDesc Old method descriptor
+   * @param newDesc New method descriptor
+   */
+  private static void tryUpdateMethodDescriptor(Context context, ClassWrapper classWrapper, String name, String oldDesc, String newDesc) {
+    // Search superclass
+    if (classWrapper.classNode().superName != null) {
+      ClassWrapper superClass = context.getClasses().get(classWrapper.classNode().superName);
+      if (superClass != null) {
+        tryUpdateMethodDescriptor(context, superClass, name, oldDesc, newDesc);
+      }
+    }
+
+    // Search interfaces
+    classWrapper.classNode().interfaces.forEach(interfaceName -> {
+      ClassWrapper interfaceClass = context.getClasses().get(interfaceName);
+      if (interfaceClass != null) {
+        tryUpdateMethodDescriptor(context, interfaceClass, name, oldDesc, newDesc);
+      }
+    });
+
+    Optional<MethodNode> optMethodNode = classWrapper.classNode().methods.stream()
+        .filter(method -> method.name.equals(name) && method.desc.equals(oldDesc))
+        .findFirst();
+
+    // Update method descriptor
+    optMethodNode.ifPresent(methodNode -> methodNode.desc = newDesc);
+  }
+
+  public static InsnList from(AbstractInsnNode... nodes) {
+    InsnList insnList = new InsnList();
+    for (AbstractInsnNode node : nodes) {
+      insnList.add(node);
+    }
+    return insnList;
+  }
+
+  public static InsnList copy(InsnList insnList) {
+    InsnList copiedInsnList = new InsnList();
+    for (AbstractInsnNode node : insnList.toArray()) {
+      copiedInsnList.add(node.clone(Map.of()));
+    }
+
+    return copiedInsnList;
+  }
+
+  public static MethodNode copyMethod(MethodNode methodNode) {
+    MethodNode copyMethod =
+        new MethodNode(
+            methodNode.access,
+            methodNode.name,
+            methodNode.desc,
+            methodNode.signature,
+            methodNode.exceptions.toArray(new String[0]));
+    methodNode.accept(copyMethod);
+
+    return copyMethod;
+  }
+
+  public static void removeField(FieldInsnNode fieldInsnNode, Context context) {
+    if (!context.getClasses().containsKey(fieldInsnNode.owner)) return;
+
+    context
+        .getClasses()
+        .get(fieldInsnNode.owner)
+        .fields()
+        .removeIf(
+            fieldNode ->
+                fieldNode.name.equals(fieldInsnNode.name)
+                    && fieldNode.desc.equals(fieldInsnNode.desc));
+  }
+
   public static Optional<MethodNode> findMethod(
       ClassNode classNode, MethodInsnNode methodInsnNode) {
     return classNode == null || classNode.methods == null
         ? Optional.empty()
         : classNode.methods.stream()
-            .filter(methodNode -> methodNode.name.equals(methodInsnNode.name))
-            .filter(methodNode -> methodNode.desc.equals(methodInsnNode.desc))
-            .findFirst();
+        .filter(methodNode -> methodNode.name.equals(methodInsnNode.name))
+        .filter(methodNode -> methodNode.desc.equals(methodInsnNode.desc))
+        .findFirst();
   }
 
   public static Optional<MethodNode> findMethod(
@@ -136,69 +264,5 @@ public class AsmHelper implements Opcodes {
     if (includeEnd) instructions.add(end);
 
     return instructions;
-  }
-
-  /**
-   * Convert constant value to instruction that represents this constant
-   *
-   * @param value A constant value
-   * @return An instruction that represents this constant
-   */
-  public static AbstractInsnNode toConstantInsn(Object value) {
-    if (value == null)
-      return new InsnNode(ACONST_NULL);
-    if (value instanceof String || value instanceof Type)
-      return new LdcInsnNode(value);
-    if (value instanceof Number number)
-      return numberInsn(number);
-    if (value instanceof Boolean bool)
-      return numberInsn(bool ? 1 : 0);
-    if (value instanceof Character character)
-      return numberInsn(character);
-
-    throw new IllegalArgumentException("Not a constant");
-  }
-
-  public static InsnList from(AbstractInsnNode... nodes) {
-    InsnList insnList = new InsnList();
-    for (AbstractInsnNode node : nodes) {
-      insnList.add(node);
-    }
-    return insnList;
-  }
-
-  public static InsnList copy(InsnList insnList) {
-    InsnList copiedInsnList = new InsnList();
-    for (AbstractInsnNode node : insnList.toArray()) {
-      copiedInsnList.add(node.clone(Map.of()));
-    }
-
-    return copiedInsnList;
-  }
-
-  public static MethodNode copyMethod(MethodNode methodNode) {
-    MethodNode copyMethod =
-        new MethodNode(
-            methodNode.access,
-            methodNode.name,
-            methodNode.desc,
-            methodNode.signature,
-            methodNode.exceptions.toArray(new String[0]));
-    methodNode.accept(copyMethod);
-
-    return copyMethod;
-  }
-
-  public void removeField(FieldInsnNode fieldInsnNode, Context context) {
-    if (!context.getClasses().containsKey(fieldInsnNode.owner)) return;
-
-    context
-        .getClasses()
-        .get(fieldInsnNode.owner)
-        .fields()
-        .removeIf(
-            fieldNode ->
-                fieldNode.name.equals(fieldInsnNode.name)
-                    && fieldNode.desc.equals(fieldInsnNode.desc));
   }
 }
