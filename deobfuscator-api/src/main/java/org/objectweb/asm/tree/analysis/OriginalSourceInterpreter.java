@@ -205,8 +205,11 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
       OriginalSourceValue.ConstantValue constant2 = value2.getConstantValue();
 
       if (constant1 != null && constant2 != null && constant1.get() instanceof Number constNum1 && constant2.get() instanceof Number constNum2) {
-        Number result = AsmMathHelper.mathBinaryOperation(constNum1, constNum2, insn.getOpcode());
-        return new OriginalSourceValue(size, insn, null, OriginalSourceValue.ConstantValue.of(result));
+        try {
+          Number result = AsmMathHelper.mathBinaryOperation(constNum1, constNum2, insn.getOpcode());
+          return new OriginalSourceValue(size, insn, null, OriginalSourceValue.ConstantValue.of(result));
+        } catch (ArithmeticException ignored) {
+        }
       }
     }
     // Narumii end

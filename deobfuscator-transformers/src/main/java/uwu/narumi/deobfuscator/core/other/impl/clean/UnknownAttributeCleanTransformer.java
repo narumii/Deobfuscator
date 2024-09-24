@@ -11,18 +11,21 @@ public class UnknownAttributeCleanTransformer extends Transformer {
 
   @Override
   protected void transform(ClassWrapper scope, Context context) throws Exception {
-    context
-        .classes(scope)
-        .forEach(
-            classWrapper -> {
-              changed |= classWrapper.classNode().attrs.removeIf(Attribute::isUnknown);
-              classWrapper
-                  .methods()
-                  .forEach(methodNode -> changed |= methodNode.attrs.removeIf(Attribute::isUnknown));
-              classWrapper
-                  .fields()
-                  .forEach(fieldNode -> changed |= fieldNode.attrs.removeIf(Attribute::isUnknown));
-            });
+    context.classes(scope).forEach(classWrapper -> {
+      if (classWrapper.classNode().attrs != null) {
+        changed |= classWrapper.classNode().attrs.removeIf(Attribute::isUnknown);
+      }
+      classWrapper.methods().forEach(methodNode -> {
+        if (methodNode.attrs != null) {
+          changed |= methodNode.attrs.removeIf(Attribute::isUnknown);
+        }
+      });
+      classWrapper.fields().forEach(fieldNode -> {
+        if (fieldNode.attrs != null) {
+          changed |= fieldNode.attrs.removeIf(Attribute::isUnknown);
+        }
+      });
+    });
 
     if (changed) {
       markChange();

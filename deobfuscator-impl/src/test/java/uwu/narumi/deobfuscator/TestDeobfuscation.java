@@ -1,5 +1,6 @@
 package uwu.narumi.deobfuscator;
 
+import uwu.narumi.deobfuscator.core.other.composed.ComposedHP888Transformer;
 import uwu.narumi.deobfuscator.core.other.composed.ComposedZelixTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedGeneralFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedPeepholeCleanTransformer;
@@ -103,6 +104,12 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
     register("Zelix (21) Snake Game", InputType.CUSTOM_JAR,
         List.of(ComposedZelixTransformer::new),
         Source.of("SnakeGame-obf-zkm")
+    );
+
+    // Example HP888 classes. Without packer.
+    register("HP888", InputType.CUSTOM_CLASS, List.of(ComposedHP888Transformer::new),
+        Source.of("hp888/ExampleClass"),
+        Source.of("hp888/Strings") // Obfuscated strings
     );
   }
 }
