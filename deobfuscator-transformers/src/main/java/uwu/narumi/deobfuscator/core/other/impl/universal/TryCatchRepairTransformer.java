@@ -45,7 +45,7 @@ public class TryCatchRepairTransformer extends Transformer {
               this.changed |= methodNode.exceptions.removeIf(
                   exception ->
                       methodNode.tryCatchBlocks.stream()
-                          .noneMatch(tbce -> tbce.type.equals(exception)));
+                          .noneMatch(tbce -> tbce.type != null && tbce.type.equals(exception)));
             });
 
     if (changed) {

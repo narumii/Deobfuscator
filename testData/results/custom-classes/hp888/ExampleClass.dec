@@ -1,0 +1,32 @@
+package pack;
+
+public class MyClassLoader extends ClassLoader {
+    private static int[] llIIllIIlIIIIIIlIIIlIllII = new int[2];
+    public MyFunction2 function2;
+
+    public Class loadClass(String var1) {
+        if (this.function2 != null) {
+            Class var2 = this.function2.apply(var1);
+            if (var2 != null) {
+                return var2;
+            }
+        }
+
+        return super.loadClass(var1);
+    }
+
+    static {
+        llIIllIIlIIIIIIlIIIlIllII[0] = 1;
+        llIIllIIlIIIIIIlIIIlIllII[1] = 1;
+    }
+
+    public MyClassLoader(MyFunction2 var1) {
+        StackTraceElement[] var2 = new Throwable().getStackTrace();
+        if (var2[llIIllIIlIIIIIIlIIIlIllII[0]].getClassName().equals("pack.MyLoader") && var2[llIIllIIlIIIIIIlIIIlIllII[1]].getMethodName().equals("main")) {
+            this.function2 = var1;
+            this.function2.setClassLoader(this);
+        } else {
+            this.function2 = null;
+        }
+    }
+}
