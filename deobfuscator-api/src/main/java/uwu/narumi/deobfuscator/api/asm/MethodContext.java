@@ -6,23 +6,52 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
-import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.helper.MethodHelper;
 
 import java.util.Map;
 
 /**
  * Method context
- *
- * @param classWrapper Class that owns this instruction
- * @param methodNode Method that owns this instruction
- * @param frames Frames of the method
  */
-public record MethodContext(
-    ClassWrapper classWrapper,
-    MethodNode methodNode,
-    @Nullable @Unmodifiable Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames
-) {
+public class MethodContext {
+  private final ClassWrapper classWrapper;
+  private final MethodNode methodNode;
+  private final @Nullable @Unmodifiable Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames;
+
+  private MethodContext(
+      ClassWrapper classWrapper,
+      MethodNode methodNode,
+      @Nullable @Unmodifiable Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames
+  ) {
+    this.classWrapper = classWrapper;
+    this.methodNode = methodNode;
+    this.frames = frames;
+  }
+
+  /**
+   * Class that owns this method
+   */
+  public ClassWrapper classWrapper() {
+    return classWrapper;
+  }
+
+  /**
+   * Method itself
+   */
+  public MethodNode methodNode() {
+    return methodNode;
+  }
+
+  /**
+   * Frames of the method
+   */
+  public @Nullable @Unmodifiable Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames() {
+    return frames;
+  }
+
+  public InstructionContext newInsnContext(AbstractInsnNode insn) {
+    return new InstructionContext(insn, this);
+  }
 
   /**
    * Creates new {@link MethodContext} and computes its frames
@@ -34,9 +63,5 @@ public record MethodContext(
 
   public static MethodContext frameless(ClassWrapper classWrapper, MethodNode methodNode) {
     return new MethodContext(classWrapper, methodNode, null);
-  }
-
-  public InstructionContext newInsnContext(AbstractInsnNode insn) {
-    return new InstructionContext(insn, this);
   }
 }

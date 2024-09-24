@@ -1,7 +1,7 @@
 package uwu.narumi.deobfuscator.core.other.composed;
 
 import uwu.narumi.deobfuscator.api.transformer.ComposedTransformer;
-import uwu.narumi.deobfuscator.core.other.impl.clean.PeepholeCleanTransformer;
+import uwu.narumi.deobfuscator.core.other.composed.general.ComposedPeepholeCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.JsrInlinerTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.RecoverSyntheticsTransformer;
@@ -23,20 +23,23 @@ public class ComposedZelixTransformer extends ComposedTransformer {
 
   public ComposedZelixTransformer(Map<String, String> classInitializationOrder) {
     super(
+        // Initial cleanup
         JsrInlinerTransformer::new,
         RecoverSyntheticsTransformer::new,
 
         // Fixes flow a bit
         ZelixUselessTryCatchRemoverTransformer::new,
 
+        // Decompose method parameters
+        ZelixParametersTransformer::new,
+
+        // Decrypt longs
         () -> new ZelixLongEncryptionMPCTransformer(classInitializationOrder),
         InlineStaticFieldTransformer::new,
         UniversalNumberTransformer::new,
 
-        ZelixParametersTransformer::new,
-
         // Cleanup
-        PeepholeCleanTransformer::new
+        ComposedPeepholeCleanTransformer::new
     );
   }
 }

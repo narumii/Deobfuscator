@@ -1,12 +1,10 @@
 package org.objectweb.asm.tree.analysis;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -52,6 +50,7 @@ public class OriginalSourceValue extends SourceValue {
    * instructions (DUP, ILOAD) and jumps to get the original source value of this instruction at line 6.
    * In this example, it will return source value of instruction at line 2.
    */
+  @NotNull
   public final OriginalSourceValue originalSource;
 
   /**
@@ -85,52 +84,55 @@ public class OriginalSourceValue extends SourceValue {
   private ConstantValue constantValue = null;
 
   /**
-   * Children that copied this source value
+   * If a source value is a method parameter.
    */
-  private final List<OriginalSourceValue> children = new ArrayList<>();
+  private final boolean isMethodParameter;
 
-  public OriginalSourceValue(int size) {
-    this(size, new SmallSet<>());
+  public OriginalSourceValue(int size, boolean isMethodParameter) {
+    super(size, new SmallSet<>());
+    this.isMethodParameter = isMethodParameter;
+
+    // Fill single-producer-only fields with empty
+    this.copiedFrom = null;
+    this.originalSource = this;
   }
 
   public OriginalSourceValue(int size, AbstractInsnNode insnNode) {
-    this(size, new SmallSet<>(insnNode));
-  }
-
-  public OriginalSourceValue(int size, Set<AbstractInsnNode> insnSet) {
-    this(size, insnSet, null);
-  }
-
-  public OriginalSourceValue(AbstractInsnNode insnNode, OriginalSourceValue copiedFrom) {
-    this(copiedFrom.size, new SmallSet<>(insnNode), copiedFrom);
-  }
-
-  public OriginalSourceValue(int size, Set<AbstractInsnNode> insnSet, @Nullable OriginalSourceValue copiedFrom) {
-    this(size, insnSet, copiedFrom, null);
-  }
-
-  public OriginalSourceValue(int size, AbstractInsnNode insnNode, @Nullable ConstantValue constantValue) {
-    this(size, new SmallSet<>(insnNode), null, constantValue);
+    this(size, insnNode, null, null);
   }
 
   /**
-   * Create a new {@link OriginalSourceValue} with the given size, instruction set, copied from value and
-   * predicted constant value.
+   * Create new {@link OriginalSourceValue} from multiple producers
    *
    * @param size Stack size of the value
    * @param insnSet Set of instructions that produce this value
+   */
+  public OriginalSourceValue(int size, Set<AbstractInsnNode> insnSet) {
+    super(size, insnSet);
+    this.isMethodParameter = false;
+
+    // Fill single-producer-only fields with empty
+    this.copiedFrom = null;
+    this.originalSource = this;
+  }
+
+  public OriginalSourceValue(AbstractInsnNode insnNode, OriginalSourceValue copiedFrom) {
+    this(copiedFrom.size, insnNode, copiedFrom, null);
+  }
+
+  /**
+   * Create new {@link OriginalSourceValue} from a single producer
+   *
+   * @param size Stack size of the value
+   * @param insn An instruction that produces this value
    * @param copiedFrom The value from which this value was copied or null if it was not copied
    * @param constantValue Predicted constant value if exists
    */
-  public OriginalSourceValue(int size, Set<AbstractInsnNode> insnSet, @Nullable OriginalSourceValue copiedFrom, @Nullable ConstantValue constantValue) {
-    super(size, insnSet);
+  public OriginalSourceValue(int size, AbstractInsnNode insn, @Nullable OriginalSourceValue copiedFrom, @Nullable ConstantValue constantValue) {
+    super(size, new SmallSet<>(insn));
+    this.isMethodParameter = false;
     this.copiedFrom = copiedFrom;
-    this.originalSource = copiedFrom == null ? this : copiedFrom.originalSource;
-
-    if (copiedFrom != null) {
-      // Add child
-      copiedFrom.addChild(this);
-    }
+    this.originalSource = copiedFrom == null || copiedFrom.isMethodParameter ? this : copiedFrom.originalSource;
 
     if (constantValue != null) {
       // If the constant value is present, then use it
@@ -138,9 +140,8 @@ public class OriginalSourceValue extends SourceValue {
     } else if (copiedFrom != null) {
       // Copy constant value from copied value
       this.constantValue = copiedFrom.constantValue;
-    } else if (insnSet.size() == 1) {
+    } else {
       // Try to infer constant value from producer
-      AbstractInsnNode insn = insnSet.iterator().next();
       if (insn.isConstant()) {
         this.constantValue = ConstantValue.of(insn.asConstant());
       }
@@ -176,12 +177,8 @@ public class OriginalSourceValue extends SourceValue {
     return constantValue;
   }
 
-  void addChild(OriginalSourceValue child) {
-    this.children.add(child);
-  }
-
-  public List<OriginalSourceValue> getChildren() {
-    return Collections.unmodifiableList(children);
+  public boolean isMethodParameter() {
+    return isMethodParameter;
   }
 
   /**

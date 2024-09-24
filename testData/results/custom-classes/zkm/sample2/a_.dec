@@ -178,15 +178,15 @@ public class a_<T> implements Serializable {
         }
     }
 
-    public Comparator a(Object[] var1) {
+    public Comparator a() {
         return this.a;
     }
 
-    public Object b(Object[] var1) {
+    public Object b() {
         return this.c;
     }
 
-    public Object c(Object[] var1) {
+    public Object c() {
         return this.d;
     }
 

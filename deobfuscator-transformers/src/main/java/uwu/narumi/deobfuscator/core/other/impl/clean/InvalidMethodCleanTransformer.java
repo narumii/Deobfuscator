@@ -9,7 +9,7 @@ import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 /**
- * Remove invalid methods. WARNING: If some transformer will produce invalid bytecode in methods, this transformer will remove them.
+ * Remove invalid methods. WARNING: If some transformer produces invalid bytecode in methods, this transformer will remove them.
  */
 public class InvalidMethodCleanTransformer extends Transformer {
 

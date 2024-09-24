@@ -1,0 +1,1009 @@
+import java.util.ArrayList;
+import java.util.Iterator;
+
+public class d extends Thread {
+    ArrayList<ArrayList<b>> a = new ArrayList();
+    c b;
+    int c;
+    long d;
+    public static int e;
+    ArrayList<c> f;
+    c g;
+    public static boolean h;
+    private static final String[] i;
+    private static final String[] j;
+    private static final long[] k;
+    private static final Integer[] l;
+    private static final long m;
+
+    d(long var1, c var3) {
+        this.c = a(20214, 210489315596258668L ^ var1);
+        this.d = m;
+        this.f = new ArrayList();
+        this.a = e.a;
+        boolean var10000 = h;
+        this.b = new c(var3.a, var3.b);
+        e = 1;
+        c var5 = new c(this.b.a(new Object[0]), this.b.b(new Object[0]));
+        boolean var4 = var10000;
+        this.f.add(var5);
+        this.g = new c(e.c - 1, e.b - 1);
+        this.d(new Object[]{this.g});
+        var10000 = var4;
+        if (var1 > 0L) {
+            if (!var4) {
+                return;
+            }
+
+            var10000 = c.c;
+        }
+
+        if (var1 >= 0L) {
+            var10000 = !var10000;
+        }
+
+        c.c = var10000;
+    }
+
+    public void run() {
+        long var1 = 89995196843699L;
+        long var3 = 12972172530972L;
+        long var5 = 121593940001805L;
+        long var7 = 41896598891982L;
+        short var9 = 18292;
+        int var10 = -1604886824;
+
+        while (true) {
+            int var10001 = e;
+            Object[] var10004 = new Object[]{null, var7};
+            var10004[0] = var10001;
+            this.e(var10004);
+            this.b(new Object[]{var5});
+            this.f(new Object[]{var3});
+            var10004 = new Object[]{null, var10};
+            var10004[0] = Integer.valueOf(var9);
+            this.g(var10004);
+            this.a(new Object[0]);
+        }
+    }
+
+    private void a() {
+        try {
+            sleep(this.d);
+        } catch (InterruptedException var3) {
+            var3.printStackTrace();
+        }
+    }
+
+    // $VF: Irreducible bytecode was duplicated to produce valid code
+    private void b(long var1) {
+        long var4 = var1 ^ 110402980100581L;
+        long var6 = var1 ^ 34179827676109L;
+        int var10000 = h;
+        c var9 = (c)this.f.get(this.f.size() - 1);
+        byte var8 = (byte)var10000;
+        int var10 = 0;
+
+        int var17;
+        byte var10002;
+        label96: {
+            label95:
+            while (true) {
+                c var10001;
+                if (var10 <= this.f.size() - 2) {
+                    var10000 = var9.a(new Object[0]);
+                    var10001 = (c)this.f.get(var10);
+                } else {
+                    var10000 = var9.a(new Object[0]);
+                    var10001 = this.g;
+                    if (var1 > 0L) {
+                        var17 = this.g.b;
+                        break;
+                    }
+                }
+
+                do {
+                    var17 = var10001.a(new Object[0]);
+                    var10002 = var8;
+                    if (var1 <= 0L) {
+                        break label96;
+                    }
+
+                    if (var8 != 0) {
+                        break label95;
+                    }
+
+                    if (var8 == 0) {
+                        if (var10000 == var17) {
+                            var10000 = var9.b(new Object[0]);
+                            if (var8 == 0) {
+                                var10000 = var10000 == ((c)this.f.get(var10)).b(new Object[0]) ? 1 : 0;
+                            }
+                        } else {
+                            var10000 = 0;
+                        }
+                    } else {
+                        var10000 = var10000 == var17 ? 1 : 0;
+                    }
+
+                    int var11 = var10000;
+                    byte var15 = var8;
+                    if (var1 > 0L) {
+                        if (var8 == 0) {
+                            if (var11 != 0) {
+                                this.c(new Object[]{var6});
+                            }
+
+                            var10++;
+                        }
+
+                        var15 = var8;
+                    }
+
+                    if (var15 == 0) {
+                        continue label95;
+                    }
+
+                    var10000 = var9.a(new Object[0]);
+                    var10001 = this.g;
+                } while (var1 <= 0L);
+
+                var17 = this.g.b;
+                break;
+            }
+
+            var10002 = var8;
+        }
+
+        label66: {
+            label65: {
+                if (var10002 == 0) {
+                    if (var10000 != var17) {
+                        break label65;
+                    }
+
+                    var10000 = var9.b(new Object[0]);
+                    if (var8 != 0) {
+                        break label66;
+                    }
+
+                    var17 = this.g.a;
+                }
+
+                if (var10000 == var17) {
+                    var10000 = 1;
+                    break label66;
+                }
+            }
+
+            var10000 = 0;
+        }
+
+        label102: {
+            var10 = var10000;
+            var10000 = var8;
+            if (var1 > 0L) {
+                if (var8 != 0) {
+                    break label102;
+                }
+
+                var10000 = var10;
+            }
+
+            if (var10000 == 0) {
+                return;
+            }
+
+            System.out.println(a(879106065, -879064062, (int)var1));
+            this.c++;
+            this.g = this.a(new Object[]{var4});
+        }
+
+        this.d(new Object[]{this.g});
+    }
+
+    private void c(long var1) {
+        System.out.println(a(672771037, -672779940, (int)var1));
+
+        while (true) {
+            this.a(new Object[0]);
+        }
+    }
+
+    private void d(c var1) {
+        ((b)((ArrayList)this.a.get(var1.a)).get(var1.b)).a(new Object[]{1});
+    }
+
+    // $VF: Irreducible bytecode was duplicated to produce valid code
+    private c a(long var1) {
+        int var10000 = h;
+        int var6 = 0 + (int)(Math.random() * 19.0);
+        int var7 = 0 + (int)(Math.random() * 19.0);
+        c var5 = new c(var6, var7);
+        byte var4 = (byte)var10000;
+        int var10 = 0;
+
+        label53:
+        while (true) {
+            if (var10 <= this.f.size() - 1) {
+                var11 = var5;
+                int var10001 = var4;
+                if (var1 >= 0L) {
+                    if (var4 != 0) {
+                        break;
+                    }
+
+                    var10001 = 0;
+                }
+
+                label58: {
+                    var10000 = var5.b(new Object[var10001]);
+                    var10001 = ((c)this.f.get(var10)).a(new Object[0]);
+                    byte var10002 = var4;
+                    if (var1 >= 0L) {
+                        if (var4 == 0) {
+                            if (var10000 != var10001) {
+                                break label58;
+                            }
+
+                            var10000 = var5.a(new Object[0]);
+                            var10001 = ((c)this.f.get(var10)).b(new Object[0]);
+                            var10002 = var4;
+                        } else {
+                            var10002 = var4;
+                        }
+                    }
+
+                    if (var10002 == 0) {
+                        if (var10000 != var10001) {
+                            break label58;
+                        }
+
+                        var6 = 0 + (int)(Math.random() * 19.0);
+                        var10000 = 0;
+                        var10001 = (int)(Math.random() * 19.0);
+                    }
+
+                    var7 = var10000 + var10001;
+                    var5 = new c(var6, var7);
+                    var10 = 0;
+                }
+
+                var10++;
+                if (var4 == 0) {
+                    continue;
+                }
+            }
+
+            while (var1 <= 0L) {
+                var10 = 0;
+                var10++;
+                if (var4 == 0) {
+                    continue label53;
+                }
+            }
+
+            var11 = var5;
+            break;
+        }
+
+        return var11;
+    }
+
+    private void e(int var1, long var2) {
+        label106: {
+            byte var5;
+            d var10;
+            label101: {
+                label107: {
+                    label99: {
+                        var5 = h;
+                        int var10000 = var1;
+                        if (var2 >= 0L) {
+                            if (var5 == 0) {
+                                switch (var1) {
+                                    case 1:
+                                        break label106;
+                                    case 2:
+                                        break label107;
+                                    case 3:
+                                        break label99;
+                                    case 4:
+                                        c var6 = this.b;
+                                        int var10001 = this.b.a;
+                                        Object[] var10004 = new Object[]{null, (this.b.b + 1) % a(29246, 1908309985901173826L ^ var2)};
+                                        var10004[0] = var10001;
+                                        var6.a(var10004);
+                                        this.f.add(new c(this.b.a, this.b.b));
+                                        break;
+                                    default:
+                                        return;
+                                }
+                            }
+
+                            var10000 = var5;
+                        }
+
+                        if (var10000 == 0) {
+                            return;
+                        }
+                    }
+
+                    label108: {
+                        label86: {
+                            c var7 = this.b;
+                            int var15 = var5;
+                            if (var2 >= 0L) {
+                                if (var5 == 0) {
+                                    label110: {
+                                        var8 = this.b.b - 1;
+                                        if (var2 >= 0L) {
+                                            if (var8 >= 0) {
+                                                break label110;
+                                            }
+
+                                            c var9 = this.b;
+                                            var15 = this.b.a;
+                                            Object[] var20 = new Object[]{null, a(23257, 8351649413545882788L ^ var2)};
+                                            var20[0] = var15;
+                                            var9.a(var20);
+                                            var8 = var5;
+                                        }
+
+                                        if (var2 <= 0L) {
+                                            break label108;
+                                        }
+
+                                        if (var8 == 0) {
+                                            break label86;
+                                        }
+                                    }
+
+                                    var7 = this.b;
+                                }
+
+                                var15 = this.b.a;
+                            }
+
+                            Object[] var21 = new Object[]{null, Math.abs(this.b.b - 1) % a(12965, 6421566126420663514L ^ var2)};
+                            var21[0] = var15;
+                            var7.a(var21);
+                        }
+
+                        var10 = this;
+                        if (var2 < 0L) {
+                            break label101;
+                        }
+
+                        this.f.add(new c(this.b.a, this.b.b));
+                        var8 = var5;
+                    }
+
+                    if (var8 == 0) {
+                        return;
+                    }
+                }
+
+                var10 = this;
+            }
+
+            label64: {
+                label63: {
+                    c var11 = var10.b;
+                    int var17 = var5;
+                    if (var2 >= 0L) {
+                        if (var5 == 0) {
+                            label112: {
+                                var12 = var10.b.a - 1;
+                                if (var2 > 0L) {
+                                    if (var12 >= 0) {
+                                        break label112;
+                                    }
+
+                                    c var13 = this.b;
+                                    var17 = a(15174, 2782928937078887741L ^ var2);
+                                    Object[] var22 = new Object[]{null, this.b.b};
+                                    var22[0] = var17;
+                                    var13.a(var22);
+                                    var12 = var5;
+                                }
+
+                                if (var2 < 0L) {
+                                    break label64;
+                                }
+
+                                if (var12 == 0) {
+                                    break label63;
+                                }
+                            }
+
+                            var11 = this.b;
+                        }
+
+                        var17 = Math.abs(this.b.a - 1) % a(12965, 6421566126420663514L ^ var2);
+                    }
+
+                    Object[] var23 = new Object[]{null, this.b.b};
+                    var23[0] = var17;
+                    var11.a(var23);
+                }
+
+                this.f.add(new c(this.b.a, this.b.b));
+                var12 = var5;
+            }
+
+            if (var2 < 0L || var12 == 0) {
+                return;
+            }
+        }
+
+        c var14 = this.b;
+        int var19 = Math.abs(this.b.a + 1) % a(12965, 6421566126420663514L ^ var2);
+        Object[] var24 = new Object[]{null, this.b.b};
+        var24[0] = var19;
+        var14.a(var24);
+        this.f.add(new c(this.b.a, this.b.b));
+    }
+
+    private void f(long var1) {
+        boolean var10000 = h;
+        Iterator var5 = this.f.iterator();
+        boolean var4 = var10000;
+
+        while (var5.hasNext()) {
+            c var6 = (c)var5.next();
+            int var7 = var6.a(new Object[0]);
+            int var8 = var6.b(new Object[0]);
+            ((b)((ArrayList)this.a.get(var8)).get(var7)).a(new Object[]{0});
+            if (var4) {
+                break;
+            }
+        }
+    }
+
+    private void g(int param1, int param2) {
+        // $VF: Couldn't be decompiled
+        // Please report this to the Vineflower issue tracker, at https://github.com/Vineflower/vineflower/issues with a copy of the class file (if you have the rights to distribute it!)
+        // java.lang.IllegalStateException: Could not find destination nodes for stat id {Do}:48 from source 40_tail
+        //   at org.jetbrains.java.decompiler.modules.decompiler.flow.FlattenStatementsHelper.setEdges(FlattenStatementsHelper.java:563)
+        //   at org.jetbrains.java.decompiler.modules.decompiler.flow.FlattenStatementsHelper.buildDirectGraph(FlattenStatementsHelper.java:50)
+        //   at org.jetbrains.java.decompiler.modules.decompiler.sforms.SFormsConstructor.splitVariables(SFormsConstructor.java:72)
+        //   at org.jetbrains.java.decompiler.modules.decompiler.StackVarsProcessor.simplifyStackVars(StackVarsProcessor.java:52)
+        //   at org.jetbrains.java.decompiler.modules.decompiler.StackVarsProcessor.simplifyStackVars(StackVarsProcessor.java:40)
+        //   at org.jetbrains.java.decompiler.main.rels.MethodProcessor.codeToJava(MethodProcessor.java:292)
+        //
+        // Bytecode:
+        // 00: iload 1
+        // 01: i2l
+        // 02: bipush 32
+        // 04: lshl
+        // 05: iload 2
+        // 06: i2l
+        // 07: bipush 32
+        // 09: lshl
+        // 0a: bipush 32
+        // 0c: lushr
+        // 0d: lor
+        // 0e: pop2
+        // 0f: getstatic d.h Z
+        // 12: aload 0
+        // 13: getfield d.c I
+        // 16: istore 7
+        // 18: aload 0
+        // 19: getfield d.f Ljava/util/ArrayList;
+        // 1c: invokevirtual java/util/ArrayList.size ()I
+        // 1f: bipush 1
+        // 20: isub
+        // 21: istore 8
+        // 23: istore 6
+        // 25: iload 8
+        // 27: iflt 80
+        // 2a: iload 7
+        // 2c: iload 6
+        // 2e: ifne 93
+        // 31: ifne 75
+        // 34: aload 0
+        // 35: getfield d.f Ljava/util/ArrayList;
+        // 38: iload 8
+        // 3a: invokevirtual java/util/ArrayList.get (I)Ljava/lang/Object;
+        // 3d: checkcast c
+        // 40: astore 9
+        // 42: aload 0
+        // 43: getfield d.a Ljava/util/ArrayList;
+        // 46: aload 9
+        // 48: getfield c.b I
+        // 4b: invokevirtual java/util/ArrayList.get (I)Ljava/lang/Object;
+        // 4e: checkcast java/util/ArrayList
+        // 51: aload 9
+        // 53: getfield c.a I
+        // 56: invokevirtual java/util/ArrayList.get (I)Ljava/lang/Object;
+        // 59: checkcast b
+        // 5c: bipush 2
+        // 5d: bipush 1
+        // 5e: anewarray 67
+        // 61: dup_x1
+        // 62: swap
+        // 63: invokestatic java/lang/Integer.valueOf (I)Ljava/lang/Integer;
+        // 66: bipush 0
+        // 67: swap
+        // 68: aastore
+        // 69: invokevirtual b.a ([Ljava/lang/Object;)V
+        // 6c: iload 6
+        // 6e: iload 2
+        // 6f: ifge 7d
+        // 72: ifeq 78
+        // 75: iinc 7 -1
+        // 78: iinc 8 -1
+        // 7b: iload 6
+        // 7d: ifeq 25
+        // 80: aload 0
+        // 81: getfield d.c I
+        // 84: istore 7
+        // 86: aload 0
+        // 87: getfield d.f Ljava/util/ArrayList;
+        // 8a: invokevirtual java/util/ArrayList.size ()I
+        // 8d: bipush 1
+        // 8e: iload 1
+        // 8f: ifle 2e
+        // 92: isub
+        // 93: istore 8
+        // 95: iload 8
+        // 97: iflt c1
+        // 9a: iload 7
+        // 9c: iload 1
+        // 9d: ifle af
+        // a0: ifne b6
+        // a3: aload 0
+        // a4: getfield d.f Ljava/util/ArrayList;
+        // a7: iload 8
+        // a9: invokevirtual java/util/ArrayList.remove (I)Ljava/lang/Object;
+        // ac: pop
+        // ad: iload 6
+        // af: iload 1
+        // b0: iflt be
+        // b3: ifeq b9
+        // b6: iinc 7 -1
+        // b9: iinc 8 -1
+        // bc: iload 6
+        // be: ifeq 95
+        // c1: iload 2
+        // c2: ifgt b6
+        // c5: return
+    }
+
+    // $VF: Irreducible bytecode was duplicated to produce valid code
+    static {
+        String[] var13 = new String[2];
+        int var11 = 0;
+        String var10 = "úÑ\u0017tµ9\u000b_ÉÛ.\u0003º·y³ß\u0081";
+        byte var12 = 18;
+        char var9 = 6;
+        int var8 = -1;
+
+        while (true) {
+            char[] var30;
+            label56: {
+                char[] var10001 = var10.substring(++var8, var8 + var9).toCharArray();
+                int var10003 = var10001.length;
+                int var14 = 0;
+                var30 = var10001;
+                int var19 = var10003;
+                char[] var39;
+                int var10004;
+                if (var10003 <= 1) {
+                    var39 = var10001;
+                    var10004 = var14;
+                } else {
+                    var30 = var10001;
+                    var19 = var10003;
+                    if (var10003 <= var14) {
+                        break label56;
+                    }
+
+                    var39 = var10001;
+                    var10004 = var14;
+                }
+
+                while (true) {
+                    var39[var10004] = (char)(var39[var10004] ^ switch (var14 % 7) {
+                        case 0 -> 10;
+                        case 1 -> 70;
+                        case 2 -> 22;
+                        case 3 -> 48;
+                        case 4 -> 44;
+                        case 5 -> 80;
+                        default -> 36;
+                    });
+                    var14++;
+                    if (var19 == 0) {
+                        var10004 = var19;
+                        var39 = var30;
+                    } else {
+                        if (var19 <= var14) {
+                            break;
+                        }
+
+                        var39 = var30;
+                        var10004 = var14;
+                    }
+                }
+            }
+
+            String var46 = new String(var30).intern();
+            int var23 = -1;
+            var13[var11++] = var46;
+            if ((var8 += var9) >= var12) {
+                i = var13;
+                j = new String[2];
+                long var0 = 107634029375693L;
+                long[] var6 = new long[5];
+                int var3 = 0;
+                String var4 = ":Q o5\u000eÁÍg¡ù¢XÉ½\u0088sÊUÂÈò©´";
+                byte var5 = 24;
+                byte var2 = 0;
+
+                label40:
+                while (true) {
+                    var23 = var2;
+                    var2 += 8;
+                    byte[] var7 = var4.substring(var23, var2).getBytes("ISO-8859-1");
+                    long[] var10000 = var6;
+                    var23 = var3++;
+                    long var35 = ((long)var7[0] & 255L) << 56
+                        | ((long)var7[1] & 255L) << 48
+                        | ((long)var7[2] & 255L) << 40
+                        | ((long)var7[3] & 255L) << 32
+                        | ((long)var7[4] & 255L) << 24
+                        | ((long)var7[5] & 255L) << 16
+                        | ((long)var7[6] & 255L) << 8
+                        | (long)var7[7] & 255L;
+                    byte var47 = -1;
+
+                    while (true) {
+                        long var50 = var35 ^ var0;
+                        switch (var47) {
+                            case 0:
+                                var10000[var23] = var50;
+                                if (var2 >= var5) {
+                                    k = var6;
+                                    l = new Integer[5];
+                                    long var27 = 107634029375743L;
+                                    byte var28 = -1;
+                                    m = 50L;
+                                    return;
+                                }
+                                break;
+                            default:
+                                var10000[var23] = var50;
+                                if (var2 < var5) {
+                                    continue label40;
+                                }
+
+                                var4 = ">\u0099\u0092í\u0001\n\u0081U\u008a±Å\u001bæLÈ-";
+                                var5 = 16;
+                                var2 = 0;
+                        }
+
+                        byte var26 = var2;
+                        var2 += 8;
+                        var7 = var4.substring(var26, var2).getBytes("ISO-8859-1");
+                        var10000 = var6;
+                        var23 = var3++;
+                        var35 = ((long)var7[0] & 255L) << 56
+                            | ((long)var7[1] & 255L) << 48
+                            | ((long)var7[2] & 255L) << 40
+                            | ((long)var7[3] & 255L) << 32
+                            | ((long)var7[4] & 255L) << 24
+                            | ((long)var7[5] & 255L) << 16
+                            | ((long)var7[6] & 255L) << 8
+                            | (long)var7[7] & 255L;
+                        var47 = 0;
+                    }
+                }
+            }
+
+            var9 = var10.charAt(var8);
+        }
+    }
+
+    private static String a(int var0, int var1, int var2) {
+        int var3 = (var0 ^ var2 ^ -9188) & 65535;
+        if (j[var3] == null) {
+            char[] var4 = i[var3].toCharArray();
+
+            short var5 = switch (var4[0] & 0xFF) {
+                case 0 -> 197;
+                case 1 -> 149;
+                case 2 -> 246;
+                case 3 -> 142;
+                case 4 -> 144;
+                case 5 -> 165;
+                case 6 -> 232;
+                case 7 -> 71;
+                case 8 -> 18;
+                case 9 -> 216;
+                case 10 -> 198;
+                case 11 -> 124;
+                case 12 -> 191;
+                case 13 -> 24;
+                case 14 -> 40;
+                case 15 -> 0;
+                case 16 -> 247;
+                case 17 -> 41;
+                case 18 -> 121;
+                case 19 -> 38;
+                case 20 -> 139;
+                case 21 -> 75;
+                case 22 -> 53;
+                case 23 -> 70;
+                case 24 -> 222;
+                case 25 -> 152;
+                case 26 -> 229;
+                case 27 -> 239;
+                case 28 -> 25;
+                case 29 -> 181;
+                case 30 -> 12;
+                case 31 -> 166;
+                case 32 -> 59;
+                case 33 -> 192;
+                case 34 -> 89;
+                case 35 -> 217;
+                case 36 -> 230;
+                case 37 -> 219;
+                case 38 -> 93;
+                case 39 -> 81;
+                case 40 -> 23;
+                case 41 -> 243;
+                case 42 -> 63;
+                case 43 -> 57;
+                case 44 -> 34;
+                case 45 -> 184;
+                case 46 -> 167;
+                case 47 -> 22;
+                case 48 -> 21;
+                case 49 -> 169;
+                case 50 -> 255;
+                case 51 -> 7;
+                case 52 -> 103;
+                case 53 -> 47;
+                case 54 -> 187;
+                case 55 -> 133;
+                case 56 -> 37;
+                case 57 -> 91;
+                case 58 -> 178;
+                case 59 -> 163;
+                case 60 -> 238;
+                case 61 -> 225;
+                case 62 -> 164;
+                case 63 -> 79;
+                case 64 -> 249;
+                case 65 -> 196;
+                case 66 -> 159;
+                case 67 -> 180;
+                case 68 -> 92;
+                case 69 -> 101;
+                case 70 -> 28;
+                case 71 -> 10;
+                case 72 -> 205;
+                case 73 -> 244;
+                case 74 -> 83;
+                case 75 -> 55;
+                case 76 -> 56;
+                case 77 -> 27;
+                case 78 -> 200;
+                case 79 -> 132;
+                case 80 -> 175;
+                case 81 -> 99;
+                case 82 -> 126;
+                case 83 -> 35;
+                case 84 -> 250;
+                case 85 -> 134;
+                case 86 -> 123;
+                case 87 -> 26;
+                case 88 -> 29;
+                case 89 -> 68;
+                case 90 -> 104;
+                case 91 -> 179;
+                case 92 -> 78;
+                case 93 -> 147;
+                case 94 -> 111;
+                case 95 -> 114;
+                case 96 -> 130;
+                case 97 -> 15;
+                case 98 -> 6;
+                case 99 -> 85;
+                case 100 -> 86;
+                case 101 -> 186;
+                case 102 -> 135;
+                case 103 -> 210;
+                case 104 -> 131;
+                case 105 -> 67;
+                case 106 -> 36;
+                case 107 -> 146;
+                case 108 -> 90;
+                case 109 -> 20;
+                case 110 -> 182;
+                case 111 -> 189;
+                case 112 -> 19;
+                case 113 -> 168;
+                case 114 -> 236;
+                case 115 -> 45;
+                case 116 -> 141;
+                case 117 -> 127;
+                case 118 -> 153;
+                case 119 -> 80;
+                case 120 -> 1;
+                case 121 -> 190;
+                case 122 -> 5;
+                case 123 -> 72;
+                case 124 -> 11;
+                case 125 -> 203;
+                case 126 -> 194;
+                case 127 -> 110;
+                case 128 -> 116;
+                case 129 -> 82;
+                case 130 -> 43;
+                case 131 -> 154;
+                case 132 -> 30;
+                case 133 -> 151;
+                case 134 -> 113;
+                case 135 -> 16;
+                case 136 -> 254;
+                case 137 -> 226;
+                case 138 -> 145;
+                case 139 -> 69;
+                case 140 -> 49;
+                case 141 -> 119;
+                case 142 -> 108;
+                case 143 -> 248;
+                case 144 -> 235;
+                case 145 -> 77;
+                case 146 -> 157;
+                case 147 -> 117;
+                case 148 -> 138;
+                case 149 -> 65;
+                case 150 -> 201;
+                case 151 -> 252;
+                case 152 -> 54;
+                case 153 -> 136;
+                case 154 -> 115;
+                case 155 -> 212;
+                case 156 -> 253;
+                case 157 -> 106;
+                case 158 -> 173;
+                case 159 -> 87;
+                case 160 -> 125;
+                case 161 -> 88;
+                case 162 -> 220;
+                case 163 -> 209;
+                case 164 -> 221;
+                case 165 -> 118;
+                case 166 -> 33;
+                case 167 -> 241;
+                case 168 -> 66;
+                case 169 -> 172;
+                case 170 -> 245;
+                case 171 -> 185;
+                case 172 -> 207;
+                case 173 -> 237;
+                case 174 -> 94;
+                case 175 -> 183;
+                case 176 -> 206;
+                case 177 -> 44;
+                case 178 -> 112;
+                case 179 -> 177;
+                case 180 -> 62;
+                case 181 -> 160;
+                case 182 -> 97;
+                case 183 -> 148;
+                case 184 -> 42;
+                case 185 -> 64;
+                case 186 -> 120;
+                case 187 -> 223;
+                case 188 -> 204;
+                case 189 -> 60;
+                case 190 -> 171;
+                case 191 -> 156;
+                case 192 -> 218;
+                case 193 -> 228;
+                case 194 -> 73;
+                case 195 -> 234;
+                case 196 -> 161;
+                case 197 -> 128;
+                case 198 -> 158;
+                case 199 -> 227;
+                case 200 -> 162;
+                case 201 -> 58;
+                case 202 -> 52;
+                case 203 -> 95;
+                case 204 -> 17;
+                case 205 -> 242;
+                case 206 -> 76;
+                case 207 -> 155;
+                case 208 -> 107;
+                case 209 -> 208;
+                case 210 -> 51;
+                case 211 -> 211;
+                case 212 -> 48;
+                case 213 -> 195;
+                case 214 -> 39;
+                case 215 -> 122;
+                case 216 -> 50;
+                case 217 -> 8;
+                case 218 -> 188;
+                case 219 -> 14;
+                case 220 -> 193;
+                case 221 -> 96;
+                case 222 -> 46;
+                case 223 -> 240;
+                case 224 -> 2;
+                case 225 -> 213;
+                case 226 -> 13;
+                case 227 -> 231;
+                case 228 -> 202;
+                case 229 -> 214;
+                case 230 -> 3;
+                case 231 -> 9;
+                case 232 -> 109;
+                case 233 -> 84;
+                case 234 -> 31;
+                case 235 -> 74;
+                case 236 -> 100;
+                case 237 -> 98;
+                case 238 -> 4;
+                case 239 -> 199;
+                case 240 -> 102;
+                case 241 -> 170;
+                case 242 -> 233;
+                case 243 -> 150;
+                case 244 -> 140;
+                case 245 -> 215;
+                case 246 -> 32;
+                case 247 -> 224;
+                case 248 -> 251;
+                case 249 -> 176;
+                case 250 -> 61;
+                case 251 -> 105;
+                case 252 -> 143;
+                case 253 -> 129;
+                case 254 -> 137;
+                default -> 174;
+            };
+            int var10;
+            int var6 = ((var10 = var1 ^ var2) & 0xFF) - var5;
+            if (var6 < 0) {
+                var6 += 256;
+            }
+
+            int var7 = ((var10 & 65535) >>> 8) - var5;
+            if (var7 < 0) {
+                var7 += 256;
+            }
+
+            for (int var8 = 0; var8 < var4.length; var8++) {
+                int var9 = var8 % 2;
+                char var10002 = var4[var8];
+                if (var9 == 0) {
+                    var4[var8] = (char)(var10002 ^ var6);
+                    var6 = ((var6 >>> 3 | var6 << 5) ^ var4[var8]) & 0xFF;
+                } else {
+                    var4[var8] = (char)(var10002 ^ var7);
+                    var7 = ((var7 >>> 3 | var7 << 5) ^ var4[var8]) & 0xFF;
+                }
+            }
+
+            j[var3] = new String(var4).intern();
+        }
+
+        return j[var3];
+    }
+
+    private static int a(int var0, long var1) {
+        int var3 = var0 ^ (int)(var1 & 32767L) ^ 17329;
+        if (l[var3] == null) {
+            l[var3] = (int)(k[var3] ^ var1);
+        }
+
+        return l[var3];
+    }
+}

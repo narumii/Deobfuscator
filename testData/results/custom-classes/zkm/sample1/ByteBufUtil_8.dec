@@ -9,22 +9,26 @@ public final class ByteBufUtil_8 implements ByteBufUtil {
     private static String[] Vulcan_n;
 
     @Override
-    public Object Vulcan_y(Object[] var1) {
+    public Object Vulcan_y() {
         return Unpooled.buffer();
     }
 
+    @Override
     public Object Vulcan_u(byte[] var1) {
         return Unpooled.wrappedBuffer(var1);
     }
 
+    @Override
     public void Vulcan_G(Object var1) {
         ((ByteBuf)var1).retain();
     }
 
+    @Override
     public void Vulcan_u(Object var1) {
         ((ByteBuf)var1).release();
     }
 
+    @Override
     public byte[] Vulcan_S(Object var1, long var2) {
         String[] var10000 = Vulcan_O();
         ByteBuf var6 = (ByteBuf)var1;
@@ -73,6 +77,7 @@ public final class ByteBufUtil_8 implements ByteBufUtil {
         return var7;
     }
 
+    @Override
     public void Vulcan_S(Object var1, byte[] var2, long var3) {
         String[] var10000 = Vulcan_O();
         ByteBuf var7 = (ByteBuf)var1;

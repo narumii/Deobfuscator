@@ -46,7 +46,7 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
 
   private static final Match INVOKE_AND_RETURN =
       SequenceMatch.of(
-          MethodMatch.invokeStatic().save("invocation"),
+          MethodMatch.invokeStatic().capture("invocation"),
           OpcodeMatch.of(ATHROW)
       );
 
@@ -77,6 +77,9 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
           MatchContext result = INVOKE_AND_RETURN.matchResult(start);
           if (result != null) {
             MethodRef methodRef = MethodRef.of((MethodInsnNode) result.insn());
+
+            // Check if method is returning an exception instantly
+            if (!instantReturnExceptionMethods.contains(methodRef)) return false;
 
             if (!toRemove.contains(methodRef)) {
               toRemove.add(methodRef);

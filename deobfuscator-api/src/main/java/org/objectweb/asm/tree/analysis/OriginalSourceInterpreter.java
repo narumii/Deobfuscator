@@ -77,7 +77,15 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
     if (type == Type.VOID_TYPE) {
       return null;
     }
-    return new OriginalSourceValue(type == null ? 1 : type.getSize());
+    return new OriginalSourceValue(type == null ? 1 : type.getSize(), false);
+  }
+
+  @Override
+  public OriginalSourceValue newParameterValue(boolean isInstanceMethod, int local, Type type) {
+    if (type == Type.VOID_TYPE) {
+      return null;
+    }
+    return new OriginalSourceValue(type == null ? 1 : type.getSize(), true);
   }
 
   @Override
@@ -153,7 +161,7 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
 
       if (constant != null && constant.get() instanceof Number constNum) {
         Number result = AsmMathHelper.mathUnaryOperation(constNum, insn.getOpcode());
-        return new OriginalSourceValue(size, insn, OriginalSourceValue.ConstantValue.of(result));
+        return new OriginalSourceValue(size, insn, null, OriginalSourceValue.ConstantValue.of(result));
       }
     }
     // Narumii end
@@ -198,7 +206,7 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
 
       if (constant1 != null && constant2 != null && constant1.get() instanceof Number constNum1 && constant2.get() instanceof Number constNum2) {
         Number result = AsmMathHelper.mathBinaryOperation(constNum1, constNum2, insn.getOpcode());
-        return new OriginalSourceValue(size, insn, OriginalSourceValue.ConstantValue.of(result));
+        return new OriginalSourceValue(size, insn, null, OriginalSourceValue.ConstantValue.of(result));
       }
     }
     // Narumii end
@@ -238,34 +246,32 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
 
   @Override
   public OriginalSourceValue merge(final OriginalSourceValue value1, final OriginalSourceValue value2) {
-    if (value1.insns instanceof SmallSet && value2.insns instanceof SmallSet) {
-      Set<AbstractInsnNode> setUnion =
-          ((SmallSet<AbstractInsnNode>) value1.insns)
-              .union((SmallSet<AbstractInsnNode>) value2.insns);
-      if (setUnion == value1.insns && value1.size == value2.size && Objects.equals(value1.copiedFrom, value2.copiedFrom)) { // Narumii
-        return value1;
+    if (value1.size != value2.size || !containsAll(value1.insns, value2.insns) || !Objects.equals(value1.copiedFrom, value2.copiedFrom)) {
+      Set<AbstractInsnNode> setUnion;
+      if (value1.insns instanceof SmallSet && value2.insns instanceof SmallSet) {
+        // Use optimized merging method
+        setUnion =
+            ((SmallSet<AbstractInsnNode>) value1.insns)
+                .union((SmallSet<AbstractInsnNode>) value2.insns);
       } else {
-        // Narumii start
+        setUnion = new HashSet<>();
+        setUnion.addAll(value1.insns);
+        setUnion.addAll(value2.insns);
+      }
+
+      // Single producer
+      if (setUnion.size() == 1) {
+        AbstractInsnNode producer = setUnion.iterator().next();
+
         OriginalSourceValue copiedFrom = null;
-        if (setUnion.size() == 1 && value1.copiedFrom != null && value2.copiedFrom != null) {
+        if (value1.copiedFrom != null && value2.copiedFrom != null) {
           copiedFrom = this.merge(value1.copiedFrom, value2.copiedFrom);
         }
-        return new OriginalSourceValue(Math.min(value1.size, value2.size), setUnion, copiedFrom);
-        // Narumii end
-      }
-    }
-    if (value1.size != value2.size || !containsAll(value1.insns, value2.insns) || !Objects.equals(value1.copiedFrom, value2.copiedFrom)) { // Narumii
-      HashSet<AbstractInsnNode> setUnion = new HashSet<>();
-      setUnion.addAll(value1.insns);
-      setUnion.addAll(value2.insns);
 
-      // Narumii start
-      OriginalSourceValue copiedFrom = null;
-      if (setUnion.size() == 1 && value1.copiedFrom != null && value2.copiedFrom != null) {
-        copiedFrom = this.merge(value1.copiedFrom, value2.copiedFrom);
+        return new OriginalSourceValue(Math.min(value1.size, value2.size), producer, copiedFrom, null);
       }
-      return new OriginalSourceValue(Math.min(value1.size, value2.size), setUnion, copiedFrom);
-      // Narumii end
+      // Multiple producers
+      return new OriginalSourceValue(Math.min(value1.size, value2.size), setUnion);
     }
     return value1;
   }

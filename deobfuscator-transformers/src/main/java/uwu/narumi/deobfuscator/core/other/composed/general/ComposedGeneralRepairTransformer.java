@@ -9,6 +9,9 @@ import uwu.narumi.deobfuscator.core.other.impl.universal.AccessRepairTransformer
 import uwu.narumi.deobfuscator.core.other.impl.universal.AnnotationFilterTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.TryCatchRepairTransformer;
 
+/**
+ * If methods are hidden from decompiler, or something uncommon happen, then this transformer will try to fix it.
+ */
 public class ComposedGeneralRepairTransformer extends ComposedTransformer {
 
   public ComposedGeneralRepairTransformer() {
