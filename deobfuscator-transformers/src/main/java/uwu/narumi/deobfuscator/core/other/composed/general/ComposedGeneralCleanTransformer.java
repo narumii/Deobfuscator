@@ -14,7 +14,7 @@ public class ComposedGeneralCleanTransformer extends ComposedTransformer {
         AnnotationCleanTransformer::new,
         ClassDebugInfoCleanTransformer::new,
         LineNumberCleanTransformer::new,
-        MethodDebugInfoCleanTransformer::new,
+        LocalVariableNamesCleanTransformer::new,
         NopCleanTransformer::new,
         StackOperationResolveTransformer::new,
         TryCatchRepairTransformer::new,
