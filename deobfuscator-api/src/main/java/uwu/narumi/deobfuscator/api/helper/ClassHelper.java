@@ -27,7 +27,7 @@ public final class ClassHelper {
   }
 
   public static ClassWrapper loadClass(String pathInJar, byte[] bytes, int classReaderFlags, int classWriterFlags) throws Exception {
-    return loadClass(pathInJar, bytes, classReaderFlags, classWriterFlags, false);
+    return loadClass(pathInJar, bytes, classReaderFlags, classWriterFlags, true);
   }
 
   /**
