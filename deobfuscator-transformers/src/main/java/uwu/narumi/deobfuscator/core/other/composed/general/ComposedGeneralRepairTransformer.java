@@ -3,6 +3,7 @@ package uwu.narumi.deobfuscator.core.other.composed.general;
 import uwu.narumi.deobfuscator.api.transformer.ComposedTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.ClassDebugInfoCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.LocalVariableNamesCleanTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.clean.MethodDebugInfoCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.SignatureCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.UnknownAttributeCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.AccessRepairTransformer;
@@ -18,7 +19,7 @@ public class ComposedGeneralRepairTransformer extends ComposedTransformer {
         TryCatchRepairTransformer::new,
         UnknownAttributeCleanTransformer::new,
         SignatureCleanTransformer::new,
-        LocalVariableNamesCleanTransformer::new,
+        MethodDebugInfoCleanTransformer::new,
         ClassDebugInfoCleanTransformer::new
     );
   }
