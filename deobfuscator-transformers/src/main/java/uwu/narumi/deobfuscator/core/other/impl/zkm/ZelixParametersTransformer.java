@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Decomposes object array param ({@code foo(Object[] args)}) into a readable params like: {@code foo(String arg1, int arg2)}.
@@ -122,12 +123,7 @@ public class ZelixParametersTransformer extends Transformer {
     int nextVarIndex = MethodHelper.getFirstParameterIdx(methodContext.methodNode());
 
     // Find all casts from that Object array
-    for (AbstractInsnNode insn : methodContext.methodNode().instructions.toArray()) {
-      InsnContext insnContext = methodContext.newInsnContext(insn);
-
-      MatchContext matchContext = OBJECT_ARRAY_VAR_USAGE.matchResult(insnContext);
-      if (matchContext == null) continue;
-
+    for (MatchContext matchContext : OBJECT_ARRAY_VAR_USAGE.findAllMatches(methodContext)) {
       // Found argument!
       VarInsnNode varStore = (VarInsnNode) matchContext.captures().get("var-store").insn();
       TypeInsnNode typeInsn = (TypeInsnNode) matchContext.captures().get("cast").insn();
@@ -169,22 +165,17 @@ public class ZelixParametersTransformer extends Transformer {
    */
   private boolean removeObjectArrayAccess(MethodContext methodContext) {
     // Remove all object array accesses
-    for (AbstractInsnNode insn : methodContext.methodNode().instructions.toArray()) {
-      InsnContext insnContext = methodContext.newInsnContext(insn);
+    Optional<MatchContext> optMatch = OBJECT_ARRAY_POP.findAllMatches(methodContext).stream().findFirst();
+    if (optMatch.isEmpty()) return false;
+    MatchContext matchContext = optMatch.get();
 
-      MatchContext matchContext = OBJECT_ARRAY_POP.matchResult(insnContext);
-      if (matchContext == null) continue;
+    AbstractInsnNode loadArrayInsn = matchContext.captures().get("load-array").insn();
 
-      AbstractInsnNode loadArrayInsn = matchContext.captures().get("load-array").insn();
+    // Remove those instructions
+    methodContext.methodNode().instructions.remove(loadArrayInsn); // ALOAD
+    methodContext.methodNode().instructions.remove(matchContext.insn()); // POP
 
-      // Remove those instructions
-      methodContext.methodNode().instructions.remove(loadArrayInsn); // ALOAD
-      methodContext.methodNode().instructions.remove(insn); // POP
-
-      return true;
-    }
-
-    return false;
+    return true;
   }
 
   /**
