@@ -56,7 +56,7 @@ import java.util.Map;
 public class ZelixParametersTransformer extends Transformer {
 
   private static final Match OBJECT_ARRAY_ALOAD = OpcodeMatch.of(ALOAD).and(
-      Match.predicate(context -> {
+      Match.of(context -> {
         // The object array is always the first argument to method
         return ((VarInsnNode) context.insn()).var == MethodHelper.getFirstParameterIdx(context.insnContext().methodNode());
       }));
@@ -71,7 +71,7 @@ public class ZelixParametersTransformer extends Transformer {
       ))
   );
 
-  private static final Match OBJECT_ARRAY_VAR_USAGE = Match.predicate(ctx -> ctx.insn().isVarStore()).capture("var-store")
+  private static final Match OBJECT_ARRAY_VAR_USAGE = Match.of(ctx -> ctx.insn().isVarStore()).capture("var-store")
       .and(
           StackMatch.of(0, MethodMatch.invokeVirtual().capture("to-primitive") // Converting to a primitive type
               .and(OBJECT_ARRAY_ACCESS)

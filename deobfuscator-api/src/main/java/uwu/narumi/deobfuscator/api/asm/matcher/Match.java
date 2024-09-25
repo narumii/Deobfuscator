@@ -1,7 +1,11 @@
 package uwu.narumi.deobfuscator.api.asm.matcher;
 
+import org.objectweb.asm.tree.AbstractInsnNode;
 import uwu.narumi.deobfuscator.api.asm.InstructionContext;
+import uwu.narumi.deobfuscator.api.asm.MethodContext;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -41,6 +45,26 @@ public abstract class Match {
   }
 
   /**
+   * Finds all matches in the method
+   *
+   * @param methodContext Method context
+   * @return List of all matches
+   */
+  public List<MatchContext> findAllMatches(MethodContext methodContext) {
+    List<MatchContext> allMatches = new ArrayList<>();
+
+    for (AbstractInsnNode insn : methodContext.methodNode().instructions) {
+      InstructionContext insnContext = methodContext.newInsnContext(insn);
+      MatchContext match = this.matchResult(insnContext);
+      if (match != null) {
+        allMatches.add(match);
+      }
+    }
+
+    return allMatches;
+  }
+
+  /**
    * @return {@link MatchContext} if matches or {@code null} if it does not match
    */
   public MatchContext matchResult(InstructionContext insnContext) {
@@ -72,15 +96,15 @@ public abstract class Match {
   protected abstract boolean test(MatchContext context);
 
   public Match and(Match match) {
-    return Match.predicate(context -> this.matchAndMerge(context.insnContext(), context) && match.matchAndMerge(context.insnContext(), context));
+    return Match.of(context -> this.matchAndMerge(context.insnContext(), context) && match.matchAndMerge(context.insnContext(), context));
   }
 
   public Match or(Match match) {
-    return Match.predicate(context -> this.matchAndMerge(context.insnContext(), context) || match.matchAndMerge(context.insnContext(), context));
+    return Match.of(context -> this.matchAndMerge(context.insnContext(), context) || match.matchAndMerge(context.insnContext(), context));
   }
 
   public Match not() {
-    return Match.predicate(context -> !matchAndMerge(context.insnContext(), context));
+    return Match.of(context -> !matchAndMerge(context.insnContext(), context));
   }
 
   public Match defineTransformation(Transformation transformation) {
@@ -108,7 +132,7 @@ public abstract class Match {
    * @param predicate Your lambda predicate
    * @return A new {@link Match}
    */
-  public static Match predicate(Predicate<MatchContext> predicate) {
+  public static Match of(Predicate<MatchContext> predicate) {
     return new Match() {
       @Override
       protected boolean test(MatchContext context) {

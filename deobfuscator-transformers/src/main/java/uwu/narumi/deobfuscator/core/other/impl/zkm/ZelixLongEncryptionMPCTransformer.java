@@ -64,7 +64,7 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
       .and(StackMatch.of(0, MethodMatch.invokeInterface().desc("(J)J")
           .and(StackMatch.of(0, NumberMatch.numLong().capture("decrypt-key"))) // Decrypt key
           // Create decrypter
-          .and(StackMatch.of(1, MethodMatch.invokeStatic().and(Match.predicate(context ->
+          .and(StackMatch.of(1, MethodMatch.invokeStatic().and(Match.of(context ->
                   ((MethodInsnNode) context.insn()).desc.startsWith("(JJLjava/lang/Object;)"))).capture("create-decrypter-method")
 
               .and(StackMatch.of(0, MethodMatch.invokeVirtual().and(StackMatch.of(0, MethodMatch.invokeStatic())))) // Class lookup

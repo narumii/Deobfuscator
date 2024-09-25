@@ -219,13 +219,13 @@ public class AsmHelper implements Opcodes {
                     && fieldNode.desc.equals(fieldInsnNode.desc));
   }
 
-  public static Optional<MethodNode> findMethod(
-      ClassNode classNode, MethodInsnNode methodInsnNode) {
-    return classNode == null || classNode.methods == null
-        ? Optional.empty()
-        : classNode.methods.stream()
-        .filter(methodNode -> methodNode.name.equals(methodInsnNode.name))
-        .filter(methodNode -> methodNode.desc.equals(methodInsnNode.desc))
+  public static Optional<MethodNode> findMethod(ClassNode classNode, MethodRef methodRef) {
+    if (classNode == null || classNode.methods == null) {
+      return Optional.empty();
+    }
+    return classNode.methods.stream()
+        .filter(methodNode -> methodNode.name.equals(methodRef.name()))
+        .filter(methodNode -> methodNode.desc.equals(methodRef.desc()))
         .findFirst();
   }
 

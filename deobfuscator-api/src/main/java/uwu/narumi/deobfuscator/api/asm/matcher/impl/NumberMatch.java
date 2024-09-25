@@ -15,23 +15,23 @@ public class NumberMatch extends Match {
   }
 
   public static Match of() {
-    return predicate(ctx -> ctx.insn().isNumber());
+    return Match.of(ctx -> ctx.insn().isNumber());
   }
 
   public static Match numDouble() {
-    return predicate(ctx -> ctx.insn().isDouble());
+    return Match.of(ctx -> ctx.insn().isDouble());
   }
 
   public static Match numFloat() {
-    return predicate(ctx -> ctx.insn().isFloat());
+    return Match.of(ctx -> ctx.insn().isFloat());
   }
 
   public static Match numInteger() {
-    return predicate(ctx -> ctx.insn().isInteger());
+    return Match.of(ctx -> ctx.insn().isInteger());
   }
 
   public static Match numLong() {
-    return predicate(ctx -> ctx.insn().isLong());
+    return Match.of(ctx -> ctx.insn().isLong());
   }
 
   @Override

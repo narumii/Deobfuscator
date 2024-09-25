@@ -16,7 +16,7 @@ public class StringMatch extends Match {
   }
 
   public static Match of() {
-    return Match.predicate(context -> context.insn().isString());
+    return Match.of(context -> context.insn().isString());
   }
 
   @Override

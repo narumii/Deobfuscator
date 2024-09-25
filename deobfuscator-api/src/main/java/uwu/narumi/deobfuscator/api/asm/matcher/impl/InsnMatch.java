@@ -4,6 +4,9 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 
+/**
+ * Matches an instruction by its instance.
+ */
 public class InsnMatch extends Match {
 
   private final AbstractInsnNode node;

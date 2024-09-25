@@ -17,9 +17,9 @@ import java.util.List;
 // TODO: backwards match?
 public class SequenceMatch extends Match {
 
-  private static final Match FRAME_MATCH = Match.predicate(context -> context.insn() instanceof FrameNode);
-  private static final Match LABEL_MATCH = Match.predicate(context -> context.insn() instanceof LabelNode);
-  private static final Match LINE_MATCH = Match.predicate(context -> context.insn() instanceof LineNumberNode);
+  private static final Match FRAME_MATCH = Match.of(context -> context.insn() instanceof FrameNode);
+  private static final Match LABEL_MATCH = Match.of(context -> context.insn() instanceof LabelNode);
+  private static final Match LINE_MATCH = Match.of(context -> context.insn() instanceof LineNumberNode);
 
   private final Match[] matches;
   private final List<Match> skipMatches = new ArrayList<>(List.of(FRAME_MATCH, LABEL_MATCH, LINE_MATCH));

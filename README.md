@@ -5,10 +5,10 @@ A deobfuscator for java
 > **This is dev(v2) version of diobfuscator version and it's not completed yet, if you are willing to help there is a list of things that needs to be completed. The old diobfuscator was moved to [v1 branch](https://github.com/narumii/Deobfuscator/tree/v1).**<br>
 > 
 > - Porting old transformers to new code base
-> - Testing InstructionMatcher
+> - Testing `Match` API
 > - Implementing/Improving transformers
 > - Writing tests
-> - Feedback on how the new api presents itself (mainly InstructionMatcher)
+> - Feedback on how the new api presents itself (mainly `Match` API)
 >   <br>
 > 
 > 1. *You can also provide samples of obfuscation to help with development of the transformers.*
