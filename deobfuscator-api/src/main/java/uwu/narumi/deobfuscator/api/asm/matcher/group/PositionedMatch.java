@@ -24,10 +24,10 @@ public class PositionedMatch extends Match {
   }
 
   private AbstractInsnNode walk(AbstractInsnNode node) {
-    if (skipAsmInstructions) {
-      node = previous ? node.previous(offset) : node.getPrevious(offset);
+    if (previous) {
+      node = skipAsmInstructions ? node.previous(offset) : node.getPrevious(offset);
     } else {
-      node = previous ? node.next(offset) : node.getNext(offset);
+      node = skipAsmInstructions ? node.next(offset) : node.getNext(offset);
     }
 
     return node;
