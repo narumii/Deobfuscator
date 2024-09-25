@@ -8,48 +8,35 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 // TODO: Will probably shit itself
 public class TryCatchRepairTransformer extends Transformer {
 
-  private boolean changed = false;
-
   @Override
   protected void transform(ClassWrapper scope, Context context) throws Exception {
-    context.classes(scope).stream()
-        .flatMap(classWrapper -> classWrapper.methods().stream())
-        .forEach(
-            methodNode -> {
-              this.changed |= methodNode.tryCatchBlocks.removeIf(
-                  tbce -> {
-                    if (tbce.start.equals(tbce.end)
-                        || tbce.start.equals(tbce.handler)
-                        || tbce.end.equals(tbce.handler)) return true;
+    context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
+      methodNode.tryCatchBlocks.removeIf(tryCatchBlock -> {
+        LabelNode start = tryCatchBlock.start;
+        LabelNode handler = tryCatchBlock.handler;
+        LabelNode end = tryCatchBlock.end;
 
-                    LabelNode start = tbce.start;
-                    LabelNode handler = tbce.handler;
-                    LabelNode end = tbce.end;
+        if (start.equals(end) || start.equals(handler) || end.equals(handler)) {
+          // Try-catch has overlapping labels. Remove it.
+          markChange();
+          return true;
+        }
 
-                    if (methodNode.instructions.indexOf(start) == -1
-                        || methodNode.instructions.indexOf(handler) == -1
-                        || methodNode.instructions.indexOf(end) == -1) return true;
-                    else if (end.getNext() != null
-                        && end.getNext().getNext() != null
-                        && end.getNext().getOpcode() == ACONST_NULL
-                        && end.getNext().getNext().getOpcode() == ATHROW) return true;
-                    else
-                      return methodNode.instructions.indexOf(start)
-                              >= methodNode.instructions.indexOf(handler)
-                          || methodNode.instructions.indexOf(start)
-                              >= methodNode.instructions.indexOf(end)
-                          || methodNode.instructions.indexOf(handler)
-                              <= methodNode.instructions.indexOf(end);
-                  });
+        // Check if try-catch labels exist
+        if (methodNode.instructions.indexOf(start) == -1 || methodNode.instructions.indexOf(handler) == -1 || methodNode.instructions.indexOf(end) == -1) {
+          return true;
+        }
 
-              this.changed |= methodNode.exceptions.removeIf(
-                  exception ->
-                      methodNode.tryCatchBlocks.stream()
-                          .noneMatch(tbce -> tbce.type != null && tbce.type.equals(exception)));
-            });
+        // Check if try-catch labels are in the correct order
+        return methodNode.instructions.indexOf(start) >= methodNode.instructions.indexOf(handler)
+            || methodNode.instructions.indexOf(start) >= methodNode.instructions.indexOf(end)
+            || methodNode.instructions.indexOf(handler) <= methodNode.instructions.indexOf(end);
+      });
 
-    if (changed) {
-      this.markChange();
-    }
+      // Remove exceptions that are already caught by try-catch blocks
+      methodNode.exceptions.removeIf(exception ->
+          methodNode.tryCatchBlocks.stream().noneMatch(tryCatch -> tryCatch.type != null && tryCatch.type.equals(exception))
+      );
+    }));
   }
 }

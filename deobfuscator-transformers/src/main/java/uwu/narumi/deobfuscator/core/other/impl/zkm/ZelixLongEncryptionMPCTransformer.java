@@ -8,7 +8,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.asm.InstructionContext;
+import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
@@ -148,7 +148,7 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
     MethodContext methodContext = MethodContext.framed(classWrapper, clinit);
 
     for (AbstractInsnNode insn : clinit.instructions) {
-      InstructionContext insnContext = methodContext.newInsnContext(insn);
+      InsnContext insnContext = methodContext.newInsnContext(insn);
       if (insnContext.frame() == null) return;
 
       MatchContext result = DECRYPT_LONG_MATCHER.matchResult(insnContext);

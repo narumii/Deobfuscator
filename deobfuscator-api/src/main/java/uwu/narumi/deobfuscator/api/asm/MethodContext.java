@@ -49,8 +49,8 @@ public class MethodContext {
     return frames;
   }
 
-  public InstructionContext newInsnContext(AbstractInsnNode insn) {
-    return new InstructionContext(insn, this);
+  public InsnContext newInsnContext(AbstractInsnNode insn) {
+    return new InsnContext(insn, this);
   }
 
   /**

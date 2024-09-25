@@ -4,7 +4,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.asm.InstructionContext;
+import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.FramedInstructionsStream;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
@@ -39,7 +39,7 @@ public class UselessPopCleanTransformer extends Transformer {
    * @param insnContext Instructon context
    * @return If removed
    */
-  private boolean tryRemovePop(InstructionContext insnContext) {
+  private boolean tryRemovePop(InsnContext insnContext) {
     AbstractInsnNode insn = insnContext.insn();
     OriginalSourceValue firstValue = insnContext.frame().getStack(insnContext.frame().getStackSize() - 1);
 

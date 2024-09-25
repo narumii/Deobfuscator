@@ -2,7 +2,7 @@ package uwu.narumi.deobfuscator.core.other.impl.zkm;
 
 import org.objectweb.asm.tree.MethodInsnNode;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.asm.InstructionContext;
+import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.MethodRef;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
@@ -73,7 +73,7 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
         MethodContext framelessContext = MethodContext.frameless(classWrapper, methodNode);
 
         methodNode.tryCatchBlocks.removeIf(tryBlock -> {
-          InstructionContext start = framelessContext.newInsnContext(tryBlock.handler.getNext());
+          InsnContext start = framelessContext.newInsnContext(tryBlock.handler.getNext());
           MatchContext result = INVOKE_AND_RETURN.matchResult(start);
           if (result != null) {
             MethodRef methodRef = MethodRef.of((MethodInsnNode) result.insn());

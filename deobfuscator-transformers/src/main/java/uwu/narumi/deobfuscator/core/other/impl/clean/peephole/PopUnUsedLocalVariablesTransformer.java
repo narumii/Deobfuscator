@@ -6,7 +6,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.asm.InstructionContext;
+import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
@@ -26,7 +26,7 @@ public class PopUnUsedLocalVariablesTransformer extends Transformer {
       // Find all local variables in use
       for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
         if ((insn instanceof VarInsnNode && !insn.isVarStore()) || insn instanceof IincInsnNode) {
-          InstructionContext insnContext = methodContext.newInsnContext(insn);
+          InsnContext insnContext = methodContext.newInsnContext(insn);
 
           Frame<OriginalSourceValue> frame = insnContext.frame();
           if (frame == null) return;
@@ -52,7 +52,7 @@ public class PopUnUsedLocalVariablesTransformer extends Transformer {
       for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
         if (insn instanceof VarInsnNode varInsnNode && insn.isVarStore()) {
           if (!varStoresInUse.contains(varInsnNode)) {
-            InstructionContext insnContext = methodContext.newInsnContext(insn);
+            InsnContext insnContext = methodContext.newInsnContext(insn);
 
             // Pop the value from the stack
             insnContext.pop(1);

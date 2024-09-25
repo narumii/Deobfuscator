@@ -8,7 +8,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.asm.InstructionContext;
+import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
@@ -123,7 +123,7 @@ public class ZelixParametersTransformer extends Transformer {
 
     // Find all casts from that Object array
     for (AbstractInsnNode insn : methodContext.methodNode().instructions.toArray()) {
-      InstructionContext insnContext = methodContext.newInsnContext(insn);
+      InsnContext insnContext = methodContext.newInsnContext(insn);
 
       MatchContext matchContext = OBJECT_ARRAY_VAR_USAGE.matchResult(insnContext);
       if (matchContext == null) continue;
@@ -170,7 +170,7 @@ public class ZelixParametersTransformer extends Transformer {
   private boolean removeObjectArrayAccess(MethodContext methodContext) {
     // Remove all object array accesses
     for (AbstractInsnNode insn : methodContext.methodNode().instructions.toArray()) {
-      InstructionContext insnContext = methodContext.newInsnContext(insn);
+      InsnContext insnContext = methodContext.newInsnContext(insn);
 
       MatchContext matchContext = OBJECT_ARRAY_POP.matchResult(insnContext);
       if (matchContext == null) continue;

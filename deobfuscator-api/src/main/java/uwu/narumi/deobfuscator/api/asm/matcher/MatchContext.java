@@ -3,7 +3,7 @@ package uwu.narumi.deobfuscator.api.asm.matcher;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
-import uwu.narumi.deobfuscator.api.asm.InstructionContext;
+import uwu.narumi.deobfuscator.api.asm.InsnContext;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,17 +15,17 @@ import java.util.Map;
  * Immutable match context. After matching process, the context is frozen by {@link MatchContext#freeze()}
  */
 public class MatchContext {
-  private final InstructionContext insnContext;
+  private final InsnContext insnContext;
   private final Map<String, MatchContext> captures;
   private final List<AbstractInsnNode> collectedInsns;
 
-  private MatchContext(InstructionContext insnContext, Map<String, MatchContext> captures, List<AbstractInsnNode> collectedInsns) {
+  private MatchContext(InsnContext insnContext, Map<String, MatchContext> captures, List<AbstractInsnNode> collectedInsns) {
     this.insnContext = insnContext;
     this.captures = captures;
     this.collectedInsns = collectedInsns;
   }
 
-  public static MatchContext of(InstructionContext insnContext) {
+  public static MatchContext of(InsnContext insnContext) {
     return new MatchContext(insnContext, new HashMap<>(), new ArrayList<>());
   }
 
@@ -36,7 +36,7 @@ public class MatchContext {
   /**
    * Merges other {@link MatchContext} into this {@link MatchContext}.
    *
-   * @see Match#matchAndMerge(InstructionContext, MatchContext)
+   * @see Match#matchAndMerge(InsnContext, MatchContext)
    */
   void merge(MatchContext other) {
     this.captures.putAll(other.captures);
@@ -49,14 +49,14 @@ public class MatchContext {
   }
 
   /**
-   * @see InstructionContext#insn()
+   * @see InsnContext#insn()
    */
   public AbstractInsnNode insn() {
     return this.insnContext.insn();
   }
 
   /**
-   * @see InstructionContext#frame()
+   * @see InsnContext#frame()
    */
   public Frame<OriginalSourceValue> frame() {
     return this.insnContext.frame();
@@ -65,7 +65,7 @@ public class MatchContext {
   /**
    * Instruction context
    */
-  public InstructionContext insnContext() {
+  public InsnContext insnContext() {
     return insnContext;
   }
 

@@ -4,7 +4,7 @@ import org.jetbrains.annotations.Contract;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.asm.InstructionContext;
+import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.context.Context;
 
@@ -14,7 +14,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
- * Framed instructions stream that gives {@link InstructionContext} and computing all frames for you. Also, this class
+ * Framed instructions stream that gives {@link InsnContext} and computing all frames for you. Also, this class
  * iterate over classes and methods ASYNC, and instructions SYNC. This can really speed up computing frames for methods.
  */
 public class FramedInstructionsStream {
@@ -52,7 +52,7 @@ public class FramedInstructionsStream {
     return this;
   }
 
-  public void forEach(Consumer<InstructionContext> consumer) {
+  public void forEach(Consumer<InsnContext> consumer) {
     // Iterate over classes in parallel
     this.classesStreamModifier.apply(this.context.classes(this.scope).parallelStream())
         // Iterate over methods in parallel
@@ -67,7 +67,7 @@ public class FramedInstructionsStream {
               // Iterate over instructions SYNC
               instructionsStreamModifier.apply(Arrays.stream(methodNode.instructions.toArray()))
                   .forEach(insn -> {
-                    InstructionContext insnContext = methodContext.newInsnContext(insn);
+                    InsnContext insnContext = methodContext.newInsnContext(insn);
                     // Check if frame exists
                     if (insnContext.frame() == null) return;
 

@@ -1,7 +1,7 @@
 package uwu.narumi.deobfuscator.api.asm.matcher;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
-import uwu.narumi.deobfuscator.api.asm.InstructionContext;
+import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public abstract class Match {
    * @param insnContext Instruction context
    * @return If matches
    */
-  public boolean matches(InstructionContext insnContext) {
+  public boolean matches(InsnContext insnContext) {
     return this.matchResult(insnContext) != null;
   }
 
@@ -36,7 +36,7 @@ public abstract class Match {
    * @param currentMatchContext Match context to merge into
    * @return If matches
    */
-  public boolean matchAndMerge(InstructionContext insnContext, MatchContext currentMatchContext) {
+  public boolean matchAndMerge(InsnContext insnContext, MatchContext currentMatchContext) {
     MatchContext result = this.matchResult(insnContext);
     if (result != null) {
       currentMatchContext.merge(result);
@@ -54,7 +54,7 @@ public abstract class Match {
     List<MatchContext> allMatches = new ArrayList<>();
 
     for (AbstractInsnNode insn : methodContext.methodNode().instructions) {
-      InstructionContext insnContext = methodContext.newInsnContext(insn);
+      InsnContext insnContext = methodContext.newInsnContext(insn);
       MatchContext match = this.matchResult(insnContext);
       if (match != null) {
         allMatches.add(match);
@@ -67,7 +67,7 @@ public abstract class Match {
   /**
    * @return {@link MatchContext} if matches or {@code null} if it does not match
    */
-  public MatchContext matchResult(InstructionContext insnContext) {
+  public MatchContext matchResult(InsnContext insnContext) {
     // Create MatchContext
     MatchContext context = MatchContext.of(insnContext);
 
@@ -91,7 +91,7 @@ public abstract class Match {
   }
 
   /**
-   * @see #matches(InstructionContext)
+   * @see #matches(InsnContext)
    */
   protected abstract boolean test(MatchContext context);
 
@@ -149,6 +149,6 @@ public abstract class Match {
      * @param context Current instruction context
      * @return If changed
      */
-    boolean transform(InstructionContext context);
+    boolean transform(InsnContext context);
   }
 }

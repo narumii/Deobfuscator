@@ -4,7 +4,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LineNumberNode;
-import uwu.narumi.deobfuscator.api.asm.InstructionContext;
+import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 
@@ -73,7 +73,7 @@ public class SequenceMatch extends Match {
         return false;
       }
 
-      InstructionContext currentInsnContext = context.insnContext().of(currentInsn);
+      InsnContext currentInsnContext = context.insnContext().of(currentInsn);
       if (this.skipMatches.stream().anyMatch(match -> match.matches(currentInsnContext))) {
         // Skip instruction
         currentInsn = currentInsn.getNext();
