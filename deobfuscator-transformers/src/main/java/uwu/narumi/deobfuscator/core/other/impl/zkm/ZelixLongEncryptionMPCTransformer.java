@@ -85,7 +85,7 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
    */
   private final Map<String, String> classInitOrder;
 
-  private SandBox sandBox;
+  private SandBox sandBox = null;
   private final List<String> processedClasses = new ArrayList<>(); // class internal names
 
   public ZelixLongEncryptionMPCTransformer() {
@@ -105,8 +105,6 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
 
   @Override
   protected void transform(ClassWrapper scope, Context context) throws Exception {
-    sandBox = new SandBox(context);
-
     // Firstly, process the manual list of class initialization order
     for (var entry : classInitOrder.entrySet()) {
       ClassWrapper first = context.getClasses().get(entry.getKey());
@@ -122,7 +120,9 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
     });
 
     // Remove decrypter classes
-    sandBox.getUsedCustomClasses().forEach(clazz -> context.getClasses().remove(clazz.getInternalName()));
+    if (sandBox != null) {
+      sandBox.getUsedCustomClasses().forEach(clazz -> context.getClasses().remove(clazz.getInternalName()));
+    }
   }
 
   /**
@@ -149,6 +149,11 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
 
     // Find all encrypted longs
     DECRYPT_LONG_MATCHER.findAllMatches(methodContext).forEach(matchContext -> {
+      if (sandBox == null) {
+        // Lazily load sandbox
+        this.sandBox = new SandBox(context);
+      }
+
       // Get instructions from storage
       MethodInsnNode createDecrypterInsn = (MethodInsnNode) matchContext.captures().get("create-decrypter-method").insn();
       MatchContext decryptContext = matchContext.captures().get("decrypt-method");
