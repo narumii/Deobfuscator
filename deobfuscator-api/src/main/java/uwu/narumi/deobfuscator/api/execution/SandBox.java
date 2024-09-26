@@ -34,26 +34,31 @@ public class SandBox {
   private static final Logger LOGGER = LogManager.getLogger(SandBox.class);
 
   private final VirtualMachine vm;
-  private final Context context;
+  private final SupplyingClassLoaderInstaller.DataSupplier dataSupplier;
   private final MemoryManager memoryManager;
   private final SupplyingClassLoaderInstaller.Helper helper;
   private final InvocationUtil invocationUtil;
 
   public SandBox(Context context) {
-    this(context, new VirtualMachine());
+    // Install all classes from deobfuscator context
+    this(new ClasspathDataSupplier(context.getClasspath()));
   }
 
-  public SandBox(Context context, VirtualMachine vm) {
+  public SandBox(SupplyingClassLoaderInstaller.DataSupplier dataSupplier) {
+    this(dataSupplier, new VirtualMachine());
+  }
+
+  public SandBox(SupplyingClassLoaderInstaller.DataSupplier dataSupplier, VirtualMachine vm) {
     LOGGER.info("Initializing SSVM sandbox...");
-    this.context = context;
+    this.dataSupplier = dataSupplier;
     this.vm = vm;
 
     try {
       this.vm.initialize();
       this.vm.bootstrap();
       this.memoryManager = vm.getMemoryManager();
-      // Install all classes from deobfuscator context
-      this.helper = SupplyingClassLoaderInstaller.install(vm, new ClasspathDataSupplier(context.getClasspath()));
+      // Install all classes from data supplier
+      this.helper = SupplyingClassLoaderInstaller.install(vm, this.dataSupplier);
       this.invocationUtil = InvocationUtil.create(vm);
       patchVm();
     } catch (Exception ex) {
@@ -166,7 +171,7 @@ public class SandBox {
    */
   public List<JavaClass> getUsedCustomClasses() {
     return this.vm.getClassStorage().list().stream()
-        .filter(clazz -> this.context.getClasses().containsKey(clazz.getInternalName()))
+        .filter(clazz -> this.dataSupplier.getClass(clazz.getName()) != null)
         .toList();
   }
 }
