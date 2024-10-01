@@ -29,6 +29,10 @@ public abstract class Match {
     return this.matchResult(insnContext) != null;
   }
 
+  public boolean matches(MethodContext methodContext) {
+    return !this.findAllMatches(methodContext).isEmpty();
+  }
+
   /**
    * Matches the instrustion and merges if successful
    *
@@ -62,6 +66,10 @@ public abstract class Match {
     }
 
     return allMatches;
+  }
+
+  public MatchContext findFirstMatch(MethodContext methodContext) {
+    return this.findAllMatches(methodContext).stream().findFirst().orElse(null);
   }
 
   /**

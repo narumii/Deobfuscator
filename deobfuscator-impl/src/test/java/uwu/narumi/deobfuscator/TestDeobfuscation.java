@@ -106,6 +106,31 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         Source.of("SnakeGame-obf-zkm")
     );
 
+    // Zelix (22.0.3)
+    /*
+    obfuscate   changeLogFileIn=""
+                changeLogFileOut="ChangeLog.txt"
+                obfuscateFlow=none
+                exceptionObfuscation=none
+                encryptStringLiterals=enhanced
+                encryptIntegerConstants=none
+                encryptLongConstants=none
+                mixedCaseClassNames=ifInArchive
+                collapsePackagesWithDefault=""
+                localVariables=delete
+                lineNumbers=delete
+                autoReflectionHandling=normal
+                obfuscateReferences=none;
+     */
+    register("Zelix (22.0.3) - String Encryption - Enhanced - Some strings", InputType.CUSTOM_CLASS,
+        List.of(ComposedZelixTransformer::new),
+        Source.of("zkm/EnhancedStringEncSomeStrings")
+    );
+    register("Zelix (22.0.3) - String Encryption - Enhanced - Many strings", InputType.CUSTOM_CLASS,
+        List.of(ComposedZelixTransformer::new),
+        Source.of("zkm/EnhancedStringEncManyStrings")
+    );
+
     // Example HP888 classes. Without packer.
     register("HP888", InputType.CUSTOM_CLASS, List.of(ComposedHP888Transformer::new),
         Source.of("hp888/ExampleClass"),

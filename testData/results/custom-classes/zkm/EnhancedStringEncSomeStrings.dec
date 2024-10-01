@@ -1,0 +1,376 @@
+public class a {
+    private static final String[] a;
+    private static final String[] b;
+
+    public static void main(String[] var0) {
+        a(a(30479, -25658));
+    }
+
+    private static void a(String var0) {
+        if (!var0.equals(a(30478, -17804))) {
+            throw new RuntimeException(a(30477, 20135));
+        }
+    }
+
+    // $VF: Irreducible bytecode was duplicated to produce valid code
+    static {
+        String[] var5 = new String[3];
+        int var3 = 0;
+        String var2 = "Õ\u0082t\u009dÄ\u0081\u0003µ\u0092ö\u000eÜÜ\u0098\u0086\u0094\u0005TR\f¥¤¤)o";
+        byte var4 = 25;
+        char var1 = 6;
+        int var0 = -1;
+
+        while (true) {
+            char[] var16;
+            label38: {
+                char[] var10001 = var2.substring(++var0, var0 + var1).toCharArray();
+                int var10003 = var10001.length;
+                int var6 = 0;
+                var16 = var10001;
+                int var10 = var10003;
+                char[] var23;
+                int var10004;
+                if (var10003 <= 1) {
+                    var23 = var10001;
+                    var10004 = var6;
+                } else {
+                    var16 = var10001;
+                    var10 = var10003;
+                    if (var10003 <= var6) {
+                        break label38;
+                    }
+
+                    var23 = var10001;
+                    var10004 = var6;
+                }
+
+                while (true) {
+                    var23[var10004] = (char)(var23[var10004] ^ switch (var6 % 7) {
+                        case 0 -> 84;
+                        case 1 -> 40;
+                        case 2 -> 91;
+                        case 3 -> 74;
+                        case 4 -> 9;
+                        case 5 -> 31;
+                        default -> 60;
+                    });
+                    var6++;
+                    if (var10 == 0) {
+                        var10004 = var10;
+                        var23 = var16;
+                    } else {
+                        if (var10 <= var6) {
+                            break;
+                        }
+
+                        var23 = var16;
+                        var10004 = var6;
+                    }
+                }
+            }
+
+            String var30 = new String(var16).intern();
+            byte var14 = -1;
+            var5[var3++] = var30;
+            if ((var0 += var1) >= var4) {
+                a = var5;
+                b = new String[3];
+                return;
+            }
+
+            var1 = var2.charAt(var0);
+        }
+    }
+
+    private static String a(int var0, int var1) {
+        int var2 = (var0 ^ 30479) & 65535;
+        if (b[var2] == null) {
+            char[] var3 = a[var2].toCharArray();
+
+            short var4 = switch (var3[0] & 0xFF) {
+                case 0 -> 177;
+                case 1 -> 28;
+                case 2 -> 194;
+                case 3 -> 248;
+                case 4 -> 244;
+                case 5 -> 236;
+                case 6 -> 133;
+                case 7 -> 9;
+                case 8 -> 169;
+                case 9 -> 88;
+                case 10 -> 182;
+                case 11 -> 118;
+                case 12 -> 82;
+                case 13 -> 59;
+                case 14 -> 120;
+                case 15 -> 127;
+                case 16 -> 243;
+                case 17 -> 6;
+                case 18 -> 137;
+                case 19 -> 45;
+                case 20 -> 239;
+                case 21 -> 36;
+                case 22 -> 147;
+                case 23 -> 69;
+                case 24 -> 104;
+                case 25 -> 202;
+                case 26 -> 62;
+                case 27 -> 255;
+                case 28 -> 220;
+                case 29 -> 119;
+                case 30 -> 21;
+                case 31 -> 94;
+                case 32 -> 122;
+                case 33 -> 163;
+                case 34 -> 247;
+                case 35 -> 51;
+                case 36 -> 31;
+                case 37 -> 87;
+                case 38 -> 221;
+                case 39 -> 204;
+                case 40 -> 5;
+                case 41 -> 37;
+                case 42 -> 201;
+                case 43 -> 11;
+                case 44 -> 41;
+                case 45 -> 115;
+                case 46 -> 211;
+                case 47 -> 42;
+                case 48 -> 206;
+                case 49 -> 117;
+                case 50 -> 67;
+                case 51 -> 148;
+                case 52 -> 142;
+                case 53 -> 181;
+                case 54 -> 191;
+                case 55 -> 80;
+                case 56 -> 46;
+                case 57 -> 39;
+                case 58 -> 102;
+                case 59 -> 130;
+                case 60 -> 116;
+                case 61 -> 58;
+                case 62 -> 40;
+                case 63 -> 93;
+                case 64 -> 7;
+                case 65 -> 48;
+                case 66 -> 184;
+                case 67 -> 74;
+                case 68 -> 90;
+                case 69 -> 173;
+                case 70 -> 152;
+                case 71 -> 25;
+                case 72 -> 198;
+                case 73 -> 135;
+                case 74 -> 91;
+                case 75 -> 3;
+                case 76 -> 77;
+                case 77 -> 253;
+                case 78 -> 151;
+                case 79 -> 222;
+                case 80 -> 149;
+                case 81 -> 160;
+                case 82 -> 111;
+                case 83 -> 228;
+                case 84 -> 64;
+                case 85 -> 0;
+                case 86 -> 216;
+                case 87 -> 166;
+                case 88 -> 76;
+                case 89 -> 212;
+                case 90 -> 251;
+                case 91 -> 43;
+                case 92 -> 162;
+                case 93 -> 188;
+                case 94 -> 34;
+                case 95 -> 225;
+                case 96 -> 109;
+                case 97 -> 242;
+                case 98 -> 78;
+                case 99 -> 183;
+                case 100 -> 165;
+                case 101 -> 86;
+                case 102 -> 73;
+                case 103 -> 83;
+                case 104 -> 53;
+                case 105 -> 71;
+                case 106 -> 32;
+                case 107 -> 18;
+                case 108 -> 8;
+                case 109 -> 159;
+                case 110 -> 85;
+                case 111 -> 81;
+                case 112 -> 235;
+                case 113 -> 14;
+                case 114 -> 17;
+                case 115 -> 146;
+                case 116 -> 144;
+                case 117 -> 30;
+                case 118 -> 27;
+                case 119 -> 112;
+                case 120 -> 15;
+                case 121 -> 171;
+                case 122 -> 129;
+                case 123 -> 195;
+                case 124 -> 131;
+                case 125 -> 226;
+                case 126 -> 241;
+                case 127 -> 232;
+                case 128 -> 107;
+                case 129 -> 213;
+                case 130 -> 210;
+                case 131 -> 140;
+                case 132 -> 205;
+                case 133 -> 68;
+                case 134 -> 136;
+                case 135 -> 238;
+                case 136 -> 200;
+                case 137 -> 89;
+                case 138 -> 56;
+                case 139 -> 54;
+                case 140 -> 143;
+                case 141 -> 12;
+                case 142 -> 110;
+                case 143 -> 50;
+                case 144 -> 215;
+                case 145 -> 234;
+                case 146 -> 13;
+                case 147 -> 95;
+                case 148 -> 100;
+                case 149 -> 190;
+                case 150 -> 193;
+                case 151 -> 20;
+                case 152 -> 175;
+                case 153 -> 185;
+                case 154 -> 155;
+                case 155 -> 180;
+                case 156 -> 168;
+                case 157 -> 70;
+                case 158 -> 179;
+                case 159 -> 125;
+                case 160 -> 1;
+                case 161 -> 84;
+                case 162 -> 207;
+                case 163 -> 150;
+                case 164 -> 10;
+                case 165 -> 218;
+                case 166 -> 139;
+                case 167 -> 250;
+                case 168 -> 170;
+                case 169 -> 108;
+                case 170 -> 197;
+                case 171 -> 79;
+                case 172 -> 209;
+                case 173 -> 33;
+                case 174 -> 47;
+                case 175 -> 63;
+                case 176 -> 105;
+                case 177 -> 233;
+                case 178 -> 246;
+                case 179 -> 26;
+                case 180 -> 22;
+                case 181 -> 121;
+                case 182 -> 249;
+                case 183 -> 66;
+                case 184 -> 65;
+                case 185 -> 23;
+                case 186 -> 199;
+                case 187 -> 29;
+                case 188 -> 230;
+                case 189 -> 172;
+                case 190 -> 245;
+                case 191 -> 123;
+                case 192 -> 124;
+                case 193 -> 61;
+                case 194 -> 16;
+                case 195 -> 217;
+                case 196 -> 227;
+                case 197 -> 24;
+                case 198 -> 134;
+                case 199 -> 126;
+                case 200 -> 96;
+                case 201 -> 92;
+                case 202 -> 208;
+                case 203 -> 72;
+                case 204 -> 44;
+                case 205 -> 52;
+                case 206 -> 240;
+                case 207 -> 128;
+                case 208 -> 138;
+                case 209 -> 141;
+                case 210 -> 132;
+                case 211 -> 38;
+                case 212 -> 106;
+                case 213 -> 113;
+                case 214 -> 187;
+                case 215 -> 167;
+                case 216 -> 252;
+                case 217 -> 189;
+                case 218 -> 49;
+                case 219 -> 161;
+                case 220 -> 158;
+                case 221 -> 174;
+                case 222 -> 196;
+                case 223 -> 231;
+                case 224 -> 229;
+                case 225 -> 223;
+                case 226 -> 214;
+                case 227 -> 237;
+                case 228 -> 60;
+                case 229 -> 153;
+                case 230 -> 57;
+                case 231 -> 154;
+                case 232 -> 186;
+                case 233 -> 4;
+                case 234 -> 101;
+                case 235 -> 98;
+                case 236 -> 103;
+                case 237 -> 192;
+                case 238 -> 19;
+                case 239 -> 35;
+                case 240 -> 55;
+                case 241 -> 2;
+                case 242 -> 156;
+                case 243 -> 99;
+                case 244 -> 203;
+                case 245 -> 224;
+                case 246 -> 178;
+                case 247 -> 75;
+                case 248 -> 219;
+                case 249 -> 114;
+                case 250 -> 157;
+                case 251 -> 176;
+                case 252 -> 164;
+                case 253 -> 254;
+                case 254 -> 145;
+                default -> 97;
+            };
+            int var5 = (var1 & 0xFF) - var4;
+            if (var5 < 0) {
+                var5 += 256;
+            }
+
+            int var6 = ((var1 & 65535) >>> 8) - var4;
+            if (var6 < 0) {
+                var6 += 256;
+            }
+
+            for (int var7 = 0; var7 < var3.length; var7++) {
+                int var8 = var7 % 2;
+                char var10002 = var3[var7];
+                if (var8 == 0) {
+                    var3[var7] = (char)(var10002 ^ var5);
+                    var5 = ((var5 >>> 3 | var5 << 5) ^ var3[var7]) & 0xFF;
+                } else {
+                    var3[var7] = (char)(var10002 ^ var6);
+                    var6 = ((var6 >>> 3 | var6 << 5) ^ var3[var7]) & 0xFF;
+                }
+            }
+
+            b[var2] = new String(var3).intern();
+        }
+
+        return b[var2];
+    }
+}

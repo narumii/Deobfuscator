@@ -375,7 +375,7 @@ public abstract class AbstractInsnNode {
       return (Integer) ((LdcInsnNode) this).cst;
     }
 
-    throw new IllegalArgumentException();
+    throw new IllegalArgumentException("Not an integer");
   }
 
   public long asLong() {
@@ -387,7 +387,7 @@ public abstract class AbstractInsnNode {
       return (Long) ((LdcInsnNode) this).cst;
     }
 
-    throw new IllegalArgumentException();
+    throw new IllegalArgumentException("Not a long");
   }
 
   public float asFloat() {
@@ -399,7 +399,7 @@ public abstract class AbstractInsnNode {
       return (Float) ((LdcInsnNode) this).cst;
     }
 
-    throw new IllegalArgumentException();
+    throw new IllegalArgumentException("Not a float");
   }
 
   public double asDouble() {
@@ -411,7 +411,7 @@ public abstract class AbstractInsnNode {
       return (Double) ((LdcInsnNode) this).cst;
     }
 
-    throw new IllegalArgumentException();
+    throw new IllegalArgumentException("Not a double");
   }
 
   public Number asNumber() {
@@ -425,7 +425,7 @@ public abstract class AbstractInsnNode {
       return asFloat();
     }
 
-    throw new IllegalArgumentException();
+    throw new IllegalArgumentException("Not a number");
   }
 
   public boolean isMathOperator() {
