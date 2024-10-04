@@ -101,7 +101,7 @@ public class Deobfuscator {
 
   private void loadClass(String pathInJar, byte[] bytes) {
     try {
-      if (ClassHelper.isClass(bytes)) {
+      if (ClassHelper.isClass(pathInJar, bytes)) {
         ClassWrapper classWrapper = ClassHelper.loadClass(
             pathInJar,
             bytes,

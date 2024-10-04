@@ -37,7 +37,7 @@ public class UselessPopCleanTransformer extends Transformer {
   /**
    * Tries to remove pop's source values
    *
-   * @param insnContext Instructon context
+   * @param insnContext Instruction context
    * @return If removed
    */
   private boolean tryRemovePop(InsnContext insnContext) {
