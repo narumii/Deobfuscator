@@ -1,0 +1,65 @@
+package com.arlania;
+
+import com.arlania.r.H;
+import com.arlania.r.W;
+import javax.swing.ImageIcon;
+import javax.swing.JColorChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
+
+class Ld implements Runnable {
+    public void run() {
+        AbstractColorChooserPanel[] var5;
+        JColorChooser var7;
+        int var4 = (var5 = (var7 = new JColorChooser()).getChooserPanels()).length;
+
+        int var3;
+        for (int var10000 = var3 = 0; var10000 < var4; var10000 = ++var3) {
+            String var2;
+            AbstractColorChooserPanel var6;
+            switch ((var2 = (var6 = var5[var3]).getDisplayName()).hashCode()) {
+                case -249666038:
+                    while (false) {
+                    }
+
+                    if (!var2.equals(H.ALLATORIxDEMO("\u0013\u001a!\u0019#\u0005%\u001e"))) {
+                        continue;
+                    }
+                    break;
+                case 71851:
+                    if (!var2.equals(W.ALLATORIxDEMO("\"\u0011<"))) {
+                        continue;
+                    }
+                    break;
+                case 81069:
+                    if (!var2.equals(H.ALLATORIxDEMO("?\u0007/"))) {
+                        continue;
+                    }
+                    break;
+                case 2072828:
+                    if (!var2.equals(W.ALLATORIxDEMO("\u0001'\u001b!"))) {
+                        continue;
+                    }
+                    break;
+                default:
+                    continue;
+            }
+
+            var7.removeChooserPanel(var6);
+        }
+
+        var7.setColor(com.arlania.H.Wa[a.ALLATORIxDEMO].KC);
+        var7.setPreviewPanel(new JPanel());
+        var7.getSelectionModel().addChangeListener(new BA(a, var7, a.E, a.ALLATORIxDEMO));
+        Client.ALLATORIxDEMO(var7);
+        JOptionPane.showMessageDialog(null, var7, a.M, -1, new ImageIcon());
+    }
+
+    Ld(Client var1, int var2, String var3, int var4) {
+        a.j = var1;
+        a.ALLATORIxDEMO = var2;
+        a.M = var3;
+        a.E = var4;
+    }
+}

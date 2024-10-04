@@ -28,6 +28,7 @@ public class FramedInstructionsStream {
   private Function<Stream<ClassWrapper>, Stream<ClassWrapper>> classesStreamModifier = Function.identity();
   private Function<Stream<MethodNode>, Stream<MethodNode>> methodsStreamModifier = Function.identity();
   private Function<Stream<AbstractInsnNode>, Stream<AbstractInsnNode>> instructionsStreamModifier = Function.identity();
+  private boolean forceSync = false;
 
   private FramedInstructionsStream(ClassWrapper scope, Context context) {
     this.scope = scope;
@@ -52,11 +53,17 @@ public class FramedInstructionsStream {
     return this;
   }
 
+  @Contract(" -> this")
+  public FramedInstructionsStream forceSync() {
+    this.forceSync = true;
+    return this;
+  }
+
   public void forEach(Consumer<InsnContext> consumer) {
     // Iterate over classes in parallel
-    this.classesStreamModifier.apply(this.context.classes(this.scope).parallelStream())
+    this.classesStreamModifier.apply(this.forceSync ? this.context.classes(this.scope).stream() : this.context.classes(this.scope).parallelStream())
         // Iterate over methods in parallel
-        .forEach(classWrapper -> this.methodsStreamModifier.apply(classWrapper.methods().parallelStream())
+        .forEach(classWrapper -> this.methodsStreamModifier.apply(this.forceSync ? classWrapper.methods().stream() : classWrapper.methods().parallelStream())
             .forEach(methodNode -> {
               // Skip if no instructions
               if (instructionsStreamModifier.apply(Arrays.stream(methodNode.instructions.toArray())).findAny().isEmpty()) return;

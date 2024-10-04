@@ -11,6 +11,7 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class UselessPopCleanTransformer extends Transformer {
   public UselessPopCleanTransformer() {
@@ -57,15 +58,19 @@ public class UselessPopCleanTransformer extends Transformer {
         // Pop two values from the stack
 
         int index = insnContext.frame().getStackSize() - 2;
-        OriginalSourceValue secondValue = index >= 0 ? insnContext.frame().getStack(insnContext.frame().getStackSize() - 2) : null;
+        if (index < 0) return false;
+        OriginalSourceValue secondValue = insnContext.frame().getStack(index);
+        if (firstValue.getProducer().getOpcode() == DUP) {
+          // Extract the original source value from DUP
+          secondValue = Objects.requireNonNull(secondValue.copiedFrom);
+        }
+
         // Return if we can't remove the source value
-        if (secondValue != null && !canPop(secondValue)) return false;
+        if (!canPop(secondValue)) return false;
 
         // Pop
         popSourceValue(firstValue, insnContext.methodNode());
-        if (secondValue != null) {
-          popSourceValue(secondValue, insnContext.methodNode());
-        }
+        popSourceValue(secondValue, insnContext.methodNode());
       }
       return true;
     }

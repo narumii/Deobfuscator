@@ -5,6 +5,7 @@ import uwu.narumi.deobfuscator.core.other.composed.ComposedZelixTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedGeneralFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedPeepholeCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.JsrInlinerTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.UselessPopCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineLocalVariablesTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
@@ -136,5 +137,7 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         Source.of("hp888/ExampleClass"),
         Source.of("hp888/Strings") // Obfuscated strings
     );
+
+    register("POP2 Sample", InputType.CUSTOM_CLASS, List.of(UselessPopCleanTransformer::new), Source.of("Pop2Sample"));
   }
 }
