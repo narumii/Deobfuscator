@@ -18,10 +18,14 @@ import java.util.Map;
  */
 public class ComposedZelixTransformer extends ComposedTransformer {
   public ComposedZelixTransformer() {
-    this(new HashMap<>());
+    this(false);
   }
 
-  public ComposedZelixTransformer(Map<String, String> classInitializationOrder) {
+  public ComposedZelixTransformer(boolean experimental) {
+    this(experimental, new HashMap<>());
+  }
+
+  public ComposedZelixTransformer(boolean experimental, Map<String, String> classInitializationOrder) {
     super(
         // Initial cleanup
         JsrInlinerTransformer::new,
@@ -31,7 +35,7 @@ public class ComposedZelixTransformer extends ComposedTransformer {
         ZelixUselessTryCatchRemoverTransformer::new,
 
         // Decompose method parameters
-        ZelixParametersTransformer::new,
+        () -> experimental ? new ZelixParametersTransformer() : null,
 
         // Decrypt longs
         () -> new ZelixLongEncryptionMPCTransformer(classInitializationOrder),

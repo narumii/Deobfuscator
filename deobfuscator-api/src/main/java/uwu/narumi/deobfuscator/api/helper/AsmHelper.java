@@ -124,6 +124,7 @@ public class AsmHelper implements Opcodes {
     if (insn.owner.equals("java/lang/Long") && insn.name.equals("longValue")) return Type.LONG_TYPE;
     if (insn.owner.equals("java/lang/Double") && insn.name.equals("doubleValue")) return Type.DOUBLE_TYPE;
     if (insn.owner.equals("java/lang/Float") && insn.name.equals("floatValue")) return Type.FLOAT_TYPE;
+    if (insn.owner.equals("java/lang/Boolean") && insn.name.equals("booleanValue")) return Type.BOOLEAN_TYPE;
 
     throw new IllegalStateException("Unexpected value: " + insn.owner+"."+insn.name+insn.desc);
   }

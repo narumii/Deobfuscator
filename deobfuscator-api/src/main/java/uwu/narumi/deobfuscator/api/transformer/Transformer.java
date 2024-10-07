@@ -72,17 +72,22 @@ public abstract class Transformer extends AsmHelper implements Opcodes {
    * @param context The context
    * @return If the transformation changed something
    */
-  public static boolean transform(Supplier<Transformer> transformerSupplier, @Nullable ClassWrapper scope, Context context) {
+  public static boolean transform(Supplier<@Nullable Transformer> transformerSupplier, @Nullable ClassWrapper scope, Context context) {
     return transform(transformerSupplier, scope, context, false);
   }
 
   private static boolean transform(
-      Supplier<Transformer> transformerSupplier,
+      Supplier<@Nullable Transformer> transformerSupplier,
       @Nullable ClassWrapper scope,
       Context context,
       boolean reran
   ) {
     Transformer transformer = transformerSupplier.get();
+    if (transformer == null) {
+      // Null means that transformer is disabled. Skip it
+      return false;
+    }
+
     if (transformer.hasRan) {
       throw new IllegalArgumentException("transformerSupplier tried to reuse transformer instance. You must pass a new instance of transformer");
     }

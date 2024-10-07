@@ -39,7 +39,7 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
     register("Some flow obf sample", InputType.CUSTOM_CLASS, List.of(ComposedGeneralFlowTransformer::new), Source.of("FlowObfSample"));
 
     // Zelix
-    register("Zelix (22.0.3) Sample 1", InputType.CUSTOM_CLASS, List.of(ComposedZelixTransformer::new),
+    register("Zelix (22.0.3) Sample 1", InputType.CUSTOM_CLASS, List.of(() -> new ComposedZelixTransformer(true)),
         Source.of("zkm/sample1/ExampleClass"),
         Source.of("zkm/sample1/ILongDecrypter", false),
         Source.of("zkm/sample1/LongDecrypter1", false),
@@ -69,7 +69,7 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
      */
     register("Zelix (22.0.3) Sample 2 - Class initialization order", InputType.CUSTOM_CLASS,
         List.of(
-            () -> new ComposedZelixTransformer(
+            () -> new ComposedZelixTransformer(true,
                 // During obfuscation was specified classInitializationOrder option,
                 // so we need to also pass it here for correct decrypted values
                 Map.of("a.a.a.a.a4", "a.a.a.a.bc")
@@ -103,7 +103,7 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
             obfuscateParameters=normal;
      */
     register("Zelix (21) Snake Game", InputType.CUSTOM_JAR,
-        List.of(ComposedZelixTransformer::new),
+        List.of(() -> new ComposedZelixTransformer(true)),
         Source.of("SnakeGame-obf-zkm")
     );
 
