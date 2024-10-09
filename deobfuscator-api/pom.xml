@@ -23,8 +23,7 @@
           - https://gitlab.ow2.org/asm/asm/-/merge_requests/415
           - https://gitlab.ow2.org/asm/asm/-/merge_requests/416
         -->
-        <!-- TODO: As we use snapshot version, we need to keep it up to date, because snapshot versions are deleted over time -->
-        <asm.version>9.8-20240921.152704-25</asm.version>
+        <asm.version>9.8-SNAPSHOT</asm.version>
 
         <log4j.version>2.23.1</log4j.version>
         <slf4j.version>2.0.13</slf4j.version>
