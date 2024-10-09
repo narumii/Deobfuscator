@@ -41,7 +41,7 @@ public class SandBox {
 
   public SandBox(Context context) {
     // Install all classes from deobfuscator context
-    this(new ClasspathDataSupplier(context.getClasspath()));
+    this(new ClasspathDataSupplier(context.getCombinedClasspath()));
   }
 
   public SandBox(SupplyingClassLoaderInstaller.DataSupplier dataSupplier) {

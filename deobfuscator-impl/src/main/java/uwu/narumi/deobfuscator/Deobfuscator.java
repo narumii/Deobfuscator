@@ -12,12 +12,14 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.objectweb.asm.ClassReader;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.context.DeobfuscatorOptions;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
 import uwu.narumi.deobfuscator.api.helper.FileHelper;
 import uwu.narumi.deobfuscator.api.classpath.Classpath;
+import uwu.narumi.deobfuscator.api.inheritance.InheritanceGraph;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 public class Deobfuscator {
@@ -45,26 +47,35 @@ public class Deobfuscator {
       LOGGER.warn("Output file already exist, data will be overwritten");
     }
 
-    Classpath classpath = this.buildClasspath();
+    Classpath primaryClasspath = buildPrimaryClasspath();
+    LOGGER.info("Loaded {} classes from a primary source", primaryClasspath.rawClasses().size());
 
-    this.context = new Context(options, classpath);
+    Classpath libClasspath = buildLibClasspath();
+    LOGGER.info("Loaded {} classes from libraries", libClasspath.rawClasses().size());
+
+    this.context = new Context(options, primaryClasspath, libClasspath);
   }
 
-  private Classpath buildClasspath() {
-    Classpath classpath = new Classpath(this.options.classWriterFlags());
-
-    // Add libraries
-    options.libraries().forEach(classpath::addJar);
+  public Classpath buildPrimaryClasspath() {
+    Classpath.Builder builder = Classpath.builder();
     // Add input jar as a library
     if (options.inputJar() != null) {
-      classpath.addJar(options.inputJar());
+      builder.addJar(options.inputJar());
     }
     // Add raw classes as a library
     if (!options.classes().isEmpty()) {
-      options.classes().forEach(classpath::addExternalClass);
+      options.classes().forEach(builder::addExternalClass);
     }
 
-    return classpath;
+    return builder.build();
+  }
+
+  public Classpath buildLibClasspath() {
+    Classpath.Builder builder = Classpath.builder();
+    // Add libraries
+    options.libraries().forEach(builder::addJar);
+
+    return builder.build();
   }
 
   public void start() {
@@ -102,12 +113,11 @@ public class Deobfuscator {
   private void loadClass(String pathInJar, byte[] bytes) {
     try {
       if (ClassHelper.isClass(pathInJar, bytes)) {
-        ClassWrapper classWrapper = ClassHelper.loadClass(
+        ClassWrapper classWrapper = ClassHelper.loadUnknownClass(
             pathInJar,
             bytes,
-            this.options.classReaderFlags(),
-            this.options.classWriterFlags(),
-            true
+            ClassReader.SKIP_FRAMES,
+            this.options.classWriterFlags()
         );
         context.getClasses().putIfAbsent(classWrapper.name(), classWrapper);
       } else if (!context.getFiles().containsKey(pathInJar)) {
@@ -144,11 +154,13 @@ public class Deobfuscator {
   private void saveClassesToDir() {
     LOGGER.info("Saving classes to output directory: {}", this.options.outputDir());
 
+    InheritanceGraph inheritanceGraph = new InheritanceGraph(this.context.getCombinedClasspath());
+
     context
         .getClasses()
         .forEach((ignored, classWrapper) -> {
           try {
-            byte[] data = classWrapper.compileToBytes(this.context);
+            byte[] data = classWrapper.compileToBytes(inheritanceGraph);
 
             Path path = this.options.outputDir().resolve(classWrapper.getPathInJar());
             Files.createDirectories(path.getParent());
@@ -173,6 +185,8 @@ public class Deobfuscator {
       }
     }
 
+    InheritanceGraph inheritanceGraph = new InheritanceGraph(this.context.getCombinedClasspath());
+
     try (ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(this.options.outputJar()))) {
       zipOutputStream.setLevel(9);
 
@@ -181,7 +195,7 @@ public class Deobfuscator {
           .forEach(
               (ignored, classWrapper) -> {
                 try {
-                  byte[] data = classWrapper.compileToBytes(this.context);
+                  byte[] data = classWrapper.compileToBytes(inheritanceGraph);
 
                   zipOutputStream.putNextEntry(new ZipEntry(classWrapper.name() + ".class"));
                   zipOutputStream.write(data);
@@ -191,7 +205,7 @@ public class Deobfuscator {
 
                   try {
                     // Save original class as a fallback
-                    byte[] data = context.getClasspath().getClasses().get(classWrapper.name());
+                    byte[] data = context.getPrimaryClasspath().rawClasses().get(classWrapper.name());
 
                     zipOutputStream.putNextEntry(new ZipEntry(classWrapper.name() + ".class"));
                     zipOutputStream.write(data);

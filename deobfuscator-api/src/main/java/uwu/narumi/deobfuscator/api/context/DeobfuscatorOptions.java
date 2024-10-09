@@ -1,8 +1,8 @@
 package uwu.narumi.deobfuscator.api.context;
 
+import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
@@ -31,8 +31,7 @@ public record DeobfuscatorOptions(
 
     List<Supplier<Transformer>> transformers,
 
-    int classReaderFlags,
-    int classWriterFlags,
+    @MagicConstant(flagsFromClass = ClassWriter.class) int classWriterFlags,
 
     boolean printStacktraces,
     boolean continueOnError,
@@ -69,7 +68,7 @@ public record DeobfuscatorOptions(
     private final List<Supplier<Transformer>> transformers = new ArrayList<>();
 
     // Other config
-    private int classReaderFlags = ClassReader.SKIP_FRAMES;
+    @MagicConstant(flagsFromClass = ClassWriter.class)
     private int classWriterFlags = ClassWriter.COMPUTE_FRAMES;
 
     private boolean printStacktraces = true;
@@ -116,6 +115,11 @@ public record DeobfuscatorOptions(
       return this;
     }
 
+    /**
+     * Add libraries to the classpath. You can pass here files or directories.
+     *
+     * @param paths Paths to libraries
+     */
     @Contract("_ -> this")
     public DeobfuscatorOptions.Builder libraries(Path... paths) {
       for (Path path : paths) {
@@ -178,20 +182,14 @@ public record DeobfuscatorOptions(
     }
 
     /**
-     * Flags for {@link ClassReader}
+     * Flags for {@link ClassWriter}.
+     * <ul>
+     * <li><code>0</code> - Deobfuscated jar can't be run</li>
+     * <li>{@link ClassWriter#COMPUTE_FRAMES} - Makes a runnable deobfuscated jar</li>
+     * </ul>
      */
     @Contract("_ -> this")
-    public DeobfuscatorOptions.Builder classReaderFlags(int classReaderFlags) {
-      this.classReaderFlags = classReaderFlags;
-      return this;
-    }
-
-    /**
-     * Flags for {@link ClassWriter}. When you set it to {@code 0} you will disable checking the validity
-     * of the bytecode. Although this is not recommended.
-     */
-    @Contract("_ -> this")
-    public DeobfuscatorOptions.Builder classWriterFlags(int classWriterFlags) {
+    public DeobfuscatorOptions.Builder classWriterFlags(@MagicConstant(flagsFromClass = ClassWriter.class) int classWriterFlags) {
       this.classWriterFlags = classWriterFlags;
       return this;
     }
@@ -250,7 +248,6 @@ public record DeobfuscatorOptions(
           // Transformers
           transformers,
           // Flags
-          classReaderFlags,
           classWriterFlags,
           // Other config
           printStacktraces,

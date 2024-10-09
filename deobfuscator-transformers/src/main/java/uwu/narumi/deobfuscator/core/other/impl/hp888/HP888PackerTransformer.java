@@ -61,11 +61,10 @@ public class HP888PackerTransformer extends Transformer {
           // Decrypt!
           byte[] decrypted = cipher.doFinal(bytes);
 
-          newClasses.put(cleanFileName, ClassHelper.loadClass(cleanFileName,
+          newClasses.put(cleanFileName, ClassHelper.loadUnknownClass(cleanFileName,
               decrypted,
               ClassReader.SKIP_FRAMES,
-              ClassWriter.COMPUTE_MAXS,
-              true
+              ClassWriter.COMPUTE_MAXS
           ));
           markChange();
         } catch (Exception e) {

@@ -19,13 +19,29 @@ public class Context {
   private final Map<String, byte[]> files = new ConcurrentHashMap<>();
 
   private final DeobfuscatorOptions options;
-  private final Classpath classpath;
+
+  private final Classpath primaryClasspath;
+  private final Classpath libClasspath;
+  private final Classpath combinedClasspath;
 
   private SandBox globalSandBox = null;
 
-  public Context(DeobfuscatorOptions options, Classpath classpath) {
+  /**
+   * Creates a new {@link Context} instance from its options
+   *
+   * @param options Deobfuscator options
+   * @param primaryClasspath Classpath which has only primary jar in it
+   * @param libClasspath Classpath filled with libs
+   */
+  public Context(DeobfuscatorOptions options, Classpath primaryClasspath, Classpath libClasspath) {
     this.options = options;
-    this.classpath = classpath;
+
+    this.primaryClasspath = primaryClasspath;
+    this.libClasspath = libClasspath;
+    this.combinedClasspath = Classpath.builder()
+        .addClasspath(primaryClasspath)
+        .addClasspath(libClasspath)
+        .build();
   }
 
   /**
@@ -43,8 +59,25 @@ public class Context {
     return options;
   }
 
-  public Classpath getClasspath() {
-    return classpath;
+  /**
+   * Classpath for primary jar
+   */
+  public Classpath getPrimaryClasspath() {
+    return primaryClasspath;
+  }
+
+  /**
+   * Classpath filled with libs
+   */
+  public Classpath getLibClasspath() {
+    return libClasspath;
+  }
+
+  /**
+   * {@link #getPrimaryClasspath()} and {@link #getLibClasspath()} combined
+   */
+  public Classpath getCombinedClasspath() {
+    return this.combinedClasspath;
   }
 
   public Collection<ClassWrapper> classes() {

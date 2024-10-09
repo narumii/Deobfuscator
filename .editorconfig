@@ -1,4 +1,4 @@
-[*]
+[*.java]
 charset = utf-8
 end_of_line = lf
 indent_style = space

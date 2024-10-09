@@ -13,11 +13,11 @@ public class ClasspathDataSupplier implements SupplyingClassLoaderInstaller.Data
 
   @Override
   public byte[] getClass(String className) {
-    return classpath.getClasses().get(className.replace('.', '/'));
+    return classpath.rawClasses().get(className.replace('.', '/'));
   }
 
   @Override
   public byte[] getResource(String resourcePath) {
-    return classpath.getFiles().get(resourcePath);
+    return classpath.files().get(resourcePath);
   }
 }

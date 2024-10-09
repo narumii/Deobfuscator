@@ -2,93 +2,114 @@ package uwu.narumi.deobfuscator.api.classpath;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.tree.ClassNode;
 import uwu.narumi.deobfuscator.api.context.DeobfuscatorOptions;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
 import uwu.narumi.deobfuscator.api.helper.FileHelper;
 
 /**
- * All sources for deobfuscated jar
+ * Immutable classpath
+ *
+ * @param classesInfo Class nodes that hold only the class information, not code
  */
-public class Classpath {
+public record Classpath(
+    Map<String, byte[]> rawClasses,
+    Map<String, byte[]> files,
+    Map<String, ClassNode> classesInfo
+) {
 
-  private static final Logger LOGGER = LogManager.getLogger(Classpath.class);
-
-  private final Map<String, byte[]> files = new ConcurrentHashMap<>();
-  private final Map<String, byte[]> classes = new ConcurrentHashMap<>();
-
-  private final int classWriterFlags;
-
-  public Classpath(int classWriterFlags) {
-    this.classWriterFlags = classWriterFlags;
+  public static Builder builder() {
+    return new Builder();
   }
 
-  /**
-   * Adds jar to classpath
-   *
-   * @param jarPath Jar path
-   */
-  public void addJar(@NotNull Path jarPath) {
-    int prevSize = classes.size();
+  public static class Builder {
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    FileHelper.loadFilesFromZip(
-        jarPath,
-        (classPath, bytes) -> {
-          if (!ClassHelper.isClass(classPath, bytes)) {
-            files.putIfAbsent(classPath, bytes);
-            return;
-          }
+    private final Map<String, byte[]> rawClasses = new HashMap<>();
+    private final Map<String, byte[]> files = new HashMap<>();
 
-          try {
-            String className = ClassHelper.loadClass(
-                classPath,
-                bytes,
-                ClassReader.SKIP_CODE | ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG,
-                classWriterFlags
-            ).name();
+    private final Map<String, ClassNode> classesInfo = new HashMap<>();
 
-            classes.putIfAbsent(className, bytes);
-          } catch (Exception e) {
-            LOGGER.error("Could not load {} class from {} library", classPath, jarPath, e);
-          }
-        });
-
-    LOGGER.info("Loaded {} classes from {}", classes.size() - prevSize, jarPath.getFileName());
-  }
-
-  /**
-   * Adds {@link DeobfuscatorOptions.ExternalClass} to classpath
-   *
-   * @param externalClass External class
-   */
-  public void addExternalClass(DeobfuscatorOptions.ExternalClass externalClass) {
-    try {
-      byte[] classBytes = Files.readAllBytes(externalClass.path());
-      String className = ClassHelper.loadClass(
-          externalClass.pathInJar(),
-          classBytes,
-          ClassReader.SKIP_CODE | ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG,
-          classWriterFlags
-      ).name();
-
-      // Add class to classpath
-      classes.putIfAbsent(className, classBytes);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    private Builder() {
     }
-  }
 
-  public Map<String, byte[]> getFiles() {
-    return this.files;
-  }
+    /**
+     * Adds jar to classpath
+     *
+     * @param jarPath Jar path
+     */
+    @Contract("_ -> this")
+    public Builder addJar(@NotNull Path jarPath) {
+      FileHelper.loadFilesFromZip(jarPath, (classPath, bytes) -> {
+        if (!ClassHelper.isClass(classPath, bytes)) {
+          files.putIfAbsent(classPath, bytes);
+          return;
+        }
 
-  public Map<String, byte[]> getClasses() {
-    return this.classes;
+        try {
+          ClassNode classNode = ClassHelper.loadUnknownClassInfo(bytes);
+          String className = classNode.name;
+
+          rawClasses.putIfAbsent(className, bytes);
+          classesInfo.putIfAbsent(className, classNode);
+        } catch (Exception e) {
+          LOGGER.error("Could not load {} class from {} library", classPath, jarPath, e);
+        }
+      });
+
+      return this;
+    }
+
+    /**
+     * Adds {@link DeobfuscatorOptions.ExternalClass} to classpath
+     *
+     * @param externalClass External class
+     */
+    @Contract("_ -> this")
+    public Builder addExternalClass(DeobfuscatorOptions.ExternalClass externalClass) {
+      try {
+        byte[] classBytes = Files.readAllBytes(externalClass.path());
+
+        ClassNode classNode = ClassHelper.loadUnknownClassInfo(classBytes);
+
+        String className = classNode.name;
+
+        // Add class to classpath
+        rawClasses.putIfAbsent(className, classBytes);
+        classesInfo.putIfAbsent(className, classNode);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+
+      return this;
+    }
+
+    /**
+     * Adds another classpath to this classpath
+     */
+    @Contract("_ -> this")
+    public Builder addClasspath(Classpath classpath) {
+      this.rawClasses.putAll(classpath.rawClasses);
+      this.files.putAll(classpath.files);
+      this.classesInfo.putAll(classpath.classesInfo);
+
+      return this;
+    }
+
+    public Classpath build() {
+      return new Classpath(
+          Collections.unmodifiableMap(rawClasses),
+          Collections.unmodifiableMap(files),
+          Collections.unmodifiableMap(classesInfo)
+      );
+    }
   }
 }

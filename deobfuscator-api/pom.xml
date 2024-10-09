@@ -28,8 +28,8 @@
 
         <log4j.version>2.23.1</log4j.version>
         <slf4j.version>2.0.13</slf4j.version>
-        <kafedjud.version>1.10.2</kafedjud.version>
-        <ssvm.version>d559ea90bb</ssvm.version>
+        <cafedude.version>83ea274ff8</cafedude.version>
+        <ssvm.version>4d3f2bc142</ssvm.version>
         <jlinker.version>205d8eaa1f</jlinker.version>
     </properties>
 
@@ -51,88 +51,82 @@
             <version>${jlinker.version}</version>
         </dependency>
 
+        <!-- SSVM -->
         <dependency>
-            <groupId>com.github.xxDark.SSVM</groupId>
+            <groupId>com.github.EpicPlayerA10.SSVM</groupId>
             <artifactId>mirrors</artifactId>
             <version>${ssvm.version}</version>
         </dependency>
-
         <dependency>
-            <groupId>com.github.xxDark.SSVM</groupId>
+            <groupId>com.github.EpicPlayerA10.SSVM</groupId>
             <artifactId>ssvm-core</artifactId>
             <version>${ssvm.version}</version>
         </dependency>
-
         <dependency>
-            <groupId>com.github.xxDark.SSVM</groupId>
+            <groupId>com.github.EpicPlayerA10.SSVM</groupId>
             <artifactId>ssvm-invoke</artifactId>
             <version>${ssvm.version}</version>
         </dependency>
-
         <dependency>
-            <groupId>com.github.xxDark.SSVM</groupId>
+            <groupId>com.github.EpicPlayerA10.SSVM</groupId>
             <artifactId>ssvm-io</artifactId>
             <version>${ssvm.version}</version>
         </dependency>
 
+        <!-- ASM -->
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-commons</artifactId>
             <version>${asm.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-util</artifactId>
             <version>${asm.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-tree</artifactId>
             <version>${asm.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-analysis</artifactId>
             <version>${asm.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm</artifactId>
             <version>${asm.version}</version>
         </dependency>
 
+        <!-- Logging -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
             <version>${log4j.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>${log4j.version}</version>
         </dependency>
-
+        <!-- SLF4J Bridge -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
+            <version>2.0.16</version>
         </dependency>
-
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j2-impl</artifactId>
+            <version>${log4j.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.github.Col-E</groupId>
             <artifactId>CAFED00D</artifactId>
-            <version>${kafedjud.version}</version>
+            <version>${cafedude.version}</version>
         </dependency>
     </dependencies>
 

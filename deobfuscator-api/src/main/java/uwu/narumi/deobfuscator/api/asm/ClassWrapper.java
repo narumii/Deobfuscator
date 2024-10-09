@@ -10,9 +10,9 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
-import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
-import uwu.narumi.deobfuscator.api.classpath.ClasspathClassWriter;
+import uwu.narumi.deobfuscator.api.classpath.InheritanceClassWriter;
+import uwu.narumi.deobfuscator.api.inheritance.InheritanceGraph;
 
 public class ClassWrapper implements Cloneable {
 
@@ -27,7 +27,7 @@ public class ClassWrapper implements Cloneable {
   private final ConstantPool constantPool;
   private final int classWriterFlags;
 
-  public ClassWrapper(String pathInJar, ClassReader classReader, int classReaderFlags, int classWriterFlags) throws Exception {
+  public ClassWrapper(String pathInJar, ClassReader classReader, int classReaderFlags, int classWriterFlags) {
     this.pathInJar = pathInJar;
     this.classNode = new ClassNode();
     this.constantPool = new ConstantPool(classReader);
@@ -129,9 +129,9 @@ public class ClassWrapper implements Cloneable {
   /**
    * Compiles class to bytes.
    */
-  public byte[] compileToBytes(Context context) {
+  public byte[] compileToBytes(InheritanceGraph inheritanceGraph) {
     try {
-      ClassWriter classWriter = new ClasspathClassWriter(this.classWriterFlags, context.getClasspath());
+      ClassWriter classWriter = new InheritanceClassWriter(this.classWriterFlags, inheritanceGraph);
       this.classNode.accept(classWriter);
 
       return classWriter.toByteArray();

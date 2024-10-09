@@ -1,10 +1,12 @@
 package uwu.narumi.deobfuscator.api.helper;
 
 import java.util.ArrayList;
-import me.coley.cafedude.InvalidClassException;
-import me.coley.cafedude.classfile.ClassFile;
-import me.coley.cafedude.io.ClassFileReader;
-import me.coley.cafedude.io.ClassFileWriter;
+
+import software.coley.cafedude.InvalidClassException;
+import software.coley.cafedude.classfile.ClassFile;
+import software.coley.cafedude.io.ClassFileReader;
+import software.coley.cafedude.io.ClassFileWriter;
+import org.intellij.lang.annotations.MagicConstant;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
@@ -14,7 +16,8 @@ import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 
 public final class ClassHelper {
 
-  private ClassHelper() {}
+  private ClassHelper() {
+  }
 
   public static boolean isClass(String fileName, byte[] bytes) {
     return isClass(bytes) && (fileName.endsWith(".class") || fileName.endsWith(".class/"));
@@ -22,32 +25,74 @@ public final class ClassHelper {
 
   public static boolean isClass(byte[] bytes) {
     return bytes.length >= 4
-        && String.format("%02X%02X%02X%02X", bytes[0], bytes[1], bytes[2], bytes[3])
-            .equals("CAFEBABE");
-  }
-
-  public static ClassWrapper loadClass(String pathInJar, byte[] bytes, int classReaderFlags, int classWriterFlags) throws Exception {
-    return loadClass(pathInJar, bytes, classReaderFlags, classWriterFlags, true);
+        && String.format("%02X%02X%02X%02X", bytes[0], bytes[1], bytes[2], bytes[3]).equals("CAFEBABE");
   }
 
   /**
    * Load class from bytes
    *
-   * @param pathInJar Relative path of a class in a jar
-   * @param bytes Class bytes
+   * @param pathInJar        Relative path of a class in a jar
+   * @param bytes            Class bytes
    * @param classReaderFlags {@link ClassReader} flags
    * @param classWriterFlags {@link ClassWriter} flags
-   * @param fix Fix class using CAFED00D
    */
-  public static ClassWrapper loadClass(String pathInJar, byte[] bytes, int classReaderFlags, int classWriterFlags, boolean fix) throws Exception {
-    // Fix class
-    bytes = fix ? fixClass(bytes) : bytes;
-
+  public static ClassWrapper loadClass(
+      String pathInJar,
+      byte[] bytes,
+      @MagicConstant(flagsFromClass = ClassReader.class) int classReaderFlags,
+      @MagicConstant(flagsFromClass = ClassWriter.class) int classWriterFlags
+  ) {
     return new ClassWrapper(pathInJar, new ClassReader(bytes), classReaderFlags, classWriterFlags);
+  }
+
+  /**
+   * Loads class from unknown sources. Applies fixes to bytecode using CAFED00D.
+   *
+   * @param pathInJar        Relative path of a class in a jar
+   * @param bytes            Class bytes
+   * @param classReaderFlags {@link ClassReader} flags
+   * @param classWriterFlags {@link ClassWriter} flags
+   */
+  public static ClassWrapper loadUnknownClass(
+      String pathInJar,
+      byte[] bytes,
+      @MagicConstant(flagsFromClass = ClassReader.class) int classReaderFlags,
+      @MagicConstant(flagsFromClass = ClassWriter.class) int classWriterFlags
+  ) throws InvalidClassException {
+    // Fix class
+    bytes = fixClass(bytes);
+
+    return loadClass(pathInJar, bytes, classReaderFlags, classWriterFlags);
+  }
+
+  /**
+   * Loads only class info (like class name, superclass, interfaces, etc.) without any code.
+   *
+   * @param bytes Class bytes
+   * @return {@link ClassNode} with class info only
+   */
+  public static ClassNode loadClassInfo(byte[] bytes) {
+    ClassNode classNode = new ClassNode();
+    new ClassReader(bytes).accept(classNode, ClassReader.SKIP_CODE | ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
+    return classNode;
+  }
+
+  /**
+   * Loads class info from unknown sources. Applies fixes to bytecode using CAFED00D.
+   *
+   * @param bytes Class bytes
+   * @return {@link ClassNode} with class info only
+   */
+  public static ClassNode loadUnknownClassInfo(byte[] bytes) throws InvalidClassException {
+    // Fix class
+    bytes = fixClass(bytes);
+
+    return loadClassInfo(bytes);
   }
 
   public static byte[] fixClass(byte[] bytes) throws InvalidClassException {
     ClassFileReader classFileReader = new ClassFileReader();
+    classFileReader.setDropDupeAnnotations(false);
     ClassFile classFile = classFileReader.read(bytes);
     bytes = new ClassFileWriter().write(classFile);
 

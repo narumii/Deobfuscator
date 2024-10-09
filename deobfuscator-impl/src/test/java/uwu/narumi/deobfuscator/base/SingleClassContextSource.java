@@ -4,8 +4,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.jetbrains.java.decompiler.main.extern.IContextSource;
 import org.jetbrains.java.decompiler.main.extern.IResultSaver;
-import org.objectweb.asm.ClassReader;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
 
 import java.io.ByteArrayInputStream;
@@ -25,8 +23,8 @@ public class SingleClassContextSource implements IContextSource {
     try {
       // Get qualified name
       this.contents = Files.readAllBytes(file);
-      ClassWrapper classWrapper = ClassHelper.loadClass(relativePath, this.contents, ClassReader.SKIP_FRAMES, 0);
-      this.qualifiedName = classWrapper.name();
+
+      this.qualifiedName = ClassHelper.loadUnknownClassInfo(this.contents).name;
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
