@@ -28,7 +28,7 @@
         <log4j.version>2.23.1</log4j.version>
         <slf4j.version>2.0.13</slf4j.version>
         <cafedude.version>83ea274ff8</cafedude.version>
-        <ssvm.version>4d3f2bc142</ssvm.version>
+        <ssvm.version>ca3c3ab713</ssvm.version>
         <jlinker.version>205d8eaa1f</jlinker.version>
     </properties>
 
@@ -50,7 +50,7 @@
             <version>${jlinker.version}</version>
         </dependency>
 
-        <!-- SSVM -->
+        <!-- Fork of SSVM -->
         <dependency>
             <groupId>com.github.EpicPlayerA10.SSVM</groupId>
             <artifactId>mirrors</artifactId>

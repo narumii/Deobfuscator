@@ -202,9 +202,6 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
         // Set field to decrypted long value!
         matchContext.insnContext().methodNode().instructions.insertBefore(matchContext.insn(), AsmHelper.numberInsn(value));
         markChange();
-      } catch (VMException ex) {
-        sandBox.logVMException(ex);
-        throw new RuntimeException(ex);
       } catch (ClassNotFoundException e) {
         throw new RuntimeException(e);
       }
