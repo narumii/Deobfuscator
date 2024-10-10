@@ -92,7 +92,6 @@ public final class ClassHelper {
 
   public static byte[] fixClass(byte[] bytes) throws InvalidClassException {
     ClassFileReader classFileReader = new ClassFileReader();
-    classFileReader.setDropDupeAnnotations(false);
     ClassFile classFile = classFileReader.read(bytes);
     bytes = new ClassFileWriter().write(classFile);
 
