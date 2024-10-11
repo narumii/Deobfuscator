@@ -1,4 +1,4 @@
-package reverseengineering.zelix.enhancedstringenc;
+package zelix.enhancedstringenc;
 
 public class SomeStrings {
   private static final String[] staticObfuscatedStrings;

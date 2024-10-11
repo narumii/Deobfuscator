@@ -1,4 +1,4 @@
-package reverseengineering.zelix.longdecrypter;
+package zelix.longdecrypter;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -324,7 +324,7 @@ public class FallbackLongDecrypter implements ILongDecrypter {
     var10000.put(SimpleLongDecrypter.getCachedDecrypter(364818715671619056L), SimpleLongDecrypter.getCachedDecrypter(-7753376661691852493L));
     var10000.put(SimpleLongDecrypter.getCachedDecrypter(6116050039557398859L), SimpleLongDecrypter.getCachedDecrypter(-3612871415275240979L));
     var10000.put(SimpleLongDecrypter.getCachedDecrypter(-6608651480983725416L), SimpleLongDecrypter.getCachedDecrypter(5220624081610830673L));
-    var10000.put(SimpleLongDecrypter.getCachedDecrypter(-2531369932321710358L), reverseengineering.zelix.longdecrypter.SimpleLongDecrypter.getCachedDecrypter(6770957041204362784L));
+    var10000.put(SimpleLongDecrypter.getCachedDecrypter(-2531369932321710358L), SimpleLongDecrypter.getCachedDecrypter(6770957041204362784L));
     var10000.put(SimpleLongDecrypter.getCachedDecrypter(385158871454716980L), SimpleLongDecrypter.getCachedDecrypter(5193389589470841672L));
     var10000.put(SimpleLongDecrypter.getCachedDecrypter(1181471781776655964L), SimpleLongDecrypter.getCachedDecrypter(2923672309141886419L));
     var10000.put(SimpleLongDecrypter.getCachedDecrypter(-1421322407309228933L), SimpleLongDecrypter.getCachedDecrypter(-4532644287730267790L));

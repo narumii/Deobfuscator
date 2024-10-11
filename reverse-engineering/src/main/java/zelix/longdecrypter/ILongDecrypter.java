@@ -1,4 +1,4 @@
-package reverseengineering.zelix.longdecrypter;
+package zelix.longdecrypter;
 
 public interface ILongDecrypter {
   void setChild(ILongDecrypter parent);

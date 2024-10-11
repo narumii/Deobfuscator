@@ -1,4 +1,4 @@
-package reverseengineering.zelix.enhancedstringenc;
+package zelix.enhancedstringenc;
 
 /**
  * Decompiled using Procyon because Vineflower is decompiling it wrongly...

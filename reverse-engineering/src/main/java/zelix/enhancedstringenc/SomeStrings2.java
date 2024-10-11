@@ -1,4 +1,4 @@
-package reverseengineering.zelix.enhancedstringenc;
+package zelix.enhancedstringenc;
 
 /**
  * This is just a very similar class to {@link SomeStrings} but with different strings. It exists here to compare two classes.

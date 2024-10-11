@@ -1,4 +1,4 @@
-package reverseengineering.zelix.enhancedstringenc;
+package zelix.enhancedstringenc;
 
 public class ManyStringsOriginal {
   private static final String[] a;

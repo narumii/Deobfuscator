@@ -1,4 +1,4 @@
-package reverseengineering.zelix.longdecrypter;
+package zelix.longdecrypter;
 
 import java.util.ArrayList;
 import java.util.Vector;

@@ -16,6 +16,7 @@
     <module>deobfuscator-api</module>
     <module>deobfuscator-impl</module>
     <module>deobfuscator-transformers</module>
+    <module>reverse-engineering</module>
   </modules>
 
   <properties>
