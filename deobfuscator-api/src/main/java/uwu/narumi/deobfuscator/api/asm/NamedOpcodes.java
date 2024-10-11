@@ -1,11 +1,13 @@
-package org.objectweb.asm;
+package uwu.narumi.deobfuscator.api.asm;
+
+import org.objectweb.asm.Opcodes;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-/*
-Debug purposes
+/**
+ * Maps opcodes to their names. For debug purposes.
  */
 public final class NamedOpcodes {
 

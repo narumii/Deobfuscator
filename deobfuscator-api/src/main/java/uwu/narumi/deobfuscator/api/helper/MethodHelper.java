@@ -2,7 +2,7 @@ package uwu.narumi.deobfuscator.api.helper;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
-import org.objectweb.asm.NamedOpcodes;
+import uwu.narumi.deobfuscator.api.asm.NamedOpcodes;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;

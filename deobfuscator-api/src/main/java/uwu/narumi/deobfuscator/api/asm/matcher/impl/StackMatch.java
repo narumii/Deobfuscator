@@ -1,6 +1,5 @@
 package uwu.narumi.deobfuscator.api.asm.matcher.impl;
 
-import org.objectweb.asm.NamedOpcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;

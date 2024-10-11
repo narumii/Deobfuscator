@@ -37,7 +37,7 @@ import java.util.function.Predicate;
 
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.NamedOpcodes;
+import uwu.narumi.deobfuscator.api.asm.NamedOpcodes;
 import org.objectweb.asm.Type;
 
 /**
