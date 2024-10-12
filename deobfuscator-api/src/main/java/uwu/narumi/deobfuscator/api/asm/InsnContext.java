@@ -6,6 +6,7 @@ import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
+import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 
 /**
  * Instruction context. Holds all information relevant to the current instruction.
@@ -59,8 +60,7 @@ public class InsnContext {
       OriginalSourceValue sourceValue = frame().getStack(stackValueIdx);
 
       // Pop
-      InsnNode popInsn = sourceValue.getSize() == 2 ? new InsnNode(Opcodes.POP2) : new InsnNode(Opcodes.POP);
-      this.methodNode().instructions.insertBefore(this.insn, popInsn);
+      this.methodNode().instructions.insertBefore(this.insn, AsmHelper.toPop(sourceValue));
     }
   }
 }

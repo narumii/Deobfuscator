@@ -29,7 +29,6 @@ public class a4 {
     private static final char c;
     private static final ConcurrentMap<String, List<Locale>> d;
     private static final ConcurrentMap<String, List<Locale>> e;
-    private static final long f = 31437394211371L;
     private static final String[] g;
     private static final String[] h;
     private static final Map i = new HashMap(13);

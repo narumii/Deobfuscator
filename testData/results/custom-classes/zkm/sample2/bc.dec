@@ -2,7 +2,6 @@ package a.a.a.a;
 
 public final class bc extends ba<Integer> {
     private static final long serialVersionUID = 1L;
-    private static final long f = 90497055901648L;
 
     public static bc a(int var0, long var1, int var3) {
         var1 = 90497055901648L ^ var1;

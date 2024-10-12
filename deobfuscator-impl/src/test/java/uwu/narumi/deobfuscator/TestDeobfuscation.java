@@ -26,8 +26,14 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
     register("Simple flow obfuscation", InputType.JAVA_CODE, List.of(ComposedGeneralFlowTransformer::new), Source.of("TestSimpleFlowObfuscation"));
     register("Universal Number Transformer", InputType.JAVA_CODE, List.of(UniversalNumberTransformer::new), Source.of("TestUniversalNumberTransformer"));
     // TODO: Uninitialized static fields should replace with 0?
-    register("Inline static fields", InputType.JAVA_CODE, List.of(InlineStaticFieldTransformer::new), Source.of("TestInlineStaticFields"));
-    register("Inline static fields with modification", InputType.JAVA_CODE, List.of(InlineStaticFieldTransformer::new), Source.of("TestInlineStaticFieldsWithModification"));
+    register("Inline static fields", InputType.JAVA_CODE, List.of(
+        InlineStaticFieldTransformer::new,
+        UselessPopCleanTransformer::new
+    ), Source.of("TestInlineStaticFields"));
+    register("Inline static fields with modification", InputType.JAVA_CODE, List.of(
+        InlineStaticFieldTransformer::new,
+        UselessPopCleanTransformer::new
+    ), Source.of("TestInlineStaticFieldsWithModification"));
 
     // Test sandbox security (e.g. not allowing dangerous calls)
     register("Sandbox security", InputType.JAVA_CODE, List.of(TestSandboxSecurityTransformer::new), Source.of("sandbox/TestSandboxSecurity", false));

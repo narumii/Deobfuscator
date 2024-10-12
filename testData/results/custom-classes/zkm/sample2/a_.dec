@@ -24,7 +24,6 @@ public class a_<T> implements Serializable {
     private final T c;
     private final T d;
     private transient String e;
-    private static final long h = 104039320445854L;
     private static final String[] i;
     private static final String[] j;
     private static final Map k = new HashMap(13);

@@ -2,6 +2,9 @@ package uwu.narumi.deobfuscator.core.other.impl.pool;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.analysis.BasicInterpreter;
+import org.objectweb.asm.tree.analysis.BasicValue;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
@@ -89,6 +92,7 @@ public class InlineStaticFieldTransformer extends Transformer {
         }));
 
     // Replace static fields accesses with corresponding values
+    List<FieldRef> inlinedFields = new ArrayList<>();
     context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
       Arrays.stream(methodNode.instructions.toArray())
           .filter(insn -> insn.getOpcode() == GETSTATIC)
@@ -99,10 +103,41 @@ public class InlineStaticFieldTransformer extends Transformer {
             if (constValue != null) {
               // Replace it!
               methodNode.instructions.set(insn, constValue.clone(null));
+
+              // Add to an inlined fields list
+              if (!inlinedFields.contains(fieldRef)) {
+                inlinedFields.add(fieldRef);
+              }
+
               this.markChange();
             }
           });
     }));
+
+    // Remove fields that were inlined
+    context.classes(scope).parallelStream().forEach(classWrapper -> {
+      // Remove field
+      classWrapper.classNode().fields.removeIf(fieldNode -> inlinedFields.contains(FieldRef.of(classWrapper.classNode(), fieldNode)));
+
+      // Replace PUTSTATIC with POP
+      classWrapper.findClInit().ifPresent(methodNode -> {
+        Map<AbstractInsnNode, Frame<BasicValue>> frames = MethodHelper.analyzeBasic(classWrapper.classNode(), methodNode);
+
+        Arrays.stream(methodNode.instructions.toArray())
+            .filter(insn -> insn.getOpcode() == PUTSTATIC)
+            .map(FieldInsnNode.class::cast)
+            .forEach(insn -> {
+              FieldRef fieldRef = FieldRef.of(insn);
+              if (inlinedFields.contains(fieldRef)) {
+                Frame<BasicValue> frame = frames.get(insn);
+                BasicValue value = frame.getStack(frame.getStackSize() - 1);
+
+                // Replace insn with pop
+                methodNode.instructions.set(insn, AsmHelper.toPop(value));
+              }
+            });
+      });
+    });
 
     LOGGER.info("Inlined {} constant static fields", this.getChangesCount());
   }

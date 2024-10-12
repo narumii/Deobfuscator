@@ -7,6 +7,7 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.analysis.Value;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.MethodRef;
@@ -127,6 +128,10 @@ public class AsmHelper implements Opcodes {
     if (insn.owner.equals("java/lang/Boolean") && insn.name.equals("booleanValue")) return Type.BOOLEAN_TYPE;
 
     throw new IllegalStateException("Unexpected value: " + insn.owner+"."+insn.name+insn.desc);
+  }
+
+  public static AbstractInsnNode toPop(Value value) {
+    return value.getSize() == 1 ? new InsnNode(POP) : new InsnNode(POP2);
   }
 
   /**

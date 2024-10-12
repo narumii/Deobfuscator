@@ -60,7 +60,6 @@ public final class PacketEvents implements Listener, EventManager {
     private boolean terminating;
     private boolean lateBind;
     private static int Vulcan_k;
-    private static final long a = 110160429747013L;
 
     public PacketEvents() {
         int var10000 = Vulcan_Q();

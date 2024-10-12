@@ -10,11 +10,10 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
-import uwu.narumi.deobfuscator.api.helper.ClassHelper;
 import uwu.narumi.deobfuscator.api.classpath.InheritanceClassWriter;
 import uwu.narumi.deobfuscator.api.inheritance.InheritanceGraph;
 
-public class ClassWrapper implements Cloneable {
+public class ClassWrapper {
 
   protected static final Logger LOGGER = LogManager.getLogger(ClassWrapper.class);
 
@@ -23,23 +22,14 @@ public class ClassWrapper implements Cloneable {
    */
   private final String pathInJar;
   private final ClassNode classNode;
-  private final FieldCache fieldCache;
   private final ConstantPool constantPool;
 
   public ClassWrapper(String pathInJar, ClassReader classReader, int classReaderFlags) {
     this.pathInJar = pathInJar;
     this.classNode = new ClassNode();
     this.constantPool = new ConstantPool(classReader);
-    this.fieldCache = new FieldCache();
 
     classReader.accept(this.classNode, classReaderFlags);
-  }
-
-  private ClassWrapper(String pathInJar, ClassNode classNode, FieldCache fieldCache, ConstantPool constantPool) {
-    this.pathInJar = pathInJar;
-    this.classNode = classNode;
-    this.fieldCache = fieldCache;
-    this.constantPool = constantPool;
   }
 
   public Optional<MethodNode> findMethod(String name, String desc) {
@@ -153,16 +143,7 @@ public class ClassWrapper implements Cloneable {
     return classNode;
   }
 
-  public FieldCache getFieldCache() {
-    return fieldCache;
-  }
-
   public ConstantPool getConstantPool() {
     return constantPool;
-  }
-
-  @Override
-  public ClassWrapper clone() {
-    return new ClassWrapper(this.pathInJar, ClassHelper.copy(classNode), fieldCache.clone(), constantPool.clone());
   }
 }

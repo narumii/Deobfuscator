@@ -4,7 +4,6 @@ import java.util.Comparator;
 
 public class ba<N extends Number> extends a_<N> {
     private static final long serialVersionUID = 1L;
-    private static final long g = 87486991067610L;
 
     public ba(long var1, Number var3, Number var4, Comparator var5) {
         var1 = 87486991067610L ^ var1;
