@@ -34,15 +34,13 @@ public final class ClassHelper {
    * @param pathInJar        Relative path of a class in a jar
    * @param bytes            Class bytes
    * @param classReaderFlags {@link ClassReader} flags
-   * @param classWriterFlags {@link ClassWriter} flags
    */
   public static ClassWrapper loadClass(
       String pathInJar,
       byte[] bytes,
-      @MagicConstant(flagsFromClass = ClassReader.class) int classReaderFlags,
-      @MagicConstant(flagsFromClass = ClassWriter.class) int classWriterFlags
+      @MagicConstant(flagsFromClass = ClassReader.class) int classReaderFlags
   ) {
-    return new ClassWrapper(pathInJar, new ClassReader(bytes), classReaderFlags, classWriterFlags);
+    return new ClassWrapper(pathInJar, new ClassReader(bytes), classReaderFlags);
   }
 
   /**
@@ -51,18 +49,16 @@ public final class ClassHelper {
    * @param pathInJar        Relative path of a class in a jar
    * @param bytes            Class bytes
    * @param classReaderFlags {@link ClassReader} flags
-   * @param classWriterFlags {@link ClassWriter} flags
    */
   public static ClassWrapper loadUnknownClass(
       String pathInJar,
       byte[] bytes,
-      @MagicConstant(flagsFromClass = ClassReader.class) int classReaderFlags,
-      @MagicConstant(flagsFromClass = ClassWriter.class) int classWriterFlags
+      @MagicConstant(flagsFromClass = ClassReader.class) int classReaderFlags
   ) throws InvalidClassException {
     // Fix class
     bytes = fixClass(bytes);
 
-    return loadClass(pathInJar, bytes, classReaderFlags, classWriterFlags);
+    return loadClass(pathInJar, bytes, classReaderFlags);
   }
 
   /**

@@ -125,7 +125,8 @@ public abstract class TestDeobfuscationBase {
       // Last configurations
       optionsBuilder
           .outputJar(null)
-          .outputDir(decompilerInputDir);
+          .outputDir(decompilerInputDir)
+          .skipFiles();
 
       // Build and run deobfuscator!
       Deobfuscator.from(optionsBuilder.build()).start();

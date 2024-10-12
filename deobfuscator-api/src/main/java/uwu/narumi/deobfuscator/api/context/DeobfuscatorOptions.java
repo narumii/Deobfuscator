@@ -35,7 +35,8 @@ public record DeobfuscatorOptions(
 
     boolean printStacktraces,
     boolean continueOnError,
-    boolean verifyBytecode
+    boolean verifyBytecode,
+    boolean skipFiles
 ) {
   public static DeobfuscatorOptions.Builder builder() {
     return new DeobfuscatorOptions.Builder();
@@ -74,6 +75,7 @@ public record DeobfuscatorOptions(
     private boolean printStacktraces = true;
     private boolean continueOnError = false;
     private boolean verifyBytecode = false;
+    private boolean skipFiles = false;
 
     private Builder() {
     }
@@ -223,6 +225,15 @@ public record DeobfuscatorOptions(
     }
 
     /**
+     * Skips files during saving.
+     */
+    @Contract(" -> this")
+    public DeobfuscatorOptions.Builder skipFiles() {
+      this.skipFiles = true;
+      return this;
+    }
+
+    /**
      * Build immutable {@link DeobfuscatorOptions} with options verification
      */
     public DeobfuscatorOptions build() {
@@ -252,7 +263,8 @@ public record DeobfuscatorOptions(
           // Other config
           printStacktraces,
           continueOnError,
-          verifyBytecode
+          verifyBytecode,
+          skipFiles
       );
     }
   }

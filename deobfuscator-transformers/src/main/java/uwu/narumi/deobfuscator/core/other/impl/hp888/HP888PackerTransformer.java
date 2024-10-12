@@ -32,7 +32,7 @@ public class HP888PackerTransformer extends Transformer {
 
   @Override
   protected void transform(ClassWrapper scope, Context context) throws Exception {
-    Set<String> toRemove = new HashSet<>();
+    Set<String> filesToRemove = new HashSet<>();
     HashMap<String, ClassWrapper> newClasses = new HashMap<>();
     AtomicReference<String> key = new AtomicReference<>();
 
@@ -56,16 +56,13 @@ public class HP888PackerTransformer extends Transformer {
     context.getFiles().forEach((file, bytes) -> {
       if (file.endsWith(encryptedClassFilesSuffix)) {
         String cleanFileName = file.replace(encryptedClassFilesSuffix, "").replace(".", "/");
-        toRemove.add(file);
+        filesToRemove.add(file);
         try {
           // Decrypt!
           byte[] decrypted = cipher.doFinal(bytes);
 
-          newClasses.put(cleanFileName, ClassHelper.loadUnknownClass(cleanFileName,
-              decrypted,
-              ClassReader.SKIP_FRAMES,
-              ClassWriter.COMPUTE_MAXS
-          ));
+          // Load class
+          newClasses.put(cleanFileName, ClassHelper.loadUnknownClass(cleanFileName, decrypted, ClassReader.SKIP_FRAMES));
           markChange();
         } catch (Exception e) {
           LOGGER.error(e);
@@ -73,8 +70,10 @@ public class HP888PackerTransformer extends Transformer {
       }
     });
 
-    // Cleanup
-    toRemove.forEach(context.getFiles()::remove);
+    // Put all new classes
     context.getClasses().putAll(newClasses);
+
+    // Cleanup
+    filesToRemove.forEach(context.getFiles()::remove);
   }
 }

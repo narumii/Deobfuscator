@@ -22,7 +22,6 @@ public class AssertingResultSaver implements IResultSaver {
     this.root = inputType == TestDeobfuscationBase.InputType.CUSTOM_JAR
             ? TestDeobfuscationBase.RESULTS_CLASSES_PATH.resolve(inputType.directory()).resolve(jarRelativePath)
             : TestDeobfuscationBase.RESULTS_CLASSES_PATH.resolve(inputType.directory());
-
   }
 
   @Override

@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -92,7 +93,7 @@ public class Deobfuscator {
     if (this.options.inputJar() != null) {
       LOGGER.info("Loading jar file: {}", this.options.inputJar());
       // Load jar
-      FileHelper.loadFilesFromZip(this.options.inputJar(), this::loadClass);
+      FileHelper.loadFilesFromZip(this.options.inputJar(), this::loadClassOrFile);
       LOGGER.info("Loaded jar file: {}", this.options.inputJar());
     }
 
@@ -101,7 +102,7 @@ public class Deobfuscator {
 
       try (InputStream inputStream = new FileInputStream(clazz.path().toFile())) {
         // Load class
-        this.loadClass(clazz.pathInJar(), inputStream.readAllBytes());
+        this.loadClassOrFile(clazz.pathInJar(), inputStream.readAllBytes());
 
         LOGGER.info("Loaded class: {}", clazz.pathInJar());
       } catch (IOException e) {
@@ -110,29 +111,27 @@ public class Deobfuscator {
     }
   }
 
-  private void loadClass(String pathInJar, byte[] bytes) {
-    try {
-      if (ClassHelper.isClass(pathInJar, bytes)) {
-        ClassWrapper classWrapper = ClassHelper.loadUnknownClass(
-            pathInJar,
-            bytes,
-            ClassReader.SKIP_FRAMES,
-            this.options.classWriterFlags()
-        );
+  private void loadClassOrFile(String pathInJar, byte[] bytes) {
+    // Load class
+    if (ClassHelper.isClass(pathInJar, bytes)) {
+      try {
+        ClassWrapper classWrapper = ClassHelper.loadUnknownClass(pathInJar, bytes, ClassReader.SKIP_FRAMES);
         context.getClasses().putIfAbsent(classWrapper.name(), classWrapper);
-      } else if (!context.getFiles().containsKey(pathInJar)) {
-        context.getFiles().put(pathInJar, bytes);
+        return;
+      } catch (Exception e) {
+        LOGGER.error("Could not load class: {}, adding as file", pathInJar, e);
+        // Will add as a file
       }
-    } catch (Exception e) {
-      LOGGER.error("Could not load class: {}, adding as file", pathInJar);
-      if (this.options.printStacktraces()) LOGGER.throwing(e);
+    }
 
-      context.getFiles().putIfAbsent(pathInJar, bytes);
+    // Load file
+    if (!context.getFiles().containsKey(pathInJar)) {
+      context.getFiles().put(pathInJar, bytes);
     }
   }
 
   public void transform(List<Supplier<Transformer>> transformers) {
-    if (transformers == null || transformers.isEmpty()) return;
+    if (transformers.isEmpty()) return;
 
     // Run all transformers!
     transformers.forEach(transformerSupplier -> Transformer.transform(transformerSupplier, null, this.context));
@@ -145,36 +144,28 @@ public class Deobfuscator {
     if (this.options.outputJar() != null) {
       saveToJar();
     } else if (this.options.outputDir() != null) {
-      saveClassesToDir();
+      saveToDir();
     } else {
       throw new IllegalStateException("No output file or directory provided");
     }
   }
 
-  private void saveClassesToDir() {
-    LOGGER.info("Saving classes to output directory: {}", this.options.outputDir());
+  private void saveToDir() {
+    LOGGER.info("Saving output to directory: {}", this.options.outputDir());
 
-    InheritanceGraph inheritanceGraph = new InheritanceGraph(this.context.getCombinedClasspath());
-
-    context
-        .getClasses()
-        .forEach((ignored, classWrapper) -> {
-          try {
-            byte[] data = classWrapper.compileToBytes(inheritanceGraph);
-
-            Path path = this.options.outputDir().resolve(classWrapper.getPathInJar());
-            Files.createDirectories(path.getParent());
-            Files.write(path, data);
-          } catch (Exception e) {
-            LOGGER.error("Could not save class: {}", classWrapper.name(), e);
-          }
-
-          context.getClasses().remove(classWrapper.name());
-        });
+    save((path, data) -> {
+      Path realPath = this.options.outputDir().resolve(path);
+      try {
+        Files.createDirectories(realPath.getParent());
+        Files.write(realPath, data);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    });
   }
 
   private void saveToJar() {
-    LOGGER.info("Saving output file: {}", this.options.outputJar());
+    LOGGER.info("Saving output to jar: {}", this.options.outputJar());
 
     // Create directories if not exists
     if (this.options.outputJar().getParent() != null) {
@@ -185,58 +176,69 @@ public class Deobfuscator {
       }
     }
 
-    InheritanceGraph inheritanceGraph = new InheritanceGraph(this.context.getCombinedClasspath());
-
     try (ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(this.options.outputJar()))) {
       zipOutputStream.setLevel(9);
 
-      context
-          .getClasses()
-          .forEach(
-              (ignored, classWrapper) -> {
-                try {
-                  byte[] data = classWrapper.compileToBytes(inheritanceGraph);
-
-                  zipOutputStream.putNextEntry(new ZipEntry(classWrapper.name() + ".class"));
-                  zipOutputStream.write(data);
-                } catch (Exception e) {
-                  LOGGER.error("Could not save class, saving original class instead of deobfuscated: {}", classWrapper.name());
-                  if (this.options.printStacktraces()) LOGGER.throwing(e);
-
-                  try {
-                    // Save original class as a fallback
-                    byte[] data = context.getPrimaryClasspath().rawClasses().get(classWrapper.name());
-
-                    zipOutputStream.putNextEntry(new ZipEntry(classWrapper.name() + ".class"));
-                    zipOutputStream.write(data);
-                  } catch (Exception e2) {
-                    LOGGER.error("Could not save original class: {}", classWrapper.name());
-                    if (this.options.printStacktraces()) LOGGER.throwing(e2);
-                  }
-                }
-
-                context.getClasses().remove(classWrapper.name());
-              });
-
-      context
-          .getFiles()
-          .forEach(
-              (name, data) -> {
-                try {
-                  zipOutputStream.putNextEntry(new ZipEntry(name));
-                  zipOutputStream.write(data);
-                } catch (Exception e) {
-                  LOGGER.error("Could not save file: {}", name);
-                  if (this.options.printStacktraces()) LOGGER.throwing(e);
-                }
-
-                context.getFiles().remove(name);
-              });
+      save((path, data) -> {
+        try {
+          zipOutputStream.putNextEntry(new ZipEntry(path));
+          zipOutputStream.write(data);
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      });
     } catch (IOException e) {
-      LOGGER.error("Could not save output file: {}", this.options.outputJar());
+      LOGGER.error("Could not save output to jar: {}", this.options.outputJar());
       throw new RuntimeException(e);
     }
 
-    LOGGER.info("Saved output file: {}\n", this.options.outputJar());
+    LOGGER.info("Saved output to jar: {}\n", this.options.outputJar());
+  }
+
+  /**
+   * Saves classes and files using provided saver
+   *
+   * @param saver a consumer that accepts a path and data to save
+   */
+  private void save(BiConsumer<String, byte[]> saver) {
+    InheritanceGraph inheritanceGraph = new InheritanceGraph(this.context.getCombinedClasspath());
+
+    // Save classes
+    context.getClasses().forEach((ignored, classWrapper) -> {
+      String path = classWrapper.getPathInJar();
+
+      try {
+        byte[] data = classWrapper.compileToBytes(inheritanceGraph, this.options.classWriterFlags());
+        saver.accept(path, data);
+      } catch (Exception e) {
+        LOGGER.error("Could not save class, saving original class instead of deobfuscated: {}", classWrapper.name());
+        if (this.options.printStacktraces()) LOGGER.throwing(e);
+
+        try {
+          // Save original class as a fallback
+          byte[] data = context.getPrimaryClasspath().rawClasses().get(classWrapper.name());
+          saver.accept(path, data);
+        } catch (Exception e2) {
+          LOGGER.error("Could not save original class: {}", classWrapper.name());
+          if (this.options.printStacktraces()) LOGGER.throwing(e2);
+        }
+      }
+
+      context.getClasses().remove(classWrapper.name());
+    });
+
+    // Save files
+    if (!this.options.skipFiles()) {
+      context.getFiles().forEach((path, data) -> {
+        try {
+          saver.accept(path, data);
+        } catch (Exception e) {
+          LOGGER.error("Could not save file: {}", path);
+          if (this.options.printStacktraces()) LOGGER.throwing(e);
+        }
+
+        context.getFiles().remove(path);
+      });
+    }
   }
 }

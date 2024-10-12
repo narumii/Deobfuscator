@@ -10,7 +10,7 @@ The project is structured as follows:
 - [`deobfuscator-api`](./deobfuscator-api) - The API for the deobfuscator.
 - [`deobfuscator-impl`](./deobfuscator-impl) - The main deobfuscator runner.
 - [`deobfuscator-transformers`](./deobfuscator-transformers) - Transformers for the deobfuscator.
-- [`reverse-engineering`](./deobfuscator-impl/src/test/java/reverseengineering) - A place where you can throw your reverse-engineered classes. More info [here](./deobfuscator-impl/src/test/java/reverseengineering/README.md)
+- [`reverse-engineering`](./reverse-engineering) - A place where you can throw your reverse-engineered classes (for example: complex number pool, complex string pool). You can reference them inside your transformers to make them more readable.
 - [`testData`](./testData) - Tests for transformers
   - [`src/java`](./testData/src/java) - You can write your java code to test transformers
   - [`compiled/custom-classes`](./testData/compiled/custom-classes) - Compiled classes to test transformers. You can throw here classes from your obfuscated jars.

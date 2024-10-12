@@ -25,24 +25,21 @@ public class ClassWrapper implements Cloneable {
   private final ClassNode classNode;
   private final FieldCache fieldCache;
   private final ConstantPool constantPool;
-  private final int classWriterFlags;
 
-  public ClassWrapper(String pathInJar, ClassReader classReader, int classReaderFlags, int classWriterFlags) {
+  public ClassWrapper(String pathInJar, ClassReader classReader, int classReaderFlags) {
     this.pathInJar = pathInJar;
     this.classNode = new ClassNode();
     this.constantPool = new ConstantPool(classReader);
     this.fieldCache = new FieldCache();
-    this.classWriterFlags = classWriterFlags;
 
     classReader.accept(this.classNode, classReaderFlags);
   }
 
-  private ClassWrapper(String pathInJar, ClassNode classNode, FieldCache fieldCache, ConstantPool constantPool, int classWriterFlags) {
+  private ClassWrapper(String pathInJar, ClassNode classNode, FieldCache fieldCache, ConstantPool constantPool) {
     this.pathInJar = pathInJar;
     this.classNode = classNode;
     this.fieldCache = fieldCache;
     this.constantPool = constantPool;
-    this.classWriterFlags = classWriterFlags;
   }
 
   public Optional<MethodNode> findMethod(String name, String desc) {
@@ -129,9 +126,9 @@ public class ClassWrapper implements Cloneable {
   /**
    * Compiles class to bytes.
    */
-  public byte[] compileToBytes(InheritanceGraph inheritanceGraph) {
+  public byte[] compileToBytes(InheritanceGraph inheritanceGraph, int classWriterFlags) {
     try {
-      ClassWriter classWriter = new InheritanceClassWriter(this.classWriterFlags, inheritanceGraph);
+      ClassWriter classWriter = new InheritanceClassWriter(classWriterFlags, inheritanceGraph);
       this.classNode.accept(classWriter);
 
       return classWriter.toByteArray();
@@ -166,6 +163,6 @@ public class ClassWrapper implements Cloneable {
 
   @Override
   public ClassWrapper clone() {
-    return new ClassWrapper(this.pathInJar, ClassHelper.copy(classNode), fieldCache.clone(), constantPool.clone(), this.classWriterFlags);
+    return new ClassWrapper(this.pathInJar, ClassHelper.copy(classNode), fieldCache.clone(), constantPool.clone());
   }
 }
