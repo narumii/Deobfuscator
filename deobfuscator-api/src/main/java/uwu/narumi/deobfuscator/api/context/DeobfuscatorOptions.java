@@ -23,7 +23,7 @@ import java.util.function.Supplier;
  */
 public record DeobfuscatorOptions(
     @Nullable Path inputJar,
-    List<ExternalClass> classes,
+    List<ExternalFile> externalFiles,
     Set<Path> libraries,
 
     @Nullable Path outputJar,
@@ -43,10 +43,10 @@ public record DeobfuscatorOptions(
   }
 
   /**
-   * @param path Path to the raw .class file
-   * @param pathInJar Relative path to .class file if it were in .jar
+   * @param path Path to the raw file
+   * @param pathInJar Relative path to file as if it were in .jar
    */
-  public record ExternalClass(Path path, String pathInJar) {
+  public record ExternalFile(Path path, String pathInJar) {
   }
 
   /**
@@ -56,7 +56,7 @@ public record DeobfuscatorOptions(
     // Inputs
     @Nullable
     private Path inputJar = null;
-    private final List<DeobfuscatorOptions.ExternalClass> classes = new ArrayList<>();
+    private final List<ExternalFile> externalFiles = new ArrayList<>();
     private final Set<Path> libraries = new HashSet<>();
 
     // Outputs
@@ -100,20 +100,36 @@ public record DeobfuscatorOptions(
     }
 
     /**
-     * Output jar for deobfuscated classes. Automatically filled when input jar is set
+     * Add an external file to the deobfuscation context. You can add raw .class files or files that would be in .jar
+     *
+     * @param path Path to an external file
+     * @param pathInJar Relative path to file if it were in .jar
      */
-    @Contract("_ -> this")
-    public DeobfuscatorOptions.Builder outputJar(@Nullable Path outputJar) {
-      this.outputJar = outputJar;
+    @Contract("_,_ -> this")
+    public DeobfuscatorOptions.Builder externalFile(Path path, String pathInJar) {
+      this.externalFiles.add(new ExternalFile(path, pathInJar));
       return this;
     }
 
     /**
-     * Set output dir it if you want to output raw compiled classes instead of jar file
+     * Adds all files from the directory to the deobfuscation context
+     *
+     * @param path Path to the directory
      */
     @Contract("_ -> this")
-    public DeobfuscatorOptions.Builder outputDir(@Nullable Path outputDir) {
-      this.outputDir = outputDir;
+    public DeobfuscatorOptions.Builder inputDir(Path path) {
+      try {
+        Files.walkFileTree(path, new SimpleFileVisitor<>() {
+          @Override
+          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            String pathInJar = path.relativize(file).toString();
+            externalFile(file, pathInJar);
+            return FileVisitResult.CONTINUE;
+          }
+        });
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
       return this;
     }
 
@@ -146,14 +162,20 @@ public record DeobfuscatorOptions(
     }
 
     /**
-     * Add external class to deobfuscate
-     *
-     * @param path         Path to external class
-     * @param relativePath Relative path for saving purposes
+     * Output jar for deobfuscated classes. Automatically filled when input jar is set
      */
-    @Contract("_,_ -> this")
-    public DeobfuscatorOptions.Builder clazz(Path path, String relativePath) {
-      this.classes.add(new DeobfuscatorOptions.ExternalClass(path, relativePath));
+    @Contract("_ -> this")
+    public DeobfuscatorOptions.Builder outputJar(@Nullable Path outputJar) {
+      this.outputJar = outputJar;
+      return this;
+    }
+
+    /**
+     * Set output dir it if you want to output raw compiled classes instead of jar file
+     */
+    @Contract("_ -> this")
+    public DeobfuscatorOptions.Builder outputDir(@Nullable Path outputDir) {
+      this.outputDir = outputDir;
       return this;
     }
 
@@ -238,7 +260,7 @@ public record DeobfuscatorOptions(
      */
     public DeobfuscatorOptions build() {
       // Verify some options
-      if (this.inputJar == null && this.classes.isEmpty()) {
+      if (this.inputJar == null && this.externalFiles.isEmpty()) {
         throw new IllegalStateException("No input files provided");
       }
       if (this.outputJar == null && this.outputDir == null) {
@@ -251,7 +273,7 @@ public record DeobfuscatorOptions(
       return new DeobfuscatorOptions(
           // Input
           inputJar,
-          classes,
+          externalFiles,
           libraries,
           // Output
           outputJar,

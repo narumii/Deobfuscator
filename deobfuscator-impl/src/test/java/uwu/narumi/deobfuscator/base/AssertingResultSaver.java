@@ -14,14 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class AssertingResultSaver implements IResultSaver {
 
-  private final Path root;
+  private final Path outputDir;
 
   private boolean savedContent = false;
 
-  public AssertingResultSaver(TestDeobfuscationBase.InputType inputType, String jarRelativePath) {
-    this.root = inputType == TestDeobfuscationBase.InputType.CUSTOM_JAR
-            ? TestDeobfuscationBase.RESULTS_CLASSES_PATH.resolve(inputType.directory()).resolve(jarRelativePath)
-            : TestDeobfuscationBase.RESULTS_CLASSES_PATH.resolve(inputType.directory());
+  public AssertingResultSaver(Path outputDir) {
+    this.outputDir = outputDir;
   }
 
   @Override
@@ -42,12 +40,10 @@ public class AssertingResultSaver implements IResultSaver {
     // Replace CRLF with LF
     content = content.replace("\r\n", "\n");
 
-    // The Vineflower implementations of IContextSource append .java
-    if (entryName.endsWith(".java")) {
-      entryName = entryName.substring(0, entryName.length() - 5);
-    }
+    // Remove file extension
+    entryName = entryName.substring(0, entryName.lastIndexOf('.'));
 
-    Path saveTo = this.root.resolve(entryName + ".dec");
+    Path saveTo = this.outputDir.resolve(entryName + ".dec");
 
     try {
       if (Files.exists(saveTo)) {

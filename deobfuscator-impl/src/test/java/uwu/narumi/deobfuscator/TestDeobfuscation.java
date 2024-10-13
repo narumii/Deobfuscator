@@ -12,49 +12,58 @@ import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransfor
 import uwu.narumi.deobfuscator.base.TestDeobfuscationBase;
 import uwu.narumi.deobfuscator.transformer.TestSandboxSecurityTransformer;
 
-import java.util.List;
 import java.util.Map;
 
 public class TestDeobfuscation extends TestDeobfuscationBase {
 
   @Override
   protected void registerAll() {
-    register("Inlining local variables", InputType.JAVA_CODE, List.of(
-        InlineLocalVariablesTransformer::new,
-        ComposedPeepholeCleanTransformer::new
-    ), Source.of("TestInlineLocalVariables"));
-    register("Simple flow obfuscation", InputType.JAVA_CODE, List.of(ComposedGeneralFlowTransformer::new), Source.of("TestSimpleFlowObfuscation"));
-    register("Universal Number Transformer", InputType.JAVA_CODE, List.of(UniversalNumberTransformer::new), Source.of("TestUniversalNumberTransformer"));
+    test("Inlining local variables")
+        .transformers(InlineLocalVariablesTransformer::new, ComposedPeepholeCleanTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.JAVA_CODE, "TestInlineLocalVariables.class")
+        .register();
+    test("Simple flow obfuscation")
+        .transformers(ComposedGeneralFlowTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.JAVA_CODE, "TestSimpleFlowObfuscation.class")
+        .register();
+    test("Universal number transformer")
+        .transformers(UniversalNumberTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.JAVA_CODE, "TestUniversalNumberTransformer.class")
+        .register();
     // TODO: Uninitialized static fields should replace with 0?
-    register("Inline static fields", InputType.JAVA_CODE, List.of(
-        InlineStaticFieldTransformer::new,
-        UselessPopCleanTransformer::new
-    ), Source.of("TestInlineStaticFields"));
-    register("Inline static fields with modification", InputType.JAVA_CODE, List.of(
-        InlineStaticFieldTransformer::new,
-        UselessPopCleanTransformer::new
-    ), Source.of("TestInlineStaticFieldsWithModification"));
+    test("Inline static fields")
+        .transformers(InlineStaticFieldTransformer::new, UselessPopCleanTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.JAVA_CODE, "TestInlineStaticFields.class")
+        .register();
+    test("Inline static fields with modification")
+        .transformers(InlineStaticFieldTransformer::new, UselessPopCleanTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.JAVA_CODE, "TestInlineStaticFieldsWithModification.class")
+        .register();
 
     // Test sandbox security (e.g. not allowing dangerous calls)
-    register("Sandbox security", InputType.JAVA_CODE, List.of(TestSandboxSecurityTransformer::new), Source.of("sandbox/TestSandboxSecurity", false));
+    test("Sandbox security")
+        .transformers(TestSandboxSecurityTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.JAVA_CODE, "sandbox/TestSandboxSecurity.class")
+        .noDecompile()
+        .register();
 
     // JSR Inlining
-    register("JSR Inlining", InputType.CUSTOM_CLASS, List.of(JsrInlinerTransformer::new), Source.of("JSR"));
+    test("JSR Inlining")
+        .transformers(JsrInlinerTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "JSR.class")
+        .register();
 
     // Samples
-    register("Some flow obf sample", InputType.CUSTOM_CLASS, List.of(ComposedGeneralFlowTransformer::new), Source.of("FlowObfSample"));
+    test("Some flow obf sample")
+        .transformers(ComposedGeneralFlowTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "FlowObfSample.class")
+        .register();
 
     // Zelix
-    register("Zelix (22.0.3) Sample 1", InputType.CUSTOM_CLASS, List.of(() -> new ComposedZelixTransformer(true)),
-        Source.of("zkm/sample1/ExampleClass"),
-        Source.of("zkm/sample1/ILongDecrypter", false),
-        Source.of("zkm/sample1/LongDecrypter1", false),
-        Source.of("zkm/sample1/LongDecrypter2", false),
-        // These are required to compute frames
-        Source.of("zkm/sample1/ByteBufUtil", true),
-        Source.of("zkm/sample1/ByteBufUtil_7", true),
-        Source.of("zkm/sample1/ByteBufUtil_8", true)
-    );
+    test("Zelix (22.0.3) Sample 1")
+        .transformers(() -> new ComposedZelixTransformer(true))
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "zkm/sample1")
+        .register();
     // Obfuscated using this ZKM config (https://www.zelix.com/klassmaster/docs/langZKMScript.html):
     /*
     obfuscate   changeLogFileIn=""
@@ -73,22 +82,14 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
                 methodParameterChanges=flowObfuscate
                 obfuscateParameters=normal;
      */
-    register("Zelix (22.0.3) Sample 2 - Class initialization order", InputType.CUSTOM_CLASS,
-        List.of(
-            () -> new ComposedZelixTransformer(true,
-                // During obfuscation was specified classInitializationOrder option,
-                // so we need to also pass it here for correct decrypted values
-                Map.of("a.a.a.a.a4", "a.a.a.a.bc")
-            )
-        ),
-        Source.of("zkm/sample2/bc"),
-        Source.of("zkm/sample2/a4"),
-        Source.of("zkm/sample2/ba"),
-        Source.of("zkm/sample2/a_"),
-        Source.of("zkm/sample2/ILongDecrypter", false),
-        Source.of("zkm/sample2/SimpleLongDecrypter", false),
-        Source.of("zkm/sample2/FallbackLongDecrypter", false)
-    );
+    test("Zelix (22.0.3) Sample 2 - Class initialization order")
+        .transformers(() -> new ComposedZelixTransformer(true,
+            // During obfuscation was specified classInitializationOrder option,
+            // so we need to also pass it here for correct decrypted values
+            Map.of("a.a.a.a.a4", "a.a.a.a.bc")
+        ))
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "zkm/sample2")
+        .register();
     // Obfuscated using the following ZKM config (https://www.zelix.com/klassmaster/docs/langZKMScript.html):
     /*
     obfuscate   changeLogFileIn=""
@@ -108,10 +109,10 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
             methodParameterChanges=flowObfuscate
             obfuscateParameters=normal;
      */
-    register("Zelix (21) Snake Game", InputType.CUSTOM_JAR,
-        List.of(() -> new ComposedZelixTransformer(true)),
-        Source.of("SnakeGame-obf-zkm")
-    );
+    test("Zelix (22.0.3) Sample 3 - Snake Game")
+        .transformers(() -> new ComposedZelixTransformer(true))
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_JAR, "SnakeGame-obf-zkm.jar")
+        .register();
 
     // Zelix (22.0.3)
     /*
@@ -129,21 +130,24 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
                 autoReflectionHandling=normal
                 obfuscateReferences=none;
      */
-    register("Zelix (22.0.3) - String Encryption - Enhanced - Some strings", InputType.CUSTOM_CLASS,
-        List.of(ComposedZelixTransformer::new),
-        Source.of("zkm/EnhancedStringEncSomeStrings")
-    );
-    register("Zelix (22.0.3) - String Encryption - Enhanced - Many strings", InputType.CUSTOM_CLASS,
-        List.of(ComposedZelixTransformer::new),
-        Source.of("zkm/EnhancedStringEncManyStrings")
-    );
+    test("Zelix (22.0.3) - String Encryption - Enhanced - Some strings")
+        .transformers(ComposedZelixTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "zkm/EnhancedStringEncSomeStrings.class")
+        .register();
+    test("Zelix (22.0.3) - String Encryption - Enhanced - Many strings")
+        .transformers(ComposedZelixTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "zkm/EnhancedStringEncManyStrings.class")
+        .register();
 
     // Example HP888 classes. Without packer.
-    register("HP888", InputType.CUSTOM_CLASS, List.of(ComposedHP888Transformer::new),
-        Source.of("hp888/ExampleClass"),
-        Source.of("hp888/Strings") // Obfuscated strings
-    );
+    test("HP888")
+        .transformers(ComposedHP888Transformer::new)
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "hp888")
+        .register();
 
-    register("POP2 Sample", InputType.CUSTOM_CLASS, List.of(UselessPopCleanTransformer::new), Source.of("Pop2Sample"));
+    test("POP2 Sample")
+        .transformers(UselessPopCleanTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "Pop2Sample.class")
+        .register();
   }
 }

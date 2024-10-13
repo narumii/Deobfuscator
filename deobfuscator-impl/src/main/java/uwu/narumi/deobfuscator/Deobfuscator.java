@@ -59,13 +59,13 @@ public class Deobfuscator {
 
   public Classpath buildPrimaryClasspath() {
     Classpath.Builder builder = Classpath.builder();
-    // Add input jar as a library
+    // Add input jar
     if (options.inputJar() != null) {
       builder.addJar(options.inputJar());
     }
-    // Add raw classes as a library
-    if (!options.classes().isEmpty()) {
-      options.classes().forEach(builder::addExternalClass);
+    // Add external files
+    if (!options.externalFiles().isEmpty()) {
+      options.externalFiles().forEach(builder::addExternalFile);
     }
 
     return builder.build();
@@ -97,16 +97,16 @@ public class Deobfuscator {
       LOGGER.info("Loaded jar file: {}", this.options.inputJar());
     }
 
-    for (DeobfuscatorOptions.ExternalClass clazz : this.options.classes()) {
-      LOGGER.info("Loading class: {}", clazz.pathInJar());
+    for (DeobfuscatorOptions.ExternalFile externalFile : this.options.externalFiles()) {
+      LOGGER.info("Loading external file: {}", externalFile.pathInJar());
 
-      try (InputStream inputStream = new FileInputStream(clazz.path().toFile())) {
+      try (InputStream inputStream = new FileInputStream(externalFile.path().toFile())) {
         // Load class
-        this.loadClassOrFile(clazz.pathInJar(), inputStream.readAllBytes());
+        this.loadClassOrFile(externalFile.pathInJar(), inputStream.readAllBytes());
 
-        LOGGER.info("Loaded class: {}", clazz.pathInJar());
+        LOGGER.info("Loaded external file: {}", externalFile.pathInJar());
       } catch (IOException e) {
-        LOGGER.error("Could not load class: {}", clazz.pathInJar(), e);
+        LOGGER.error("Could not load external file: {}", externalFile.pathInJar(), e);
       }
     }
   }

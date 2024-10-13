@@ -1,33 +1,25 @@
 package uwu.narumi.deobfuscator.base;
 
-import java.nio.file.Files;
+import java.io.FileInputStream;
 import java.nio.file.Path;
 import org.jetbrains.java.decompiler.main.extern.IContextSource;
 import org.jetbrains.java.decompiler.main.extern.IResultSaver;
-import uwu.narumi.deobfuscator.api.helper.ClassHelper;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
 public class SingleClassContextSource implements IContextSource {
   private final Path file;
-  private final String relativePath;
-  private final String qualifiedName;
-  private final byte[] contents;
+  private final String pathInJar;
 
-  public SingleClassContextSource(Path file, String relativePath) {
+  /**
+   * @param file Path to .class file
+   * @param pathInJar Relative path to .class file as if it were in .jar
+   */
+  public SingleClassContextSource(Path file, String pathInJar) {
     this.file = file;
-    this.relativePath = relativePath;
-    try {
-      // Get qualified name
-      this.contents = Files.readAllBytes(file);
-
-      this.qualifiedName = ClassHelper.loadUnknownClassInfo(this.contents).name;
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+    this.pathInJar = pathInJar;
   }
 
   @Override
@@ -37,12 +29,12 @@ public class SingleClassContextSource implements IContextSource {
 
   @Override
   public Entries getEntries() {
-    return new Entries(List.of(Entry.atBase(this.qualifiedName)), List.of(), List.of());
+    return new Entries(List.of(Entry.atBase(this.pathInJar)), List.of(), List.of());
   }
 
   @Override
   public InputStream getInputStream(String resource) throws IOException {
-    return new ByteArrayInputStream(this.contents);
+    return new FileInputStream(this.file.toFile());
   }
 
   @Override
@@ -55,7 +47,7 @@ public class SingleClassContextSource implements IContextSource {
 
       @Override
       public void acceptClass(String qualifiedName, String fileName, String content, int[] mapping) {
-        saver.saveClassFile("", qualifiedName, relativePath, content, mapping);
+        saver.saveClassFile("", qualifiedName, pathInJar, content, mapping);
       }
 
       @Override

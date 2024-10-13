@@ -69,21 +69,24 @@ public record Classpath(
     }
 
     /**
-     * Adds {@link DeobfuscatorOptions.ExternalClass} to classpath
+     * Adds {@link DeobfuscatorOptions.ExternalFile} to classpath
      *
-     * @param externalClass External class
+     * @param externalFile External class
      */
     @Contract("_ -> this")
-    public Builder addExternalClass(DeobfuscatorOptions.ExternalClass externalClass) {
+    public Builder addExternalFile(DeobfuscatorOptions.ExternalFile externalFile) {
       try {
-        byte[] classBytes = Files.readAllBytes(externalClass.path());
+        byte[] bytes = Files.readAllBytes(externalFile.path());
+        if (!ClassHelper.isClass(externalFile.pathInJar(), bytes)) {
+          files.putIfAbsent(externalFile.pathInJar(), bytes);
+          return this;
+        }
 
-        ClassNode classNode = ClassHelper.loadUnknownClassInfo(classBytes);
-
+        ClassNode classNode = ClassHelper.loadUnknownClassInfo(bytes);
         String className = classNode.name;
 
         // Add class to classpath
-        rawClasses.putIfAbsent(className, classBytes);
+        rawClasses.putIfAbsent(className, bytes);
         classesInfo.putIfAbsent(className, classNode);
       } catch (Exception e) {
         throw new RuntimeException(e);

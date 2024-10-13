@@ -2,6 +2,7 @@ package uwu.narumi.deobfuscator.base;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.java.decompiler.api.Decompiler;
 import org.jetbrains.java.decompiler.main.extern.IContextSource;
@@ -27,9 +28,9 @@ import java.util.stream.Stream;
 @Timeout(60)
 public abstract class TestDeobfuscationBase {
   public static final Path TEST_DATA_PATH = Path.of("..", "testData");
-  public static final Path COMPILED_CLASSES_PATH = TEST_DATA_PATH.resolve("compiled");
-  public static final Path DEOBFUSCATED_CLASSES_PATH = TEST_DATA_PATH.resolve("deobfuscated");
-  public static final Path RESULTS_CLASSES_PATH = TEST_DATA_PATH.resolve("results");
+  public static final Path COMPILED_PATH = TEST_DATA_PATH.resolve("compiled");
+  public static final Path DEOBFUSCATED_PATH = TEST_DATA_PATH.resolve("deobfuscated");
+  public static final Path RESULTS_PATH = TEST_DATA_PATH.resolve("results");
 
   private final List<RegisteredTest> registeredTests = new ArrayList<>();
 
@@ -37,18 +38,6 @@ public abstract class TestDeobfuscationBase {
    * Register your tests here
    */
   protected abstract void registerAll();
-
-  /**
-   * Register input files for testing
-   *
-   * @param testName     Test name
-   * @param inputType    Input type. See enum optionsConsumer.
-   * @param transformers Transformers to use
-   * @param sources      You can choose one class or multiple classes for testing
-   */
-  protected void register(String testName, InputType inputType, List<Supplier<Transformer>> transformers, Source... sources) {
-    this.registeredTests.add(new RegisteredTest(testName, inputType, transformers, sources));
-  }
 
   @BeforeAll
   public static void setup() {
@@ -60,21 +49,26 @@ public abstract class TestDeobfuscationBase {
   @DisplayName("Test deobfuscation")
   public Stream<DynamicTest> testDeobfuscation() {
     this.registeredTests.clear();
-    FileHelper.deleteDirectory(DEOBFUSCATED_CLASSES_PATH);
+    FileHelper.deleteDirectory(DEOBFUSCATED_PATH);
 
     this.registerAll();
     return this.registeredTests.stream().map(RegisteredTest::buildTest);
   }
 
-  /**
-   * @see TestDeobfuscationBase#register(String, InputType, List, Source...)
-   */
   public record RegisteredTest(
       String testName,
       InputType inputType,
+      OutputType outputType,
       List<Supplier<Transformer>> transformers,
-      Source[] sources
+      String path,
+      boolean decompile
   ) {
+    public RegisteredTest {
+      if (outputType == OutputType.SINGLE_CLASS && inputType == InputType.CUSTOM_JAR) {
+        throw new IllegalArgumentException("Cannot use 'OutputType.SINGLE_CLASS' with a jar input");
+      }
+    }
+
     /**
      * Build test
      */
@@ -90,88 +84,86 @@ public abstract class TestDeobfuscationBase {
       DeobfuscatorOptions.Builder optionsBuilder = DeobfuscatorOptions.builder()
           .transformers(this.transformers.toArray(new Supplier[0]));
 
-      Path decompilerInputDir = DEOBFUSCATED_CLASSES_PATH.resolve(this.inputType.directory());
-      String jarSource = null;
+      // Some paths
+      Path outputDir = DEOBFUSCATED_PATH.resolve(this.inputType.directory());
+      Path decompilerOutputDir = RESULTS_PATH.resolve(this.inputType.directory());
+      IContextSource contextSource = null;
 
-      // Get sources paths
-      if (this.inputType == InputType.CUSTOM_JAR) {
-        if (sources.length > 1) {
-          throw new IllegalArgumentException("Cannot use multiple sources with a jar input");
+      if (this.outputType == OutputType.SINGLE_CLASS) {
+        // Handle single class output
+
+        Path relativePath = Path.of(this.inputType.directory()).resolve(this.path);
+        Path compiledClassPath = COMPILED_PATH.resolve(relativePath);
+        Path deobfuscatedClassPath = DEOBFUSCATED_PATH.resolve(relativePath);
+
+        if (Files.notExists(compiledClassPath)) {
+          throw new IllegalArgumentException(
+              "Compiled class not found: '" + compiledClassPath.toAbsolutePath().normalize() + "'." +
+                  (this.inputType == InputType.JAVA_CODE ? " Did you forgot to compile it? Use 'mvn test' to compile test classes." : "")
+          );
         }
 
-        jarSource = sources[0].sourceName;
-
-        Path relativePath = Path.of(this.inputType.directory(), jarSource);
-
-        // Add jar input
-        Path inputJarPath = COMPILED_CLASSES_PATH.resolve(relativePath + ".jar");
-        optionsBuilder.inputJar(inputJarPath);
-
-        decompilerInputDir = decompilerInputDir.resolve(jarSource);
+        // Add class
+        optionsBuilder.externalFile(compiledClassPath, this.path);
+        contextSource = new SingleClassContextSource(deobfuscatedClassPath, this.path);
       } else {
-        for (Source source : sources) {
-          Path compiledClassPath = COMPILED_CLASSES_PATH.resolve(this.inputType.directory()).resolve(source.sourceName + ".class");
-          if (Files.notExists(compiledClassPath)) {
-            throw new IllegalArgumentException(
-                "Compiled class not found: '" + compiledClassPath.toAbsolutePath().normalize() + "'. You might forgot to compile the class. Use 'mvn test' to compile test classes."
-            );
-          }
+        // Handle multiple classes output
 
-          // Add class
-          optionsBuilder.clazz(compiledClassPath, source.sourceName + ".class");
+        Path inputPath = COMPILED_PATH.resolve(this.inputType.directory()).resolve(this.path);
+        String relativePath = this.path;
+        if (this.inputType == InputType.CUSTOM_JAR) {
+          // Prepare input
+          optionsBuilder.inputJar(inputPath);
+
+          // Set the correct relative path
+          relativePath = this.path.substring(0, this.path.length() - ".jar".length());
+        } else {
+          // Prepare input files
+          optionsBuilder.inputDir(inputPath);
         }
+
+        // Prepare output
+        outputDir = outputDir.resolve(relativePath);
+        decompilerOutputDir = decompilerOutputDir.resolve(relativePath);
       }
 
       // Last configurations
       optionsBuilder
           .outputJar(null)
-          .outputDir(decompilerInputDir)
+          .outputDir(outputDir)
           .skipFiles();
 
       // Build and run deobfuscator!
       Deobfuscator.from(optionsBuilder.build()).start();
 
-      if (!shouldDecompile()) return;
-
-      // Init context sources
-      List<IContextSource> contextSources = new ArrayList<>();
-      if (this.inputType != InputType.CUSTOM_JAR) {
-        for (Source source : sources) {
-          if (!source.decompile) continue;
-
-          contextSources.add(new SingleClassContextSource(
-              DEOBFUSCATED_CLASSES_PATH.resolve(this.inputType.directory()).resolve(source.sourceName + ".class"),
-              source.sourceName
-          ));
-        }
+      if (!this.decompile) {
+        return;
       }
 
       // Assert output
-      this.assertOutput(contextSources, decompilerInputDir, jarSource);
+      this.assertOutput(contextSource, outputDir, decompilerOutputDir);
     }
 
     /**
      * Asserts output of a decompilation result
      *
-     * @param contextSources  Classes to be decompiled
-     * @param inputDir        Optionally you can give a whole directory to decompile.
-     * @param jarRelativePath Specifies a relative path in save directory. Only used for jars
+     * @param contextSource  Class to be decompiled
+     * @param inputDir Directory to decompile.
      */
-    private void assertOutput(List<IContextSource> contextSources, @Nullable Path inputDir, @Nullable String jarRelativePath) {
-      AssertingResultSaver assertingResultSaver = new AssertingResultSaver(this.inputType, jarRelativePath);
+    private void assertOutput(@Nullable IContextSource contextSource, @Nullable Path inputDir, Path decompilerOutputDir) {
+      AssertingResultSaver assertingResultSaver = new AssertingResultSaver(decompilerOutputDir);
 
-      // Decompile classes
       Decompiler.Builder decompilerBuilder = Decompiler.builder()
           .option(IFernflowerPreferences.INDENT_STRING, "    ")
           .output(assertingResultSaver); // Assert output
 
       // Add sources
-      if (this.inputType == InputType.CUSTOM_JAR) {
+      if (contextSource != null) {
+        decompilerBuilder.inputs(contextSource);
+      } else if (inputDir != null) {
         decompilerBuilder.inputs(inputDir.toFile()); //fuck you path > file
       } else {
-        for (IContextSource contextSource : contextSources) {
-          decompilerBuilder.inputs(contextSource);
-        }
+        throw new IllegalArgumentException();
       }
 
       // Decompile
@@ -180,13 +172,6 @@ public abstract class TestDeobfuscationBase {
       if (assertingResultSaver.savedContent()) {
         throw new TestAbortedException("No previous decompiled code found, skipping test");
       }
-    }
-
-    private boolean shouldDecompile() {
-      for (Source source : sources) {
-        if (source.decompile) return true;
-      }
-      return false;
     }
   }
 
@@ -207,17 +192,85 @@ public abstract class TestDeobfuscationBase {
     }
   }
 
-  /**
-   * @param sourceName Class or jar path
-   * @param decompile  Should decompile this source. Does not work with {@link InputType#CUSTOM_JAR}
-   */
-  public record Source(String sourceName, boolean decompile) {
-    public static Source of(String source, boolean decompile) {
-      return new Source(source, decompile);
+  public enum OutputType {
+    SINGLE_CLASS,
+    MULTIPLE_CLASSES
+  }
+
+  protected TestBuilder test(String testName) {
+    return new TestBuilder().name(testName);
+  }
+
+  protected class TestBuilder {
+    private String name = null;
+    private InputType inputType = null;
+    private OutputType outputType = null;
+    private List<Supplier<Transformer>> transformers = null;
+    private String path = null;
+
+    private boolean decompile = true;
+
+    private TestBuilder() {
     }
 
-    public static Source of(String source) {
-      return of(source, true);
+    /**
+     * Test name
+     */
+    @Contract("_ -> this")
+    public TestBuilder name(String name) {
+      this.name = name;
+      return this;
+    }
+
+    /**
+     * Transformers to use
+     */
+    @Contract("_ -> this")
+    @SafeVarargs
+    public final TestBuilder transformers(Supplier<Transformer>... transformers) {
+      this.transformers = List.of(transformers);
+      return this;
+    }
+
+    /**
+     * Specifies input to your test
+     *
+     * <p>Path should be:<br>
+     * {@link OutputType#SINGLE_CLASS}:
+     * <ul>
+     *   <li>For {@link InputType#CUSTOM_CLASS} and {@link InputType#JAVA_CODE} - it should be a path to .class file</li>
+     * </ul>
+     * {@link OutputType#MULTIPLE_CLASSES}:
+     * <ul>
+     *   <li>For {@link InputType#CUSTOM_CLASS} and {@link InputType#JAVA_CODE} - it should be a path to a directory with .class files</li>
+     *   <li>For {@link InputType#CUSTOM_JAR} -  it should be a path to a .jar file</li>
+     * </ul>
+     *
+     * @param outputType Output type
+     * @param inputType Input type
+     * @param path Input path (see note above)
+     */
+    @Contract("_,_,_ -> this")
+    public TestBuilder input(OutputType outputType, InputType inputType, String path) {
+      this.outputType = outputType;
+      this.inputType = inputType;
+      this.path = path;
+      return this;
+    }
+
+    @Contract(" -> this")
+    public TestBuilder noDecompile() {
+      this.decompile = false;
+      return this;
+    }
+
+    /**
+     * Register input files for testing
+     */
+    public void register() {
+      registeredTests.add(
+          new RegisteredTest(name, inputType, outputType, transformers, path, decompile)
+      );
     }
   }
 }
