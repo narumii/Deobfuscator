@@ -7,8 +7,6 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
@@ -16,7 +14,6 @@ import uwu.narumi.deobfuscator.api.asm.matcher.impl.MethodMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.NumberMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.StackMatch;
-import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.helper.MethodHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
@@ -85,8 +82,8 @@ public class ZelixParametersTransformer extends Transformer {
       );
 
   @Override
-  protected void transform(ClassWrapper scope, Context context) throws Exception {
-    context.classes(scope).forEach(classWrapper -> classWrapper.methods().stream()
+  protected void transform() throws Exception {
+    scopedClasses().forEach(classWrapper -> classWrapper.methods().stream()
         .filter(methodNode -> methodNode.desc.startsWith("([Ljava/lang/Object;)"))
         .forEach(methodNode -> {
           MethodContext methodContext = MethodContext.framed(classWrapper, methodNode);
@@ -102,7 +99,7 @@ public class ZelixParametersTransformer extends Transformer {
           if (shouldReplaceArgumentTypes) {
             // Update method arguments
             String desc = Type.getMethodDescriptor(Type.getReturnType(methodNode.desc), newArgumentTypes.toArray(new Type[0]));
-            AsmHelper.updateMethodDescriptor(context, methodContext, desc);
+            AsmHelper.updateMethodDescriptor(context(), methodContext, desc);
 
             // Replace local variables indexes with the corresponding ones
             fixLocalVariableIndexes(methodNode, newVarIndexes);

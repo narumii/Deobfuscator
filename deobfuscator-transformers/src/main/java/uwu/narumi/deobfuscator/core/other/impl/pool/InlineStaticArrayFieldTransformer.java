@@ -18,8 +18,8 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 // TODO: Rewrite it entirely
 public class InlineStaticArrayFieldTransformer extends Transformer {
   @Override
-  protected void transform(ClassWrapper scope, Context context) throws Exception {
-
+  protected void transform() throws Exception {
+    throw new UnsupportedOperationException("Not implemented yet");
   }
 
 //  private static final Object NULL = new Object();

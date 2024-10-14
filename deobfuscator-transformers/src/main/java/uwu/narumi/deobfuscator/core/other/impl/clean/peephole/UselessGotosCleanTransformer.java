@@ -6,8 +6,6 @@ import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LookupSwitchInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TableSwitchInsnNode;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.Arrays;
@@ -26,8 +24,8 @@ import java.util.List;
 public class UselessGotosCleanTransformer extends Transformer {
 
   @Override
-  protected void transform(ClassWrapper scope, Context context) throws Exception {
-    context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
+  protected void transform() throws Exception {
+    scopedClasses().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
       for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
         if (insn.getOpcode() == GOTO) {
           JumpInsnNode jumpInsn = (JumpInsnNode) insn;

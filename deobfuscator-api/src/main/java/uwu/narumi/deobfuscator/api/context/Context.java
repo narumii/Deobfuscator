@@ -2,11 +2,11 @@ package uwu.narumi.deobfuscator.api.context;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.UnmodifiableView;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.execution.SandBox;
 import uwu.narumi.deobfuscator.api.classpath.Classpath;
@@ -93,10 +93,11 @@ public class Context {
         .filter(classWrapper -> scope == null || classWrapper.name().equals(scope.name()));
   }
 
-  public List<ClassWrapper> classes(ClassWrapper scope) {
+  @UnmodifiableView
+  public List<ClassWrapper> scopedClasses(ClassWrapper scope) {
     return classes.values().stream()
         .filter(classWrapper -> scope == null || classWrapper.name().equals(scope.name()))
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public Optional<ClassWrapper> get(String name) {

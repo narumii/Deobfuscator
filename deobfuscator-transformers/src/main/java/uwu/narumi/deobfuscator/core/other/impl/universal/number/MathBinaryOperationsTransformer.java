@@ -2,8 +2,6 @@ package uwu.narumi.deobfuscator.core.other.impl.universal.number;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
 import uwu.narumi.deobfuscator.api.helper.FramedInstructionsStream;
@@ -15,8 +13,8 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 public class MathBinaryOperationsTransformer extends Transformer {
 
   @Override
-  protected void transform(ClassWrapper scope, Context context) throws Exception {
-    FramedInstructionsStream.of(scope, context)
+  protected void transform() throws Exception {
+    FramedInstructionsStream.of(this)
         .editInstructionsStream(stream -> stream.filter(insn -> AsmMathHelper.isMathBinaryOperation(insn.getOpcode())))
         .forEach(insnContext -> {
           // Get instructions from stack that are passed

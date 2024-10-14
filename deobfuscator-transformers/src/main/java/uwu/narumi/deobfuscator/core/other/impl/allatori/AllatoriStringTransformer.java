@@ -4,8 +4,6 @@ import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.ArrayList;
@@ -27,8 +25,8 @@ public class AllatoriStringTransformer extends Transformer {
     /* Written by https://github.com/Lampadina17 | 06/08/2024 */
     /* use UniversalNumberTransformer before this transformer to decrypt keys */
     @Override
-    protected void transform(ClassWrapper scope, Context context) throws Exception {
-        context.classes(scope).forEach(classWrapper -> {
+    protected void transform() throws Exception {
+        scopedClasses().forEach(classWrapper -> {
             classWrapper.methods().forEach(methodNode -> {
 
                 AtomicBoolean isDecryptor = new AtomicBoolean(false);
@@ -67,7 +65,7 @@ public class AllatoriStringTransformer extends Transformer {
         });
 
         /* Decrypt all strings */
-        context.classes(scope).forEach(classWrapper -> {
+        scopedClasses().forEach(classWrapper -> {
             classWrapper.methods().forEach(methodNode -> {
                 Arrays.stream(methodNode.instructions.toArray()).forEach(node -> {
                     if (node instanceof LdcInsnNode ldc && ldc.cst instanceof String && node.getNext() instanceof MethodInsnNode next && next.getOpcode() == INVOKESTATIC) {
@@ -98,7 +96,7 @@ public class AllatoriStringTransformer extends Transformer {
                 });
             });
         });
-        LOGGER.info("Decrypted {} strings in {} classes", this.getChangesCount(), context.classes().size());
+        LOGGER.info("Decrypted {} strings in {} classes", this.getChangesCount(), scopedClasses().size());
     }
 
     public class DecryptionMethod {

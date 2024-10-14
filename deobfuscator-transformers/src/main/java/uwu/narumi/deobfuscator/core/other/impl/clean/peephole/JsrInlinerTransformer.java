@@ -2,8 +2,6 @@ package uwu.narumi.deobfuscator.core.other.impl.clean.peephole;
 
 import org.objectweb.asm.commons.JSRInlinerAdapter;
 import org.objectweb.asm.tree.MethodNode;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.Arrays;
@@ -13,8 +11,8 @@ import java.util.Arrays;
  */
 public class JsrInlinerTransformer extends Transformer {
   @Override
-  protected void transform(ClassWrapper scope, Context context) throws Exception {
-    context.classes(scope).forEach(classWrapper -> {
+  protected void transform() throws Exception {
+    scopedClasses().forEach(classWrapper -> {
       for (int i = 0; i < classWrapper.methods().size(); i++) {
         MethodNode methodNode = classWrapper.methods().get(i);
 

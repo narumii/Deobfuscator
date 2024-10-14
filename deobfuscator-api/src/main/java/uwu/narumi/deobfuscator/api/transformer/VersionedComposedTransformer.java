@@ -4,9 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.context.Context;
-
 public abstract class VersionedComposedTransformer extends Transformer {
 
   private final String version;
@@ -18,7 +15,7 @@ public abstract class VersionedComposedTransformer extends Transformer {
   private boolean changed = false;
 
   @Override
-  protected void transform(ClassWrapper scope, Context context) {
+  protected void transform() {
     Map<String, List<Supplier<Transformer>>> transformers = transformersByVersions();
     if (!transformers.containsKey(version)) {
       throw new IllegalArgumentException(String.format("Version '%s' not found!", version));
@@ -26,7 +23,7 @@ public abstract class VersionedComposedTransformer extends Transformer {
 
     transformers
         .get(version)
-        .forEach(transformer -> changed |= Transformer.transform(transformer, scope, context));
+        .forEach(transformer -> changed |= Transformer.transform(transformer, scope(), context()));
 
     if (changed) {
       markChange();

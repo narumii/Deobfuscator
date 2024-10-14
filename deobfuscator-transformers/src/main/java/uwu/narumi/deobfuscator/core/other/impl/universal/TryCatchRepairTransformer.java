@@ -1,16 +1,14 @@
 package uwu.narumi.deobfuscator.core.other.impl.universal;
 
 import org.objectweb.asm.tree.LabelNode;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 // TODO: Will probably shit itself
 public class TryCatchRepairTransformer extends Transformer {
 
   @Override
-  protected void transform(ClassWrapper scope, Context context) throws Exception {
-    context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
+  protected void transform() throws Exception {
+    scopedClasses().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
       methodNode.tryCatchBlocks.removeIf(tryCatchBlock -> {
         LabelNode start = tryCatchBlock.start;
         LabelNode handler = tryCatchBlock.handler;

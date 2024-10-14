@@ -1,9 +1,7 @@
 package uwu.narumi.deobfuscator.core.other.impl.hp888;
 
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
@@ -31,14 +29,14 @@ public class HP888PackerTransformer extends Transformer {
   }
 
   @Override
-  protected void transform(ClassWrapper scope, Context context) throws Exception {
+  protected void transform() throws Exception {
     Set<String> filesToRemove = new HashSet<>();
     HashMap<String, ClassWrapper> newClasses = new HashMap<>();
     AtomicReference<String> key = new AtomicReference<>();
 
     /* Firstly you must use HP888StringTransformer, so key would be decrypted,
         and it only searches in loader classes so don't tell me its bad searching. */
-    context.classes().stream().map(ClassWrapper::classNode).forEach(classNode -> classNode.methods.forEach(methodNode -> methodNode.instructions.forEach(abstractInsnNode -> {
+    scopedClasses().stream().map(ClassWrapper::classNode).forEach(classNode -> classNode.methods.forEach(methodNode -> methodNode.instructions.forEach(abstractInsnNode -> {
       if (abstractInsnNode.isString() && abstractInsnNode.asString().endsWith("==")) {
         // Find base64 key
         key.set(abstractInsnNode.asString());
@@ -53,7 +51,7 @@ public class HP888PackerTransformer extends Transformer {
     // Decrypt encrypted classes
     Cipher cipher = Cipher.getInstance("AES");
     cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(Base64.getDecoder().decode(key.get()), "AES"));
-    context.getFiles().forEach((file, bytes) -> {
+    context().getFiles().forEach((file, bytes) -> {
       if (file.endsWith(encryptedClassFilesSuffix)) {
         String cleanFileName = file.replace(encryptedClassFilesSuffix, "").replace(".", "/");
         filesToRemove.add(file);
@@ -71,9 +69,9 @@ public class HP888PackerTransformer extends Transformer {
     });
 
     // Put all new classes
-    context.getClasses().putAll(newClasses);
+    context().getClasses().putAll(newClasses);
 
     // Cleanup
-    filesToRemove.forEach(context.getFiles()::remove);
+    filesToRemove.forEach(context().getFiles()::remove);
   }
 }

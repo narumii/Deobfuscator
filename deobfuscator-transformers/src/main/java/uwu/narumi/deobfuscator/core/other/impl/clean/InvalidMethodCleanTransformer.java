@@ -4,8 +4,6 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Analyzer;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.BasicInterpreter;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 /**
@@ -14,8 +12,8 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 public class InvalidMethodCleanTransformer extends Transformer {
 
   @Override
-  protected void transform(ClassWrapper scope, Context context) throws Exception {
-    context.classes(scope).parallelStream().forEach(classWrapper -> {
+  protected void transform() throws Exception {
+    scopedClasses().parallelStream().forEach(classWrapper -> {
       var iterator = classWrapper.methods().iterator();
       while (iterator.hasNext()) {
         MethodNode methodNode = iterator.next();

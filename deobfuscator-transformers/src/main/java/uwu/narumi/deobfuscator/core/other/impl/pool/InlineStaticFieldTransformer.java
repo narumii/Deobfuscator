@@ -2,14 +2,10 @@ package uwu.narumi.deobfuscator.core.other.impl.pool;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.analysis.BasicInterpreter;
 import org.objectweb.asm.tree.analysis.BasicValue;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.FieldRef;
-import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.helper.MethodHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
@@ -26,12 +22,12 @@ import java.util.Map;
 public class InlineStaticFieldTransformer extends Transformer {
 
   @Override
-  protected void transform(ClassWrapper scope, Context context) throws Exception {
+  protected void transform() throws Exception {
     List<FieldRef> notConstantFields = new ArrayList<>();
     Map<FieldRef, AbstractInsnNode> staticConstantFields = new HashMap<>();
 
     // Find all static constant fields
-    context.classes(scope).forEach(classWrapper -> findClInit(classWrapper.classNode()).ifPresent(clInit -> {
+    scopedClasses().forEach(classWrapper -> findClInit(classWrapper.classNode()).ifPresent(clInit -> {
       var frames = MethodHelper.analyzeSource(classWrapper.classNode(), clInit);
 
       Arrays.stream(clInit.instructions.toArray())
@@ -64,7 +60,7 @@ public class InlineStaticFieldTransformer extends Transformer {
     }));
 
     // Also account for FieldNode#value
-    context.classes(scope).forEach(classWrapper -> {
+    scopedClasses().forEach(classWrapper -> {
       classWrapper.classNode().fields.forEach(fieldNode -> {
         if (fieldNode.value != null) {
           FieldRef fieldRef = FieldRef.of(classWrapper.classNode(), fieldNode);
@@ -78,7 +74,7 @@ public class InlineStaticFieldTransformer extends Transformer {
     });
 
     // Check if these static fields aren't modified outside clinit
-    context.classes(scope).forEach(classWrapper -> classWrapper.methods().stream()
+    scopedClasses().forEach(classWrapper -> classWrapper.methods().stream()
         .filter(methodNode -> !methodNode.name.equals("<clinit>"))
         .forEach(methodNode -> {
           Arrays.stream(methodNode.instructions.toArray())
@@ -93,7 +89,7 @@ public class InlineStaticFieldTransformer extends Transformer {
 
     // Replace static fields accesses with corresponding values
     List<FieldRef> inlinedFields = new ArrayList<>();
-    context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
+    scopedClasses().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
       Arrays.stream(methodNode.instructions.toArray())
           .filter(insn -> insn.getOpcode() == GETSTATIC)
           .map(FieldInsnNode.class::cast)
@@ -115,7 +111,7 @@ public class InlineStaticFieldTransformer extends Transformer {
     }));
 
     // Remove fields that were inlined
-    context.classes(scope).parallelStream().forEach(classWrapper -> {
+    scopedClasses().parallelStream().forEach(classWrapper -> {
       // Remove field
       classWrapper.classNode().fields.removeIf(fieldNode -> inlinedFields.contains(FieldRef.of(classWrapper.classNode(), fieldNode)));
 

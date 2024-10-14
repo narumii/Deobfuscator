@@ -7,6 +7,7 @@ import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.context.Context;
+import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -18,6 +19,10 @@ import java.util.stream.Stream;
  * iterate over classes and methods ASYNC, and instructions SYNC. This can really speed up computing frames for methods.
  */
 public class FramedInstructionsStream {
+  public static FramedInstructionsStream of(Transformer transformer) {
+    return of(transformer.scope(), transformer.context());
+  }
+
   public static FramedInstructionsStream of(ClassWrapper scope, Context context) {
     return new FramedInstructionsStream(scope, context);
   }
@@ -61,7 +66,7 @@ public class FramedInstructionsStream {
 
   public void forEach(Consumer<InsnContext> consumer) {
     // Iterate over classes in parallel
-    this.classesStreamModifier.apply(this.forceSync ? this.context.classes(this.scope).stream() : this.context.classes(this.scope).parallelStream())
+    this.classesStreamModifier.apply(this.forceSync ? this.context.scopedClasses(this.scope).stream() : this.context.scopedClasses(this.scope).parallelStream())
         // Iterate over methods in parallel
         .forEach(classWrapper -> this.methodsStreamModifier.apply(this.forceSync ? classWrapper.methods().stream() : classWrapper.methods().parallelStream())
             .forEach(methodNode -> {

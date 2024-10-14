@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.jetbrains.annotations.Nullable;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.context.Context;
 
 public class ComposedTransformer extends Transformer {
 
@@ -23,9 +21,9 @@ public class ComposedTransformer extends Transformer {
   }
 
   @Override
-  protected void transform(ClassWrapper scope, Context context) {
+  protected void transform() {
     transformers.forEach(transformerSupplier -> {
-      boolean changed = Transformer.transform(transformerSupplier, scope, context);
+      boolean changed = Transformer.transform(transformerSupplier, scope(), context());
       if (changed) {
         this.markChange();
       }

@@ -5,10 +5,8 @@ import org.objectweb.asm.tree.IincInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
-import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.ArrayList;
@@ -17,8 +15,8 @@ import java.util.List;
 public class PopUnUsedLocalVariablesTransformer extends Transformer {
 
   @Override
-  protected void transform(ClassWrapper scope, Context context) throws Exception {
-    context.classes(scope).forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
+  protected void transform() throws Exception {
+    scopedClasses().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
       MethodContext methodContext = MethodContext.framed(classWrapper, methodNode);
 
       List<VarInsnNode> varStoresInUse = new ArrayList<>();

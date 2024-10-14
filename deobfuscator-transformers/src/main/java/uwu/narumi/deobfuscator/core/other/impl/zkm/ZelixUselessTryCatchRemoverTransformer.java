@@ -1,7 +1,6 @@
 package uwu.narumi.deobfuscator.core.other.impl.zkm;
 
 import org.objectweb.asm.tree.MethodInsnNode;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.MethodRef;
@@ -10,7 +9,6 @@ import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.group.SequenceMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.MethodMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
-import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.ArrayList;
@@ -51,8 +49,8 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
       );
 
   @Override
-  protected void transform(ClassWrapper scope, Context context) throws Exception {
-    context.classes(scope).forEach(classWrapper -> {
+  protected void transform() throws Exception {
+    scopedClasses().forEach(classWrapper -> {
       List<MethodRef> instantReturnExceptionMethods = new ArrayList<>();
 
       // Find methods that instantly returns an exception

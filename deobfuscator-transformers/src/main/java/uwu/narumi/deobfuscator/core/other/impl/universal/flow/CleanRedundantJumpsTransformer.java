@@ -2,8 +2,6 @@ package uwu.narumi.deobfuscator.core.other.impl.universal.flow;
 
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.MethodNode;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
 import uwu.narumi.deobfuscator.api.helper.FramedInstructionsStream;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
@@ -12,8 +10,8 @@ import java.util.Optional;
 
 public class CleanRedundantJumpsTransformer extends Transformer {
   @Override
-  protected void transform(ClassWrapper scope, Context context) throws Exception {
-    FramedInstructionsStream.of(scope, context).forEach(insnContext -> {
+  protected void transform() throws Exception {
+    FramedInstructionsStream.of(this).forEach(insnContext -> {
       if (!(insnContext.insn() instanceof JumpInsnNode jumpInsn)) return;
 
       Optional<Boolean> optIfResult = AsmMathHelper.predictIf(jumpInsn, insnContext.frame());

@@ -4,8 +4,6 @@ import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LookupSwitchInsnNode;
 import org.objectweb.asm.tree.TableSwitchInsnNode;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
 import uwu.narumi.deobfuscator.api.helper.FramedInstructionsStream;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
@@ -18,8 +16,8 @@ import java.util.Optional;
 public class CleanRedundantSwitchesTransformer extends Transformer {
 
   @Override
-  protected void transform(ClassWrapper scope, Context context) throws Exception {
-    FramedInstructionsStream.of(scope, context).forEach(insnContext -> {
+  protected void transform() throws Exception {
+    FramedInstructionsStream.of(this).forEach(insnContext -> {
       if (insnContext.insn().getOpcode() == LOOKUPSWITCH) {
         LookupSwitchInsnNode lookupSwitchInsn = (LookupSwitchInsnNode) insnContext.insn();
 

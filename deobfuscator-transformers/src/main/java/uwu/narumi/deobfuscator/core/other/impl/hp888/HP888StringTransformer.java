@@ -10,7 +10,6 @@ import uwu.narumi.deobfuscator.api.asm.matcher.group.SequenceMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.MethodMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.StringMatch;
-import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.ArrayList;
@@ -33,8 +32,8 @@ public class HP888StringTransformer extends Transformer {
   );
 
   @Override
-  protected void transform(ClassWrapper scope, Context context) throws Exception {
-    context.classes().forEach(classWrapper -> {
+  protected void transform() throws Exception {
+    scopedClasses().forEach(classWrapper -> {
       List<MethodNode> toRemove = new ArrayList<>();
 
       // Find all encrypted strings
@@ -59,7 +58,7 @@ public class HP888StringTransformer extends Transformer {
             Type classForConstantPoolType = (Type) constantPoolClassLdc.cst;
 
             // Prepare data for decryption
-            ClassWrapper classForConstantPool = context.getClasses().get(classForConstantPoolType.getInternalName());
+            ClassWrapper classForConstantPool = context().getClasses().get(classForConstantPoolType.getInternalName());
             int constantPoolSize = classForConstantPool.getConstantPool().getSize();
             String class0 = classWrapper.name();
             String class1 = classWrapper.name();

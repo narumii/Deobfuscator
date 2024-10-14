@@ -1,8 +1,6 @@
 package uwu.narumi.deobfuscator.core.other.impl.zkm;
 
 import org.objectweb.asm.tree.*;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.ArrayList;
@@ -22,8 +20,8 @@ public class ZelixStringTransformer extends Transformer {
 
     /* Written by https://github.com/Lampadina17 | OG 19/07/2024, Rewritten 09/08/2024 */
     @Override
-    protected void transform(ClassWrapper scope, Context context) throws Exception {
-        context.classes(scope).forEach(classWrapper -> {
+    protected void transform() throws Exception {
+        scopedClasses().forEach(classWrapper -> {
             /* Extract key type 1 from hardcoded xor encryption */
             classWrapper.methods().stream()
                     .filter(methodNode -> methodNode.desc.equals("(Ljava/lang/String;)[C"))
@@ -96,7 +94,7 @@ public class ZelixStringTransformer extends Transformer {
         });
 
         /* Decrypt and cleanup */
-        context.classes(scope).forEach(classWrapper -> {
+        scopedClasses().forEach(classWrapper -> {
             classWrapper.methods().stream()
                     .forEach(methodNode -> {
                         List<String> encrypted = encryptedStrings.get(classWrapper.name());
@@ -172,7 +170,7 @@ public class ZelixStringTransformer extends Transformer {
                         }
                     });
         });
-        LOGGER.info("Decrypted {} strings in {} classes", this.getChangesCount(), context.classes().size());
+        LOGGER.info("Decrypted {} strings in {} classes", this.getChangesCount(), scopedClasses().size());
     }
 
     /* Convert arraylist to array and shift values, when a bug transform into a feature (Key type 2) */

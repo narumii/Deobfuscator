@@ -5,15 +5,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.objectweb.asm.tree.*;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 public class UnUsedLabelCleanTransformer extends Transformer {
 
   @Override
-  protected void transform(ClassWrapper scope, Context context) throws Exception {
-    context.classes(scope).stream()
+  protected void transform() throws Exception {
+    scopedClasses().stream()
         .flatMap(classWrapper -> classWrapper.methods().stream())
         .forEach(
             methodNode -> {

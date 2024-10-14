@@ -1,14 +1,11 @@
 package uwu.narumi.deobfuscator.core.other.impl.zkm;
 
-import dev.xdark.ssvm.execution.VMException;
 import dev.xdark.ssvm.invoke.Argument;
 import dev.xdark.ssvm.mirror.type.InstanceClass;
 import dev.xdark.ssvm.value.ObjectValue;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
-import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
@@ -104,24 +101,24 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
   }
 
   @Override
-  protected void transform(ClassWrapper scope, Context context) throws Exception {
+  protected void transform() throws Exception {
     // Firstly, process the manual list of class initialization order
     for (var entry : classInitOrder.entrySet()) {
-      ClassWrapper first = context.getClasses().get(entry.getKey());
-      ClassWrapper second = context.getClasses().get(entry.getValue());
+      ClassWrapper first = context().getClasses().get(entry.getKey());
+      ClassWrapper second = context().getClasses().get(entry.getValue());
 
-      decryptEncryptedLongs(context, first);
-      decryptEncryptedLongs(context, second);
+      decryptEncryptedLongs(context(), first);
+      decryptEncryptedLongs(context(), second);
     }
 
     // Decrypt longs
-    context.classes(scope).forEach(classWrapper -> {
-      decryptEncryptedLongs(context, classWrapper);
+    scopedClasses().forEach(classWrapper -> {
+      decryptEncryptedLongs(context(), classWrapper);
     });
 
     // Remove decrypter classes
     if (sandBox != null) {
-      sandBox.getUsedCustomClasses().forEach(clazz -> context.getClasses().remove(clazz.getInternalName()));
+      sandBox.getUsedCustomClasses().forEach(clazz -> context().getClasses().remove(clazz.getInternalName()));
     }
   }
 
