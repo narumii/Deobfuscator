@@ -92,7 +92,7 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 public class SomeTransformer extends Transformer {
   @Override
   protected void transform() throws Exception {
-    classes().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
+    scopedClasses().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
       // Code here
     }));
   }
@@ -110,7 +110,7 @@ import java.util.Arrays;
 public class SomeTransformer extends Transformer {
   @Override
   protected void transform() throws Exception {
-    classes().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
+    scopedClasses().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
       
       // Iterate over all LDC instructions in the method
       Arrays.stream(methodNode.instructions.toArray())
@@ -144,7 +144,7 @@ import java.util.Arrays;
 public class SomeTransformer extends Transformer {
   @Override
   protected void transform() throws Exception {
-    classes().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
+    scopedClasses().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
       MethodContext methodContext = MethodContext.framed(classWrapper, methodNode);
 
       // Find all System.out.println calls and replace the string with "Bye, World!"
