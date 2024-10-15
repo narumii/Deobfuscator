@@ -53,17 +53,18 @@ public class HP888PackerTransformer extends Transformer {
     cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(Base64.getDecoder().decode(key.get()), "AES"));
     context().getFiles().forEach((file, bytes) -> {
       if (file.endsWith(encryptedClassFilesSuffix)) {
-        String cleanFileName = file.replace(encryptedClassFilesSuffix, "").replace(".", "/");
         filesToRemove.add(file);
+
+        String className = file.replace(encryptedClassFilesSuffix, "").replace(".", "/");
         try {
           // Decrypt!
           byte[] decrypted = cipher.doFinal(bytes);
 
           // Load class
-          newClasses.put(cleanFileName, ClassHelper.loadUnknownClass(cleanFileName, decrypted, ClassReader.SKIP_FRAMES));
+          newClasses.put(className, ClassHelper.loadUnknownClass(className + ".class", decrypted, ClassReader.SKIP_FRAMES));
           markChange();
         } catch (Exception e) {
-          LOGGER.error(e);
+          throw new RuntimeException("Failed to decrypt class: " + className, e);
         }
       }
     });
