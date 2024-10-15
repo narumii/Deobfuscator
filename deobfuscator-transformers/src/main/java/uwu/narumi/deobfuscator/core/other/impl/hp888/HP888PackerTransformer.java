@@ -51,28 +51,26 @@ public class HP888PackerTransformer extends Transformer {
     // Decrypt encrypted classes
     Cipher cipher = Cipher.getInstance("AES");
     cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(Base64.getDecoder().decode(key.get()), "AES"));
-    context().getFiles().forEach((file, bytes) -> {
+    context().getFilesMap().forEach((file, bytes) -> {
       if (file.endsWith(encryptedClassFilesSuffix)) {
         filesToRemove.add(file);
 
-        String className = file.replace(encryptedClassFilesSuffix, "").replace(".", "/");
+        String path = file.replace(encryptedClassFilesSuffix, ".class").replace(".", "/");
         try {
           // Decrypt!
           byte[] decrypted = cipher.doFinal(bytes);
 
-          // Load class
-          newClasses.put(className, ClassHelper.loadUnknownClass(className + ".class", decrypted, ClassReader.SKIP_FRAMES));
+          // Load and put class
+          context().addCompiledClass(path, decrypted);
+
           markChange();
         } catch (Exception e) {
-          throw new RuntimeException("Failed to decrypt class: " + className, e);
+          throw new RuntimeException("Failed to decrypt class: " + path, e);
         }
       }
     });
 
-    // Put all new classes
-    context().getClasses().putAll(newClasses);
-
     // Cleanup
-    filesToRemove.forEach(context().getFiles()::remove);
+    filesToRemove.forEach(context().getFilesMap()::remove);
   }
 }

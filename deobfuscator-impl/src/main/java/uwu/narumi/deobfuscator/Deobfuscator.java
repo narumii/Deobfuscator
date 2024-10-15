@@ -13,13 +13,12 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.objectweb.asm.ClassReader;
-import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.classpath.ClassStorage;
+import uwu.narumi.deobfuscator.api.classpath.CombinedClassProvider;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.context.DeobfuscatorOptions;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
 import uwu.narumi.deobfuscator.api.helper.FileHelper;
-import uwu.narumi.deobfuscator.api.classpath.Classpath;
 import uwu.narumi.deobfuscator.api.inheritance.InheritanceGraph;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
@@ -48,35 +47,21 @@ public class Deobfuscator {
       LOGGER.warn("Output file already exist, data will be overwritten");
     }
 
-    Classpath primaryClasspath = buildPrimaryClasspath();
-    LOGGER.info("Loaded {} classes from a primary source", primaryClasspath.rawClasses().size());
+    ClassStorage originalClasses = new ClassStorage();
+    LOGGER.info("Loaded {} classes from a primary source", originalClasses.compiledClasses().size());
 
-    Classpath libClasspath = buildLibClasspath();
-    LOGGER.info("Loaded {} classes from libraries", libClasspath.rawClasses().size());
+    ClassStorage libraries = buildLibraries();
+    LOGGER.info("Loaded {} classes from libraries", libraries.compiledClasses().size());
 
-    this.context = new Context(options, primaryClasspath, libClasspath);
+    this.context = new Context(options, originalClasses, libraries);
   }
 
-  public Classpath buildPrimaryClasspath() {
-    Classpath.Builder builder = Classpath.builder();
-    // Add input jar
-    if (options.inputJar() != null) {
-      builder.addJar(options.inputJar());
-    }
-    // Add external files
-    if (!options.externalFiles().isEmpty()) {
-      options.externalFiles().forEach(builder::addExternalFile);
-    }
-
-    return builder.build();
-  }
-
-  public Classpath buildLibClasspath() {
-    Classpath.Builder builder = Classpath.builder();
+  public ClassStorage buildLibraries() {
+    ClassStorage classStorage = new ClassStorage();
     // Add libraries
-    options.libraries().forEach(builder::addJar);
+    options.libraries().forEach(classStorage::addJar);
 
-    return builder.build();
+    return classStorage;
   }
 
   public void start() {
@@ -115,8 +100,7 @@ public class Deobfuscator {
     // Load class
     if (ClassHelper.isClass(pathInJar, bytes)) {
       try {
-        ClassWrapper classWrapper = ClassHelper.loadUnknownClass(pathInJar, bytes, ClassReader.SKIP_FRAMES);
-        context.getClasses().putIfAbsent(classWrapper.name(), classWrapper);
+        this.context.addCompiledClass(pathInJar, bytes);
         return;
       } catch (Exception e) {
         LOGGER.error("Could not load class: {}, adding as file", pathInJar, e);
@@ -125,8 +109,8 @@ public class Deobfuscator {
     }
 
     // Load file
-    if (!context.getFiles().containsKey(pathInJar)) {
-      context.getFiles().put(pathInJar, bytes);
+    if (!context.getFilesMap().containsKey(pathInJar)) {
+      context.addFile(pathInJar, bytes);
     }
   }
 
@@ -201,10 +185,12 @@ public class Deobfuscator {
    * @param saver a consumer that accepts a path and data to save
    */
   private void save(BiConsumer<String, byte[]> saver) {
-    InheritanceGraph inheritanceGraph = new InheritanceGraph(this.context.getCombinedClasspath());
+    InheritanceGraph inheritanceGraph = new InheritanceGraph(
+        new CombinedClassProvider(this.context, this.context.getLibraries())
+    );
 
     // Save classes
-    context.getClasses().forEach((ignored, classWrapper) -> {
+    context.getClassesMap().forEach((ignored, classWrapper) -> {
       String path = classWrapper.getPathInJar();
 
       try {
@@ -216,28 +202,24 @@ public class Deobfuscator {
 
         try {
           // Save original class as a fallback
-          byte[] data = context.getPrimaryClasspath().rawClasses().get(classWrapper.name());
+          byte[] data = context.getCompiledClasses().getClass(classWrapper.name());
           saver.accept(path, data);
         } catch (Exception e2) {
           LOGGER.error("Could not save original class: {}", classWrapper.name());
           if (this.options.printStacktraces()) LOGGER.throwing(e2);
         }
       }
-
-      context.getClasses().remove(classWrapper.name());
     });
 
     // Save files
     if (!this.options.skipFiles()) {
-      context.getFiles().forEach((path, data) -> {
+      context.getFilesMap().forEach((path, data) -> {
         try {
           saver.accept(path, data);
         } catch (Exception e) {
           LOGGER.error("Could not save file: {}", path);
           if (this.options.printStacktraces()) LOGGER.throwing(e);
         }
-
-        context.getFiles().remove(path);
       });
     }
   }

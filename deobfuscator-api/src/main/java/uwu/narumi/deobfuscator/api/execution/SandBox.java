@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import uwu.narumi.deobfuscator.api.classpath.CombinedClassProvider;
 import uwu.narumi.deobfuscator.api.context.Context;
 
 /**
@@ -37,7 +38,10 @@ public class SandBox {
 
   public SandBox(Context context) {
     // Install all classes from deobfuscator context
-    this(new ClasspathDataSupplier(context.getCombinedClasspath()));
+    this(new ClasspathDataSupplier(
+        // We need to use compiled classes as they are already compiled
+        new CombinedClassProvider(context.getCompiledClasses(), context.getLibraries())
+    ));
   }
 
   public SandBox(SupplyingClassLoaderInstaller.DataSupplier dataSupplier) {

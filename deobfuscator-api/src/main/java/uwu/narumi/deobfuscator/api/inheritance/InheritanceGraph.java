@@ -6,8 +6,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
-import uwu.narumi.deobfuscator.api.classpath.Classpath;
-import uwu.narumi.deobfuscator.api.classpath.JvmClasspath;
+import uwu.narumi.deobfuscator.api.classpath.ClassProvider;
+import uwu.narumi.deobfuscator.api.classpath.CombinedClassProvider;
+import uwu.narumi.deobfuscator.api.classpath.JvmClassProvider;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,13 +32,13 @@ public class InheritanceGraph {
   private final Map<String, InheritanceVertex> vertices = new ConcurrentHashMap<>();
   private final Set<String> stubs = ConcurrentHashMap.newKeySet();
   private final Function<String, InheritanceVertex> vertexProvider = createVertexProvider();
-  private final Classpath classpath;
+  private final ClassProvider classProvider;
 
   /**
    * Create an inheritance graph.
    */
-  public InheritanceGraph(@NotNull Classpath classpath) {
-    this.classpath = classpath;
+  public InheritanceGraph(@NotNull ClassProvider classProvider) {
+    this.classProvider = new CombinedClassProvider(classProvider, JvmClassProvider.INSTANCE);
 
     // Populate downwards (parent --> child) lookup
     refreshChildLookup();
@@ -51,7 +52,10 @@ public class InheritanceGraph {
     parentToChild.clear();
 
     // Repopulate
-    classpath.classesInfo().values().forEach(this::populateParentToChildLookup);
+    classProvider.getLoadedClasses().stream()
+        .map(classProvider::getClassInfo)
+        .filter(Objects::nonNull)
+        .forEach(this::populateParentToChildLookup);
   }
 
   /**
@@ -297,7 +301,7 @@ public class InheritanceGraph {
         return null;
 
       // Find class in workspace, if not found yield stub.
-      ClassNode result = this.getClassNode(name);
+      ClassNode result = this.classProvider.getClassInfo(name);
       if (result == null) {
         return STUB;
       }
@@ -308,15 +312,6 @@ public class InheritanceGraph {
       //ClassInfo info = result.getValue();
       return new InheritanceVertex(result, this::getVertex, this::getDirectChildren);
     };
-  }
-
-  @Nullable
-  private ClassNode getClassNode(String name) {
-    ClassNode result = classpath.classesInfo().get(name);
-    if (result != null) return result;
-
-    // Try to find it in classloader
-    return JvmClasspath.getClassNode(name);
   }
 
   private static class InheritanceStubVertex extends InheritanceVertex {

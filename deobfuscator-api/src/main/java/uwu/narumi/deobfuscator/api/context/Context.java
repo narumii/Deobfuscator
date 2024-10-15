@@ -2,27 +2,27 @@ package uwu.narumi.deobfuscator.api.context;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.tree.ClassNode;
+import software.coley.cafedude.InvalidClassException;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.classpath.ClassProvider;
+import uwu.narumi.deobfuscator.api.classpath.ClassStorage;
 import uwu.narumi.deobfuscator.api.execution.SandBox;
-import uwu.narumi.deobfuscator.api.classpath.Classpath;
+import uwu.narumi.deobfuscator.api.helper.ClassHelper;
 
-public class Context {
+public class Context implements ClassProvider {
 
-  private static final Logger LOGGER = LogManager.getLogger(Context.class);
-
-  private final Map<String, ClassWrapper> classes = new ConcurrentHashMap<>();
-  private final Map<String, byte[]> files = new ConcurrentHashMap<>();
+  private final Map<String, ClassWrapper> classesMap = new ConcurrentHashMap<>();
+  private final Map<String, byte[]> filesMap = new ConcurrentHashMap<>();
 
   private final DeobfuscatorOptions options;
 
-  private final Classpath primaryClasspath;
-  private final Classpath libClasspath;
-  private final Classpath combinedClasspath;
+  private final ClassStorage compiledClasses;
+  private final ClassStorage libraries;
 
   private SandBox globalSandBox = null;
 
@@ -30,18 +30,14 @@ public class Context {
    * Creates a new {@link Context} instance from its options
    *
    * @param options Deobfuscator options
-   * @param primaryClasspath Classpath which has only primary jar in it
-   * @param libClasspath Classpath filled with libs
+   * @param compiledClasses {@link ClassStorage} that holds the original classes of the primary jar
+   * @param libraries {@link ClassStorage} that holds the libraries' classes
    */
-  public Context(DeobfuscatorOptions options, Classpath primaryClasspath, Classpath libClasspath) {
+  public Context(DeobfuscatorOptions options, ClassStorage compiledClasses, ClassStorage libraries) {
     this.options = options;
 
-    this.primaryClasspath = primaryClasspath;
-    this.libClasspath = libClasspath;
-    this.combinedClasspath = Classpath.builder()
-        .addClasspath(primaryClasspath)
-        .addClasspath(libClasspath)
-        .build();
+    this.compiledClasses = compiledClasses;
+    this.libraries = libraries;
   }
 
   /**
@@ -60,63 +56,73 @@ public class Context {
   }
 
   /**
-   * Classpath for primary jar
+   * Class storage that holds already compiled classes from original jar
    */
-  public Classpath getPrimaryClasspath() {
-    return primaryClasspath;
+  public ClassStorage getCompiledClasses() {
+    return compiledClasses;
   }
 
   /**
-   * Classpath filled with libs
+   * Class storage that holds libraries' classes
    */
-  public Classpath getLibClasspath() {
-    return libClasspath;
-  }
-
-  /**
-   * {@link #getPrimaryClasspath()} and {@link #getLibClasspath()} combined
-   */
-  public Classpath getCombinedClasspath() {
-    return this.combinedClasspath;
+  public ClassStorage getLibraries() {
+    return libraries;
   }
 
   public Collection<ClassWrapper> classes() {
-    return classes.values();
-  }
-
-  public Stream<ClassWrapper> stream() {
-    return classes.values().stream();
-  }
-
-  public Stream<ClassWrapper> stream(ClassWrapper scope) {
-    return classes.values().stream()
-        .filter(classWrapper -> scope == null || classWrapper.name().equals(scope.name()));
+    return classesMap.values();
   }
 
   @UnmodifiableView
   public List<ClassWrapper> scopedClasses(ClassWrapper scope) {
-    return classes.values().stream()
+    return classesMap.values().stream()
         .filter(classWrapper -> scope == null || classWrapper.name().equals(scope.name()))
         .toList();
   }
 
-  public Optional<ClassWrapper> get(String name) {
-    return Optional.ofNullable(classes.get(name));
+  public void addCompiledClass(String pathInJar, byte[] bytes) {
+    try {
+      ClassWrapper classWrapper = ClassHelper.loadUnknownClass(pathInJar, bytes, ClassReader.SKIP_FRAMES);
+      this.classesMap.putIfAbsent(classWrapper.name(), classWrapper);
+      this.compiledClasses.addRawClass(bytes);
+    } catch (InvalidClassException e) {
+      throw new RuntimeException(e);
+    }
   }
 
-  public Optional<ClassWrapper> remove(ClassWrapper classWrapper) {
-    return remove(classWrapper.name());
+  public void addFile(String path, byte[] bytes) {
+    this.filesMap.put(path, bytes);
+    this.compiledClasses.files().put(path, bytes);
   }
 
-  public Optional<ClassWrapper> remove(String name) {
-    return Optional.ofNullable(classes.remove(name));
+  @Override
+  public byte @Nullable [] getClass(String name) {
+    // Not implemented because it would need to compile class which is CPU intensive
+    return null;
   }
 
-  public Map<String, ClassWrapper> getClasses() {
-    return classes;
+  @Override
+  public byte @Nullable [] getFile(String path) {
+    return filesMap.get(path);
   }
 
-  public Map<String, byte[]> getFiles() {
-    return files;
+  @Override
+  public @Nullable ClassNode getClassInfo(String name) {
+    ClassWrapper classWrapper = classesMap.get(name);
+    if (classWrapper == null) return null;
+    return classWrapper.classNode();
+  }
+
+  @Override
+  public Collection<String> getLoadedClasses() {
+    return this.classesMap.keySet();
+  }
+
+  public Map<String, ClassWrapper> getClassesMap() {
+    return classesMap;
+  }
+
+  public Map<String, byte[]> getFilesMap() {
+    return filesMap;
   }
 }

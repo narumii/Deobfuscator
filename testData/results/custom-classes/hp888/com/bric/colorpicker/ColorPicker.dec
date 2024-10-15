@@ -1,0 +1,418 @@
+package com.bric.colorpicker;
+
+import com.bric.colorpicker.colorslider.ColorSlider;
+import com.bric.colorpicker.colorslider.ColorSliderUI;
+import com.bric.colorpicker.listeners.ColorListener;
+import com.bric.colorpicker.listeners.HexFieldListener;
+import com.bric.colorpicker.listeners.SelectAllListener;
+import com.bric.colorpicker.models.ColorModel;
+import com.bric.colorpicker.models.ModeModel;
+import com.bric.colorpicker.options.AlphaOption;
+import com.bric.colorpicker.options.BlueOption;
+import com.bric.colorpicker.options.BrightnessOption;
+import com.bric.colorpicker.options.GreenOption;
+import com.bric.colorpicker.options.HueOption;
+import com.bric.colorpicker.options.Option;
+import com.bric.colorpicker.options.RedOption;
+import com.bric.colorpicker.options.SaturationOption;
+import com.bric.colorpicker.parts.ColorSwatch;
+import com.bric.colorpicker.parts.HexField;
+import com.bric.colorpicker.parts.OpacitySlider;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.ResourceBundle;
+import javax.swing.ButtonGroup;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+
+public class ColorPicker extends JPanel {
+    public static final String MODE_PROPERTY = "mode";
+    private static final String SELECTED_COLOR_PROPERTY = "selected color";
+    private static final String MODE_CONTROLS_VISIBLE_PROPERTY = "mode controls visible";
+    private static ResourceBundle strings = ResourceBundle.getBundle("com.bric.colorpicker.resources.ColorPicker");
+    private ColorModel colorModel = new ColorModel();
+    private ModeModel modeModel = new ModeModel();
+    private ColorSlider slider = new ColorSlider();
+    private Option alphaOption = new AlphaOption();
+    private Option hueOption = new HueOption();
+    private Option saturationOption = new SaturationOption();
+    private Option brightnessOption = new BrightnessOption();
+    private Option redOption = new RedOption();
+    private Option greenOption = new GreenOption();
+    private Option blueOption = new BlueOption();
+    private ColorSwatch preview = new ColorSwatch(50);
+    private JLabel hexLabel = new JLabel(strings.getObject("hexLabel").toString());
+    private HexField hexField = new HexField();
+    private JPanel expertControls = new JPanel(new GridBagLayout());
+    private ColorPickerPanel colorPanel = new ColorPickerPanel();
+    private OpacitySlider opacitySlider = new OpacitySlider();
+    private JLabel opacityLabel = new JLabel(strings.getObject("opacityLabel").toString());
+
+    public ColorPicker() {
+        this(true, false);
+    }
+
+    public ColorPicker(boolean var1, boolean var2) {
+        super(new GridBagLayout());
+        this.initNames();
+        GridBagConstraints var3 = new GridBagConstraints();
+        Insets var4 = new Insets(3, 3, 3, 3);
+        JPanel var5 = new JPanel(new GridBagLayout());
+        var3.gridx = 0;
+        var3.gridy = 0;
+        var3.weightx = 1.0;
+        var3.weighty = 1.0;
+        var3.insets = var4;
+        ButtonGroup var6 = new ButtonGroup();
+        Option[] var7 = new Option[]{this.hueOption, this.saturationOption, this.brightnessOption, this.redOption, this.greenOption, this.blueOption};
+
+        for (int var8 = 0; var8 < var7.length; var8++) {
+            if (var8 != 3 && var8 != 6) {
+                var3.insets = var4;
+            } else {
+                var3.insets = new Insets(var4.top + 10, var4.left, var4.bottom, var4.right);
+            }
+
+            var7[var8].addTo(var5, var3, var6);
+        }
+
+        var3.insets = new Insets(var4.top + 10, var4.left, var4.bottom, var4.right);
+        var3.anchor = 22;
+        var3.fill = 0;
+        var5.add(this.hexLabel, var3);
+        var3.gridx++;
+        var3.anchor = 21;
+        var3.fill = 2;
+        var5.add(this.hexField, var3);
+        this.alphaOption.addTo(var5, var3);
+        var3.gridx = 0;
+        var3.gridy = 0;
+        var3.weightx = 1.0;
+        var3.weighty = 1.0;
+        var3.fill = 1;
+        var3.anchor = 10;
+        var3.insets = var4;
+        var3.gridwidth = 2;
+        this.add(this.colorPanel, var3);
+        var3.gridwidth = 1;
+        var3.insets = var4;
+        var3.gridx += 2;
+        var3.weighty = 1.0;
+        var3.gridwidth = 1;
+        var3.fill = 3;
+        var3.weightx = 0.0;
+        this.add(this.slider, var3);
+        var3.gridx++;
+        var3.fill = 3;
+        var3.gridheight = 0;
+        var3.anchor = 10;
+        var3.insets = new Insets(0, 0, 0, 0);
+        this.add(this.expertControls, var3);
+        var3.gridx = 0;
+        var3.gridheight = 1;
+        var3.gridy = 1;
+        var3.weightx = 0.0;
+        var3.weighty = 0.0;
+        var3.insets = var4;
+        var3.anchor = 10;
+        this.add(this.opacityLabel, var3);
+        var3.gridx++;
+        var3.gridwidth = 2;
+        var3.weightx = 1.0;
+        var3.fill = 2;
+        this.add(this.opacitySlider, var3);
+        var3.gridx = 0;
+        var3.gridy = 0;
+        var3.gridheight = 1;
+        var3.gridwidth = 1;
+        var3.fill = 1;
+        var3.weighty = 1.0;
+        var3.weightx = 1.0;
+        var3.anchor = 19;
+        var3.insets = new Insets(var4.top, var4.left + 8, var4.bottom + 10, var4.right + 8);
+        this.expertControls.add(this.preview, var3);
+        var3.gridy++;
+        var3.weighty = 0.0;
+        var3.anchor = 10;
+        var3.insets = new Insets(var4.top, var4.left, 0, var4.right);
+        this.expertControls.add(var5, var3);
+        this.initializeColorPanel();
+        this.initializeSlider();
+        this.initializePreview();
+        this.initializeHexField();
+        this.initialize(this.hueOption);
+        this.initialize(this.saturationOption);
+        this.initialize(this.brightnessOption);
+        this.initialize(this.redOption);
+        this.initialize(this.greenOption);
+        this.initialize(this.blueOption);
+        this.initializeOpacitySlider();
+        this.initialize(this.alphaOption);
+        this.setExpertControlsVisible(var1);
+        this.setOpacityVisible(var2);
+        setOpaque(this, false);
+        this.setColor(Color.BLACK);
+        this.setMode(ColorPickerMode.BRIGHTNESS);
+    }
+
+    private static void setOpaque(JComponent var0, boolean var1) {
+        if (!(var0 instanceof JTextField)) {
+            var0.setOpaque(false);
+            if (!(var0 instanceof JSpinner)) {
+                for (int var2 = 0; var2 < var0.getComponentCount(); var2++) {
+                    JComponent var3 = (JComponent)var0.getComponent(var2);
+                    setOpaque(var3, var1);
+                }
+            }
+        }
+    }
+
+    private static void requireValidFloat(float var0, String var1) {
+        if (Float.isInfinite(var0) || Float.isNaN(var0)) {
+            throw new IllegalArgumentException("The " + var1 + " value '" + var0 + "' is not a valid number.");
+        } else if (var0 < 0.0F || var0 > 1.0F) {
+            throw new IllegalArgumentException("The " + var1 + " value '" + var0 + "' must be between [0,1]");
+        }
+    }
+
+    private void initialize(Option var1) {
+        this.colorModel.addColorListener(var1);
+        var1.addSpinnerChangeListener(var2 -> {
+            if (!this.colorModel.isChanging()) {
+                var1.aboutToChangeColor();
+                var1.update(this.colorModel);
+            }
+        });
+        this.modeModel.addListener(var1);
+        var1.addRadioActionListener(var2 -> {
+            if (!this.colorModel.isChanging()) {
+                var1.aboutToChangeMode();
+                var1.update(this.modeModel);
+            }
+        });
+        var1.addFocusListener(new SelectAllListener());
+    }
+
+    private void initializeOpacitySlider() {
+        this.colorModel.addColorListener(this.opacitySlider);
+        this.opacitySlider.addChangeListener(var1 -> {
+            if (!this.opacitySlider.getValueIsAdjusting()) {
+                if (this.colorModel.isChanging()) {
+                    return;
+                }
+
+                this.opacitySlider.aboutToChangeColor();
+                this.colorModel.setAlpha(this.opacitySlider.getValue());
+            }
+        });
+    }
+
+    private void initializeHexField() {
+        this.colorModel.addColorListener(this.hexField);
+        HexFieldListener var1 = new HexFieldListener();
+        var1.setColorModel(this.colorModel);
+        var1.setHexField(this.hexField);
+        this.hexField.getDocument().addDocumentListener(var1);
+        this.hexField.addFocusListener(new SelectAllListener());
+    }
+
+    private void initializePreview() {
+        this.preview.setOpaque(true);
+        this.colorModel.addColorListener(this.preview);
+    }
+
+    private void initializeColorPanel() {
+        int var1 = this.expertControls.getPreferredSize().height;
+        this.colorPanel.setPreferredSize(new Dimension(var1, var1));
+        this.colorModel.addColorListener(this.colorPanel);
+        this.modeModel.addListener(this.colorPanel);
+        this.colorPanel.addChangeListener(var1x -> {
+            if (!this.colorModel.isChanging()) {
+                int[] var2 = this.colorPanel.getRGB();
+                this.colorPanel.aboutToChangeColor();
+                this.colorModel.setColor(new Color(var2[0], var2[1], var2[2]));
+            }
+        });
+    }
+
+    private void initializeSlider() {
+        this.colorModel.addColorListener(this.slider);
+        this.modeModel.addListener(this.slider);
+        this.slider.addChangeListener(var1 -> {
+            if (!this.slider.getValueIsAdjusting()) {
+                if (this.colorModel.isChanging()) {
+                    return;
+                }
+
+                this.slider.aboutToChangeColor();
+                ColorPickerMode var2 = this.modeModel.getMode();
+                switch (var2) {
+                    case HUE:
+                        this.colorModel.setHue((float)this.slider.getValue() / (float)var2.getMax());
+                        break;
+                    case SATURATION:
+                        this.colorModel.setSaturation((float)this.slider.getValue() / (float)var2.getMax());
+                        break;
+                    case BRIGHTNESS:
+                        this.colorModel.setBrightness((float)this.slider.getValue() / (float)var2.getMax());
+                        break;
+                    case RED:
+                        this.colorModel.setRed(this.slider.getValue());
+                        break;
+                    case GREEN:
+                        this.colorModel.setGreen(this.slider.getValue());
+                        break;
+                    case BLUE:
+                        this.colorModel.setBlue(this.slider.getValue());
+                }
+            }
+        });
+        this.slider.setUI(new ColorSliderUI(this.slider, this));
+    }
+
+    public Option getSelectedOption() {
+        ColorPickerMode var1 = this.getMode();
+        switch (var1) {
+            case HUE:
+                return this.hueOption;
+            case SATURATION:
+                return this.saturationOption;
+            case BRIGHTNESS:
+                return this.brightnessOption;
+            case RED:
+                return this.redOption;
+            case GREEN:
+                return this.greenOption;
+            case BLUE:
+                return this.blueOption;
+            default:
+                return null;
+        }
+    }
+
+    private void initNames() {
+        this.hexField.setName("Hex");
+        this.hueOption.setName("Hue");
+        this.saturationOption.setName("Saturation");
+        this.brightnessOption.setName("Brightness");
+        this.redOption.setName("Red");
+        this.greenOption.setName("Green");
+        this.blueOption.setName("Blue");
+    }
+
+    public void setHexControlsVisible(boolean var1) {
+        this.hexLabel.setVisible(var1);
+        this.hexField.setVisible(var1);
+    }
+
+    public void setPreviewSwatchVisible(boolean var1) {
+        this.preview.setVisible(var1);
+    }
+
+    public void setExpertControlsVisible(boolean var1) {
+        this.expertControls.setVisible(var1);
+    }
+
+    public void setModeControlsVisible(boolean var1) {
+        this.hueOption.setRadioButtonVisible(var1 && this.hueOption.isVisible());
+        this.saturationOption.setRadioButtonVisible(var1 && this.saturationOption.isVisible());
+        this.brightnessOption.setRadioButtonVisible(var1 && this.brightnessOption.isVisible());
+        this.redOption.setRadioButtonVisible(var1 && this.redOption.isVisible());
+        this.greenOption.setRadioButtonVisible(var1 && this.greenOption.isVisible());
+        this.blueOption.setRadioButtonVisible(var1 && this.blueOption.isVisible());
+        this.putClientProperty("mode controls visible", var1);
+    }
+
+    public ColorPickerMode getMode() {
+        return this.modeModel.getMode();
+    }
+
+    public void setMode(ColorPickerMode var1) {
+        if (var1 == null) {
+            throw new IllegalArgumentException("mode must not be null");
+        } else {
+            this.modeModel.setMode(var1);
+        }
+    }
+
+    public void setRGB(int var1, int var2, int var3) {
+        this.setColor(new Color(var1, var2, var3));
+    }
+
+    public Color getColor() {
+        return this.colorModel.getColor();
+    }
+
+    public void setColor(Color var1) {
+        Color var2 = this.colorModel.getColor();
+        this.colorModel.setColor(var1);
+        this.firePropertyChange("selected color", var2, var1);
+    }
+
+    public JPanel getExpertControls() {
+        return this.expertControls;
+    }
+
+    public void setRGBControlsVisible(boolean var1) {
+        boolean var2 = this.areRadioButtonsAllowed();
+        this.redOption.setVisible(var1, var2);
+        this.greenOption.setVisible(var1, var2);
+        this.blueOption.setVisible(var1, var2);
+    }
+
+    private boolean areRadioButtonsAllowed() {
+        Boolean var1 = (Boolean)this.getClientProperty("mode controls visible");
+        return var1 != null ? var1 : true;
+    }
+
+    public void setHSBControlsVisible(boolean var1) {
+        boolean var2 = this.areRadioButtonsAllowed();
+        this.hueOption.setVisible(var1, var2);
+        this.saturationOption.setVisible(var1, var2);
+        this.brightnessOption.setVisible(var1, var2);
+    }
+
+    public final void setOpacityVisible(boolean var1) {
+        this.opacityLabel.setVisible(var1);
+        this.opacitySlider.setVisible(var1);
+        this.alphaOption.setLabelVisible(var1);
+        this.alphaOption.setSpinnerVisible(var1);
+    }
+
+    public ColorPickerPanel getColorPanel() {
+        return this.colorPanel;
+    }
+
+    public void setHSB(float var1, float var2, float var3) {
+        requireValidFloat(var1, "hue");
+        requireValidFloat(var2, "saturation");
+        requireValidFloat(var3, "brightness");
+        this.setColor(Color.getHSBColor(var1, var2, var3));
+    }
+
+    public float[] getHSB() {
+        return this.colorModel.getHSB();
+    }
+
+    public int[] getRGB() {
+        return this.colorModel.getRGB();
+    }
+
+    public void setOpacity(int var1) {
+        this.setColor(new Color(this.colorModel.getRed(), this.colorModel.getGreen(), this.colorModel.getBlue(), var1));
+    }
+
+    public void addColorListener(ColorListener var1) {
+        this.colorModel.addColorListener(var1);
+    }
+
+    public void removeColorListener(ColorListener var1) {
+        this.colorModel.removeColorListener(var1);
+    }
+}

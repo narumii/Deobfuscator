@@ -104,8 +104,8 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
   protected void transform() throws Exception {
     // Firstly, process the manual list of class initialization order
     for (var entry : classInitOrder.entrySet()) {
-      ClassWrapper first = context().getClasses().get(entry.getKey());
-      ClassWrapper second = context().getClasses().get(entry.getValue());
+      ClassWrapper first = context().getClassesMap().get(entry.getKey());
+      ClassWrapper second = context().getClassesMap().get(entry.getValue());
 
       decryptEncryptedLongs(context(), first);
       decryptEncryptedLongs(context(), second);
@@ -118,7 +118,7 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
 
     // Remove decrypter classes
     if (sandBox != null) {
-      sandBox.getUsedCustomClasses().forEach(clazz -> context().getClasses().remove(clazz.getInternalName()));
+      sandBox.getUsedCustomClasses().forEach(clazz -> context().getClassesMap().remove(clazz.getInternalName()));
     }
   }
 
@@ -136,7 +136,7 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
     // Zelix came up with a great idea to infer class initialization order by the super classes.
     // So firstly, process encrypted longs in the super class
     if (classWrapper.classNode().superName != null && !classWrapper.classNode().superName.equals("java/lang/Object")) {
-      ClassWrapper superClass = context.getClasses().get(classWrapper.classNode().superName);
+      ClassWrapper superClass = context.getClassesMap().get(classWrapper.classNode().superName);
       if (superClass != null) {
         decryptEncryptedLongs(context, superClass);
       }
@@ -161,7 +161,7 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
       long key2 = matchContext.captures().get("key-2").insn().asLong();
       long decryptKey = matchContext.captures().get("decrypt-key").insn().asLong();
 
-      ClassWrapper longDecrypterCreatorClass = context.getClasses().get(createDecrypterInsn.owner);
+      ClassWrapper longDecrypterCreatorClass = context.getClassesMap().get(createDecrypterInsn.owner);
 
       try {
         // Create decrypter

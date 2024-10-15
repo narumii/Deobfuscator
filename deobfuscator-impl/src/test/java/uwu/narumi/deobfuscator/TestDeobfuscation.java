@@ -139,9 +139,9 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "zkm/EnhancedStringEncManyStrings.class")
         .register();
 
-    // Example HP888 classes. Without packer.
+    // Example HP888 classes
     test("HP888")
-        .transformers(ComposedHP888Transformer::new)
+        .transformers(() -> new ComposedHP888Transformer(".mc"))
         .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "hp888")
         .register();
 

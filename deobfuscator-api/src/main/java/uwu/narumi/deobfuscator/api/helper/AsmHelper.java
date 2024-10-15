@@ -160,7 +160,7 @@ public class AsmHelper implements Opcodes {
   private static void tryUpdateMethodDescriptor(Context context, ClassWrapper classWrapper, String name, String oldDesc, String newDesc) {
     // Search superclass
     if (classWrapper.classNode().superName != null) {
-      ClassWrapper superClass = context.getClasses().get(classWrapper.classNode().superName);
+      ClassWrapper superClass = context.getClassesMap().get(classWrapper.classNode().superName);
       if (superClass != null) {
         tryUpdateMethodDescriptor(context, superClass, name, oldDesc, newDesc);
       }
@@ -168,7 +168,7 @@ public class AsmHelper implements Opcodes {
 
     // Search interfaces
     classWrapper.classNode().interfaces.forEach(interfaceName -> {
-      ClassWrapper interfaceClass = context.getClasses().get(interfaceName);
+      ClassWrapper interfaceClass = context.getClassesMap().get(interfaceName);
       if (interfaceClass != null) {
         tryUpdateMethodDescriptor(context, interfaceClass, name, oldDesc, newDesc);
       }
@@ -213,10 +213,10 @@ public class AsmHelper implements Opcodes {
   }
 
   public static void removeField(FieldInsnNode fieldInsnNode, Context context) {
-    if (!context.getClasses().containsKey(fieldInsnNode.owner)) return;
+    if (!context.getClassesMap().containsKey(fieldInsnNode.owner)) return;
 
     context
-        .getClasses()
+        .getClassesMap()
         .get(fieldInsnNode.owner)
         .fields()
         .removeIf(
