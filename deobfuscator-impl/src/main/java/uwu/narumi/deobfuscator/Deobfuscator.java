@@ -47,13 +47,13 @@ public class Deobfuscator {
       LOGGER.warn("Output file already exist, data will be overwritten");
     }
 
-    ClassStorage originalClasses = new ClassStorage();
-    LOGGER.info("Loaded {} classes from a primary source", originalClasses.compiledClasses().size());
+    // Those classes will be loaded by Deobfuscator#loadInput
+    ClassStorage compiledClasses = new ClassStorage();
 
     ClassStorage libraries = buildLibraries();
     LOGGER.info("Loaded {} classes from libraries", libraries.compiledClasses().size());
 
-    this.context = new Context(options, originalClasses, libraries);
+    this.context = new Context(options, compiledClasses, libraries);
   }
 
   public ClassStorage buildLibraries() {
