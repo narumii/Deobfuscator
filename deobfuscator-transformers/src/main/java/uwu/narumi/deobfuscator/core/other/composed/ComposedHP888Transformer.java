@@ -2,9 +2,10 @@ package uwu.narumi.deobfuscator.core.other.composed;
 
 import org.jetbrains.annotations.Nullable;
 import uwu.narumi.deobfuscator.api.transformer.ComposedTransformer;
-import uwu.narumi.deobfuscator.core.other.composed.general.ComposedGeneralRepairTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.clean.LocalVariableNamesCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.hp888.HP888PackerTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.hp888.HP888StringTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.universal.AccessRepairTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.RecoverSyntheticsTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
 
@@ -31,7 +32,8 @@ public class ComposedHP888Transformer extends ComposedTransformer {
 
         // Cleanup
         UniversalNumberTransformer::new,
-        ComposedGeneralRepairTransformer::new,
+        AccessRepairTransformer::new,
+        LocalVariableNamesCleanTransformer::new,
         RecoverSyntheticsTransformer::new
     );
   }

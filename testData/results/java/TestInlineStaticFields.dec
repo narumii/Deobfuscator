@@ -1,15 +1,25 @@
 public class TestInlineStaticFields {
     public static int TEST1 = 123;
     public static int TEST4;
+    public static String TEST5;
 
     public static void test() {
         System.out.println(TEST1);
         System.out.println("placki");
         System.out.println(true);
         System.out.println(TEST4);
+        System.out.println(TEST5.toUpperCase());
     }
 
     public static void modifyStatic() {
         TEST1 = 321;
+    }
+
+    static {
+        try {
+            TEST5 = Number.class.getSimpleName();
+        } catch (Exception var1) {
+            TEST5 = null;
+        }
     }
 }

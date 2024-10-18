@@ -13,8 +13,10 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Inlines constant static fields
@@ -23,7 +25,7 @@ public class InlineStaticFieldTransformer extends Transformer {
 
   @Override
   protected void transform() throws Exception {
-    List<FieldRef> notConstantFields = new ArrayList<>();
+    Set<FieldRef> notConstantFields = new HashSet<>();
     Map<FieldRef, AbstractInsnNode> staticConstantFields = new HashMap<>();
 
     // Find all static constant fields
@@ -55,6 +57,8 @@ public class InlineStaticFieldTransformer extends Transformer {
             if (valueInsn.isConstant()) {
               // We have constant static field
               staticConstantFields.put(FieldRef.of(insn), valueInsn);
+            } else {
+              notConstantFields.add(fieldRef);
             }
           });
     }));
