@@ -16,18 +16,11 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <!--
-        We need to use a snapshot version of asm lib as there are some recent important changes to it
-         that are not in a release version yet:
-          - https://gitlab.ow2.org/asm/asm/-/merge_requests/414
-          - https://gitlab.ow2.org/asm/asm/-/merge_requests/415
-          - https://gitlab.ow2.org/asm/asm/-/merge_requests/416
-        -->
-        <asm.version>9.8-SNAPSHOT</asm.version>
+        <asm.version>9.7.1</asm.version>
 
         <log4j.version>2.23.1</log4j.version>
         <slf4j.version>2.0.13</slf4j.version>
-        <cafedude.version>83ea274ff8</cafedude.version>
+        <cafedude.version>2.1.2</cafedude.version>
         <ssvm.version>ca3c3ab713</ssvm.version>
         <jlinker.version>205d8eaa1f</jlinker.version>
     </properties>
@@ -36,10 +29,6 @@
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
-        </repository>
-        <repository>
-            <id>ow2-repo</id>
-            <url>https://repository.ow2.org/nexus/content/repositories/snapshots</url>
         </repository>
     </repositories>
 
