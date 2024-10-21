@@ -10,11 +10,9 @@ import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.helper.MethodHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -92,7 +90,7 @@ public class InlineStaticFieldTransformer extends Transformer {
         }));
 
     // Replace static fields accesses with corresponding values
-    List<FieldRef> inlinedFields = new ArrayList<>();
+    Set<FieldRef> inlinedFields = new HashSet<>();
     scopedClasses().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
       Arrays.stream(methodNode.instructions.toArray())
           .filter(insn -> insn.getOpcode() == GETSTATIC)
@@ -105,9 +103,7 @@ public class InlineStaticFieldTransformer extends Transformer {
               methodNode.instructions.set(insn, constValue.clone(null));
 
               // Add to an inlined fields list
-              if (!inlinedFields.contains(fieldRef)) {
-                inlinedFields.add(fieldRef);
-              }
+              inlinedFields.add(fieldRef);
 
               this.markChange();
             }

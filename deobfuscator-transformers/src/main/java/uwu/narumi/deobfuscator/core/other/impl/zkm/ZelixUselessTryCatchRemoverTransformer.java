@@ -12,7 +12,9 @@ import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Removes useless try catches. References:
@@ -64,7 +66,7 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
         }
       });
 
-      List<MethodRef> toRemove = new ArrayList<>();
+      Set<MethodRef> toRemove = new HashSet<>();
 
       // Remove try-catches with these instant return exception methods
       classWrapper.methods().forEach(methodNode -> {
@@ -79,9 +81,7 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
             // Check if method is returning an exception instantly
             if (!instantReturnExceptionMethods.contains(methodRef)) return false;
 
-            if (!toRemove.contains(methodRef)) {
-              toRemove.add(methodRef);
-            }
+            toRemove.add(methodRef);
 
             markChange();
             return true;

@@ -7,16 +7,16 @@ import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.helper.FramedInstructionsStream;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class UselessPopCleanTransformer extends Transformer {
   public UselessPopCleanTransformer() {
     this.rerunOnChange = true;
   }
 
-  private final List<AbstractInsnNode> poppedDups = new ArrayList<>();
+  private final Set<AbstractInsnNode> poppedDups = new HashSet<>();
 
   @Override
   protected void transform() throws Exception {

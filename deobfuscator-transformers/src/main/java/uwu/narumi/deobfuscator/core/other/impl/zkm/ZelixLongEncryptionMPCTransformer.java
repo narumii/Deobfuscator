@@ -18,10 +18,10 @@ import uwu.narumi.deobfuscator.api.execution.SandBox;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -83,7 +83,7 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
   private final Map<String, String> classInitOrder;
 
   private SandBox sandBox = null;
-  private final List<String> processedClasses = new ArrayList<>(); // class internal names
+  private final Set<String> processedClasses = new HashSet<>(); // class internal names
 
   public ZelixLongEncryptionMPCTransformer() {
     this.classInitOrder = new HashMap<>();

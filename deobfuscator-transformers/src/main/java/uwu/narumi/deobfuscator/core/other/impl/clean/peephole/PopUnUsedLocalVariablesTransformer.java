@@ -9,8 +9,8 @@ import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class PopUnUsedLocalVariablesTransformer extends Transformer {
 
@@ -19,7 +19,7 @@ public class PopUnUsedLocalVariablesTransformer extends Transformer {
     scopedClasses().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
       MethodContext methodContext = MethodContext.framed(classWrapper, methodNode);
 
-      List<VarInsnNode> varStoresInUse = new ArrayList<>();
+      Set<VarInsnNode> varStoresInUse = new HashSet<>();
 
       // Find all local variables in use
       for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
