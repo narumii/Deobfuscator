@@ -24,9 +24,10 @@ The project is structured as follows:
 - [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) - IDE for Java development
 - [Recaf](https://github.com/Col-E/Recaf) - Modern java bytecode editor. Use it to analyze obfuscated classes.
 - [JVM Specification](https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html) - Java Virtual Machine Specification. Use it to learn more about java bytecode. There are described things like JVM instructions, some terms, etc.
+- [JVM Manual](https://github.com/ethaanol/jvm-manual/wiki) - Excellent community-made JVM manual that clearly explains most JVM concepts.
 
 ## 🔢 Some basics about java bytecode
-[First of all](https://www.youtube.com/watch?v=TrHabuoQf7s) you need to learn some basics about java bytecode. The best way to learn it is to write an example java code (start with "hello world" program), compile it and throw the compiled jar to Recaf. Then find your class, right click, and click `Edit` -> `Edit class in assembler`. Here you can see your java bytecode. Try to compare it with your written java code, and find similarities, like how method invocation is done, variable accesses, math operations, etc. If you want to read a bit more about bytecode itself and instructions then there is a great documentation of all JVM instructions here: https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html.
+[First of all](https://www.youtube.com/watch?v=TrHabuoQf7s) you need to learn some basics about java bytecode. The best way to learn it is to write an example java code (start with "hello world" program), compile it and throw the compiled jar to Recaf. Then find your class, right click, and click `Edit` -> `Edit class in assembler`. Here you can see your java bytecode. Try to compare it with your written java code, and find similarities, like how method invocation is done, variable accesses, math operations, etc. If you want to read a bit more about bytecode itself and instructions then there is [a great documentation of all JVM instructions](https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html). I also highly recommend to read [JVM Manual](https://github.com/ethaanol/jvm-manual/wiki), which explains most JVM concepts in simple and easy-to-understand terms.
 
 In this section, we will cover some basics about java bytecode.
 
