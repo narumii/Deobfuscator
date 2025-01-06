@@ -46,7 +46,6 @@ public class d extends Thread {
     }
 
     public void run() {
-        long var1 = 89995196843699L;
         long var3 = 12972172530972L;
         long var5 = 121593940001805L;
         long var7 = 41896598891982L;

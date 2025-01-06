@@ -136,7 +136,6 @@ public final class PacketEvents implements Listener, EventManager {
         int var17;
         PacketEvents var24;
         label89: {
-            long var1 = 37314761108082L;
             var3 = 100924278520616L;
             var5 = 26099128416120L;
             var7 = 127830791373044L;
@@ -318,7 +317,6 @@ public final class PacketEvents implements Listener, EventManager {
             Runnable var6;
             label37: {
                 var6 = () -> {
-                    long var1x = 66876338785522L;
                     long var3 = 119084676127620L;
                     long var5x = 123797029215992L;
                     Bukkit.getPluginManager().registerEvents(this.bukkitEventProcessorInternal, plugin);
@@ -373,7 +371,6 @@ public final class PacketEvents implements Listener, EventManager {
     }
 
     public void Vulcan_o() {
-        long var1 = 47666491843353L;
         long var3 = 94080624911225L;
         long var5 = 53297714112873L;
         int var7 = Vulcan_Q();
@@ -498,7 +495,6 @@ public final class PacketEvents implements Listener, EventManager {
         }
 
         Thread var4 = new Thread(() -> {
-            long var1 = 73114304934084L;
             long var3x = 71820540609001L;
             int var10000x = Vulcan_a();
             this.Vulcan_a().getLogger().info("[packetevents] Checking for an update, please wait...");

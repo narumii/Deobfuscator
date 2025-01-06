@@ -4,7 +4,6 @@ public class Main {
     private static final Integer[] c;
 
     public static void main(String[] var0) {
-        long var1 = 53836601486112L;
         e var3 = new e();
         var3.setTitle(a);
         var3.setSize(a(23704, 8408508685984484905L), a(21193, 5113680640368394361L));
