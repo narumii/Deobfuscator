@@ -50,7 +50,7 @@ public class InsnContext {
   }
 
   /**
-   * Pops current instruction's stack values by adding POP instructions before this instruction
+   * Places POP or POP2 instruction before current instruction to remove the value from the stack
    *
    * @param count Stack values count to pop
    */

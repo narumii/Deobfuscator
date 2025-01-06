@@ -12,10 +12,14 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ClassStorage implements ClassProvider {
+/**
+ * Class storage that holds only information about classes, not the bytecode.
+ */
+public class ClassInfoStorage implements ClassProvider {
   private final Map<String, byte[]> compiledClasses = new ConcurrentHashMap<>();
   private final Map<String, byte[]> files = new ConcurrentHashMap<>();
 
+  // ClassNode without code, only info (like name, superName, interfaces, etc.)
   private final Map<String, ClassNode> classesInfo = new ConcurrentHashMap<>();
 
   /**
@@ -30,21 +34,24 @@ public class ClassStorage implements ClassProvider {
         return;
       }
 
-      addRawClass(bytes);
+      try {
+        // Fix class bytes
+        bytes = ClassHelper.fixClass(bytes);
+
+        addRawClass(bytes);
+      } catch (InvalidClassException e) {
+        throw new RuntimeException(e);
+      }
     });
   }
 
   public void addRawClass(byte[] bytes) {
-    try {
-      ClassNode classNode = ClassHelper.loadUnknownClassInfo(bytes);
-      String className = classNode.name;
+    ClassNode classNode = ClassHelper.loadClassInfo(bytes);
+    String className = classNode.name;
 
-      // Add class to class storage
-      compiledClasses.putIfAbsent(className, bytes);
-      classesInfo.putIfAbsent(className, classNode);
-    } catch (InvalidClassException e) {
-      throw new RuntimeException(e);
-    }
+    // Add class to class storage
+    compiledClasses.putIfAbsent(className, bytes);
+    classesInfo.putIfAbsent(className, classNode);
   }
 
   @Override

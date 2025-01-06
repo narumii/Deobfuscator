@@ -44,24 +44,6 @@ public final class ClassHelper {
   }
 
   /**
-   * Loads class from unknown sources. Applies fixes to bytecode using CAFED00D.
-   *
-   * @param pathInJar        Relative path of a class in a jar
-   * @param bytes            Class bytes
-   * @param classReaderFlags {@link ClassReader} flags
-   */
-  public static ClassWrapper loadUnknownClass(
-      String pathInJar,
-      byte[] bytes,
-      @MagicConstant(flagsFromClass = ClassReader.class) int classReaderFlags
-  ) throws InvalidClassException {
-    // Fix class
-    bytes = fixClass(bytes);
-
-    return loadClass(pathInJar, bytes, classReaderFlags);
-  }
-
-  /**
    * Loads only class info (like class name, superclass, interfaces, etc.) without any code.
    *
    * @param bytes Class bytes
@@ -74,18 +56,11 @@ public final class ClassHelper {
   }
 
   /**
-   * Loads class info from unknown sources. Applies fixes to bytecode using CAFED00D.
+   * Fix class using CAFED00D
    *
    * @param bytes Class bytes
-   * @return {@link ClassNode} with class info only
+   * @return Fixed class bytes
    */
-  public static ClassNode loadUnknownClassInfo(byte[] bytes) throws InvalidClassException {
-    // Fix class
-    bytes = fixClass(bytes);
-
-    return loadClassInfo(bytes);
-  }
-
   public static byte[] fixClass(byte[] bytes) throws InvalidClassException {
     ClassFileReader classFileReader = new ClassFileReader();
     ClassFile classFile = classFileReader.read(bytes);

@@ -46,7 +46,7 @@ public class MethodHelper implements Opcodes {
     try {
       framesArray = new JumpPredictingAnalyzer(new OriginalSourceInterpreter()).analyze(classNode.name, methodNode);
     } catch (AnalyzerException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Error analyzing " + classNode.name + "#" + methodNode.name + methodNode.desc, e);
     }
     for (int i = 0; i < framesArray.length; i++) {
       frames.put(methodNode.instructions.get(i), framesArray[i]);
