@@ -5,11 +5,11 @@ import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.asm.InsnContext;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Immutable match context. After matching process, the context is frozen by {@link MatchContext#freeze()}
@@ -17,20 +17,20 @@ import java.util.Map;
 public class MatchContext {
   private final InsnContext insnContext;
   private final Map<String, MatchContext> captures;
-  private final List<AbstractInsnNode> collectedInsns;
+  private final Set<AbstractInsnNode> collectedInsns;
 
-  private MatchContext(InsnContext insnContext, Map<String, MatchContext> captures, List<AbstractInsnNode> collectedInsns) {
+  private MatchContext(InsnContext insnContext, Map<String, MatchContext> captures, Set<AbstractInsnNode> collectedInsns) {
     this.insnContext = insnContext;
     this.captures = captures;
     this.collectedInsns = collectedInsns;
   }
 
   public static MatchContext of(InsnContext insnContext) {
-    return new MatchContext(insnContext, new HashMap<>(), new ArrayList<>());
+    return new MatchContext(insnContext, new HashMap<>(), new HashSet<>());
   }
 
   public MatchContext freeze() {
-    return new MatchContext(this.insnContext, Collections.unmodifiableMap(this.captures), Collections.unmodifiableList(this.collectedInsns));
+    return new MatchContext(this.insnContext, Collections.unmodifiableMap(this.captures), Collections.unmodifiableSet(this.collectedInsns));
   }
 
   /**
@@ -40,12 +40,7 @@ public class MatchContext {
    */
   void merge(MatchContext other) {
     this.captures.putAll(other.captures);
-    for (AbstractInsnNode insn : other.collectedInsns) {
-      // Don't allow duplicates
-      if (this.collectedInsns.contains(insn)) continue;
-
-      this.collectedInsns.add(insn);
-    }
+    this.collectedInsns.addAll(other.collectedInsns);
   }
 
   /**
@@ -81,7 +76,7 @@ public class MatchContext {
   /**
    * Collected instructions that matches this match and children matches
    */
-  public List<AbstractInsnNode> collectedInsns() {
+  public Set<AbstractInsnNode> collectedInsns() {
     return collectedInsns;
   }
 

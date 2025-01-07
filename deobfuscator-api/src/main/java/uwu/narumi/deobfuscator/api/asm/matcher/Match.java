@@ -1,5 +1,6 @@
 package uwu.narumi.deobfuscator.api.asm.matcher;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
@@ -34,12 +35,13 @@ public abstract class Match {
   }
 
   /**
-   * Matches the instrustion and merges if successful
+   * Matches the instruction and merges if successful
    *
    * @param insnContext         Instruction context
    * @param currentMatchContext Match context to merge into
    * @return If matches
    */
+  @ApiStatus.Internal
   public boolean matchAndMerge(InsnContext insnContext, MatchContext currentMatchContext) {
     MatchContext result = this.matchResult(insnContext);
     if (result != null) {

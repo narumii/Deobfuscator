@@ -1,6 +1,7 @@
 package uwu.narumi.deobfuscator;
 
 import uwu.narumi.deobfuscator.core.other.composed.ComposedHP888Transformer;
+import uwu.narumi.deobfuscator.core.other.composed.ComposedUnknownObf1Transformer;
 import uwu.narumi.deobfuscator.core.other.composed.ComposedZelixTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedGeneralFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedPeepholeCleanTransformer;
@@ -53,10 +54,11 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "JSR.class")
         .register();
 
-    // Samples
-    test("Some flow obf sample")
-        .transformers(ComposedGeneralFlowTransformer::new)
-        .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "FlowObfSample.class")
+    // Unknown obf 1
+    // TODO: If you know the obfuscator used to obfuscate this class, you can make a PR which renames this test
+    test("Unknown obf 1")
+        .transformers(ComposedUnknownObf1Transformer::new)
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "unknown/obf1")
         .register();
 
     // Zelix

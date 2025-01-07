@@ -12,7 +12,7 @@ import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.FieldMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.MethodMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.NumberMatch;
-import uwu.narumi.deobfuscator.api.asm.matcher.impl.StackMatch;
+import uwu.narumi.deobfuscator.api.asm.matcher.impl.FrameMatch;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.execution.SandBox;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
@@ -58,15 +58,15 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
 
   private static final Match DECRYPT_LONG_MATCHER = FieldMatch.putStatic().desc("J")
       // Decrypt
-      .and(StackMatch.of(0, MethodMatch.invokeInterface().desc("(J)J")
-          .and(StackMatch.of(0, NumberMatch.numLong().capture("decrypt-key"))) // Decrypt key
+      .and(FrameMatch.stack(0, MethodMatch.invokeInterface().desc("(J)J")
+          .and(FrameMatch.stack(0, NumberMatch.numLong().capture("decrypt-key"))) // Decrypt key
           // Create decrypter
-          .and(StackMatch.of(1, MethodMatch.invokeStatic().and(Match.of(context ->
+          .and(FrameMatch.stack(1, MethodMatch.invokeStatic().and(Match.of(context ->
                   ((MethodInsnNode) context.insn()).desc.startsWith("(JJLjava/lang/Object;)"))).capture("create-decrypter-method")
 
-              .and(StackMatch.of(0, MethodMatch.invokeVirtual().and(StackMatch.of(0, MethodMatch.invokeStatic())))) // Class lookup
-              .and(StackMatch.of(1, NumberMatch.numLong().capture("key-2"))) // Key 2
-              .and(StackMatch.of(2, NumberMatch.numLong().capture("key-1"))) // Key 1
+              .and(FrameMatch.stack(0, MethodMatch.invokeVirtual().and(FrameMatch.stack(0, MethodMatch.invokeStatic())))) // Class lookup
+              .and(FrameMatch.stack(1, NumberMatch.numLong().capture("key-2"))) // Key 2
+              .and(FrameMatch.stack(2, NumberMatch.numLong().capture("key-1"))) // Key 1
           ))
           .capture("decrypt-method")
       ));
