@@ -41,10 +41,13 @@ public final class FileHelper {
 
       while (it.hasNext()) {
         JarEntry zipEntry = it.next();
-        if (zipEntry.isDirectory()) continue;
 
         String name = zipEntry.getName();
         byte[] bytes = zipFile.getInputStream(zipEntry).readAllBytes();
+
+        // Skip directories
+        boolean isDirectory = zipEntry.isDirectory() && bytes.length == 0;
+        if (isDirectory) continue;
 
         CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
           try {
