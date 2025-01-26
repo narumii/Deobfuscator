@@ -39,7 +39,7 @@ public class MathBinaryOperationsTransformer extends Transformer {
               return;
             }
 
-            insnContext.pop(2);
+            insnContext.placePops();
             insnContext.methodNode().instructions.set(insnContext.insn(), AsmHelper.numberInsn(result));
 
             markChange();

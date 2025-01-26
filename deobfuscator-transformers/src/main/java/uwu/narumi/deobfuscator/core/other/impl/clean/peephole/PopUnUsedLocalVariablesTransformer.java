@@ -53,7 +53,7 @@ public class PopUnUsedLocalVariablesTransformer extends Transformer {
             InsnContext insnContext = methodContext.newInsnContext(insn);
 
             // Pop the value from the stack
-            insnContext.pop(1);
+            insnContext.placePops();
 
             methodNode.instructions.remove(insn);
 

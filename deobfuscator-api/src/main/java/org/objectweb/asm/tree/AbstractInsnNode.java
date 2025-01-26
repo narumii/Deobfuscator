@@ -37,6 +37,7 @@ import java.util.function.Predicate;
 
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 import uwu.narumi.deobfuscator.api.asm.NamedOpcodes;
 import org.objectweb.asm.Type;
 
@@ -646,6 +647,66 @@ public abstract class AbstractInsnNode {
 
   public String namedOpcode() {
     return NamedOpcodes.map(this.getOpcode());
+  }
+
+  /**
+   * Returns the number of stack values required by this instruction.
+   */
+  public int getRequiredStackValuesCount() {
+    return switch (this.opcode) {
+      // Unary operations (one value)
+      case Opcodes.ISTORE, Opcodes.LSTORE, Opcodes.FSTORE, Opcodes.DSTORE, Opcodes.ASTORE, Opcodes.POP, Opcodes.POP2,
+           Opcodes.DUP, Opcodes.DUP_X1, Opcodes.DUP_X2, Opcodes.DUP2, Opcodes.DUP2_X1, Opcodes.DUP2_X2, Opcodes.SWAP,
+           Opcodes.INEG, Opcodes.LNEG, Opcodes.FNEG, Opcodes.DNEG, Opcodes.I2L, Opcodes.I2F, Opcodes.I2D, Opcodes.L2I,
+           Opcodes.L2F, Opcodes.L2D, Opcodes.F2I, Opcodes.F2L, Opcodes.F2D, Opcodes.D2I, Opcodes.D2L, Opcodes.D2F,
+           Opcodes.I2B, Opcodes.I2C, Opcodes.I2S, Opcodes.IFEQ, Opcodes.IFNE, Opcodes.IFLT, Opcodes.IFGE, Opcodes.IFGT,
+           Opcodes.IFLE, Opcodes.TABLESWITCH, Opcodes.LOOKUPSWITCH, Opcodes.IRETURN, Opcodes.LRETURN, Opcodes.FRETURN,
+           Opcodes.DRETURN, Opcodes.ARETURN, Opcodes.PUTSTATIC, Opcodes.GETFIELD, Opcodes.NEWARRAY, Opcodes.ANEWARRAY,
+           Opcodes.ARRAYLENGTH, Opcodes.ATHROW, Opcodes.CHECKCAST, Opcodes.INSTANCEOF, Opcodes.MONITORENTER,
+           Opcodes.MONITOREXIT, Opcodes.IFNULL, Opcodes.IFNONNULL -> 1;
+      // Binary operations (two values)
+      case Opcodes.IALOAD, Opcodes.LALOAD, Opcodes.FALOAD, Opcodes.DALOAD, Opcodes.AALOAD, Opcodes.BALOAD,
+           Opcodes.CALOAD, Opcodes.SALOAD, Opcodes.IADD, Opcodes.LADD, Opcodes.FADD, Opcodes.DADD, Opcodes.ISUB,
+           Opcodes.LSUB, Opcodes.FSUB, Opcodes.DSUB, Opcodes.IMUL, Opcodes.LMUL, Opcodes.FMUL, Opcodes.DMUL,
+           Opcodes.IDIV, Opcodes.LDIV, Opcodes.FDIV, Opcodes.DDIV, Opcodes.IREM, Opcodes.LREM, Opcodes.FREM,
+           Opcodes.DREM, Opcodes.ISHL, Opcodes.LSHL, Opcodes.ISHR, Opcodes.LSHR, Opcodes.IUSHR, Opcodes.LUSHR,
+           Opcodes.IAND, Opcodes.LAND, Opcodes.IOR, Opcodes.LOR, Opcodes.IXOR, Opcodes.LXOR, Opcodes.LCMP,
+           Opcodes.FCMPL, Opcodes.FCMPG, Opcodes.DCMPL, Opcodes.DCMPG, Opcodes.IF_ICMPEQ, Opcodes.IF_ICMPNE,
+           Opcodes.IF_ICMPLT, Opcodes.IF_ICMPGE, Opcodes.IF_ICMPGT, Opcodes.IF_ICMPLE, Opcodes.IF_ACMPEQ,
+           Opcodes.IF_ACMPNE, Opcodes.PUTFIELD -> 2;
+      // Ternary operations (three values)
+      case Opcodes.IASTORE, Opcodes.LASTORE, Opcodes.FASTORE, Opcodes.DASTORE, Opcodes.AASTORE, Opcodes.BASTORE,
+           Opcodes.CASTORE, Opcodes.SASTORE -> 3;
+
+      // Method invocation
+      case Opcodes.INVOKEVIRTUAL, Opcodes.INVOKESPECIAL, Opcodes.INVOKESTATIC, Opcodes.INVOKEINTERFACE,
+           Opcodes.INVOKEDYNAMIC -> getRequiredStackValuesCountForMethodInvocation();
+      // Multi-dimensional array creation
+      case Opcodes.MULTIANEWARRAY -> ((MultiANewArrayInsnNode) this).dims;
+
+      default -> throw new IllegalStateException("Unknown opcode: " + this);
+    };
+  }
+
+  /**
+   * Calculates the number of stack values required for a method invocation by descriptor.
+   */
+  private int getRequiredStackValuesCountForMethodInvocation() {
+    String desc;
+    if (this instanceof MethodInsnNode methodInsn) {
+      desc = methodInsn.desc;
+    } else if (this instanceof InvokeDynamicInsnNode invokeDynamicInsn) {
+      desc = invokeDynamicInsn.desc;
+    } else {
+      throw new IllegalStateException("Not a method instruction");
+    }
+
+    int count = Type.getArgumentCount(desc); // Arguments count = Stack values count
+    if (this.getOpcode() != Opcodes.INVOKESTATIC && this.getOpcode() != Opcodes.INVOKEDYNAMIC) {
+      count++; // "this" reference
+    }
+
+    return count;
   }
 
   @Override

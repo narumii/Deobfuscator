@@ -94,6 +94,8 @@ public class Deobfuscator {
         LOGGER.error("Could not load external file: {}", externalFile.pathInJar(), e);
       }
     }
+
+    LOGGER.info("Loaded {} classes", this.context.getClassesMap().size());
   }
 
   private void loadClassOrFile(String pathInJar, byte[] bytes) {

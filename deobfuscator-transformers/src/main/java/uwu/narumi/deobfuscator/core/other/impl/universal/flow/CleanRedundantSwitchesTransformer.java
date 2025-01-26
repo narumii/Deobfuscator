@@ -26,7 +26,7 @@ public class CleanRedundantSwitchesTransformer extends Transformer {
 
         LabelNode predictedJump = optPredictedJump.get();
         // Remove value from stack
-        insnContext.pop(1);
+        insnContext.placePops();
         // Replace lookup switch with predicted jump
         insnContext.methodNode().instructions.set(lookupSwitchInsn, new JumpInsnNode(GOTO, predictedJump));
 
@@ -39,7 +39,7 @@ public class CleanRedundantSwitchesTransformer extends Transformer {
 
         LabelNode predictedJump = optPredictedJump.get();
         // Remove value from stack
-        insnContext.pop(1);
+        insnContext.placePops();
         // Replace lookup switch with predicted jump
         insnContext.methodNode().instructions.set(tableSwitchInsn, new JumpInsnNode(GOTO, predictedJump));
 

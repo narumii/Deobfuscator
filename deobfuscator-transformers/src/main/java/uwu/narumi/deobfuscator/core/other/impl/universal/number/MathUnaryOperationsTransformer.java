@@ -26,7 +26,7 @@ public class MathUnaryOperationsTransformer extends Transformer {
           if (valueInsn.isNumber()) {
             Number castedNumber = AsmMathHelper.mathUnaryOperation(valueInsn.asNumber(), insnContext.insn().getOpcode());
 
-            insnContext.pop(1);
+            insnContext.placePops();
             insnContext.methodNode().instructions.set(insnContext.insn(), AsmHelper.numberInsn(castedNumber));
 
             markChange();

@@ -20,10 +20,8 @@ public class CleanRedundantJumpsTransformer extends Transformer {
 
       boolean ifResult = optIfResult.get();
 
-      if (AsmMathHelper.isOneValueCondition(jumpInsn.getOpcode())) {
-        insnContext.pop(1);
-      } else if (AsmMathHelper.isTwoValuesCondition(jumpInsn.getOpcode())) {
-        insnContext.pop(2);
+      if (AsmMathHelper.isOneValueCondition(jumpInsn.getOpcode()) || AsmMathHelper.isTwoValuesCondition(jumpInsn.getOpcode())) {
+        insnContext.placePops();
       }
 
       // Replace if with corresponding GOTO or remove it

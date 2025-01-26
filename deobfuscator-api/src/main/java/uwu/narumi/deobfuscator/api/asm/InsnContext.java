@@ -1,8 +1,6 @@
 package uwu.narumi.deobfuscator.api.asm;
 
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
@@ -50,12 +48,11 @@ public class InsnContext {
   }
 
   /**
-   * Places POP or POP2 instruction before current instruction to remove the value from the stack
-   *
-   * @param count Stack values count to pop
+   * Places POPs instructions before current instruction to remove source values from the stack.
+   * This method automatically calculates how many stack values to pop.
    */
-  public void pop(int count) {
-    for (int i = 0; i < count; i++) {
+  public void placePops() {
+    for (int i = 0; i < this.insn.getRequiredStackValuesCount(); i++) {
       int stackValueIdx = frame().getStackSize() - (i + 1);
       OriginalSourceValue sourceValue = frame().getStack(stackValueIdx);
 
