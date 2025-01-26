@@ -655,34 +655,23 @@ public abstract class AbstractInsnNode {
   public int getRequiredStackValuesCount() {
     return switch (this.opcode) {
       // Unary operations (one value)
-      case Opcodes.ISTORE, Opcodes.LSTORE, Opcodes.FSTORE, Opcodes.DSTORE, Opcodes.ASTORE, Opcodes.POP, Opcodes.POP2,
-           Opcodes.DUP, Opcodes.DUP_X1, Opcodes.DUP_X2, Opcodes.DUP2, Opcodes.DUP2_X1, Opcodes.DUP2_X2, Opcodes.SWAP,
-           Opcodes.INEG, Opcodes.LNEG, Opcodes.FNEG, Opcodes.DNEG, Opcodes.I2L, Opcodes.I2F, Opcodes.I2D, Opcodes.L2I,
-           Opcodes.L2F, Opcodes.L2D, Opcodes.F2I, Opcodes.F2L, Opcodes.F2D, Opcodes.D2I, Opcodes.D2L, Opcodes.D2F,
-           Opcodes.I2B, Opcodes.I2C, Opcodes.I2S, Opcodes.IFEQ, Opcodes.IFNE, Opcodes.IFLT, Opcodes.IFGE, Opcodes.IFGT,
-           Opcodes.IFLE, Opcodes.TABLESWITCH, Opcodes.LOOKUPSWITCH, Opcodes.IRETURN, Opcodes.LRETURN, Opcodes.FRETURN,
-           Opcodes.DRETURN, Opcodes.ARETURN, Opcodes.PUTSTATIC, Opcodes.GETFIELD, Opcodes.NEWARRAY, Opcodes.ANEWARRAY,
-           Opcodes.ARRAYLENGTH, Opcodes.ATHROW, Opcodes.CHECKCAST, Opcodes.INSTANCEOF, Opcodes.MONITORENTER,
-           Opcodes.MONITOREXIT, Opcodes.IFNULL, Opcodes.IFNONNULL -> 1;
+      case ISTORE, LSTORE, FSTORE, DSTORE, ASTORE, POP, POP2, DUP, DUP_X1, DUP_X2, DUP2, DUP2_X1, DUP2_X2, SWAP, INEG,
+           LNEG, FNEG, DNEG, I2L, I2F, I2D, L2I, L2F, L2D, F2I, F2L, F2D, D2I, D2L, D2F, I2B, I2C, I2S, IFEQ, IFNE,
+           IFLT, IFGE, IFGT, IFLE, TABLESWITCH, LOOKUPSWITCH, IRETURN, LRETURN, FRETURN, DRETURN, ARETURN, PUTSTATIC,
+           GETFIELD, NEWARRAY, ANEWARRAY, ARRAYLENGTH, ATHROW, CHECKCAST, INSTANCEOF, MONITORENTER, MONITOREXIT, IFNULL,
+           IFNONNULL -> 1;
       // Binary operations (two values)
-      case Opcodes.IALOAD, Opcodes.LALOAD, Opcodes.FALOAD, Opcodes.DALOAD, Opcodes.AALOAD, Opcodes.BALOAD,
-           Opcodes.CALOAD, Opcodes.SALOAD, Opcodes.IADD, Opcodes.LADD, Opcodes.FADD, Opcodes.DADD, Opcodes.ISUB,
-           Opcodes.LSUB, Opcodes.FSUB, Opcodes.DSUB, Opcodes.IMUL, Opcodes.LMUL, Opcodes.FMUL, Opcodes.DMUL,
-           Opcodes.IDIV, Opcodes.LDIV, Opcodes.FDIV, Opcodes.DDIV, Opcodes.IREM, Opcodes.LREM, Opcodes.FREM,
-           Opcodes.DREM, Opcodes.ISHL, Opcodes.LSHL, Opcodes.ISHR, Opcodes.LSHR, Opcodes.IUSHR, Opcodes.LUSHR,
-           Opcodes.IAND, Opcodes.LAND, Opcodes.IOR, Opcodes.LOR, Opcodes.IXOR, Opcodes.LXOR, Opcodes.LCMP,
-           Opcodes.FCMPL, Opcodes.FCMPG, Opcodes.DCMPL, Opcodes.DCMPG, Opcodes.IF_ICMPEQ, Opcodes.IF_ICMPNE,
-           Opcodes.IF_ICMPLT, Opcodes.IF_ICMPGE, Opcodes.IF_ICMPGT, Opcodes.IF_ICMPLE, Opcodes.IF_ACMPEQ,
-           Opcodes.IF_ACMPNE, Opcodes.PUTFIELD -> 2;
+      case IALOAD, LALOAD, FALOAD, DALOAD, AALOAD, BALOAD, CALOAD, SALOAD, IADD, LADD, FADD, DADD, ISUB, LSUB, FSUB,
+           DSUB, IMUL, LMUL, FMUL, DMUL, IDIV, LDIV, FDIV, DDIV, IREM, LREM, FREM, DREM, ISHL, LSHL, ISHR, LSHR, IUSHR,
+           LUSHR, IAND, LAND, IOR, LOR, IXOR, LXOR, LCMP, FCMPL, FCMPG, DCMPL, DCMPG, IF_ICMPEQ, IF_ICMPNE, IF_ICMPLT,
+           IF_ICMPGE, IF_ICMPGT, IF_ICMPLE, IF_ACMPEQ, IF_ACMPNE, PUTFIELD -> 2;
       // Ternary operations (three values)
-      case Opcodes.IASTORE, Opcodes.LASTORE, Opcodes.FASTORE, Opcodes.DASTORE, Opcodes.AASTORE, Opcodes.BASTORE,
-           Opcodes.CASTORE, Opcodes.SASTORE -> 3;
+      case IASTORE, LASTORE, FASTORE, DASTORE, AASTORE, BASTORE, CASTORE, SASTORE -> 3;
 
       // Method invocation
-      case Opcodes.INVOKEVIRTUAL, Opcodes.INVOKESPECIAL, Opcodes.INVOKESTATIC, Opcodes.INVOKEINTERFACE,
-           Opcodes.INVOKEDYNAMIC -> getRequiredStackValuesCountForMethodInvocation();
+      case INVOKEVIRTUAL, INVOKESPECIAL, INVOKESTATIC, INVOKEINTERFACE, INVOKEDYNAMIC -> getRequiredStackValuesCountForMethodInvocation();
       // Multi-dimensional array creation
-      case Opcodes.MULTIANEWARRAY -> ((MultiANewArrayInsnNode) this).dims;
+      case MULTIANEWARRAY -> ((MultiANewArrayInsnNode) this).dims;
 
       default -> throw new IllegalStateException("Unknown opcode: " + this);
     };
@@ -702,7 +691,7 @@ public abstract class AbstractInsnNode {
     }
 
     int count = Type.getArgumentCount(desc); // Arguments count = Stack values count
-    if (this.getOpcode() != Opcodes.INVOKESTATIC && this.getOpcode() != Opcodes.INVOKEDYNAMIC) {
+    if (this.getOpcode() != INVOKESTATIC && this.getOpcode() != INVOKEDYNAMIC) {
       count++; // "this" reference
     }
 
