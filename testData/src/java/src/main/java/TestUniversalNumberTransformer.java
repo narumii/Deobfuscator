@@ -6,6 +6,11 @@ public class TestUniversalNumberTransformer {
     float d = 123123.123123f / 12.34f;
 
     System.out.println(a + b + c + d);
+
+    int constant = 69420;
+    for (int i = 0; i < 10; i++) {
+      System.out.println(i + constant);
+    }
   }
 
   public void divideByZero() {

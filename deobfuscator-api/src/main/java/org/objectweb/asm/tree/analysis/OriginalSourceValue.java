@@ -203,12 +203,12 @@ public class OriginalSourceValue extends SourceValue {
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
     OriginalSourceValue that = (OriginalSourceValue) o;
-    return Objects.equals(copiedFrom, that.copiedFrom);
+    return Objects.equals(constantValue, that.constantValue) && Objects.equals(copiedFrom, that.copiedFrom);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), copiedFrom);
+    return Objects.hash(super.hashCode(), constantValue, copiedFrom);
   }
 
   /**

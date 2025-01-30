@@ -673,7 +673,8 @@ public abstract class AbstractInsnNode {
       // Multi-dimensional array creation
       case MULTIANEWARRAY -> ((MultiANewArrayInsnNode) this).dims;
 
-      default -> throw new IllegalStateException("Unknown opcode: " + this);
+      // No values required
+      default -> 0;
     };
   }
 
