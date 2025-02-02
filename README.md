@@ -39,6 +39,7 @@ Contributions are welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for a projec
 
 ### Git shows `Filename too long`
 You need to open cmd as administrator and run `git config --system core.longpaths true`. This error is only shown for windows users.
+
 ![img.png](assets/filename-too-long.png)
 
 ## Links
