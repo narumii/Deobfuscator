@@ -22,7 +22,7 @@ A deobfuscator for java
 ## ✅ How to run deobfuscator
 If you want to use this deobfuscator, you need to start it from your IDE manually.
 
-1. (Windows) Run `git config --system core.longpaths true` to enable long paths support
+1. (Windows) Open cmd as administrator and run `git config --system core.longpaths true` to enable long paths support
 2. Place your obfuscated jar inside the root project directory. For example in `work/obf-test.jar`
 3. Navigate to class [`Bootstrap.java`](./deobfuscator-impl/src/test/java/Bootstrap.java)
 4. In this class edit the deobfuscator configuration
@@ -38,7 +38,8 @@ Contributions are welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for a projec
 ## Troubleshooting
 
 ### Git shows `Filename too long`
-You need to run `git config --system core.longpaths true`. This error is only shown for windows users.
+You need to open cmd as administrator and run `git config --system core.longpaths true`. This error is only shown for windows users.
+![img.png](assets/filename-too-long.png)
 
 ## Links
 
