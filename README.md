@@ -1,34 +1,20 @@
 # Diobfuscator
 A deobfuscator for java
 
-> [!IMPORTANT]
-> **This is dev(v2) version of diobfuscator version and it's not completed yet, if you are willing to help there is a list of things that needs to be completed. The old diobfuscator was moved to [v1 branch](https://github.com/narumii/Deobfuscator/tree/v1).**<br>
-> 
-> - Porting old transformers to new code base
-> - Testing `Match` API
-> - Implementing/Improving transformers
-> - Writing tests
-> - Feedback on how the new api presents itself (mainly `Match` API)
->   <br>
-> 
-> 1. *You can also provide samples of obfuscation to help with development of the transformers.*
-> 2. **No... there is no gui planned**
-> 3. _Also from now on Diobfuscator uses [Java Google Codestyle](https://github.com/google/styleguide/blob/gh-pages/intellij-java-google-style.xml)_
->    - `mvn fmt:format`
->    - `mvn fmt:check`
-
-> Built on: [Java 17 (Temurin)](https://adoptium.net/temurin/releases/?version=17)
+> If you are looking for v1 version of Diobfuscator, you can find it [here](https://github.com/narumii/Deobfuscator/tree/v1)
 
 ## ✅ How to run deobfuscator
 If you want to use this deobfuscator, you need to start it from your IDE manually.
 
-1. (Windows) Open cmd as administrator and run `git config --system core.longpaths true` to enable long paths support
-2. Place your obfuscated jar inside the root project directory. For example in `work/obf-test.jar`
-3. Navigate to class [`Bootstrap.java`](./deobfuscator-impl/src/test/java/Bootstrap.java)
-4. In this class edit the deobfuscator configuration
+1. Clone this repository and open it in IntelliJ
+2. (Windows) Open cmd as administrator and run `git config --system core.longpaths true` to enable long paths support
+3. Make sure that you have selected [Java 17 (Temurin)](https://adoptium.net/temurin/releases/?version=17) in `Project Structure` -> `SDK`
+4. Place your obfuscated jar inside the root project directory. For example in `work/obf-test.jar`
+5. Navigate to class [`Bootstrap.java`](./deobfuscator-impl/src/test/java/Bootstrap.java)
+6. In this class edit the deobfuscator configuration
     - `inputJar` - Your obfuscated jar file that you placed in step 1
     - `transformers` - Pick transformers that you want to run. You can find them in [`deobfuscator-transformers`](./deobfuscator-transformers/src/main/java/uwu/narumi/deobfuscator/core/other) module.
-5. Run this class manually from your IDE. You can use our pre-configured IntelliJ task named `Bootstrap`.
+7. Run this class manually from your IDE. You can use our pre-configured IntelliJ task named `Bootstrap`.
 
 ![tak](./assets/run-deobfuscator.gif)
 
