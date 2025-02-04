@@ -1,0 +1,10 @@
+public class class_1 {
+    public static void method_3(String[] args) {
+        System.out.println("Hello, World!");
+        class_0 cat = new class_0("Fiona");
+        cat.method_0();
+        cat.method_2();
+        cat.method_1();
+        cat.method_4();
+    }
+}

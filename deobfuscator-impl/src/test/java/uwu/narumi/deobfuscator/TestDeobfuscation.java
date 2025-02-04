@@ -9,6 +9,7 @@ import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.JsrInlinerTransfor
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.UselessPopCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineLocalVariablesTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.universal.RemapperTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
 import uwu.narumi.deobfuscator.base.TestDeobfuscationBase;
 import uwu.narumi.deobfuscator.transformer.TestSandboxSecurityTransformer;
@@ -39,6 +40,10 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
     test("Inline static fields with modification")
         .transformers(InlineStaticFieldTransformer::new, UselessPopCleanTransformer::new)
         .input(OutputType.SINGLE_CLASS, InputType.JAVA_CODE, "TestInlineStaticFieldsWithModification.class")
+        .register();
+    test("Remapper")
+        .transformers(RemapperTransformer::new)
+        .input(OutputType.MULTIPLE_CLASSES, InputType.JAVA_CODE, "remap")
         .register();
 
     // Test sandbox security (e.g. not allowing dangerous calls)

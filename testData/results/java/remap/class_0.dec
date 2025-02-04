@@ -1,0 +1,22 @@
+public class class_0 extends class_2 {
+    private final String field_0;
+
+    public class_0(String name) {
+        this.field_0 = name;
+    }
+
+    @Override
+    public void method_0() {
+        System.out.println(this.field_0 + ": Cat is eating");
+    }
+
+    @Override
+    public void method_1() {
+        System.out.println(this.field_0 + ": Cat is sleeping");
+    }
+
+    @Override
+    public void method_2() {
+        System.out.println(this.field_0 + ": Cat is playing");
+    }
+}

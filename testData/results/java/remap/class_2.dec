@@ -1,0 +1,11 @@
+public abstract class class_2 {
+    public abstract void method_0();
+
+    public abstract void method_1();
+
+    public abstract void method_2();
+
+    public void method_4() {
+        System.out.println("Displaying pet");
+    }
+}
