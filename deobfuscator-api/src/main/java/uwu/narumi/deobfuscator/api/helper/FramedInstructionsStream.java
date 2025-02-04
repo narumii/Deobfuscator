@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Contract;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.asm.FramesProvider;
 import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.context.Context;
@@ -33,6 +34,7 @@ public class FramedInstructionsStream {
   private Function<Stream<ClassWrapper>, Stream<ClassWrapper>> classesStreamModifier = Function.identity();
   private Function<Stream<MethodNode>, Stream<MethodNode>> methodsStreamModifier = Function.identity();
   private Function<Stream<AbstractInsnNode>, Stream<AbstractInsnNode>> instructionsStreamModifier = Function.identity();
+  private FramesProvider framesProvider = MethodHelper::analyzeSource;
   private boolean forceSync = false;
 
   private FramedInstructionsStream(ClassWrapper scope, Context context) {
@@ -58,6 +60,12 @@ public class FramedInstructionsStream {
     return this;
   }
 
+  @Contract("_ -> this")
+  public FramedInstructionsStream framesProvider(FramesProvider framesProvider) {
+    this.framesProvider = framesProvider;
+    return this;
+  }
+
   @Contract(" -> this")
   public FramedInstructionsStream forceSync() {
     this.forceSync = true;
@@ -74,7 +82,7 @@ public class FramedInstructionsStream {
               if (instructionsStreamModifier.apply(Arrays.stream(methodNode.instructions.toArray())).findAny().isEmpty()) return;
 
               // Get frames of the method
-              MethodContext methodContext = MethodContext.framed(classWrapper, methodNode);
+              MethodContext methodContext = MethodContext.framed(classWrapper, methodNode, this.framesProvider);
 
               // Iterate over instructions SYNC
               instructionsStreamModifier.apply(Arrays.stream(methodNode.instructions.toArray()))

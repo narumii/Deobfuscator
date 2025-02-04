@@ -53,11 +53,15 @@ public class MethodContext {
     return new InsnContext(insn, this);
   }
 
+  public static MethodContext framed(ClassWrapper classWrapper, MethodNode methodNode) {
+    return framed(classWrapper, methodNode, MethodHelper::analyzeSource);
+  }
+
   /**
    * Creates new {@link MethodContext} and computes its frames
    */
-  public static MethodContext framed(ClassWrapper classWrapper, MethodNode methodNode) {
-    Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = MethodHelper.analyzeSource(classWrapper.classNode(), methodNode);
+  public static MethodContext framed(ClassWrapper classWrapper, MethodNode methodNode, FramesProvider framesProvider) {
+    Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = framesProvider.compute(classWrapper.classNode(), methodNode);
     return new MethodContext(classWrapper, methodNode, frames);
   }
 

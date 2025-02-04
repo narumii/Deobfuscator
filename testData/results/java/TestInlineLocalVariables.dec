@@ -40,8 +40,6 @@ public class TestInlineLocalVariables {
         System.out.println(1455.45 + (double)89.345F + "asd" + someObj);
 
         try {
-            double var12 = 3.4534535E7;
-
             try {
                 e = 45354.0F;
                 f = "gfj";
@@ -50,11 +48,8 @@ public class TestInlineLocalVariables {
             } catch (Exception var10) {
             }
 
-            System.out.println(var12 + (double)e + f + someObj);
+            System.out.println(3.4534535E7 + (double)e + f + someObj);
         } catch (Exception var11) {
-            double d = 6.5654356234E7;
-            e = 4.1454144E8F;
-            f = "hjk";
             someObj = new Object();
             System.out.println("" + 56876758 + true + 5498489489L);
             System.out.println(6.5654356234E7 + (double)4.1454144E8F + "hjk" + someObj);
