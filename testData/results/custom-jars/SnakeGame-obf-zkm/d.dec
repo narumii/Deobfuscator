@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class d extends Thread {
-    ArrayList<ArrayList<b>> a = new ArrayList();
+    ArrayList<ArrayList<b>> a = new ArrayList<>();
     c b;
     int c;
     long d;
@@ -19,7 +19,7 @@ public class d extends Thread {
     d(long var1, c var3) {
         this.c = a(20214, 210489315596258668L ^ var1);
         this.d = m;
-        this.f = new ArrayList();
+        this.f = new ArrayList<>();
         this.a = e.a;
         boolean var10000 = h;
         this.b = new c(var3.a, var3.b);
@@ -45,6 +45,7 @@ public class d extends Thread {
         c.c = var10000;
     }
 
+    @Override
     public void run() {
         long var3 = 12972172530972L;
         long var5 = 121593940001805L;
@@ -79,7 +80,7 @@ public class d extends Thread {
         long var4 = var1 ^ 110402980100581L;
         long var6 = var1 ^ 34179827676109L;
         int var10000 = h;
-        c var9 = (c)this.f.get(this.f.size() - 1);
+        c var9 = this.f.get(this.f.size() - 1);
         byte var8 = (byte)var10000;
         int var10 = 0;
 
@@ -91,7 +92,7 @@ public class d extends Thread {
                 c var10001;
                 if (var10 <= this.f.size() - 2) {
                     var10000 = var9.a(new Object[0]);
-                    var10001 = (c)this.f.get(var10);
+                    var10001 = this.f.get(var10);
                 } else {
                     var10000 = var9.a(new Object[0]);
                     var10001 = this.g;
@@ -116,7 +117,7 @@ public class d extends Thread {
                         if (var10000 == var17) {
                             var10000 = var9.b(new Object[0]);
                             if (var8 == 0) {
-                                var10000 = var10000 == ((c)this.f.get(var10)).b(new Object[0]) ? 1 : 0;
+                                var10000 = var10000 == this.f.get(var10).b(new Object[0]) ? 1 : 0;
                             }
                         } else {
                             var10000 = 0;
@@ -210,7 +211,7 @@ public class d extends Thread {
     }
 
     private void d(c var1) {
-        ((b)((ArrayList)this.a.get(var1.a)).get(var1.b)).a(new Object[]{1});
+        this.a.get(var1.a).get(var1.b).a(new Object[]{1});
     }
 
     // $VF: Irreducible bytecode was duplicated to produce valid code
@@ -237,7 +238,7 @@ public class d extends Thread {
 
                 label58: {
                     var10000 = var5.b(new Object[var10001]);
-                    var10001 = ((c)this.f.get(var10)).a(new Object[0]);
+                    var10001 = this.f.get(var10).a(new Object[0]);
                     byte var10002 = var4;
                     if (var1 >= 0L) {
                         if (var4 == 0) {
@@ -246,7 +247,7 @@ public class d extends Thread {
                             }
 
                             var10000 = var5.a(new Object[0]);
-                            var10001 = ((c)this.f.get(var10)).b(new Object[0]);
+                            var10001 = this.f.get(var10).b(new Object[0]);
                             var10002 = var4;
                         } else {
                             var10002 = var4;
@@ -453,7 +454,7 @@ public class d extends Thread {
             c var6 = (c)var5.next();
             int var7 = var6.a(new Object[0]);
             int var8 = var6.b(new Object[0]);
-            ((b)((ArrayList)this.a.get(var8)).get(var7)).a(new Object[]{0});
+            this.a.get(var8).get(var7).a(new Object[]{0});
             if (var4) {
                 break;
             }

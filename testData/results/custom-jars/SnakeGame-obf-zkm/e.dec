@@ -14,7 +14,7 @@ class e extends JFrame {
         long var3 = 61070374780970L;
         byte var10000 = d.h;
         super();
-        a = new ArrayList();
+        a = new ArrayList<>();
         boolean var5 = (boolean)var10000;
         int var7 = 0;
 
@@ -63,7 +63,7 @@ class e extends JFrame {
 
             while (true) {
                 if (var12 < c) {
-                    this.getContentPane().add(((b)((ArrayList)a.get(var7)).get(var12)).c);
+                    this.getContentPane().add(a.get(var7).get(var12).c);
                     var12++;
                     if (var5) {
                         break;

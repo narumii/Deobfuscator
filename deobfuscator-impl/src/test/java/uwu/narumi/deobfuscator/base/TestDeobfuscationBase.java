@@ -155,6 +155,7 @@ public abstract class TestDeobfuscationBase {
 
       Decompiler.Builder decompilerBuilder = Decompiler.builder()
           .option(IFernflowerPreferences.INDENT_STRING, "    ")
+          .option(IFernflowerPreferences.INCLUDE_JAVA_RUNTIME, true)
           .output(assertingResultSaver); // Assert output
 
       // Add sources

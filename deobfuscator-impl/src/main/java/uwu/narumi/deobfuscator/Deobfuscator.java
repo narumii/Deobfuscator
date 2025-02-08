@@ -187,9 +187,7 @@ public class Deobfuscator {
    * @param saver a consumer that accepts a path and data to save
    */
   private void save(BiConsumer<String, byte[]> saver) {
-    InheritanceGraph inheritanceGraph = new InheritanceGraph(
-        new CombinedClassProvider(this.context, this.context.getLibraries())
-    );
+    InheritanceGraph inheritanceGraph = new InheritanceGraph(this.context);
 
     // Save classes
     context.getClassesMap().forEach((ignored, classWrapper) -> {

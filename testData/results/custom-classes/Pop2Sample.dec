@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 
 class Ld implements Runnable {
+    @Override
     public void run() {
         AbstractColorChooserPanel[] var5;
         JColorChooser var7;

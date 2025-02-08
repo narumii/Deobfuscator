@@ -17,4 +17,9 @@ public record MethodRef(String owner, String name, String desc) {
   public static MethodRef of(MethodInsnNode methodInsn) {
     return new MethodRef(methodInsn.owner, methodInsn.name, methodInsn.desc);
   }
+
+  @Override
+  public String toString() {
+    return owner + "." + name + desc;
+  }
 }

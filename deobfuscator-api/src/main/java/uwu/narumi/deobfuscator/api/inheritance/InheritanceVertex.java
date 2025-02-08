@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 public class InheritanceVertex {
   private final Function<String, InheritanceVertex> lookup;
   private final Function<String, Collection<String>> childrenLookup;
-  //private final boolean isPrimary;
+  private final boolean isPrimary;
   private volatile Set<InheritanceVertex> parents;
   private volatile Set<InheritanceVertex> children;
   private ClassNode value;
@@ -35,11 +35,12 @@ public class InheritanceVertex {
    */
   public InheritanceVertex(@NotNull ClassNode value,
                            @NotNull Function<String, InheritanceVertex> lookup,
-                           @NotNull Function<String, Collection<String>> childrenLookup) {
+                           @NotNull Function<String, Collection<String>> childrenLookup,
+                           boolean isPrimary) {
     this.value = value;
     this.lookup = lookup;
     this.childrenLookup = childrenLookup;
-    //this.isPrimary = isPrimary;
+    this.isPrimary = isPrimary;
   }
 
   /**
@@ -138,12 +139,10 @@ public class InheritanceVertex {
 
   /**
    * @return {@code true} if the class represented by this vertex is a library class.
-   * This means a class that does not belong to the primary {@link WorkspaceResource}
-   * of a {@link Workspace}.
    */
-  /*public boolean isLibraryVertex() {
+  public boolean isLibraryVertex() {
     return !isPrimary;
-  }*/
+  }
 
   /**
    * @return {@code true} when the current vertex represents {@link Object}.
@@ -177,7 +176,7 @@ public class InheritanceVertex {
    * @return {@code true} if method is an extension of an outside class's methods and thus should not be renamed.
    * {@code false} if the method is safe to rename.
    */
-  /*public boolean isLibraryMethod(@NotNull String name, @NotNull String desc) {
+  public boolean isLibraryMethod(@NotNull String name, @NotNull String desc) {
     // Check against this definition
     if (!isPrimary && hasMethod(name, desc))
       return true;
@@ -190,7 +189,7 @@ public class InheritanceVertex {
 
     // No library definition found, so its safe to rename.
     return false;
-  }*/
+  }
 
   /**
    * @param vertex

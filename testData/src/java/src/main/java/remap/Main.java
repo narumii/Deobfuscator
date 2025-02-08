@@ -9,5 +9,8 @@ public class Main {
         cat.play();
         cat.sleep();
         cat.display();
+
+        SampleRunnable runnable = new SampleRunnable();
+        runnable.run();
     }
 }

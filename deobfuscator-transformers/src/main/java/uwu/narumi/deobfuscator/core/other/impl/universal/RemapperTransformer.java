@@ -6,12 +6,14 @@ import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.FieldRef;
 import uwu.narumi.deobfuscator.api.asm.MethodRef;
 import uwu.narumi.deobfuscator.api.asm.remapper.NamesRemapper;
-import uwu.narumi.deobfuscator.api.classpath.CombinedClassProvider;
 import uwu.narumi.deobfuscator.api.context.DeobfuscatorOptions;
 import uwu.narumi.deobfuscator.api.inheritance.InheritanceGraph;
 import uwu.narumi.deobfuscator.api.inheritance.InheritanceVertex;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -20,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 /**
- * Remaps class, method and field names. Useful to remap scrambled names to something more readable.
+ * Remaps class, method, and field names. Useful to remap scrambled names to something more readable.
  * <p>
  * WARNING: If class overrides a method from a library's class and the library is not loaded {@link DeobfuscatorOptions#libraries()}
  * then the method will be remapped and will no longer override the library method. You must load the library to prevent this.
@@ -44,9 +46,7 @@ public class RemapperTransformer extends Transformer {
   protected void transform() throws Exception {
     NamesRemapper remapper = new NamesRemapper();
 
-    InheritanceGraph inheritanceGraph = new InheritanceGraph(
-        new CombinedClassProvider(context(), context().getLibraries())
-    );
+    InheritanceGraph inheritanceGraph = new InheritanceGraph(context());
 
     AtomicInteger classCounter = new AtomicInteger(0);
     AtomicInteger methodCounter = new AtomicInteger(0);
@@ -63,8 +63,9 @@ public class RemapperTransformer extends Transformer {
         remapper.classMappings.put(classWrapper.name(), "class_" + classCounter.getAndIncrement());
       }
 
+      InheritanceVertex vertex = inheritanceGraph.getVertex(classWrapper.name());
       // Parents and children combined
-      Set<InheritanceVertex> directVertices = inheritanceGraph.getVertex(classWrapper.name()).getAllDirectVertices();
+      Set<InheritanceVertex> directVertices = vertex.getAllDirectVertices();
 
       // Methods
       classWrapper.methods().forEach(methodNode -> {
@@ -78,14 +79,19 @@ public class RemapperTransformer extends Transformer {
         // Test
         if (!this.methodPredicate.test(methodNode.name)) return;
 
+        if (vertex.isLibraryMethod(methodNode.name, methodNode.desc)) {
+          // It is a library method, don't remap
+          return;
+        }
+
         String newName = "method_" + methodCounter.getAndIncrement();
 
         // Map current method
         remapper.methodMappings.put(methodRef, newName);
 
         // Map the same method in inheritance graph
-        for (InheritanceVertex vertex : directVertices) {
-          remapper.methodMappings.put(MethodRef.of(vertex.getValue(), methodNode), newName);
+        for (InheritanceVertex directVertex : directVertices) {
+          remapper.methodMappings.put(MethodRef.of(directVertex.getValue(), methodNode), newName);
         }
       });
 
@@ -102,6 +108,8 @@ public class RemapperTransformer extends Transformer {
         remapper.fieldMappings.put(fieldRef, "field_" + fieldCounter.getAndIncrement());
       });
     });
+
+    //saveMappings(remapper);
 
     // Remap
     new ArrayList<>(context().classes()).forEach(classWrapper -> {
@@ -121,5 +129,25 @@ public class RemapperTransformer extends Transformer {
 
       markChange();
     });
+  }
+
+  private void saveMappings(NamesRemapper remapper) throws IOException {
+    StringBuilder mappings = new StringBuilder();
+    mappings.append("Class mappings:\n");
+    for (var entry : remapper.classMappings.entrySet()) {
+      mappings.append(entry.getKey()).append(" -> ").append(entry.getValue()).append("\n");
+    }
+    mappings.append("\n");
+    mappings.append("Method mappings\n");
+    for (var entry : remapper.methodMappings.entrySet()) {
+      mappings.append(entry.getKey()).append(" -> ").append(entry.getValue()).append("\n");
+    }
+    mappings.append("\n");
+    mappings.append("Field mappings\n");
+    for (var entry : remapper.fieldMappings.entrySet()) {
+      mappings.append(entry.getKey()).append(" -> ").append(entry.getValue()).append("\n");
+    }
+
+    Files.writeString(Path.of("mappings.txt"), mappings.toString());
   }
 }

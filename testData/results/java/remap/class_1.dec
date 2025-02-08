@@ -6,5 +6,7 @@ public class class_1 {
         cat.method_2();
         cat.method_1();
         cat.method_4();
+        class_3 runnable = new class_3();
+        runnable.run();
     }
 }
