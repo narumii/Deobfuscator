@@ -65,7 +65,7 @@ public class RemapperTransformer extends Transformer {
 
       InheritanceVertex vertex = inheritanceGraph.getVertex(classWrapper.name());
       // Parents and children combined
-      Set<InheritanceVertex> directVertices = vertex.getAllDirectVertices();
+      Set<InheritanceVertex> vertexFamily = vertex.getFamily(false);
 
       // Methods
       classWrapper.methods().forEach(methodNode -> {
@@ -86,12 +86,11 @@ public class RemapperTransformer extends Transformer {
 
         String newName = "method_" + methodCounter.getAndIncrement();
 
-        // Map current method
-        remapper.methodMappings.put(methodRef, newName);
+        // Map method in the whole inheritance graph
+        for (InheritanceVertex member : vertexFamily) {
+          if (member.isLibraryVertex()) continue;
 
-        // Map the same method in inheritance graph
-        for (InheritanceVertex directVertex : directVertices) {
-          remapper.methodMappings.put(MethodRef.of(directVertex.getValue(), methodNode), newName);
+          remapper.methodMappings.put(MethodRef.of(member.getValue(), methodNode), newName);
         }
       });
 
