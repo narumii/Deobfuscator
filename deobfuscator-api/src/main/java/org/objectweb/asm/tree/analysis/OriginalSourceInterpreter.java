@@ -284,7 +284,14 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
 
   @Override
   public OriginalSourceValue merge(final OriginalSourceValue value1, final OriginalSourceValue value2) {
-    if (value1.size != value2.size || !Objects.equals(value1.getConstantValue(), value2.getConstantValue()) || !containsAll(value1.insns, value2.insns) || !containsAll(value1.getConsumers(), value2.getConsumers()) || !Objects.equals(value1.copiedFrom, value2.copiedFrom)) {
+    // Optimized comparing than OriginalSourceValue#equals
+    if (value1.size != value2.size ||
+        !Objects.equals(value1.getConstantValue(), value2.getConstantValue()) ||
+        value1.isMethodParameter() != value2.isMethodParameter() ||
+        !containsAll(value1.insns, value2.insns) ||
+        !containsAll(value1.getConsumers(), value2.getConsumers()) ||
+        !Objects.equals(value1.copiedFrom, value2.copiedFrom)
+    ) {
       Set<AbstractInsnNode> producersUnion;
       if (value1.insns instanceof SmallSet && value2.insns instanceof SmallSet) {
         // Use optimized merging method
@@ -312,6 +319,7 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
         sourceValue = new OriginalSourceValue(Math.min(value1.size, value2.size), producer, copiedFrom, null);
       }
 
+      // Merge consumers
       sourceValue.getConsumers().addAll(value1.getConsumers());
       sourceValue.getConsumers().addAll(value2.getConsumers());
 

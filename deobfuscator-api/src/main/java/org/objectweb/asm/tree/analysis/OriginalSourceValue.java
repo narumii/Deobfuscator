@@ -213,12 +213,12 @@ public class OriginalSourceValue extends SourceValue {
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
     OriginalSourceValue that = (OriginalSourceValue) o;
-    return Objects.equals(constantValue, that.constantValue) && Objects.equals(copiedFrom, that.copiedFrom) && isMethodParameter == that.isMethodParameter && Objects.equals(consumers, that.consumers);
+    return Objects.equals(constantValue, that.constantValue) && isMethodParameter == that.isMethodParameter && Objects.equals(consumers, that.consumers) && Objects.equals(copiedFrom, that.copiedFrom);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), constantValue, copiedFrom, consumers);
+    return Objects.hash(super.hashCode(), constantValue, isMethodParameter, consumers, copiedFrom);
   }
 
   /**
