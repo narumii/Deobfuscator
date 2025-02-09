@@ -85,6 +85,11 @@ public class UselessPopCleanTransformer extends Transformer {
       return false;
     }
 
+    if (!sourceValue.getConsumers().isEmpty()) {
+      // If the value is consumed by another instruction, we can't remove it
+      return false;
+    }
+
     // Check if all producers of the source value are constants
     for (AbstractInsnNode producer : sourceValue.insns) {
       // Prevent popping instructions twice (especially DUPs)

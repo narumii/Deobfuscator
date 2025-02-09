@@ -131,7 +131,9 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
   @Override
   public OriginalSourceValue copyOperation(final AbstractInsnNode insn, final OriginalSourceValue value) {
     // Narumii start - Track the original value
-    return new OriginalSourceValue(insn, value);
+    OriginalSourceValue sourceValue = new OriginalSourceValue(insn, value);
+    value.getConsumers().addAll(sourceValue.insns);
+    return sourceValue;
     // Narumii end
   }
 
@@ -158,17 +160,20 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
     }
 
     // Narumii start - Predict constant
+    OriginalSourceValue sourceValue = new OriginalSourceValue(size, insn);
     if (AsmMathHelper.isMathUnaryOperation(insn.getOpcode())) {
       OriginalSourceValue.ConstantValue constant = value.getConstantValue();
 
       if (constant != null && constant.get() instanceof Number constNum) {
         Number result = AsmMathHelper.mathUnaryOperation(constNum, insn.getOpcode());
-        return new OriginalSourceValue(size, insn, null, OriginalSourceValue.ConstantValue.of(result));
+        sourceValue = new OriginalSourceValue(size, insn, null, OriginalSourceValue.ConstantValue.of(result));
       }
     }
     // Narumii end
 
-    return new OriginalSourceValue(size, insn);
+    value.getConsumers().addAll(sourceValue.insns);
+
+    return sourceValue;
   }
 
   @Override
@@ -202,6 +207,7 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
     }
 
     // Narumii start - Predict constant
+    OriginalSourceValue sourceValue = new OriginalSourceValue(size, insn);
     if (AsmMathHelper.isMathBinaryOperation(insn.getOpcode())) {
       OriginalSourceValue.ConstantValue constant1 = value1.getConstantValue();
       OriginalSourceValue.ConstantValue constant2 = value2.getConstantValue();
@@ -209,14 +215,17 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
       if (constant1 != null && constant2 != null && constant1.get() instanceof Number constNum1 && constant2.get() instanceof Number constNum2) {
         try {
           Number result = AsmMathHelper.mathBinaryOperation(constNum1, constNum2, insn.getOpcode());
-          return new OriginalSourceValue(size, insn, null, OriginalSourceValue.ConstantValue.of(result));
+          sourceValue = new OriginalSourceValue(size, insn, null, OriginalSourceValue.ConstantValue.of(result));
         } catch (ArithmeticException ignored) {
         }
       }
     }
     // Narumii end
 
-    return new OriginalSourceValue(size, insn);
+    value1.getConsumers().addAll(sourceValue.insns);
+    value2.getConsumers().addAll(sourceValue.insns);
+
+    return sourceValue;
   }
 
   @Override
@@ -225,7 +234,11 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
       final OriginalSourceValue value1,
       final OriginalSourceValue value2,
       final OriginalSourceValue value3) {
-    return new OriginalSourceValue(1, insn);
+    OriginalSourceValue sourceValue = new OriginalSourceValue(1, insn);
+    value1.getConsumers().addAll(sourceValue.insns);
+    value2.getConsumers().addAll(sourceValue.insns);
+    value3.getConsumers().addAll(sourceValue.insns);
+    return sourceValue;
   }
 
   @Override
@@ -242,6 +255,7 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
     }
 
     // Narumii start - Predict constant
+    OriginalSourceValue sourceValue = new OriginalSourceValue(size, insn);
     MethodlessInsnContext insnContext = new MethodlessInsnContext(insn, null);
 
     // Transform method calls on literals
@@ -249,13 +263,17 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
       if (methodInterpreter.match().matches(insnContext)) {
         OriginalSourceValue.ConstantValue constantValue = methodInterpreter.methodComputation().computeConstant(insn, values);
         if (constantValue != null) {
-          return new OriginalSourceValue(size, insn, null, constantValue);
+          sourceValue = new OriginalSourceValue(size, insn, null, constantValue);
         }
       }
     }
     // Narumii end
 
-    return new OriginalSourceValue(size, insn);
+    for (OriginalSourceValue value : values) {
+      value.getConsumers().addAll(sourceValue.insns);
+    }
+
+    return sourceValue;
   }
 
   @Override
@@ -266,32 +284,38 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
 
   @Override
   public OriginalSourceValue merge(final OriginalSourceValue value1, final OriginalSourceValue value2) {
-    if (value1.size != value2.size || !Objects.equals(value1.getConstantValue(), value2.getConstantValue()) || !containsAll(value1.insns, value2.insns) || !Objects.equals(value1.copiedFrom, value2.copiedFrom)) {
-      Set<AbstractInsnNode> setUnion;
+    if (value1.size != value2.size || !Objects.equals(value1.getConstantValue(), value2.getConstantValue()) || !containsAll(value1.insns, value2.insns) || !containsAll(value1.getConsumers(), value2.getConsumers()) || !Objects.equals(value1.copiedFrom, value2.copiedFrom)) {
+      Set<AbstractInsnNode> producersUnion;
       if (value1.insns instanceof SmallSet && value2.insns instanceof SmallSet) {
         // Use optimized merging method
-        setUnion =
+        producersUnion =
             ((SmallSet<AbstractInsnNode>) value1.insns)
                 .union((SmallSet<AbstractInsnNode>) value2.insns);
       } else {
-        setUnion = new HashSet<>();
-        setUnion.addAll(value1.insns);
-        setUnion.addAll(value2.insns);
+        producersUnion = new HashSet<>();
+        producersUnion.addAll(value1.insns);
+        producersUnion.addAll(value2.insns);
       }
 
+      // Multiple producers
+      OriginalSourceValue sourceValue = new OriginalSourceValue(Math.min(value1.size, value2.size), producersUnion);
+
       // Single producer
-      if (setUnion.size() == 1) {
-        AbstractInsnNode producer = setUnion.iterator().next();
+      if (producersUnion.size() == 1) {
+        AbstractInsnNode producer = producersUnion.iterator().next();
 
         OriginalSourceValue copiedFrom = null;
         if (value1.copiedFrom != null && value2.copiedFrom != null) {
           copiedFrom = this.merge(value1.copiedFrom, value2.copiedFrom);
         }
 
-        return new OriginalSourceValue(Math.min(value1.size, value2.size), producer, copiedFrom, null);
+        sourceValue = new OriginalSourceValue(Math.min(value1.size, value2.size), producer, copiedFrom, null);
       }
-      // Multiple producers
-      return new OriginalSourceValue(Math.min(value1.size, value2.size), setUnion);
+
+      sourceValue.getConsumers().addAll(value1.getConsumers());
+      sourceValue.getConsumers().addAll(value2.getConsumers());
+
+      return sourceValue;
     }
     return value1;
   }

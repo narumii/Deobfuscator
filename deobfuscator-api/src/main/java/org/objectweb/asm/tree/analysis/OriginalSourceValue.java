@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -87,6 +88,11 @@ public class OriginalSourceValue extends SourceValue {
    * If a source value is a method parameter.
    */
   private final boolean isMethodParameter;
+
+  /**
+   * Set of instructions that consume this value. Due to the nature of OW2 ASM, it does not store POP instructions
+   */
+  private final Set<AbstractInsnNode> consumers = new HashSet<>();
 
   public OriginalSourceValue(int size, boolean isMethodParameter) {
     super(size, new SmallSet<>());
@@ -181,6 +187,10 @@ public class OriginalSourceValue extends SourceValue {
     return isMethodParameter;
   }
 
+  public Set<AbstractInsnNode> getConsumers() {
+    return consumers;
+  }
+
   /**
    * Walk to the last parent value until the predicate returns true.
    *
@@ -203,12 +213,12 @@ public class OriginalSourceValue extends SourceValue {
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
     OriginalSourceValue that = (OriginalSourceValue) o;
-    return Objects.equals(constantValue, that.constantValue) && Objects.equals(copiedFrom, that.copiedFrom);
+    return Objects.equals(constantValue, that.constantValue) && Objects.equals(copiedFrom, that.copiedFrom) && isMethodParameter == that.isMethodParameter && Objects.equals(consumers, that.consumers);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), constantValue, copiedFrom);
+    return Objects.hash(super.hashCode(), constantValue, copiedFrom, consumers);
   }
 
   /**
