@@ -62,7 +62,11 @@ public class SimpleInterpreter {
           // Get value from stack
           OriginalSourceValue sourceValue = stackValues.get(stackValues.size() - 1);
           if (sourceValue.getConstantValue() != null && sourceValue.getConstantValue().value() instanceof String text) {
-            return OriginalSourceValue.ConstantValue.of(Integer.parseInt(text));
+            try {
+              return OriginalSourceValue.ConstantValue.of(Integer.parseInt(text));
+            } catch (NumberFormatException e) {
+              return null;
+            }
           }
           return null;
         }
@@ -79,7 +83,11 @@ public class SimpleInterpreter {
           OriginalSourceValue secondValue = stackValues.get(stackValues.size() - 1);
           if (firstValue.getConstantValue() != null && firstValue.getConstantValue().value() instanceof String text &&
               secondValue.getConstantValue() != null && secondValue.getConstantValue().value() instanceof Integer radix) {
-            return OriginalSourceValue.ConstantValue.of(Integer.parseInt(text, radix));
+            try {
+              return OriginalSourceValue.ConstantValue.of(Integer.parseInt(text, radix));
+            } catch (NumberFormatException e) {
+              return null;
+            }
           }
           return null;
         }

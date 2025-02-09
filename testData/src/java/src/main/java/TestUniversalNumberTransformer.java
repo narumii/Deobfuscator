@@ -13,12 +13,15 @@ public class TestUniversalNumberTransformer {
     }
   }
 
-  public void divideByZero() {
+  public void illegalOperations() {
     int a = 2;
     if (a == 0) {
       // Transformer shouldn't touch it
       int b = 9 / 0;
       System.out.println(b);
+      System.out.println(Integer.parseInt("aaa"));
+      System.out.println(Float.parseFloat("bbb"));
+      System.out.println(Double.parseDouble("ccc"));
     }
   }
 
