@@ -90,7 +90,7 @@ public class OriginalSourceValue extends SourceValue {
   private final boolean isMethodParameter;
 
   /**
-   * Set of instructions that consume this value. Due to the nature of OW2 ASM, it does not store POP instructions
+   * Set of instructions that consume this value. Due to the nature of OW2 ASM, it does not contain POP instructions
    */
   private final Set<AbstractInsnNode> consumers = new HashSet<>();
 
