@@ -1,0 +1,161 @@
+package kotlin.reflect.jvm.internal.impl.serialization.deserialization;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import kotlin.collections.SetsKt;
+import kotlin.jvm.functions.Function1;
+import kotlin.jvm.internal.Intrinsics;
+import kotlin.reflect.jvm.internal.impl.builtins.StandardNames.FqNames;
+import kotlin.reflect.jvm.internal.impl.descriptors.ClassDescriptor;
+import kotlin.reflect.jvm.internal.impl.descriptors.PackageFragmentDescriptor;
+import kotlin.reflect.jvm.internal.impl.descriptors.PackageFragmentProvider;
+import kotlin.reflect.jvm.internal.impl.descriptors.PackageFragmentProviderKt;
+import kotlin.reflect.jvm.internal.impl.descriptors.SourceElement;
+import kotlin.reflect.jvm.internal.impl.descriptors.deserialization.ClassDescriptorFactory;
+import kotlin.reflect.jvm.internal.impl.metadata.ProtoBuf.Class;
+import kotlin.reflect.jvm.internal.impl.metadata.ProtoBuf.TypeTable;
+import kotlin.reflect.jvm.internal.impl.metadata.deserialization.BinaryVersion;
+import kotlin.reflect.jvm.internal.impl.metadata.deserialization.NameResolver;
+import kotlin.reflect.jvm.internal.impl.metadata.deserialization.VersionRequirementTable;
+import kotlin.reflect.jvm.internal.impl.name.ClassId;
+import kotlin.reflect.jvm.internal.impl.name.FqName;
+import kotlin.reflect.jvm.internal.impl.name.Name;
+import kotlin.reflect.jvm.internal.impl.serialization.deserialization.ClassDeserializer.ClassKey;
+import kotlin.reflect.jvm.internal.impl.serialization.deserialization.ClassDeserializer.Companion;
+import kotlin.reflect.jvm.internal.impl.serialization.deserialization.ClassDeserializer.classes.1;
+import kotlin.reflect.jvm.internal.impl.serialization.deserialization.descriptors.DeserializedClassDescriptor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+public final class ClassDeserializer {
+    @NotNull
+    public static final Companion Companion = new Companion(null);
+    @NotNull
+    private final DeserializationComponents components;
+    @NotNull
+    private final Function1<ClassKey, ClassDescriptor> classes;
+    @NotNull
+    private static final Set<ClassId> BLACK_LIST = SetsKt.setOf(ClassId.topLevel(FqNames.cloneable.toSafe()));
+
+    public ClassDeserializer(@NotNull DeserializationComponents components) {
+        Intrinsics.checkNotNullParameter(components, "components");
+        super();
+        this.components = components;
+        this.classes = (Function1<ClassKey, ClassDescriptor>)this.components
+            .getStorageManager()
+            .createMemoizedFunctionWithNullableValues((Function1)(new 1(this)));
+    }
+
+    @Nullable
+    public final ClassDescriptor deserializeClass(@NotNull ClassId classId, @Nullable ClassData classData) {
+        Intrinsics.checkNotNullParameter(classId, "classId");
+        return (ClassDescriptor)this.classes.invoke(new ClassKey(classId, classData));
+    }
+
+    private final ClassDescriptor createClass(ClassKey key) {
+        ClassId classId = key.getClassId();
+
+        for (ClassDescriptorFactory factory : this.components.getFictitiousClassDescriptorFactories()) {
+            ClassDescriptor classProto = factory.createClass(classId);
+            if (classProto != null) {
+                int $i$a$-let-ClassDeserializer$createClass$1 = 0;
+                return classProto;
+            }
+        }
+
+        if (BLACK_LIST.contains(classId)) {
+            return null;
+        } else {
+            ClassData var10000 = key.getClassData();
+            if (var10000 == null) {
+                var10000 = this.components.getClassDataFinder().findClassData(classId);
+                if (var10000 == null) {
+                    return null;
+                }
+            }
+
+            ClassData var19 = var10000;
+            NameResolver nameResolver = var19.component1();
+            Class classProto = var19.component2();
+            BinaryVersion metadataVersion = var19.component3();
+            SourceElement sourceElement = var19.component4();
+            ClassId outerClassId = classId.getOuterClassId();
+            DeserializationContext var25;
+            if (outerClassId != null) {
+                ClassDescriptor var12 = deserializeClass$default(this, outerClassId, null, 2, null);
+                DeserializedClassDescriptor var24 = var12 instanceof DeserializedClassDescriptor ? (DeserializedClassDescriptor)var12 : null;
+                if ((var12 instanceof DeserializedClassDescriptor ? (DeserializedClassDescriptor)var12 : null) == null) {
+                    return null;
+                }
+
+                DeserializedClassDescriptor outerClass = var24;
+                Name var10001 = classId.getShortClassName();
+                Intrinsics.checkNotNullExpressionValue(var10001, "classId.shortClassName");
+                if (!outerClass.hasNestedClass$deserialization(var10001)) {
+                    return null;
+                }
+
+                var25 = outerClass.getC();
+            } else {
+                PackageFragmentProvider var26 = this.components.getPackageFragmentProvider();
+                FqName var32 = classId.getPackageFqName();
+                Intrinsics.checkNotNullExpressionValue(var32, "classId.packageFqName");
+                List fragments = PackageFragmentProviderKt.packageFragments(var26, var32);
+                Iterable $this$firstOrNull$iv = fragments;
+                int $i$f$firstOrNull = 0;
+                Iterator var15 = $this$firstOrNull$iv.iterator();
+
+                while (true) {
+                    if (!var15.hasNext()) {
+                        var10000 = null;
+                        break;
+                    }
+
+                    Object element$iv;
+                    label53: {
+                        element$iv = var15.next();
+                        PackageFragmentDescriptor it = (PackageFragmentDescriptor)element$iv;
+                        int $i$a$-firstOrNull-ClassDeserializer$createClass$outerContext$fragment$1 = 0;
+                        if (it instanceof DeserializedPackageFragment) {
+                            DeserializedPackageFragment var27 = (DeserializedPackageFragment)it;
+                            Name var33 = classId.getShortClassName();
+                            Intrinsics.checkNotNullExpressionValue(var33, "classId.shortClassName");
+                            if (!var27.hasTopLevelClass(var33)) {
+                                var28 = false;
+                                break label53;
+                            }
+                        }
+
+                        var28 = true;
+                    }
+
+                    if (var28) {
+                        var10000 = (ClassData)element$iv;
+                        break;
+                    }
+                }
+
+                PackageFragmentDescriptor var30 = (PackageFragmentDescriptor)var10000;
+                if ((PackageFragmentDescriptor)var10000 == null) {
+                    return null;
+                }
+
+                PackageFragmentDescriptor fragment = var30;
+                DeserializationComponents var31 = this.components;
+                TypeTable var10005 = classProto.getTypeTable();
+                Intrinsics.checkNotNullExpressionValue(var10005, "classProto.typeTable");
+                kotlin.reflect.jvm.internal.impl.metadata.deserialization.TypeTable var10003 = new kotlin.reflect.jvm.internal.impl.metadata.deserialization.TypeTable(
+                    var10005
+                );
+                kotlin.reflect.jvm.internal.impl.metadata.deserialization.VersionRequirementTable.Companion var10004 = VersionRequirementTable.Companion;
+                kotlin.reflect.jvm.internal.impl.metadata.ProtoBuf.VersionRequirementTable var34 = classProto.getVersionRequirementTable();
+                Intrinsics.checkNotNullExpressionValue(var34, "classProto.versionRequirementTable");
+                var25 = var31.createContext(fragment, nameResolver, var10003, var10004.create(var34), metadataVersion, null);
+            }
+
+            DeserializationContext outerContext = var25;
+            return (ClassDescriptor)(new DeserializedClassDescriptor(outerContext, classProto, nameResolver, metadataVersion, sourceElement));
+        }
+    }
+}

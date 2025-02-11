@@ -5,7 +5,6 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.objectweb.asm.tree.analysis.Analyzer;
 import org.objectweb.asm.tree.analysis.BasicInterpreter;
 import org.objectweb.asm.tree.analysis.BasicValue;
-import org.objectweb.asm.tree.analysis.Value;
 import uwu.narumi.deobfuscator.api.asm.NamedOpcodes;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -25,8 +24,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class MethodHelper implements Opcodes {
   /**
@@ -103,6 +104,29 @@ public class MethodHelper implements Opcodes {
       frames.put(methodNode.instructions.get(i), framesArray[i]);
     }
     return Collections.unmodifiableMap(frames);
+  }
+
+  /**
+   * Computes a map which corresponds to: source value producer -> consumers
+   *
+   * @param frames Frames of the method
+   */
+  public static Map<AbstractInsnNode, Set<AbstractInsnNode>> computeConsumersMap(Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames) {
+    Map<AbstractInsnNode, Set<AbstractInsnNode>> consumers = new HashMap<>();
+    for (var entry : frames.entrySet()) {
+      AbstractInsnNode consumer = entry.getKey();
+      Frame<OriginalSourceValue> frame = entry.getValue();
+      if (frame == null) continue;
+
+      // Loop through stack values and add consumer to them
+      for (int i = 0; i < consumer.getRequiredStackValuesCount(); i++) {
+        OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - (i + 1));
+        for (AbstractInsnNode producer : sourceValue.insns) {
+          consumers.computeIfAbsent(producer, k -> new HashSet<>()).add(consumer);
+        }
+      }
+    }
+    return consumers;
   }
 
   public static List<String> prettyInsnList(InsnList insnList) {

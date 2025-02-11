@@ -4,6 +4,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.asm.InsnContext;
+import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.helper.FramedInstructionsStream;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
@@ -42,7 +43,7 @@ public class UselessPopCleanTransformer extends Transformer {
     AbstractInsnNode insn = insnContext.insn();
     OriginalSourceValue firstValue = insnContext.frame().getStack(insnContext.frame().getStackSize() - 1);
 
-    if (!canPop(firstValue)) return false;
+    if (!canPop(firstValue, insnContext.methodContext())) return false;
 
     if (insn.getOpcode() == POP) {
       // Pop the value from the stack
@@ -64,7 +65,7 @@ public class UselessPopCleanTransformer extends Transformer {
         }
 
         // Return if we can't remove the source value
-        if (!canPop(secondValue)) return false;
+        if (!canPop(secondValue, insnContext.methodContext())) return false;
 
         // Pop
         popSourceValue(firstValue, insnContext.methodNode());
@@ -79,14 +80,9 @@ public class UselessPopCleanTransformer extends Transformer {
   /**
    * Checks if source value can be popped
    */
-  private boolean canPop(OriginalSourceValue sourceValue) {
+  private boolean canPop(OriginalSourceValue sourceValue, MethodContext methodContext) {
     if (sourceValue.insns.isEmpty()) {
       // Nothing to remove. Probably a local variable
-      return false;
-    }
-
-    if (!sourceValue.getConsumers().isEmpty()) {
-      // If the value is consumed by another instruction, we can't remove it
       return false;
     }
 
@@ -94,6 +90,12 @@ public class UselessPopCleanTransformer extends Transformer {
     for (AbstractInsnNode producer : sourceValue.insns) {
       // Prevent popping instructions twice (especially DUPs)
       if (poppedInsns.contains(producer)) return false;
+
+      Set<AbstractInsnNode> consumers = methodContext.getConsumersMap().get(producer);
+      if (consumers.stream().anyMatch(insn -> insn.getOpcode() != POP && insn.getOpcode() != POP2)) {
+        // If the value is consumed by another instruction, we can't remove it
+        return false;
+      }
 
       // Can be popped if the value is constant
       if (producer.isConstant()) continue;

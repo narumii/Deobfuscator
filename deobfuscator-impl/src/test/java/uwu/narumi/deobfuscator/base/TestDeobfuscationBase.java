@@ -42,7 +42,7 @@ public abstract class TestDeobfuscationBase {
   @BeforeAll
   public static void setup() {
     // Don't spam logs
-    Configurator.setRootLevel(Level.WARN);
+    Configurator.setRootLevel(Level.ERROR);
   }
 
   @TestFactory

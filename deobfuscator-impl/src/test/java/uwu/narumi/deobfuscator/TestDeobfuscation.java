@@ -161,5 +161,15 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .transformers(UselessPopCleanTransformer::new)
         .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "KotlinSample.class")
         .register();
+
+    test("Kotlin Sample 2")
+        .transformers(UselessPopCleanTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "KotlinSample2.class")
+        .register();
+
+    test("Kotlin Sample 3")
+        .transformers(UselessPopCleanTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "KotlinSample3.class")
+        .register();
   }
 }

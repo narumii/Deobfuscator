@@ -1,0 +1,94 @@
+package kotlin.jvm.internal
+
+import java.lang.reflect.Constructor
+import java.lang.reflect.Method
+import java.util.HashMap
+
+@SourceDebugExtension(["SMAP\nClassReference.kt\nKotlin\n*S Kotlin\n*F\n+ 1 ClassReference.kt\nkotlin/jvm/internal/ClassReference$Companion\n+ 2 fake.kt\nkotlin/jvm/internal/FakeKt\n*L\n1#1,205:1\n1#2:206\n*E\n"])
+companion object `ClassReference$Companion` private constructor() {
+    private final val FUNCTION_CLASSES: Map<Class<out () -> *>, Int>
+    private final val classFqNames: HashMap<String, String>
+    private final val primitiveFqNames: HashMap<String, String>
+    private final val primitiveWrapperFqNames: HashMap<String, String>
+    private final val simpleNames: Map<String, String>
+
+
+    public fun getClassSimpleName(jClass: Class<*>): String? {
+        var var10000: java.lang.String;
+        if (jClass.isAnonymousClass()) {
+            var10000 = null;
+        } else if (jClass.isLocalClass()) {
+            var componentType: java.lang.String = jClass.getSimpleName();
+            var var9: Method = jClass.getEnclosingMethod();
+            if (var9 != null) {
+                var10000 = StringsKt.substringAfter$default(componentType, var9.getName() + '$', null, 2, null);
+                if (var10000 != null) {
+                    return var10000;
+                }
+            }
+
+            var var10: Constructor = jClass.getEnclosingConstructor();
+            if (var10 != null) {
+                var10000 = StringsKt.substringAfter$default(componentType, var10.getName() + '$', null, 2, null);
+            } else {
+                var10000 = StringsKt.substringAfter$default(componentType, '$', null, 2, null);
+            }
+        } else if (jClass.isArray()) {
+            var var8: Class = jClass.getComponentType();
+            if (var8.isPrimitive()) {
+                var var3: java.lang.String = ClassReference.access$getSimpleNames$cp().get(var8.getName()) as java.lang.String;
+                var10000 = if (var3 != null) var3 + "Array" else null;
+            } else {
+                var10000 = null;
+            }
+
+            if (var10000 == null) {
+                var10000 = "Array";
+            }
+        } else {
+            var10000 = ClassReference.access$getSimpleNames$cp().get(jClass.getName()) as java.lang.String;
+            if (var10000 == null) {
+                var10000 = jClass.getSimpleName();
+            }
+        }
+
+        return var10000;
+    }
+
+    public fun getClassQualifiedName(jClass: Class<*>): String? {
+        var var10000: java.lang.String;
+        if (jClass.isAnonymousClass()) {
+            var10000 = null;
+        } else if (jClass.isLocalClass()) {
+            var10000 = null;
+        } else if (jClass.isArray()) {
+            var componentType: Class = jClass.getComponentType();
+            if (componentType.isPrimitive()) {
+                var var3: java.lang.String = ClassReference.access$getClassFqNames$cp().get(componentType.getName()) as java.lang.String;
+                var10000 = if (var3 != null) var3 + "Array" else null;
+            } else {
+                var10000 = null;
+            }
+
+            if (var10000 == null) {
+                var10000 = "kotlin.Array";
+            }
+        } else {
+            var10000 = ClassReference.access$getClassFqNames$cp().get(jClass.getName()) as java.lang.String;
+            if (var10000 == null) {
+                var10000 = jClass.getCanonicalName();
+            }
+        }
+
+        return var10000;
+    }
+
+    public fun isInstance(value: Any?, jClass: Class<*>): Boolean {
+        var var10000: java.util.Map = ClassReference.access$getFUNCTION_CLASSES$cp();
+        var objectType: Int = var10000.get(jClass) as Integer;
+        return if (objectType != null)
+            TypeIntrinsics.isFunctionOfArity(value, objectType.intValue())
+            else
+            (if (jClass.isPrimitive()) JvmClassMappingKt.getJavaObjectType(JvmClassMappingKt.getKotlinClass(jClass)) else jClass).isInstance(value);
+    }
+}

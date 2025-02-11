@@ -9,6 +9,7 @@ import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.helper.MethodHelper;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Method context
@@ -17,6 +18,7 @@ public class MethodContext {
   private final ClassWrapper classWrapper;
   private final MethodNode methodNode;
   private final @Nullable @Unmodifiable Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames;
+  private Map<AbstractInsnNode, Set<AbstractInsnNode>> consumersMap = null;
 
   private MethodContext(
       ClassWrapper classWrapper,
@@ -47,6 +49,17 @@ public class MethodContext {
    */
   public @Nullable @Unmodifiable Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames() {
     return frames;
+  }
+
+  public synchronized Map<AbstractInsnNode, Set<AbstractInsnNode>> getConsumersMap() {
+    if (this.frames == null) {
+      throw new IllegalStateException("Got frameless method context");
+    }
+    if (consumersMap == null) {
+      // Lazy initialization
+      this.consumersMap = MethodHelper.computeConsumersMap(this.frames);
+    }
+    return consumersMap;
   }
 
   public InsnContext newInsnContext(AbstractInsnNode insn) {
