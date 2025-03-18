@@ -55,22 +55,12 @@ public class FrameMatch extends Match {
         return false;
       }
 
-      if (this.match instanceof SkipMatch) {
-        // Skip match earlier
-        return true;
-      }
-
       Frame<OriginalSourceValue> frame = context.frame();
       sourceValue = frame.getStack(index);
       if (stackFrameOptions.originalValue) {
         sourceValue = sourceValue.originalSource;
       }
     } else if (this.options instanceof LocalVariableFrameOptions lvFrameOptions) {
-      if (this.match instanceof SkipMatch) {
-        // Skip match earlier
-        return true;
-      }
-
       Frame<OriginalSourceValue> frame = context.frame();
       sourceValue = frame.getLocal(lvFrameOptions.localVariableIdx);
     } else {

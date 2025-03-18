@@ -110,6 +110,8 @@ public class MethodHelper implements Opcodes {
    * Computes a map which corresponds to: source value producer -> consumers
    *
    * @param frames Frames of the method
+   * @return A map where keys are instructions that produce values and values are
+   *  *      sets of instructions that consume those produced values
    */
   public static Map<AbstractInsnNode, Set<AbstractInsnNode>> computeConsumersMap(Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames) {
     Map<AbstractInsnNode, Set<AbstractInsnNode>> consumers = new HashMap<>();
@@ -119,9 +121,12 @@ public class MethodHelper implements Opcodes {
       if (frame == null) continue;
 
       // Loop through stack values and add consumer to them
-      for (int i = 0; i < consumer.getRequiredStackValuesCount(); i++) {
+      for (int i = 0; i < consumer.getRequiredStackValuesCount(frame); i++) {
+        // Get the value from the stack (first consumed value is at the top)
         OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - (i + 1));
+
         for (AbstractInsnNode producer : sourceValue.insns) {
+          // Add this consumer to the set of consumers for the producer instruction
           consumers.computeIfAbsent(producer, k -> new HashSet<>()).add(consumer);
         }
       }

@@ -3,6 +3,7 @@ package uwu.narumi.deobfuscator;
 import uwu.narumi.deobfuscator.core.other.composed.ComposedHP888Transformer;
 import uwu.narumi.deobfuscator.core.other.composed.ComposedUnknownObf1Transformer;
 import uwu.narumi.deobfuscator.core.other.composed.ComposedZelixTransformer;
+import uwu.narumi.deobfuscator.core.other.composed.Composed_qProtectTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedGeneralFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedPeepholeCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.JsrInlinerTransformer;
@@ -150,6 +151,12 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
     test("HP888")
         .transformers(() -> new ComposedHP888Transformer(".mc"))
         .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "hp888")
+        .register();
+
+    // qProtect
+    test("qProtect Sample 1")
+        .transformers(Composed_qProtectTransformer::new)
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "qprotect/sample1")
         .register();
 
     test("POP2 Sample")

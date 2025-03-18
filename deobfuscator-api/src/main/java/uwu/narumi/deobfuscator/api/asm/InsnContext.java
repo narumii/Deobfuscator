@@ -47,12 +47,16 @@ public class InsnContext {
     return methodContext;
   }
 
+  public int getRequiredStackValuesCount() {
+    return this.insn.getRequiredStackValuesCount(this.frame());
+  }
+
   /**
    * Places POPs instructions before current instruction to remove source values from the stack.
    * This method automatically calculates how many stack values to pop.
    */
   public void placePops() {
-    for (int i = 0; i < this.insn.getRequiredStackValuesCount(); i++) {
+    for (int i = 0; i < this.getRequiredStackValuesCount(); i++) {
       int stackValueIdx = frame().getStackSize() - (i + 1);
       OriginalSourceValue sourceValue = frame().getStack(stackValueIdx);
 

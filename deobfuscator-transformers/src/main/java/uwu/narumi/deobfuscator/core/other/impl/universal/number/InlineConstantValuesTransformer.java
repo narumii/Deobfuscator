@@ -20,7 +20,7 @@ public class InlineConstantValuesTransformer extends Transformer {
     FramedInstructionsStream.of(this)
         .forceSync()
         .forEach(insnContext -> {
-          int stackCount = insnContext.insn().getRequiredStackValuesCount();
+          int stackCount = insnContext.getRequiredStackValuesCount();
 
           // Iterate over stack values
           for (int i = 0; i < stackCount; i++) {

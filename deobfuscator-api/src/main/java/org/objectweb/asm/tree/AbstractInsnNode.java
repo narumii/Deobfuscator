@@ -38,6 +38,10 @@ import java.util.function.Predicate;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.analysis.Frame;
+import org.objectweb.asm.tree.analysis.OriginalSourceValue;
+import org.objectweb.asm.tree.analysis.SourceValue;
+import org.objectweb.asm.tree.analysis.Value;
 import uwu.narumi.deobfuscator.api.asm.NamedOpcodes;
 import org.objectweb.asm.Type;
 
@@ -652,10 +656,10 @@ public abstract class AbstractInsnNode {
   /**
    * Returns the number of stack values required by this instruction.
    */
-  public int getRequiredStackValuesCount() {
-    return switch (this.opcode) {
+  public int getRequiredStackValuesCount(Frame<? extends Value> frame) {
+    return switch (this.getOpcode()) {
       // Unary operations (one value)
-      case ISTORE, LSTORE, FSTORE, DSTORE, ASTORE, POP, POP2, DUP, DUP_X1, DUP_X2, DUP2, DUP2_X1, DUP2_X2, SWAP, INEG,
+      case ISTORE, LSTORE, FSTORE, DSTORE, ASTORE, POP, DUP, DUP_X1, SWAP, INEG,
            LNEG, FNEG, DNEG, I2L, I2F, I2D, L2I, L2F, L2D, F2I, F2L, F2D, D2I, D2L, D2F, I2B, I2C, I2S, IFEQ, IFNE,
            IFLT, IFGE, IFGT, IFLE, TABLESWITCH, LOOKUPSWITCH, IRETURN, LRETURN, FRETURN, DRETURN, ARETURN, PUTSTATIC,
            GETFIELD, NEWARRAY, ANEWARRAY, ARRAYLENGTH, ATHROW, CHECKCAST, INSTANCEOF, MONITORENTER, MONITOREXIT, IFNULL,
@@ -672,6 +676,32 @@ public abstract class AbstractInsnNode {
       case INVOKEVIRTUAL, INVOKESPECIAL, INVOKESTATIC, INVOKEINTERFACE, INVOKEDYNAMIC -> getRequiredStackValuesCountForMethodInvocation();
       // Multi-dimensional array creation
       case MULTIANEWARRAY -> ((MultiANewArrayInsnNode) this).dims;
+
+      // Dynamic forms (uses frame)
+      case POP2, DUP2 -> {
+        Value sourceValue = frame.getStack(frame.getStackSize() - 1);
+        yield sourceValue.getSize() == 2 ? 1 : 2;
+      }
+      case DUP_X2 -> {
+        Value sourceValue2 = frame.getStack(frame.getStackSize() - 2);
+        yield sourceValue2.getSize() == 2 ? 2 : 3;
+      }
+      case DUP2_X1 -> {
+        Value sourceValue1 = frame.getStack(frame.getStackSize() - 1);
+        yield sourceValue1.getSize() == 2 ? 2 : 3;
+      }
+      case DUP2_X2 -> {
+        Value sourceValue1 = frame.getStack(frame.getStackSize() - 1);
+        Value sourceValue2 = frame.getStack(frame.getStackSize() - 2);
+        if (sourceValue1.getSize() == 2 && sourceValue2.getSize() == 2) {
+          yield 2;
+        }
+        Value sourceValue3 = frame.getStack(frame.getStackSize() - 2);
+        if (sourceValue1.getSize() == 2 || sourceValue3.getSize() == 2) {
+          yield 3;
+        }
+        yield 4;
+      }
 
       // No values required
       default -> 0;

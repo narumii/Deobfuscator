@@ -1,0 +1,18 @@
+package org.json;
+
+import java.io.StringWriter;
+
+public class JSONStringer extends org.json.JSONWriter {
+    public static final int IIlIIlIIIlIIIl;
+    public static final boolean IIlIIIIIIIllll = false;
+
+    public JSONStringer() {
+        super(new StringWriter());
+        org.json.ParserConfiguration.IIlIIIIlIIII();
+    }
+
+    @Override
+    public String toString() {
+        return this.mode == 'd' ? this.writer.toString() : null;
+    }
+}

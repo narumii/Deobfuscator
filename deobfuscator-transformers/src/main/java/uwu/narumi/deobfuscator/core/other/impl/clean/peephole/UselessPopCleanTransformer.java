@@ -1,5 +1,6 @@
 package uwu.narumi.deobfuscator.core.other.impl.clean.peephole;
 
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
@@ -43,7 +44,7 @@ public class UselessPopCleanTransformer extends Transformer {
     AbstractInsnNode insn = insnContext.insn();
     OriginalSourceValue firstValue = insnContext.frame().getStack(insnContext.frame().getStackSize() - 1);
 
-    if (!canPop(firstValue, insnContext.methodContext())) return false;
+    if (!canPop(firstValue, insnContext.methodContext(), null)) return false;
 
     if (insn.getOpcode() == POP) {
       // Pop the value from the stack
@@ -65,7 +66,7 @@ public class UselessPopCleanTransformer extends Transformer {
         }
 
         // Return if we can't remove the source value
-        if (!canPop(secondValue, insnContext.methodContext())) return false;
+        if (!canPop(secondValue, insnContext.methodContext(), firstValue)) return false;
 
         // Pop
         popSourceValue(firstValue, insnContext.methodNode());
@@ -79,8 +80,12 @@ public class UselessPopCleanTransformer extends Transformer {
 
   /**
    * Checks if source value can be popped
+   *
+   * @param sourceValue Source value
+   * @param methodContext Method context
+   * @param poppedInPair Source value that was popped in pair with this value
    */
-  private boolean canPop(OriginalSourceValue sourceValue, MethodContext methodContext) {
+  private boolean canPop(OriginalSourceValue sourceValue, MethodContext methodContext, @Nullable OriginalSourceValue poppedInPair) {
     if (sourceValue.insns.isEmpty()) {
       // Nothing to remove. Probably a local variable
       return false;
@@ -92,7 +97,9 @@ public class UselessPopCleanTransformer extends Transformer {
       if (poppedInsns.contains(producer)) return false;
 
       Set<AbstractInsnNode> consumers = methodContext.getConsumersMap().get(producer);
-      if (consumers.stream().anyMatch(insn -> insn.getOpcode() != POP && insn.getOpcode() != POP2)) {
+      if (consumers.stream().anyMatch(insn -> insn.getOpcode() != POP &&
+          insn.getOpcode() != POP2 && (poppedInPair == null || !poppedInPair.insns.contains(insn)))
+      ) {
         // If the value is consumed by another instruction, we can't remove it
         return false;
       }

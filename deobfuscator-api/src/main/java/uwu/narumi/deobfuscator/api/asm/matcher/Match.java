@@ -1,6 +1,7 @@
 package uwu.narumi.deobfuscator.api.asm.matcher;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
@@ -28,10 +29,6 @@ public abstract class Match {
    */
   public boolean matches(InsnContext insnContext) {
     return this.matchResult(insnContext) != null;
-  }
-
-  public boolean matches(MethodContext methodContext) {
-    return !this.findAllMatches(methodContext).isEmpty();
   }
 
   /**
@@ -70,6 +67,7 @@ public abstract class Match {
     return allMatches;
   }
 
+  @Nullable
   public MatchContext findFirstMatch(MethodContext methodContext) {
     return this.findAllMatches(methodContext).stream().findFirst().orElse(null);
   }
