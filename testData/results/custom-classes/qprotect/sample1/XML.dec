@@ -57,11 +57,6 @@ public class XML {
                         var1.appendCodePoint(var3);
                     }
             }
-
-            int var5 = 287930431;
-            IIlllllIIIllllIl = var5;
-            if (1280687910 <= IIlllllIIIllllIl) {
-            }
         }
 
         return var1.toString();
@@ -234,10 +229,6 @@ public class XML {
                                 if (var3.getForceList().contains(var9)) {
                                     if (var7.length() == 0) {
                                         var1.put(var9, new JSONArray());
-                                        int var14 = 625409678;
-                                        IIlllllIIIllllIl = var14;
-                                        if (1222458921 <= IIlllllIIIllllIl) {
-                                        }
                                     } else if (var7.length() == 1 && var7.opt(var3.getcDataTagName()) != null) {
                                         var1.append(var9, var7.opt(var3.getcDataTagName()));
                                     } else {
@@ -247,8 +238,8 @@ public class XML {
                                     var1.accumulate(var9, "");
                                 } else if (var7.length() == 1 && var7.opt(var3.getcDataTagName()) != null) {
                                     var1.accumulate(var9, var7.opt(var3.getcDataTagName()));
-                                    int var23 = 19118812;
-                                    IIlllllIIIllllIl = var23;
+                                    int var14 = 19118812;
+                                    IIlllllIIIllllIl = var14;
                                     if (333213067 < IIlllllIIIllllIl) {
                                     }
                                 } else {

@@ -4,6 +4,7 @@ import uwu.narumi.deobfuscator.api.transformer.ComposedTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedPeepholeCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.LocalVariableNamesCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectFieldFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectStringPoolTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectStringTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectTryCatchTransformer;
@@ -42,7 +43,10 @@ public class Composed_qProtectTransformer extends ComposedTransformer {
         InlineStaticFieldTransformer::new,
 
         // Cleanup
-        ComposedPeepholeCleanTransformer::new
+        ComposedPeepholeCleanTransformer::new,
+
+        // Remove field flow after cleaning code from garbage, so we can do pattern matching
+        qProtectFieldFlowTransformer::new
     );
   }
 }
