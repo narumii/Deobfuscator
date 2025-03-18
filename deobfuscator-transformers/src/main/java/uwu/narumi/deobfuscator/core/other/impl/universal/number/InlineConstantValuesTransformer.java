@@ -41,7 +41,7 @@ public class InlineConstantValuesTransformer extends Transformer {
               }
 
               // Place pops before replacing
-              insnContext.methodContext().newInsnContext(toReplace).placePops();
+              insnContext.methodContext().at(toReplace).placePops();
 
               // Replace instruction with constant value
               AbstractInsnNode newInsn = AsmHelper.toConstantInsn(sourceValue.getConstantValue().value());

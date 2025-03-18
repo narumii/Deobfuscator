@@ -86,7 +86,7 @@ public class ZelixParametersTransformer extends Transformer {
     scopedClasses().forEach(classWrapper -> classWrapper.methods().stream()
         .filter(methodNode -> methodNode.desc.startsWith("([Ljava/lang/Object;)"))
         .forEach(methodNode -> {
-          MethodContext methodContext = MethodContext.framed(classWrapper, methodNode);
+          MethodContext methodContext = MethodContext.of(classWrapper, methodNode);
 
           Map<Integer, Integer> newVarIndexes = new HashMap<>(); // old var index -> new var index
 

@@ -82,12 +82,12 @@ public class FramedInstructionsStream {
               if (instructionsStreamModifier.apply(Arrays.stream(methodNode.instructions.toArray())).findAny().isEmpty()) return;
 
               // Get frames of the method
-              MethodContext methodContext = MethodContext.framed(classWrapper, methodNode, this.framesProvider);
+              MethodContext methodContext = MethodContext.of(classWrapper, methodNode, this.framesProvider);
 
               // Iterate over instructions SYNC
               instructionsStreamModifier.apply(Arrays.stream(methodNode.instructions.toArray()))
                   .forEach(insn -> {
-                    InsnContext insnContext = methodContext.newInsnContext(insn);
+                    InsnContext insnContext = methodContext.at(insn);
                     // Check if frame exists
                     if (insnContext.frame() == null) return;
 

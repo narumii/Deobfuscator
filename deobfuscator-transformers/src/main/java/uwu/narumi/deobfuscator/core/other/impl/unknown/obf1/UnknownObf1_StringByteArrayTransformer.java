@@ -71,7 +71,7 @@ public class UnknownObf1_StringByteArrayTransformer extends Transformer {
   @Override
   protected void transform() throws Exception {
     scopedClasses().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
-      MethodContext methodContext = MethodContext.framed(classWrapper, methodNode);
+      MethodContext methodContext = MethodContext.of(classWrapper, methodNode);
 
       STRING_BYTE_ARRAY_CONSTRUCTOR.findAllMatches(methodContext).forEach(matchContext -> {
         Set<AbstractInsnNode> collectedInsns = new HashSet<>(matchContext.collectedInsns());

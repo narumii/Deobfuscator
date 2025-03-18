@@ -142,7 +142,7 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
       }
     }
 
-    MethodContext methodContext = MethodContext.framed(classWrapper, clinit);
+    MethodContext methodContext = MethodContext.of(classWrapper, clinit);
 
     // Find all encrypted longs
     DECRYPT_LONG_MATCHER.findAllMatches(methodContext).forEach(matchContext -> {

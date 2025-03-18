@@ -25,7 +25,7 @@ public class qProtectFieldFlowTransformer extends Transformer {
   protected void transform() throws Exception {
     scopedClasses().forEach(classWrapper -> {
       classWrapper.methods().forEach(methodNode -> {
-        MethodContext methodContext = MethodContext.frameless(classWrapper, methodNode);
+        MethodContext methodContext = MethodContext.of(classWrapper, methodNode);
         FIELD_FLOW_PATTERN.findAllMatches(methodContext).forEach(match -> {
           FieldInsnNode fieldInsn = (FieldInsnNode) match.captures().get("field").insn();
 

@@ -35,7 +35,7 @@ public class qProtectNumberPoolTransformer extends Transformer {
   protected void transform() throws Exception {
     scopedClasses().forEach(classWrapper -> {
       MatchContext numberPoolMatchCtx = classWrapper.methods().stream()
-          .map(methodNode -> NUMBER_POOL_METHOD_MATCH.findFirstMatch(MethodContext.framed(classWrapper, methodNode)))
+          .map(methodNode -> NUMBER_POOL_METHOD_MATCH.findFirstMatch(MethodContext.of(classWrapper, methodNode)))
           .filter(Objects::nonNull)
           .findFirst()
           .orElse(null);
@@ -75,7 +75,7 @@ public class qProtectNumberPoolTransformer extends Transformer {
 
       // Replace number pool references with actual values
       classWrapper.methods().forEach(methodNode -> {
-        MethodContext methodContext = MethodContext.framed(classWrapper, methodNode);
+        MethodContext methodContext = MethodContext.of(classWrapper, methodNode);
 
         numberPoolReferenceMatch.findAllMatches(methodContext).forEach(numberPoolReferenceCtx -> {
           int index = numberPoolReferenceCtx.captures().get("index").insn().asInteger();

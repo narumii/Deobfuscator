@@ -57,7 +57,7 @@ public abstract class Match {
     List<MatchContext> allMatches = new ArrayList<>();
 
     for (AbstractInsnNode insn : methodContext.methodNode().instructions) {
-      InsnContext insnContext = methodContext.newInsnContext(insn);
+      InsnContext insnContext = methodContext.at(insn);
       MatchContext match = this.matchResult(insnContext);
       if (match != null) {
         allMatches.add(match);

@@ -32,7 +32,7 @@ public class qProtectStringTransformer extends Transformer {
       AtomicReference<MethodRef> decryptionMethodRef = new AtomicReference<>();
 
       classWrapper.methods().forEach(methodNode -> {
-        DECRYPT_STRING_MATCH.findAllMatches(MethodContext.framed(classWrapper, methodNode)).forEach(matchContext -> {
+        DECRYPT_STRING_MATCH.findAllMatches(MethodContext.of(classWrapper, methodNode)).forEach(matchContext -> {
           String encryptedText = matchContext.captures().get("encryptedText").insn().asString();
           String xorKey = matchContext.captures().get("xorKey").insn().asString();
           String encryptedData = matchContext.captures().get("encryptedData").insn().asString();

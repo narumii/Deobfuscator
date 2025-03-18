@@ -46,7 +46,7 @@ public class qProtectTryCatchTransformer extends Transformer {
   @Override
   protected void transform() throws Exception {
     scopedClasses().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
-      MethodContext methodContext = MethodContext.frameless(classWrapper, methodNode);
+      MethodContext methodContext = MethodContext.of(classWrapper, methodNode);
 
       // Remove infinite loop try catch blocks
       methodNode.tryCatchBlocks.removeIf(tryCatch -> {
@@ -69,7 +69,7 @@ public class qProtectTryCatchTransformer extends Transformer {
         LabelNode handlerLabel = tryCatch.handler;
         AbstractInsnNode nextInsn = handlerLabel.getNext();
 
-        MatchContext matchContext = SELF_THROW_TRY_CATCH_MATCH.matchResult(methodContext.newInsnContext(nextInsn));
+        MatchContext matchContext = SELF_THROW_TRY_CATCH_MATCH.matchResult(methodContext.at(nextInsn));
         if (matchContext != null) {
           matchContext.removeAll();
           markChange();
