@@ -31,6 +31,8 @@ public class qProtectFieldFlowTransformer extends Transformer {
 
           // Remove field flow
           match.removeAll();
+
+          markChange();
         });
       });
     });
