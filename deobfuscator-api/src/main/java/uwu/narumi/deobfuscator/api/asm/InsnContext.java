@@ -23,9 +23,6 @@ public class InsnContext {
   }
 
   public Frame<OriginalSourceValue> frame() {
-    if (this.methodContext.frames() == null) {
-      throw new IllegalStateException("Got frameless method context");
-    }
     return this.methodContext.frames().get(this.insn);
   }
 

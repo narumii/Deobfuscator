@@ -36,10 +36,6 @@ public class FrameMatch extends Match {
 
   @Override
   protected boolean test(MatchContext context) {
-    if (context.insnContext().methodContext().frames() == null) {
-      throw new IllegalStateException("Got frameless method context");
-    }
-
     if (context.frame() == null) {
       // If we expect stack values, then frame can't be null
       return false;
