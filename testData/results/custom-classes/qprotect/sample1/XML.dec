@@ -117,9 +117,9 @@ public class XML {
             } else if (var5 == '[') {
                 var10 = var0.nextToken();
                 if ("CDATA".equals(var10) && var0.next() == '[') {
-                    String var16 = var0.nextCDATA();
-                    if (var16.length() > 0) {
-                        var1.accumulate(var3.getcDataTagName(), var16);
+                    String var14 = var0.nextCDATA();
+                    if (var14.length() > 0) {
+                        var1.accumulate(var3.getcDataTagName(), var14);
                     }
 
                     return false;
@@ -212,12 +212,12 @@ public class XML {
                         }
 
                         if (var10 instanceof String) {
-                            String var15 = (String)var10;
-                            if (var15.length() > 0) {
+                            String var13 = (String)var10;
+                            if (var13.length() > 0) {
                                 if (var11 != null) {
-                                    var7.accumulate(var3.getcDataTagName(), stringToValue(var15, var11));
+                                    var7.accumulate(var3.getcDataTagName(), stringToValue(var13, var11));
                                 } else {
-                                    var7.accumulate(var3.getcDataTagName(), var3.isKeepStrings() ? var15 : stringToValue(var15));
+                                    var7.accumulate(var3.getcDataTagName(), var3.isKeepStrings() ? var13 : stringToValue(var13));
                                 }
                             }
                         } else if (var10 == LT) {
@@ -238,10 +238,6 @@ public class XML {
                                     var1.accumulate(var9, "");
                                 } else if (var7.length() == 1 && var7.opt(var3.getcDataTagName()) != null) {
                                     var1.accumulate(var9, var7.opt(var3.getcDataTagName()));
-                                    int var14 = 19118812;
-                                    IIlllllIIIllllIl = var14;
-                                    if (333213067 < IIlllllIIIllllIl) {
-                                    }
                                 } else {
                                     if (!var3.shouldTrimWhiteSpace()) {
                                         removeEmpty(var7, var3);

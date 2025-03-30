@@ -18,7 +18,7 @@ public class qProtectFieldFlowTransformer extends Transformer {
       // Compare
       NumberMatch.of(),
       OpcodeMatch.of(GETSTATIC),
-      OpcodeMatch.of(IF_ICMPGT)
+      Match.of(ctx -> ctx.insn().isCompare())
   );
 
   @Override

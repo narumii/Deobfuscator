@@ -37,10 +37,7 @@ import java.util.function.Predicate;
 
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.analysis.Frame;
-import org.objectweb.asm.tree.analysis.OriginalSourceValue;
-import org.objectweb.asm.tree.analysis.SourceValue;
 import org.objectweb.asm.tree.analysis.Value;
 import uwu.narumi.deobfuscator.api.asm.NamedOpcodes;
 import org.objectweb.asm.Type;
@@ -451,13 +448,9 @@ public abstract class AbstractInsnNode {
     return this.getOpcode() >= ISTORE && this.getOpcode() <= ASTORE;
   }
 
-  public int sizeOnStack() {
-    if (this.isLong() || this.isDouble()) {
-      // Only long and double values take up two stack values
-      return 2;
-    } else {
-      return 1;
-    }
+  public boolean isCompare() {
+    return (this.getOpcode() >= IFEQ && this.getOpcode() <= IF_ACMPNE)
+        || (this.getOpcode() >= IFNULL && this.getOpcode() <= IFNONNULL);
   }
 
   public boolean isJump() {
@@ -466,15 +459,6 @@ public abstract class AbstractInsnNode {
 
   public JumpInsnNode asJump() {
     return (JumpInsnNode) this;
-  }
-
-  public int conditionStackSize() {
-    if (this.getOpcode() >= IF_ICMPEQ && this.getOpcode() <= IF_ICMPLE) return 2;
-
-    if ((this.getOpcode() >= IFEQ && this.getOpcode() <= IFLE)
-        || (this.getOpcode() == IFNULL || this.getOpcode() == IFNONNULL)) return 1;
-
-    return 0;
   }
 
   public MethodInsnNode asMethodInsn() {
@@ -654,9 +638,9 @@ public abstract class AbstractInsnNode {
   }
 
   /**
-   * Returns the number of stack values required by this instruction.
+   * Returns the number of stack values consumed by this instruction
    */
-  public int getRequiredStackValuesCount(Frame<? extends Value> frame) {
+  public int sizeOnStack(Frame<? extends Value> frame) {
     return switch (this.getOpcode()) {
       // Unary operations (one value)
       case ISTORE, LSTORE, FSTORE, DSTORE, ASTORE, POP, DUP, DUP_X1, SWAP, INEG,

@@ -85,6 +85,9 @@ public class Context implements ClassProvider {
       // Fix class bytes
       bytes = ClassHelper.fixClass(bytes);
 
+      // Class is always a file, not a directory. Remove last slash if it exists
+      pathInJar = pathInJar.replaceAll("/$", "");
+
       ClassWrapper classWrapper = ClassHelper.loadClass(pathInJar, bytes, ClassReader.SKIP_FRAMES);
       this.classesMap.putIfAbsent(classWrapper.name(), classWrapper);
 
