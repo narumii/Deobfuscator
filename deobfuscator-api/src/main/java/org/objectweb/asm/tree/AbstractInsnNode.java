@@ -640,7 +640,7 @@ public abstract class AbstractInsnNode {
   /**
    * Returns the number of stack values consumed by this instruction
    */
-  public int sizeOnStack(Frame<? extends Value> frame) {
+  public int getConsumedStackValuesCount(Frame<? extends Value> frame) {
     return switch (this.getOpcode()) {
       // Unary operations (one value)
       case ISTORE, LSTORE, FSTORE, DSTORE, ASTORE, POP, DUP, DUP_X1, SWAP, INEG,

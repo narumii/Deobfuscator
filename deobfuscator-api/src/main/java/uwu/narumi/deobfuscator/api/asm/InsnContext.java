@@ -44,8 +44,8 @@ public class InsnContext {
     return methodContext;
   }
 
-  public int sizeOnStack() {
-    return this.insn.sizeOnStack(this.frame());
+  public int getConsumedStackValuesCount() {
+    return this.insn.getConsumedStackValuesCount(this.frame());
   }
 
   /**
@@ -53,7 +53,7 @@ public class InsnContext {
    * This method automatically calculates how many stack values to pop.
    */
   public void placePops() {
-    for (int i = 0; i < this.sizeOnStack(); i++) {
+    for (int i = 0; i < this.getConsumedStackValuesCount(); i++) {
       int stackValueIdx = frame().getStackSize() - (i + 1);
       OriginalSourceValue sourceValue = frame().getStack(stackValueIdx);
 

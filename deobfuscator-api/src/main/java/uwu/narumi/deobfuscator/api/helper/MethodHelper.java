@@ -121,7 +121,7 @@ public class MethodHelper implements Opcodes {
       if (frame == null) continue;
 
       // Loop through stack values and add consumer to them
-      for (int i = 0; i < consumer.sizeOnStack(frame); i++) {
+      for (int i = 0; i < consumer.getConsumedStackValuesCount(frame); i++) {
         // Get the value from the stack (first consumed value is at the top)
         OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - (i + 1));
 
