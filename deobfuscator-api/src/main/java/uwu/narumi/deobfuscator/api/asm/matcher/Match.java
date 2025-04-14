@@ -75,6 +75,7 @@ public abstract class Match {
   /**
    * @return {@link MatchContext} if matches or {@code null} if it does not match
    */
+  @Nullable
   public MatchContext matchResult(InsnContext insnContext) {
     // Create MatchContext
     MatchContext context = MatchContext.of(insnContext);

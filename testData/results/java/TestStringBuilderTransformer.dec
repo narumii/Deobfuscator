@@ -1,0 +1,6 @@
+public class TestStringBuilderTransformer {
+    public void stringBuilderAppends() {
+        System.out.println("foobartest123");
+        System.out.println("abcdefghij");
+    }
+}

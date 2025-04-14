@@ -6,6 +6,8 @@ import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 
+import java.util.Set;
+
 /**
  * Instruction context. Holds all information relevant to the current instruction.
  */
@@ -24,6 +26,10 @@ public class InsnContext {
 
   public Frame<OriginalSourceValue> frame() {
     return this.methodContext.frames().get(this.insn);
+  }
+
+  public Set<AbstractInsnNode> consumers() {
+    return this.methodContext.getConsumersMap().get(this.insn);
   }
 
   public MethodNode methodNode() {

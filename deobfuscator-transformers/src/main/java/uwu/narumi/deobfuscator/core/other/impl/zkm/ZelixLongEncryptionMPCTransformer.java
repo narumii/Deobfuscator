@@ -178,12 +178,12 @@ public class ZelixLongEncryptionMPCTransformer extends Transformer {
         //System.out.println(classWrapper.name() + " -> " + instanceStringified);
 
         if (isFallbackDecrypter(longDecrypterClass)) {
-          LOGGER.error("Detected that '{}' class is decrypted out of order. Decrypted number will have wrong value.", classWrapper.name());
           LOGGER.error("The author used 'classInitializationOrderStatement' (https://www.zelix.com/klassmaster/docs/classInitializationOrderStatement.html) " +
               "during jar obfuscation to specify class initialization order manually. " +
-              "You need to pass to ZelixLongEncryptionMPCTransformer a class initialization order. The easiest way wille be doing a static analysis " +
+              "You need to pass to ZelixLongEncryptionMPCTransformer a class initialization order. The easiest way will be doing a static analysis " +
               "and find where the mentioned class is used."
           );
+          throw new IllegalStateException("Detected that '" + classWrapper.name() + "' class is decrypted out of order. Decrypted number will have wrong value");
         }
 
         // Decrypt long value

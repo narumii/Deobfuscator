@@ -11,6 +11,7 @@ import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.UselessPopCleanTra
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineLocalVariablesTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.RemapperTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.universal.StringBuilderTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
 import uwu.narumi.deobfuscator.base.TestDeobfuscationBase;
 import uwu.narumi.deobfuscator.transformer.TestSandboxSecurityTransformer;
@@ -32,6 +33,10 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
     test("Universal number transformer")
         .transformers(UniversalNumberTransformer::new)
         .input(OutputType.SINGLE_CLASS, InputType.JAVA_CODE, "TestUniversalNumberTransformer.class")
+        .register();
+    test("String builder transformer")
+        .transformers(StringBuilderTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.JAVA_CODE, "TestStringBuilderTransformer.class")
         .register();
     // TODO: Uninitialized static fields should replace with 0?
     test("Inline static fields")
