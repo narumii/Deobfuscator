@@ -2,6 +2,7 @@ package uwu.narumi.deobfuscator.core.other.impl.clean.peephole;
 
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.asm.InsnContext;
@@ -28,7 +29,6 @@ public class UselessPopCleanTransformer extends Transformer {
           boolean success = tryRemovePop(insnContext);
 
           if (success) {
-            insnContext.methodNode().instructions.remove(insnContext.insn());
             markChange();
           }
         });
@@ -44,16 +44,27 @@ public class UselessPopCleanTransformer extends Transformer {
     AbstractInsnNode insn = insnContext.insn();
     OriginalSourceValue firstValue = insnContext.frame().getStack(insnContext.frame().getStackSize() - 1);
 
-    if (!canPop(firstValue, insnContext.methodContext(), null)) return false;
+    boolean canPopFirstValue = canPop(firstValue, insnContext.methodContext(), null);
 
     if (insn.getOpcode() == POP) {
+      if (!canPopFirstValue) return false;
+
       // Pop the value from the stack
       popSourceValue(firstValue, insnContext.methodNode());
+
+      // Remove POP
+      insnContext.methodNode().instructions.remove(insn);
       return true;
     } else if (insn.getOpcode() == POP2) {
       if (firstValue.getSize() == 2) {
+        if (!canPopFirstValue) return false;
+
         // Pop 2-sized value from the stack
         popSourceValue(firstValue, insnContext.methodNode());
+
+        // Remove POP
+        insnContext.methodNode().instructions.remove(insn);
+        return true;
       } else {
         // Pop two values from the stack
 
@@ -65,14 +76,30 @@ public class UselessPopCleanTransformer extends Transformer {
           secondValue = Objects.requireNonNull(secondValue.copiedFrom);
         }
 
-        // Return if we can't remove the source value
-        if (!canPop(secondValue, insnContext.methodContext(), firstValue)) return false;
+        boolean canPopSecondValue = canPop(secondValue, insnContext.methodContext(), firstValue);
+        if (canPopFirstValue && canPopSecondValue) {
+          // Pop
+          popSourceValue(firstValue, insnContext.methodNode());
+          popSourceValue(secondValue, insnContext.methodNode());
 
-        // Pop
-        popSourceValue(firstValue, insnContext.methodNode());
-        popSourceValue(secondValue, insnContext.methodNode());
+          // Remove POP2
+          insnContext.methodNode().instructions.remove(insn);
+
+          return true;
+        } else if (canPopFirstValue || canPopSecondValue) {
+          // Only pop one value and replace POP2 with POP
+          if (canPopFirstValue) {
+            popSourceValue(firstValue, insnContext.methodNode());
+          } else {
+            popSourceValue(secondValue, insnContext.methodNode());
+          }
+
+          // Replace POP2 with POP
+          insnContext.methodNode().instructions.set(insn, new InsnNode(POP));
+
+          return true;
+        }
       }
-      return true;
     }
 
     return false;

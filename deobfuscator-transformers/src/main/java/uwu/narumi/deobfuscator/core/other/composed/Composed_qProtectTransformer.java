@@ -5,15 +5,18 @@ import uwu.narumi.deobfuscator.core.other.composed.general.ComposedPeepholeClean
 import uwu.narumi.deobfuscator.core.other.impl.clean.LocalVariableNamesCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectFieldFlowTransformer;
-import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectStringPoolTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.universal.pool.UniversalStringPoolTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectStringTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectTryCatchTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectInvokeDynamicTransformer;
-import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectNumberPoolTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.universal.pool.UniversalNumberPoolTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.TryCatchRepairTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
 
+/**
+ * https://qtechnologies.dev/
+ */
 public class Composed_qProtectTransformer extends ComposedTransformer {
   public Composed_qProtectTransformer() {
     super(
@@ -25,7 +28,7 @@ public class Composed_qProtectTransformer extends ComposedTransformer {
         InlineStaticFieldTransformer::new,
 
         // Inline number pools
-        qProtectNumberPoolTransformer::new,
+        UniversalNumberPoolTransformer::new,
         // Decrypt method invocation
         qProtectInvokeDynamicTransformer::new,
 
@@ -37,7 +40,7 @@ public class Composed_qProtectTransformer extends ComposedTransformer {
         // Decrypt strings
         qProtectStringTransformer::new,
         // Inline string pools
-        qProtectStringPoolTransformer::new,
+        UniversalStringPoolTransformer::new,
 
         // Inline fields again
         InlineStaticFieldTransformer::new,

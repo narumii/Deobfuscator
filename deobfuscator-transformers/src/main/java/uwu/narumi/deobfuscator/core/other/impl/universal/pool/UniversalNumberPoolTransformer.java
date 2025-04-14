@@ -1,7 +1,8 @@
-package uwu.narumi.deobfuscator.core.other.impl.qprotect;
+package uwu.narumi.deobfuscator.core.other.impl.universal.pool;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
@@ -20,15 +21,25 @@ import java.util.Objects;
 /**
  * Transforms number pool references to actual values.
  */
-public class qProtectNumberPoolTransformer extends Transformer {
-  private static final Match STORE_NUMBER_TO_ARRAY_MATCH = OpcodeMatch.of(AASTORE)
+public class UniversalNumberPoolTransformer extends Transformer {
+  private static final Match STORE_NUMBER_TO_ARRAY_OBJ_MATCH = OpcodeMatch.of(AASTORE)
       .and(FrameMatch.stack(0, MethodMatch.invokeStatic().owner("java/lang/Integer").name("valueOf").desc("(I)Ljava/lang/Integer;")
           .and(FrameMatch.stack(0, NumberMatch.of().capture("value")))))
       .and(FrameMatch.stack(1, NumberMatch.of().capture("index")))
       .and(FrameMatch.stack(2, FieldMatch.getStatic()));
 
+  private static final Match STORE_NUMBER_TO_ARRAY_PRIMITIVE_MATCH = OpcodeMatch.of(IASTORE)
+      .and(FrameMatch.stack(0, NumberMatch.of().capture("value")))
+      .and(FrameMatch.stack(1, NumberMatch.of().capture("index")))
+      .and(FrameMatch.stack(2, FieldMatch.getStatic()));
+
+  private static final Match STORE_NUMBER_TO_ARRAY_MATCH = STORE_NUMBER_TO_ARRAY_OBJ_MATCH.or(STORE_NUMBER_TO_ARRAY_PRIMITIVE_MATCH);
+
   private static final Match NUMBER_POOL_METHOD_MATCH = FieldMatch.putStatic().capture("numberPoolField")
-      .and(FrameMatch.stack(0, OpcodeMatch.of(ANEWARRAY).and(Match.of(ctx -> ((TypeInsnNode) ctx.insn()).desc.equals("java/lang/Integer")))
+      .and(FrameMatch.stack(0,
+          OpcodeMatch.of(ANEWARRAY).and(Match.of(ctx -> ((TypeInsnNode) ctx.insn()).desc.equals("java/lang/Integer")))
+              .or(OpcodeMatch.of(NEWARRAY).and(Match.of(ctx -> ((IntInsnNode) ctx.insn()).operand == T_INT)))
+              .capture("arrayType")
           .and(FrameMatch.stack(0, NumberMatch.of().capture("size")))));
 
   @Override
@@ -42,6 +53,8 @@ public class qProtectNumberPoolTransformer extends Transformer {
 
       // No number pool method found
       if (numberPoolMatchCtx == null) return;
+
+      boolean isPrimitiveArray = numberPoolMatchCtx.captures().get("arrayType").insn() instanceof IntInsnNode;
 
       //System.out.println("Found number pool method in " + classWrapper.name() + "." + numberPoolMatchCtx.insnContext().methodNode().name);
 
@@ -64,14 +77,21 @@ public class qProtectNumberPoolTransformer extends Transformer {
         }
       }
 
-      Match numberPoolReferenceMatch = MethodMatch.invokeVirtual().owner("java/lang/Integer").name("intValue").desc("()I")
-          .and(FrameMatch.stack(0, OpcodeMatch.of(AALOAD) // AALOAD - Load array reference
-              // Index
-              .and(FrameMatch.stack(0, NumberMatch.of().capture("index")
-                  // Load number pool field
-                  .and(FrameMatch.stack(0, FieldMatch.getStatic().owner(numberPoolFieldInsn.owner).name(numberPoolFieldInsn.name).desc(numberPoolFieldInsn.desc)))
-              ))
-          ));
+      Match numberPoolReferenceMatch;
+      if (isPrimitiveArray) {
+        numberPoolReferenceMatch = OpcodeMatch.of(IALOAD) // Load array reference
+            // Index
+            .and(FrameMatch.stack(0, NumberMatch.of().capture("index")))
+            // Load number pool field
+            .and(FrameMatch.stack(1, FieldMatch.getStatic().owner(numberPoolFieldInsn.owner).name(numberPoolFieldInsn.name).desc(numberPoolFieldInsn.desc)));
+      } else {
+        numberPoolReferenceMatch = MethodMatch.invokeVirtual().owner("java/lang/Integer").name("intValue").desc("()I")
+            .and(FrameMatch.stack(0, OpcodeMatch.of(AALOAD) // Load array reference
+                // Index
+                .and(FrameMatch.stack(0, NumberMatch.of().capture("index")))
+                // Load number pool field
+                .and(FrameMatch.stack(1, FieldMatch.getStatic().owner(numberPoolFieldInsn.owner).name(numberPoolFieldInsn.name).desc(numberPoolFieldInsn.desc)))));
+      }
 
       // Replace number pool references with actual values
       classWrapper.methods().forEach(methodNode -> {

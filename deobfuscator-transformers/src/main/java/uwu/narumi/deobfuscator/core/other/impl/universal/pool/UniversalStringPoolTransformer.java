@@ -1,4 +1,4 @@
-package uwu.narumi.deobfuscator.core.other.impl.qprotect;
+package uwu.narumi.deobfuscator.core.other.impl.universal.pool;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
@@ -20,7 +20,7 @@ import java.util.Objects;
 /**
  * Replaces string pool references with actual values.
  */
-public class qProtectStringPoolTransformer extends Transformer {
+public class UniversalStringPoolTransformer extends Transformer {
   private static final Match STORE_STRING_TO_ARRAY_MATCH = OpcodeMatch.of(AASTORE)
       .and(FrameMatch.stack(0, StringMatch.of().capture("value")))
       .and(FrameMatch.stack(1, NumberMatch.of().capture("index")))

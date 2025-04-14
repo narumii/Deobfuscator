@@ -1,6 +1,7 @@
 package uwu.narumi.deobfuscator;
 
 import uwu.narumi.deobfuscator.core.other.composed.ComposedHP888Transformer;
+import uwu.narumi.deobfuscator.core.other.composed.ComposedSuperblaubeereTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.ComposedUnknownObf1Transformer;
 import uwu.narumi.deobfuscator.core.other.composed.ComposedZelixTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.Composed_qProtectTransformer;
@@ -162,6 +163,12 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
     test("qProtect Sample 1")
         .transformers(Composed_qProtectTransformer::new)
         .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "qprotect/sample1")
+        .register();
+
+    // Superblaubeere
+    test("Superblaubeere Sample 1")
+        .transformers(ComposedSuperblaubeereTransformer::new)
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "sb27/sample1")
         .register();
 
     test("POP2 Sample")
