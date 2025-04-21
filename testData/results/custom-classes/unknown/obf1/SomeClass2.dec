@@ -9,8 +9,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class IIIIIllIlIIIlIIIlIIIIIlIIlIlIllIllIlllIlllllllllllIlIIIIIlIIlIllIlllIIllIllIlIIIlIlIIlllllIlIIllIIIllIlllllIIllIlllIIllIIIIlllllIlIlIlllIlIllIllllIIIIIlIlIIlIlIIlIIIIlllllllIllIlIIIlllIllIIlIIllIIIlII
-    implements Listener {
+public class SomeClass2 implements Listener {
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent var1) {
         Player var2 = var1.getPlayer();
