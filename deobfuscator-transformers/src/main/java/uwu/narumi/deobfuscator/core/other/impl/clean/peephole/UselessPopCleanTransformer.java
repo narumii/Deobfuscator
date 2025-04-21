@@ -23,6 +23,9 @@ public class UselessPopCleanTransformer extends Transformer {
 
   @Override
   protected void transform() throws Exception {
+    // Expand DUPs first
+    Transformer.transform(ExpandDupsTransformer::new, scope(), context());
+
     FramedInstructionsStream.of(this)
         .editInstructionsStream(stream -> stream.filter(insn -> insn.getOpcode() == POP || insn.getOpcode() == POP2))
         .forEach(insnContext -> {

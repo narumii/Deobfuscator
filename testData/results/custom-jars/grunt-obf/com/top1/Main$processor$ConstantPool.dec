@@ -1,0 +1,25 @@
+package com.top1;
+
+public final class Main$processor$ConstantPool {
+    public static String const_nmionQdI1EMWwVW = Sh4GunDo6B(Re3Shyl1Rd("یۡۨۨ۫ڤۥ۪۠ڤ۳ۡۨۧ۫۩ۡڥ"));
+
+    private static String Sh4GunDo6B(String var0) {
+        StringBuilder var1 = new StringBuilder();
+
+        for (int var2 = 0; var2 < var0.length(); var2++) {
+            var1.append((char)(var0.charAt(var2) ^ 2043));
+        }
+
+        return var1.toString();
+    }
+
+    private static String Re3Shyl1Rd(String var0) {
+        StringBuilder var1 = new StringBuilder();
+
+        for (int var2 = 0; var2 < var0.length(); var2++) {
+            var1.append((char)(var0.charAt(var2) ^ 1215));
+        }
+
+        return var1.toString();
+    }
+}

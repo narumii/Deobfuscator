@@ -581,31 +581,31 @@ public class d extends Thread {
         int var8 = -1;
 
         while (true) {
-            char[] var30;
+            char[] var28;
             label56: {
                 char[] var10001 = var10.substring(++var8, var8 + var9).toCharArray();
                 int var10003 = var10001.length;
                 int var14 = 0;
-                var30 = var10001;
+                var28 = var10001;
                 int var19 = var10003;
-                char[] var39;
+                char[] var37;
                 int var10004;
                 if (var10003 <= 1) {
-                    var39 = var10001;
+                    var37 = var10001;
                     var10004 = var14;
                 } else {
-                    var30 = var10001;
+                    var28 = var10001;
                     var19 = var10003;
                     if (var10003 <= var14) {
                         break label56;
                     }
 
-                    var39 = var10001;
+                    var37 = var10001;
                     var10004 = var14;
                 }
 
                 while (true) {
-                    var39[var10004] = (char)(var39[var10004] ^ switch (var14 % 7) {
+                    var37[var10004] = (char)(var37[var10004] ^ switch (var14 % 7) {
                         case 0 -> 10;
                         case 1 -> 70;
                         case 2 -> 22;
@@ -617,21 +617,21 @@ public class d extends Thread {
                     var14++;
                     if (var19 == 0) {
                         var10004 = var19;
-                        var39 = var30;
+                        var37 = var28;
                     } else {
                         if (var19 <= var14) {
                             break;
                         }
 
-                        var39 = var30;
+                        var37 = var28;
                         var10004 = var14;
                     }
                 }
             }
 
-            String var46 = new String(var30).intern();
+            String var44 = new String(var28).intern();
             int var23 = -1;
-            var13[var11++] = var46;
+            var13[var11++] = var44;
             if ((var8 += var9) >= var12) {
                 i = var13;
                 j = new String[2];
@@ -649,7 +649,7 @@ public class d extends Thread {
                     byte[] var7 = var4.substring(var23, var2).getBytes("ISO-8859-1");
                     long[] var10000 = var6;
                     var23 = var3++;
-                    long var35 = ((long)var7[0] & 255L) << 56
+                    long var33 = ((long)var7[0] & 255L) << 56
                         | ((long)var7[1] & 255L) << 48
                         | ((long)var7[2] & 255L) << 40
                         | ((long)var7[3] & 255L) << 32
@@ -657,24 +657,22 @@ public class d extends Thread {
                         | ((long)var7[5] & 255L) << 16
                         | ((long)var7[6] & 255L) << 8
                         | (long)var7[7] & 255L;
-                    byte var47 = -1;
+                    byte var45 = -1;
 
                     while (true) {
-                        long var50 = var35 ^ var0;
-                        switch (var47) {
+                        long var48 = var33 ^ var0;
+                        switch (var45) {
                             case 0:
-                                var10000[var23] = var50;
+                                var10000[var23] = var48;
                                 if (var2 >= var5) {
                                     k = var6;
                                     l = new Integer[5];
-                                    long var27 = 107634029375743L;
-                                    byte var28 = -1;
                                     m = 50L;
                                     return;
                                 }
                                 break;
                             default:
-                                var10000[var23] = var50;
+                                var10000[var23] = var48;
                                 if (var2 < var5) {
                                     continue label40;
                                 }
@@ -689,7 +687,7 @@ public class d extends Thread {
                         var7 = var4.substring(var26, var2).getBytes("ISO-8859-1");
                         var10000 = var6;
                         var23 = var3++;
-                        var35 = ((long)var7[0] & 255L) << 56
+                        var33 = ((long)var7[0] & 255L) << 56
                             | ((long)var7[1] & 255L) << 48
                             | ((long)var7[2] & 255L) << 40
                             | ((long)var7[3] & 255L) << 32
@@ -697,7 +695,7 @@ public class d extends Thread {
                             | ((long)var7[5] & 255L) << 16
                             | ((long)var7[6] & 255L) << 8
                             | (long)var7[7] & 255L;
-                        var47 = 0;
+                        var45 = 0;
                     }
                 }
             }

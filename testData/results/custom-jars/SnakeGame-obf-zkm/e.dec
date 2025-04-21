@@ -118,24 +118,21 @@ class e extends JFrame {
             byte var10003 = -1;
 
             while (true) {
-                long var17 = var10002 ^ var8;
+                long var15 = var10002 ^ var8;
                 switch (var10003) {
                     case 0:
-                        var10000[var10001] = var17;
+                        var10000[var10001] = var15;
                         if (var2 >= var5) {
                             d = var6;
                             e = new Integer[4];
-                            long var13 = -2542116333815373351L;
-                            byte var14 = -1;
-                            long var0 = -2542001418764869760L;
-                            serialVersionUID = var0;
+                            serialVersionUID = -2542001418764869760L;
                             b = a(11993, 4420636720690273987L);
                             c = a(11993, 4420636720690273987L);
                             return;
                         }
                         break;
                     default:
-                        var10000[var10001] = var17;
+                        var10000[var10001] = var15;
                         if (var2 < var5) {
                             continue label20;
                         }

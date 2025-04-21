@@ -1,5 +1,6 @@
 package uwu.narumi.deobfuscator;
 
+import uwu.narumi.deobfuscator.api.transformer.ComposedTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.ComposedHP888Transformer;
 import uwu.narumi.deobfuscator.core.other.composed.ComposedSuperblaubeereTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.ComposedUnknownObf1Transformer;
@@ -11,6 +12,7 @@ import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.JsrInlinerTransfor
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.UselessPopCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineLocalVariablesTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.universal.AccessRepairTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.RemapperTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.StringBuilderTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
@@ -169,6 +171,17 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
     test("Superblaubeere Sample 1")
         .transformers(ComposedSuperblaubeereTransformer::new)
         .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "sb27/sample1")
+        .register();
+
+    // Grunt
+    test("Grunt Sample 1")
+        .transformers(
+            AccessRepairTransformer::new,
+            () -> new ComposedTransformer(true,
+                ComposedGeneralFlowTransformer::new,
+                InlineStaticFieldTransformer::new
+            ))
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_JAR, "grunt-obf.jar")
         .register();
 
     test("POP2 Sample")
