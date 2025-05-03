@@ -12,8 +12,6 @@ public abstract class VersionedComposedTransformer extends Transformer {
     this.version = version;
   }
 
-  private boolean changed = false;
-
   @Override
   protected void transform() {
     Map<String, List<Supplier<Transformer>>> transformers = transformersByVersions();
@@ -23,11 +21,7 @@ public abstract class VersionedComposedTransformer extends Transformer {
 
     transformers
         .get(version)
-        .forEach(transformer -> changed |= Transformer.transform(transformer, scope(), context()));
-
-    if (changed) {
-      markChange();
-    }
+        .forEach(transformer -> this.changes.addAndGet(Transformer.transform(transformer, scope(), context())));
   }
 
   public abstract Map<String, List<Supplier<Transformer>>> transformersByVersions();

@@ -3,6 +3,8 @@ package uwu.narumi.deobfuscator.api.context;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 import org.objectweb.asm.ClassReader;
@@ -15,6 +17,8 @@ import uwu.narumi.deobfuscator.api.execution.SandBox;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
 
 public class Context implements ClassProvider {
+
+  private static final Logger LOGGER = LogManager.getLogger();
 
   private final Map<String, ClassWrapper> classesMap = new ConcurrentHashMap<>();
   private final Map<String, byte[]> filesMap = new ConcurrentHashMap<>();
@@ -93,7 +97,7 @@ public class Context implements ClassProvider {
 
       this.compiledClasses.addRawClass(bytes);
     } catch (InvalidClassException e) {
-      throw new RuntimeException(e);
+      LOGGER.error("Failed to load class {}", pathInJar);
     }
   }
 
