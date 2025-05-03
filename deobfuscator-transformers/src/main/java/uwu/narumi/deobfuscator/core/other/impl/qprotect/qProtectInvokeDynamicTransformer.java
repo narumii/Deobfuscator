@@ -2,6 +2,7 @@ package uwu.narumi.deobfuscator.core.other.impl.qprotect;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.LookupSwitchInsnNode;
@@ -42,6 +43,8 @@ public class qProtectInvokeDynamicTransformer extends Transformer {
             // Decrypt the method invocation
             AbstractInsnNode decryptedInsn = decryptMethodInvocation(xorKey, encryptedData, decryptionInfo);
             methodNode.instructions.set(invokeDynamicInsn, decryptedInsn);
+
+            markChange();
           }
         }
       });
@@ -95,7 +98,7 @@ public class qProtectInvokeDynamicTransformer extends Transformer {
    * @param decryptionInfo Decryption information
    * @return Decrypted method invocation instruction
    */
-  private static AbstractInsnNode decryptMethodInvocation(String xorKey, String encryptedData, DecryptionInfo decryptionInfo) {
+  private AbstractInsnNode decryptMethodInvocation(String xorKey, String encryptedData, DecryptionInfo decryptionInfo) {
     char[] xorKeyArr = xorKey.toCharArray();
 
     // Decrypt the data using XOR cipher
@@ -133,7 +136,21 @@ public class qProtectInvokeDynamicTransformer extends Transformer {
     }
 
     int opcode = decryptionInfo.invocationTypes().get(methodType);
-    return new MethodInsnNode(opcode, opcode == INVOKESPECIAL ? specialClass : ownerClass, methodName, methodDesc, false);
+
+    // Handle special case where we cannot determine if it is INVOKEVIRTUAL or INVOKEINTERFACE
+    if (opcode == INVOKEVIRTUAL) {
+      ClassNode classInfo = context().getFullClassProvider().getClassInfo(ownerClass);
+      if (classInfo != null) {
+        // Check if class is an interface
+        if (isAccess(classInfo.access, ACC_INTERFACE)) {
+          opcode = INVOKEINTERFACE;
+        }
+      } else {
+        LOGGER.warn("Could not find class {} for class/interface type detection. If you want a runnable jar then add the required lib.", ownerClass);
+      }
+    }
+
+    return new MethodInsnNode(opcode, opcode == INVOKESPECIAL ? specialClass : ownerClass, methodName, methodDesc, opcode == INVOKEINTERFACE);
   }
 
   /**

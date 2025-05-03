@@ -13,6 +13,8 @@ import software.coley.cafedude.InvalidClassException;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.classpath.ClassProvider;
 import uwu.narumi.deobfuscator.api.classpath.ClassInfoStorage;
+import uwu.narumi.deobfuscator.api.classpath.CombinedClassProvider;
+import uwu.narumi.deobfuscator.api.classpath.JvmClassProvider;
 import uwu.narumi.deobfuscator.api.execution.SandBox;
 import uwu.narumi.deobfuscator.api.helper.ClassHelper;
 
@@ -135,5 +137,12 @@ public class Context implements ClassProvider {
 
   public Map<String, byte[]> getFilesMap() {
     return filesMap;
+  }
+
+  /**
+   * Gets the class provider that holds all classes in the context, including the jvm runtime.
+   */
+  public ClassProvider getFullClassProvider() {
+    return new CombinedClassProvider(this, this.getLibraries(), JvmClassProvider.INSTANCE);
   }
 }
