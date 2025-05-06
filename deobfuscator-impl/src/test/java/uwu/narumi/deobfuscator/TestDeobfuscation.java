@@ -167,6 +167,11 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "qprotect/sample1")
         .register();
 
+    test("qProtect Sample 2")
+        .transformers(Composed_qProtectTransformer::new, RemapperTransformer::new)
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "qprotect/sample2")
+        .register();
+
     // Superblaubeere
     test("Superblaubeere Sample 1")
         .transformers(ComposedSuperblaubeereTransformer::new)

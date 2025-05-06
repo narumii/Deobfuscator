@@ -12,16 +12,18 @@ import uwu.narumi.deobfuscator.api.asm.MethodRef;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Transforms encrypted method invocations in qProtect obfuscated code. Example here: {@link qprotect.InvokeDynamicSample}
  */
 public class qProtectInvokeDynamicTransformer extends Transformer {
-  private DecryptionInfo decryptionInfo = null;
 
   @Override
   protected void transform() throws Exception {
+    Map<MethodRef, DecryptionInfo> decryptionMethods = new HashMap<>();
+
     scopedClasses().forEach(classWrapper -> {
       classWrapper.methods().forEach(methodNode -> {
 
@@ -32,13 +34,15 @@ public class qProtectInvokeDynamicTransformer extends Transformer {
               insn.getOpcode() == INVOKEDYNAMIC &&
               invokeDynamicInsn.bsm.getDesc().equals("(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;")
           ) {
+            // Get decryption information
+            MethodRef decryptMethodRef = MethodRef.of(invokeDynamicInsn.bsm);
+            DecryptionInfo decryptionInfo = decryptionMethods.computeIfAbsent(decryptMethodRef, (k) -> {
+              // Compute if absent
+              return extractDecryptionInformation(invokeDynamicInsn);
+            });
+
             String xorKey = invokeDynamicInsn.name;
             String encryptedData = (String) invokeDynamicInsn.bsmArgs[0];
-
-            if (decryptionInfo == null) {
-              // Lazy load decryption information
-              this.decryptionInfo = extractDecryptionInformation(invokeDynamicInsn);
-            }
 
             // Decrypt the method invocation
             AbstractInsnNode decryptedInsn = decryptMethodInvocation(xorKey, encryptedData, decryptionInfo);
@@ -48,6 +52,12 @@ public class qProtectInvokeDynamicTransformer extends Transformer {
           }
         }
       });
+    });
+
+    // Remove decryption methods
+    decryptionMethods.keySet().forEach(methodRef -> {
+      context().getClassesMap().get(methodRef.owner()).methods()
+          .removeIf(methodNode -> methodNode.name.equals(methodRef.name()) && methodNode.desc.equals(methodRef.desc()));
     });
   }
 
@@ -84,7 +94,7 @@ public class qProtectInvokeDynamicTransformer extends Transformer {
 
     // Store decryption information
     return new DecryptionInfo(
-        new MethodRef(invokeDynamicInsn.bsm.getOwner(), invokeDynamicInsn.bsm.getName(), invokeDynamicInsn.bsm.getDesc()),
+        MethodRef.of(invokeDynamicInsn.bsm),
         dataSeparator,
         invocationTypes
     );

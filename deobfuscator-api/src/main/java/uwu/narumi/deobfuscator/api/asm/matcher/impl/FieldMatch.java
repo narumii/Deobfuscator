@@ -2,6 +2,7 @@ package uwu.narumi.deobfuscator.api.asm.matcher.impl;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.FieldInsnNode;
+import uwu.narumi.deobfuscator.api.asm.FieldRef;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 
@@ -61,6 +62,13 @@ public class FieldMatch extends Match {
 
   public FieldMatch desc(String desc) {
     this.desc = desc;
+    return this;
+  }
+
+  public FieldMatch fieldRef(FieldRef fieldRef) {
+    this.owner = fieldRef.owner();
+    this.name = fieldRef.name();
+    this.desc = fieldRef.desc();
     return this;
   }
 }

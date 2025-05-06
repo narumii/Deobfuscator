@@ -40,6 +40,15 @@ public class ClassWrapper {
         .findFirst();
   }
 
+  public Optional<MethodNode> findMethod(MethodRef methodRef) {
+    if (!methodRef.owner().equals(classNode.name)) {
+      return Optional.empty();
+    }
+    return classNode.methods.stream()
+        .filter(methodNode -> methodNode.name.equals(methodRef.name()) && methodNode.desc.equals(methodRef.desc()))
+        .findFirst();
+  }
+
   public Optional<MethodNode> findMethod(String name, Class<?> returnType, Class<?>... parameters) {
     String descriptor = MethodType.methodType(returnType, parameters).toMethodDescriptorString();
     return classNode.methods.stream()

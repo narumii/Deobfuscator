@@ -1,5 +1,6 @@
 package uwu.narumi.deobfuscator.api.asm;
 
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -16,6 +17,10 @@ public record MethodRef(String owner, String name, String desc) {
 
   public static MethodRef of(MethodInsnNode methodInsn) {
     return new MethodRef(methodInsn.owner, methodInsn.name, methodInsn.desc);
+  }
+
+  public static MethodRef of(Handle handle) {
+    return new MethodRef(handle.getOwner(), handle.getName(), handle.getDesc());
   }
 
   @Override

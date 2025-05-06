@@ -4,6 +4,7 @@ import uwu.narumi.deobfuscator.api.transformer.ComposedTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedPeepholeCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.LocalVariableNamesCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectAESStringEncryptionTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectFieldFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.pool.UniversalStringPoolTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectStringTransformer;
@@ -39,6 +40,7 @@ public class Composed_qProtectTransformer extends ComposedTransformer {
 
         // Decrypt strings
         qProtectStringTransformer::new,
+        qProtectAESStringEncryptionTransformer::new,
         // Inline string pools
         UniversalStringPoolTransformer::new,
 

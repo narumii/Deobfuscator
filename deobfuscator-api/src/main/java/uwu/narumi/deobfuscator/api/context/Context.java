@@ -11,6 +11,8 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 import software.coley.cafedude.InvalidClassException;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.asm.FieldRef;
+import uwu.narumi.deobfuscator.api.asm.MethodRef;
 import uwu.narumi.deobfuscator.api.classpath.ClassProvider;
 import uwu.narumi.deobfuscator.api.classpath.ClassInfoStorage;
 import uwu.narumi.deobfuscator.api.classpath.CombinedClassProvider;
@@ -77,6 +79,16 @@ public class Context implements ClassProvider {
 
   public Collection<ClassWrapper> classes() {
     return classesMap.values();
+  }
+
+  public void removeMethod(MethodRef methodRef) {
+    ClassWrapper classWrapper = this.getClassesMap().get(methodRef.owner());
+    classWrapper.methods().removeIf(methodNode -> methodNode.name.equals(methodRef.name()) && methodNode.desc.equals(methodRef.desc()));
+  }
+
+  public void removeField(FieldRef fieldRef) {
+    ClassWrapper classWrapper = this.getClassesMap().get(fieldRef.owner());
+    classWrapper.fields().removeIf(fieldNode -> fieldNode.name.equals(fieldRef.name()) && fieldNode.desc.equals(fieldRef.desc()));
   }
 
   @UnmodifiableView

@@ -5,40 +5,48 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
+import uwu.narumi.deobfuscator.api.asm.FieldRef;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
+import uwu.narumi.deobfuscator.api.asm.matcher.group.AnyMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.FieldMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.FrameMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.MethodMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.NumberMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
+import uwu.narumi.deobfuscator.api.asm.matcher.impl.RangeOpcodeMatch;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Transforms number pool references to actual values.
  */
 public class UniversalNumberPoolTransformer extends Transformer {
-  private static final Match STORE_NUMBER_TO_ARRAY_OBJ_MATCH = OpcodeMatch.of(AASTORE)
-      .and(FrameMatch.stack(0, MethodMatch.invokeStatic().owner("java/lang/Integer").name("valueOf").desc("(I)Ljava/lang/Integer;")
-          .and(FrameMatch.stack(0, NumberMatch.of().capture("value")))))
-      .and(FrameMatch.stack(1, NumberMatch.of().capture("index")))
-      .and(FrameMatch.stack(2, FieldMatch.getStatic()));
+  private static final Set<String> PRIMITIVE_OBJECTS = Set.of(
+      "java/lang/Byte",
+      "java/lang/Short",
+      "java/lang/Integer",
+      "java/lang/Long",
+      "java/lang/Float",
+      "java/lang/Double"
+  );
 
-  private static final Match STORE_NUMBER_TO_ARRAY_PRIMITIVE_MATCH = OpcodeMatch.of(IASTORE)
-      .and(FrameMatch.stack(0, NumberMatch.of().capture("value")))
-      .and(FrameMatch.stack(1, NumberMatch.of().capture("index")))
-      .and(FrameMatch.stack(2, FieldMatch.getStatic()));
-
-  private static final Match STORE_NUMBER_TO_ARRAY_MATCH = STORE_NUMBER_TO_ARRAY_OBJ_MATCH.or(STORE_NUMBER_TO_ARRAY_PRIMITIVE_MATCH);
+  private static final Match CONVERT_TO_PRIMITIVE_MATCH = AnyMatch.of(
+      MethodMatch.invokeVirtual().name("intValue").desc("()I"),
+      MethodMatch.invokeVirtual().name("byteValue").desc("()B"),
+      MethodMatch.invokeVirtual().name("shortValue").desc("()S"),
+      MethodMatch.invokeVirtual().name("longValue").desc("()J"),
+      MethodMatch.invokeVirtual().name("floatValue").desc("()F")
+  );
 
   private static final Match NUMBER_POOL_METHOD_MATCH = FieldMatch.putStatic().capture("numberPoolField")
       .and(FrameMatch.stack(0,
-          OpcodeMatch.of(ANEWARRAY).and(Match.of(ctx -> ((TypeInsnNode) ctx.insn()).desc.equals("java/lang/Integer")))
-              .or(OpcodeMatch.of(NEWARRAY).and(Match.of(ctx -> ((IntInsnNode) ctx.insn()).operand == T_INT)))
+          OpcodeMatch.of(ANEWARRAY).and(Match.of(ctx -> PRIMITIVE_OBJECTS.contains(((TypeInsnNode) ctx.insn()).desc)))
+              .or(OpcodeMatch.of(NEWARRAY))
               .capture("arrayType")
           .and(FrameMatch.stack(0, NumberMatch.of().capture("size")))));
 
@@ -60,37 +68,25 @@ public class UniversalNumberPoolTransformer extends Transformer {
 
       int numberPoolSize = numberPoolMatchCtx.captures().get("size").insn().asInteger();
       FieldInsnNode numberPoolFieldInsn = (FieldInsnNode) numberPoolMatchCtx.captures().get("numberPoolField").insn();
+      FieldRef fieldRefPool = FieldRef.of(numberPoolFieldInsn);
 
       // Get whole number pool
-      Integer[] numberPool = new Integer[numberPoolSize];
-      STORE_NUMBER_TO_ARRAY_MATCH.findAllMatches(numberPoolMatchCtx.insnContext().methodContext()).forEach(storeNumberMatchCtx -> {
-        int index = storeNumberMatchCtx.captures().get("index").insn().asInteger();
-        int value = storeNumberMatchCtx.captures().get("value").insn().asInteger();
-
-        numberPool[index] = value;
-      });
-
-      for (Integer integer : numberPool) {
-        if (integer == null) {
-          // Number pool is not fully initialized
-          return;
-        }
-      }
+      Number[] numberPool = getNumberPool(numberPoolMatchCtx.insnContext().methodContext(), numberPoolSize, fieldRefPool);
 
       Match numberPoolReferenceMatch;
       if (isPrimitiveArray) {
-        numberPoolReferenceMatch = OpcodeMatch.of(IALOAD) // Load array reference
+        numberPoolReferenceMatch = RangeOpcodeMatch.of(IALOAD, DALOAD).or(RangeOpcodeMatch.of(BALOAD, SALOAD)) // Load array reference
             // Index
             .and(FrameMatch.stack(0, NumberMatch.of().capture("index")))
             // Load number pool field
-            .and(FrameMatch.stack(1, FieldMatch.getStatic().owner(numberPoolFieldInsn.owner).name(numberPoolFieldInsn.name).desc(numberPoolFieldInsn.desc)));
+            .and(FrameMatch.stack(1, FieldMatch.getStatic().fieldRef(fieldRefPool)));
       } else {
-        numberPoolReferenceMatch = MethodMatch.invokeVirtual().owner("java/lang/Integer").name("intValue").desc("()I")
+        numberPoolReferenceMatch = CONVERT_TO_PRIMITIVE_MATCH
             .and(FrameMatch.stack(0, OpcodeMatch.of(AALOAD) // Load array reference
                 // Index
                 .and(FrameMatch.stack(0, NumberMatch.of().capture("index")))
                 // Load number pool field
-                .and(FrameMatch.stack(1, FieldMatch.getStatic().owner(numberPoolFieldInsn.owner).name(numberPoolFieldInsn.name).desc(numberPoolFieldInsn.desc)))));
+                .and(FrameMatch.stack(1, FieldMatch.getStatic().fieldRef(fieldRefPool)))));
       }
 
       // Replace number pool references with actual values
@@ -99,7 +95,7 @@ public class UniversalNumberPoolTransformer extends Transformer {
 
         numberPoolReferenceMatch.findAllMatches(methodContext).forEach(numberPoolReferenceCtx -> {
           int index = numberPoolReferenceCtx.captures().get("index").insn().asInteger();
-          int value = numberPool[index];
+          Number value = numberPool[index];
 
           // Value
           methodNode.instructions.insert(numberPoolReferenceCtx.insn(), AsmHelper.numberInsn(value));
@@ -124,5 +120,46 @@ public class UniversalNumberPoolTransformer extends Transformer {
         }
       });
     });
+  }
+
+  /**
+   * Get number pool from method
+   *
+   * @param methodContext Method context
+   * @param poolSize Size of the pool
+   * @param fieldRefPool Field that holds the array of numbers
+   * @return The number pool
+   */
+  public static Number[] getNumberPool(MethodContext methodContext, int poolSize, FieldRef fieldRefPool) {
+    Match STORE_NUMBER_TO_ARRAY_OBJ_MATCH = OpcodeMatch.of(AASTORE)
+        .and(FrameMatch.stack(0, MethodMatch.invokeStatic().name("valueOf")
+            .and(FrameMatch.stack(0, NumberMatch.of().capture("value")))))
+        .and(FrameMatch.stack(1, NumberMatch.of().capture("index")))
+        .and(FrameMatch.stack(2, FieldMatch.getStatic().fieldRef(fieldRefPool)));
+
+    Match STORE_NUMBER_TO_ARRAY_PRIMITIVE_MATCH = RangeOpcodeMatch.of(IASTORE, DASTORE).or(RangeOpcodeMatch.of(BASTORE, SASTORE))
+        .and(FrameMatch.stack(0, NumberMatch.of().capture("value")))
+        .and(FrameMatch.stack(1, NumberMatch.of().capture("index")))
+        .and(FrameMatch.stack(2, FieldMatch.getStatic().fieldRef(fieldRefPool)));
+
+    Match STORE_NUMBER_TO_ARRAY_MATCH = STORE_NUMBER_TO_ARRAY_OBJ_MATCH.or(STORE_NUMBER_TO_ARRAY_PRIMITIVE_MATCH);
+
+    Number[] numberPool = new Number[poolSize];
+    // Collect all numbers from the method
+    STORE_NUMBER_TO_ARRAY_MATCH.findAllMatches(methodContext).forEach(storeNumberMatchCtx -> {
+      int index = storeNumberMatchCtx.captures().get("index").insn().asInteger();
+      Number value = storeNumberMatchCtx.captures().get("value").insn().asNumber();
+
+      numberPool[index] = value;
+    });
+
+    for (Number number : numberPool) {
+      if (number == null) {
+        // Number pool is not fully initialized
+        throw new IllegalStateException("Number pool is not fully initialized");
+      }
+    }
+
+    return numberPool;
   }
 }
