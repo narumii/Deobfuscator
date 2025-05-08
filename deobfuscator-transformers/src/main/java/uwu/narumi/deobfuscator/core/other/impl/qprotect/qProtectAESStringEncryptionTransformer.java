@@ -137,7 +137,7 @@ public class qProtectAESStringEncryptionTransformer extends Transformer {
 
       int size = ivArrayMatchCtx.captures().get("size").insn().asInteger();
 
-      Number[] ivArrayObj = UniversalNumberPoolTransformer.getNumberPool(methodContext, size, ivArrayFieldRef);
+      Number[] ivArrayObj = UniversalNumberPoolTransformer.getFieldNumberPool(methodContext, size, ivArrayFieldRef);
       byte[] ivArray = new byte[size];
       for (int i = 0; i < size; i++) {
         // Convert Number to byte

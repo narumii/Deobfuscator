@@ -15,9 +15,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UselessPopCleanTransformer extends Transformer {
-  public UselessPopCleanTransformer() {
-    this.rerunOnChange = true;
-  }
 
   private final Set<AbstractInsnNode> poppedInsns = ConcurrentHashMap.newKeySet();
 

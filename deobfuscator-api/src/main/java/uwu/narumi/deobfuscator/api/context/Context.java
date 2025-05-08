@@ -9,9 +9,11 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.MethodNode;
 import software.coley.cafedude.InvalidClassException;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.FieldRef;
+import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.MethodRef;
 import uwu.narumi.deobfuscator.api.classpath.ClassProvider;
 import uwu.narumi.deobfuscator.api.classpath.ClassInfoStorage;
@@ -89,6 +91,14 @@ public class Context implements ClassProvider {
   public void removeField(FieldRef fieldRef) {
     ClassWrapper classWrapper = this.getClassesMap().get(fieldRef.owner());
     classWrapper.fields().removeIf(fieldNode -> fieldNode.name.equals(fieldRef.name()) && fieldNode.desc.equals(fieldRef.desc()));
+  }
+
+  public Optional<MethodContext> getMethodContext(MethodRef methodRef) {
+    ClassWrapper classWrapper = this.getClassesMap().get(methodRef.owner());
+    if (classWrapper == null) return Optional.empty();
+    Optional<MethodNode> methodNode = classWrapper.findMethod(methodRef);
+
+    return methodNode.map(node -> MethodContext.of(classWrapper, node));
   }
 
   @UnmodifiableView

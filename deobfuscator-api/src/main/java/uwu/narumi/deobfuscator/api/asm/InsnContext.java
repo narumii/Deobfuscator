@@ -1,5 +1,6 @@
 package uwu.narumi.deobfuscator.api.asm;
 
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Frame;
@@ -24,6 +25,7 @@ public class InsnContext {
     return new InsnContext(insn, this.methodContext);
   }
 
+  @Nullable
   public Frame<OriginalSourceValue> frame() {
     return this.methodContext.frames().get(this.insn);
   }

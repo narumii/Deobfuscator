@@ -12,8 +12,6 @@ public class qProtectFieldFlowTransformer extends Transformer {
   private static final Match FIELD_FLOW_PATTERN = SequenceMatch.of(
       // Init variable through field
       NumberMatch.of(),
-      OpcodeMatch.of(ISTORE),
-      OpcodeMatch.of(ILOAD),
       OpcodeMatch.of(PUTSTATIC).capture("field"),
       // Compare
       NumberMatch.of(),
@@ -23,8 +21,8 @@ public class qProtectFieldFlowTransformer extends Transformer {
 
   @Override
   protected void transform() throws Exception {
-    scopedClasses().forEach(classWrapper -> {
-      classWrapper.methods().forEach(methodNode -> {
+    scopedClasses().parallelStream().forEach(classWrapper -> {
+      classWrapper.methods().parallelStream().forEach(methodNode -> {
         MethodContext methodContext = MethodContext.of(classWrapper, methodNode);
         FIELD_FLOW_PATTERN.findAllMatches(methodContext).forEach(match -> {
           FieldInsnNode fieldInsn = (FieldInsnNode) match.captures().get("field").insn();

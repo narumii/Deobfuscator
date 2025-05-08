@@ -5,6 +5,7 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
 import uwu.narumi.deobfuscator.api.asm.FieldRef;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
@@ -12,10 +13,12 @@ import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.group.AnyMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.FieldMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.FrameMatch;
+import uwu.narumi.deobfuscator.api.asm.matcher.impl.InsnMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.MethodMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.NumberMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.RangeOpcodeMatch;
+import uwu.narumi.deobfuscator.api.asm.matcher.impl.VarLoadMatch;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
@@ -71,7 +74,7 @@ public class UniversalNumberPoolTransformer extends Transformer {
       FieldRef fieldRefPool = FieldRef.of(numberPoolFieldInsn);
 
       // Get whole number pool
-      Number[] numberPool = getNumberPool(numberPoolMatchCtx.insnContext().methodContext(), numberPoolSize, fieldRefPool);
+      Number[] numberPool = getFieldNumberPool(numberPoolMatchCtx.insnContext().methodContext(), numberPoolSize, fieldRefPool);
 
       Match numberPoolReferenceMatch;
       if (isPrimitiveArray) {
@@ -123,14 +126,14 @@ public class UniversalNumberPoolTransformer extends Transformer {
   }
 
   /**
-   * Get number pool from method
+   * Get number pool from the field from the method.
    *
    * @param methodContext Method context
    * @param poolSize Size of the pool
    * @param fieldRefPool Field that holds the array of numbers
    * @return The number pool
    */
-  public static Number[] getNumberPool(MethodContext methodContext, int poolSize, FieldRef fieldRefPool) {
+  public static Number[] getFieldNumberPool(MethodContext methodContext, int poolSize, FieldRef fieldRefPool) {
     Match STORE_NUMBER_TO_ARRAY_OBJ_MATCH = OpcodeMatch.of(AASTORE)
         .and(FrameMatch.stack(0, MethodMatch.invokeStatic().name("valueOf")
             .and(FrameMatch.stack(0, NumberMatch.of().capture("value")))))
@@ -157,6 +160,51 @@ public class UniversalNumberPoolTransformer extends Transformer {
       if (number == null) {
         // Number pool is not fully initialized
         throw new IllegalStateException("Number pool is not fully initialized");
+      }
+    }
+
+    return numberPool;
+  }
+
+  /**
+   * Get number pool from variable from the method.
+   *
+   * @param methodContext Method context
+   * @param poolSize Size of the pool
+   * @param storeArrayInsn Store array instruction that we will be referring to
+   * @return The number pool
+   */
+  public static Number[] getVarNumberPool(MethodContext methodContext, int poolSize, VarInsnNode storeArrayInsn) {
+    Match STORE_NUMBER_TO_ARRAY_OBJ_MATCH = OpcodeMatch.of(AASTORE)
+        .and(FrameMatch.stack(0, MethodMatch.invokeStatic().name("valueOf")
+            .and(FrameMatch.stack(0, NumberMatch.of().capture("value")))))
+        .and(FrameMatch.stack(1, NumberMatch.of().capture("index")))
+        .and(FrameMatch.stack(2, VarLoadMatch.of().localStoreMatch(InsnMatch.of(storeArrayInsn))));
+
+    Match STORE_NUMBER_TO_ARRAY_PRIMITIVE_MATCH = RangeOpcodeMatch.of(IASTORE, DASTORE).or(RangeOpcodeMatch.of(BASTORE, SASTORE))
+        .and(FrameMatch.stack(0, NumberMatch.of().capture("value")))
+        .and(FrameMatch.stack(1, NumberMatch.of().capture("index")))
+        .and(FrameMatch.stack(2, VarLoadMatch.of().localStoreMatch(InsnMatch.of(storeArrayInsn))));
+
+    Match STORE_NUMBER_TO_ARRAY_MATCH = STORE_NUMBER_TO_ARRAY_OBJ_MATCH.or(STORE_NUMBER_TO_ARRAY_PRIMITIVE_MATCH);
+
+    Number[] numberPool = new Number[poolSize];
+    // Collect all numbers from the method
+    STORE_NUMBER_TO_ARRAY_MATCH.findAllMatches(methodContext).forEach(storeNumberMatchCtx -> {
+      int index = storeNumberMatchCtx.captures().get("index").insn().asInteger();
+      Number value = storeNumberMatchCtx.captures().get("value").insn().asNumber();
+      //System.out.println(index + " -> "+value);
+
+      numberPool[index] = value;
+    });
+
+    //System.out.println(Arrays.toString(numberPool));
+
+    for (int i = 0; i < numberPool.length; i++) {
+      Number number = numberPool[i];
+      if (number == null) {
+        // Null values set to 0 to keep with primitive array behavior
+        numberPool[i] = 0;
       }
     }
 

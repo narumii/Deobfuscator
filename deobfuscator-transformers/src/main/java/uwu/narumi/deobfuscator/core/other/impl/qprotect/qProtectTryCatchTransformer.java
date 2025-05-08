@@ -40,7 +40,10 @@ public class qProtectTryCatchTransformer extends Transformer {
   private static final Match SELF_THROW_TRY_CATCH_MATCH = SequenceMatch.of(
       OpcodeMatch.of(DUP),
       MethodMatch.invokeVirtual().name("printStackTrace").desc("()V"),
-      OpcodeMatch.of(ATHROW)
+      OpcodeMatch.of(ATHROW).or(SequenceMatch.of(
+          OpcodeMatch.of(CHECKCAST),
+          OpcodeMatch.of(ATHROW)
+      ))
   );
 
   @Override

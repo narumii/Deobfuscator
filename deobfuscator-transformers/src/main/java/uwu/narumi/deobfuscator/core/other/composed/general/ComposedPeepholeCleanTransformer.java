@@ -22,12 +22,12 @@ public class ComposedPeepholeCleanTransformer extends ComposedTransformer {
         UnUsedLabelCleanTransformer::new,
         UselessGotosCleanTransformer::new,
 
-        // Early pop clean (for correct unused var stores removal)
-        UselessPopCleanTransformer::new,
-        // Pop unused local variables stores
-        PopUnUsedLocalVariablesTransformer::new,
-        // Remove useless POP instructions. This also cleans up garbage var stores from the PopUnUsedLocalVariablesTransformer
-        UselessPopCleanTransformer::new
+        () -> new ComposedTransformer(true,
+            // Pop unused local variables stores
+            PopUnUsedLocalVariablesTransformer::new,
+            // Remove useless POP instructions. This also cleans up garbage var stores from the PopUnUsedLocalVariablesTransformer
+            UselessPopCleanTransformer::new
+        )
     );
   }
 }

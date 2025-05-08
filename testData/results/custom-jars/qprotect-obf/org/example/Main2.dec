@@ -1,0 +1,46 @@
+package org.example;
+
+public class Main2 {
+    public static final int c;
+    public static final boolean d = false;
+
+    public static void main(String[] var0) {
+        checkLicence("OwhHid6Rqbr75Uw2H9ih0rm3KZnm8FESo18UalSAwnHOMRDFxY6zxDH7TwTO4zBaUJLv0SbSa8fPvY36jDxRdJ2UkLdxPIuLr7tkWhVibx5WzubxyaFeBaFvwbtBnE32");
+    }
+
+    public static void checkLicence(String var0) {
+        String var1 = var0.substring(0, 8);
+        String var2 = var0.substring(8, 16);
+        String var3 = var0.substring(16, 24);
+        String var4 = var0.substring(24, 32);
+        String var5 = caesarCipher(var1, 15) + "";
+        String var6 = caesarCipher(var2, 7) + "";
+        String var7 = caesarCipher(var3, 23) + "";
+        String var8 = caesarCipher(var4, 11) + "";
+        System.out.println(var5);
+        System.out.println(var6);
+        System.out.println(var7);
+        System.out.println(var8);
+    }
+
+    public static StringBuffer caesarCipher(String var0, int var1) {
+        StringBuffer var2 = new StringBuffer();
+
+        for (int var3 = 0; var3 < var0.length(); var3++) {
+            if (!Character.isDigit(var0.charAt(var3))) {
+                if (!Character.isUpperCase(var0.charAt(var3))) {
+                    char var4 = (char)((var0.charAt(var3) + var1 - 97) % 26 + 97);
+                    var2.append(var4);
+                } else {
+                    char var5 = (char)((var0.charAt(var3) + var1 - 65) % 26 + 65);
+                    var2.append(var5);
+                }
+            } else {
+                char var6 = var0.charAt(var3);
+                var2.append(var6);
+            }
+        }
+
+        return var2;
+    }
+}

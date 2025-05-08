@@ -16,7 +16,7 @@ public class PopUnUsedLocalVariablesTransformer extends Transformer {
 
   @Override
   protected void transform() throws Exception {
-    scopedClasses().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
+    scopedClasses().parallelStream().forEach(classWrapper -> classWrapper.methods().parallelStream().forEach(methodNode -> {
       MethodContext methodContext = MethodContext.of(classWrapper, methodNode);
 
       Set<VarInsnNode> varStoresInUse = new HashSet<>();

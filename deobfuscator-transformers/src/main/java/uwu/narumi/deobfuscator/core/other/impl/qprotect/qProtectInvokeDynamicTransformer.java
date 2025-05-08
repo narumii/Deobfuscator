@@ -160,7 +160,13 @@ public class qProtectInvokeDynamicTransformer extends Transformer {
       }
     }
 
-    return new MethodInsnNode(opcode, opcode == INVOKESPECIAL ? specialClass : ownerClass, methodName, methodDesc, opcode == INVOKEINTERFACE);
+    return new MethodInsnNode(
+        opcode,
+        opcode == INVOKESPECIAL ? specialClass : ownerClass,
+        methodName,
+        methodDesc,
+        opcode == INVOKEINTERFACE
+    );
   }
 
   /**

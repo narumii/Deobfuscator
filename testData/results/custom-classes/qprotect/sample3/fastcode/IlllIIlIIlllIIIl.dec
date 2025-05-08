@@ -1,0 +1,419 @@
+package fastcode;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+
+public class IlllIIlIIlllIIIl {
+    private static final String[] IlIIlIlIIIIIlll = new String[]{
+        "EáÞ\u0018¸", "ßÖA", "Õ", "%Qj\u0002", "\u009fS\u0085NÓúØ", "÷Ö\u0006\u0095ù", "ÚÈb\u001cÛ9", "$wòÊ=j", "ý»\u0001\u0018\u009a", "\u0090¦]í®*"
+    };
+    public IIIlllIIIIllIl userManager;
+    public IIIIlIIIIIIl plugin = IIIIlIIIIIIl.getPlugin();
+    private static final String[] IIllIIIlIlIIlII = new String[10];
+    private File database;
+
+    public File getDatabase() {
+        return this.database;
+    }
+
+    public IlllIIlIIlllIIIl() {
+        this.userManager = this.plugin.getUserManager();
+        this.database = new File(this.plugin.getDataFolder(), IIIllIIIlIIIIIl(-2044252752, 906984765));
+    }
+
+    public void loadUser(IllIlIIIllIIll var1, File var2) {
+        try {
+            YamlConfiguration var3 = YamlConfiguration.loadConfiguration(var2);
+            ArrayList var4 = new ArrayList();
+            if (var3.contains(IIIllIIIlIIIIIl(498347452, -1569708320) + IIIllIIIlIIIIIl(-472699458, -412626163))) {
+                Objects.requireNonNull(
+                        var3.getList(
+                            IIIllIIIlIIIIIl(-260821569, 1878136150) + IIIllIIIlIIIIIl(525217201, -1963008494) + IIIllIIIlIIIIIl(-924701254, -1452694356)
+                        )
+                    )
+                    .forEach(var1x -> {
+                        if (var1x instanceof ItemStack) {
+                            var4.add((ItemStack)var1x);
+                        }
+                    });
+            }
+
+            var1.setSakiewkaItems(var4);
+        } catch (Exception var5) {
+            Bukkit.getLogger().severe("Failed to load user data from file: " + var2.getName());
+            var5.printStackTrace();
+        }
+    }
+
+    public IllIlIIIllIIll loadUser(String var1) {
+        File var2 = this.getFile(var1);
+        if (!var2.exists()) {
+            return new IllIlIIIllIIll(var1);
+        } else {
+            try {
+                YamlConfiguration var3 = YamlConfiguration.loadConfiguration(var2);
+                IllIlIIIllIIll var4 = new IllIlIIIllIIll(var3.getString(IIIllIIIlIIIIIl(-466014789, -1870939692)));
+                ArrayList var5 = new ArrayList();
+                if (var3.contains(IIIllIIIlIIIIIl(-616747585, 821106006) + IIIllIIIlIIIIIl(-681955919, -1796547054) + IIIllIIIlIIIIIl(1487220154, -1766480724))
+                    )
+                 {
+                    Objects.requireNonNull(
+                            var3.getList(
+                                IIIllIIIlIIIIIl(-1446695489, -1084877482) + IIIllIIIlIIIIIl(493628849, -115483118) + IIIllIIIlIIIIIl(135540154, -998923092)
+                            )
+                        )
+                        .forEach(var1x -> {
+                            if (var1x instanceof ItemStack) {
+                                var5.add((ItemStack)var1x);
+                            }
+                        });
+                }
+
+                var4.setSakiewkaItems(var5);
+                return var4;
+            } catch (Exception var6) {
+                Bukkit.getLogger().severe("Failed to load user data for UUID: " + var1);
+                var6.printStackTrace();
+                return new IllIlIIIllIIll(var1);
+            }
+        }
+    }
+
+    public void saveUser(IllIlIIIllIIll var1) {
+        File var2 = this.getFile(var1.getName());
+        YamlConfiguration var3 = new YamlConfiguration();
+
+        try {
+            var3.set(IIIllIIIlIIIIIl(224341435, 1776794068), var1.getName());
+            List var4 = var1.getSakiewkaItems();
+            var3.set(IIIllIIIlIIIIIl(1792421304, 826715748) + IIIllIIIlIIIIIl(-24891971, 315653954) + IIIllIIIlIIIIIl(378023353, 747270512), var4);
+            var3.save(var2);
+        } catch (IOException var5) {
+            Bukkit.getLogger().severe("Failed to save user data to file: " + var2.getName());
+            var5.printStackTrace();
+        }
+    }
+
+    private static String IIIllIIIlIIIIIl(int var0, int var1) {
+        int var12 = (var0 | 11704) & ~(var0 & 11704);
+        int var2 = (~var12 | 65535) - ~var12;
+        if (IIllIIIlIlIIlII[var2] == null) {
+            char[] var3 = IlIIlIlIIIIIlll[var2].toCharArray();
+            int var14 = var3[0];
+
+            int var4 = switch ((~var14 | 0xFF) - ~var14) {
+                case 0 -> 55;
+                case 1 -> 95;
+                case 2 -> 0;
+                case 3 -> 21;
+                case 4 -> 105;
+                case 5 -> 38;
+                case 6 -> 116;
+                case 7 -> 80;
+                case 8 -> 19;
+                case 9 -> 65;
+                case 10 -> 2;
+                case 11 -> 123;
+                case 12 -> 161;
+                case 13 -> 163;
+                case 14 -> 233;
+                case 15 -> 50;
+                case 16 -> 10;
+                case 17 -> 243;
+                case 18 -> 177;
+                case 19 -> 127;
+                case 20 -> 199;
+                case 21 -> 62;
+                case 22 -> 81;
+                case 23 -> 58;
+                case 24 -> 162;
+                case 25 -> 120;
+                case 26 -> 229;
+                case 27 -> 74;
+                case 28 -> 11;
+                case 29 -> 159;
+                case 30 -> 119;
+                case 31 -> 66;
+                case 32 -> 225;
+                case 33 -> 190;
+                case 34 -> 167;
+                case 35 -> 18;
+                case 36 -> 255;
+                case 37 -> 137;
+                case 38 -> 215;
+                case 39 -> 201;
+                case 40 -> 131;
+                case 41 -> 37;
+                case 42 -> 22;
+                case 43 -> 91;
+                case 44 -> 178;
+                case 45 -> 113;
+                case 46 -> 157;
+                case 47 -> 246;
+                case 48 -> 25;
+                case 49 -> 180;
+                case 50 -> 170;
+                case 51 -> 14;
+                case 52 -> 138;
+                case 53 -> 17;
+                case 54 -> 212;
+                case 55 -> 72;
+                case 56 -> 9;
+                case 57 -> 88;
+                case 58 -> 149;
+                case 59 -> 124;
+                case 60 -> 168;
+                case 61 -> 226;
+                case 62 -> 107;
+                case 63 -> 64;
+                case 64 -> 188;
+                case 65 -> 184;
+                case 66 -> 34;
+                case 67 -> 213;
+                case 68 -> 63;
+                case 69 -> 46;
+                case 70 -> 223;
+                case 71 -> 92;
+                case 72 -> 133;
+                case 73 -> 164;
+                case 74 -> 98;
+                case 75 -> 208;
+                case 76 -> 197;
+                case 77 -> 28;
+                case 78 -> 7;
+                case 79 -> 13;
+                case 80 -> 155;
+                case 81 -> 148;
+                case 82 -> 117;
+                case 83 -> 15;
+                case 84 -> 114;
+                case 85 -> 247;
+                case 86 -> 236;
+                case 87 -> 205;
+                case 88 -> 32;
+                case 89 -> 41;
+                case 90 -> 76;
+                case 91 -> 189;
+                case 92 -> 141;
+                case 93 -> 69;
+                case 94 -> 192;
+                case 95 -> 135;
+                case 96 -> 89;
+                case 97 -> 40;
+                case 98 -> 51;
+                case 99 -> 47;
+                case 100 -> 110;
+                case 101 -> 118;
+                case 102 -> 57;
+                case 103 -> 239;
+                case 104 -> 253;
+                case 105 -> 54;
+                case 106 -> 206;
+                case 107 -> 60;
+                case 108 -> 165;
+                case 109 -> 102;
+                case 110 -> 125;
+                case 111 -> 130;
+                case 112 -> 166;
+                case 113 -> 12;
+                case 114 -> 36;
+                case 115 -> 222;
+                case 116 -> 26;
+                case 117 -> 142;
+                case 118 -> 45;
+                case 119 -> 129;
+                case 120 -> 78;
+                case 121 -> 156;
+                case 122 -> 132;
+                case 123 -> 195;
+                case 124 -> 220;
+                case 125 -> 71;
+                case 126 -> 238;
+                case 127 -> 49;
+                case 128 -> 202;
+                case 129 -> 151;
+                case 130 -> 126;
+                case 131 -> 230;
+                case 132 -> 173;
+                case 133 -> 53;
+                case 134 -> 245;
+                case 135 -> 5;
+                case 136 -> 150;
+                case 137 -> 187;
+                case 138 -> 8;
+                case 139 -> 61;
+                case 140 -> 193;
+                case 141 -> 68;
+                case 142 -> 99;
+                case 143 -> 175;
+                case 144 -> 23;
+                case 145 -> 196;
+                case 146 -> 30;
+                case 147 -> 85;
+                case 148 -> 4;
+                case 149 -> 101;
+                case 150 -> 44;
+                case 151 -> 139;
+                case 152 -> 70;
+                case 153 -> 83;
+                case 154 -> 209;
+                case 155 -> 174;
+                case 156 -> 87;
+                case 157 -> 75;
+                case 158 -> 29;
+                case 159 -> 244;
+                case 160 -> 154;
+                case 161 -> 94;
+                case 162 -> 147;
+                case 163 -> 171;
+                case 164 -> 112;
+                case 165 -> 59;
+                case 166 -> 35;
+                case 167 -> 79;
+                case 168 -> 204;
+                case 169 -> 97;
+                case 170 -> 146;
+                case 171 -> 108;
+                case 172 -> 1;
+                case 173 -> 104;
+                case 174 -> 176;
+                case 175 -> 73;
+                case 176 -> 198;
+                case 177 -> 90;
+                case 178 -> 158;
+                case 179 -> 221;
+                case 180 -> 152;
+                case 181 -> 103;
+                case 182 -> 100;
+                case 183 -> 248;
+                case 184 -> 143;
+                case 185 -> 240;
+                case 186 -> 31;
+                case 187 -> 43;
+                case 188 -> 252;
+                case 189 -> 234;
+                case 190 -> 235;
+                case 191 -> 249;
+                case 192 -> 144;
+                case 193 -> 254;
+                case 194 -> 153;
+                case 195 -> 140;
+                case 196 -> 207;
+                case 197 -> 217;
+                case 198 -> 3;
+                case 199 -> 160;
+                case 200 -> 224;
+                case 201 -> 109;
+                case 202 -> 121;
+                case 203 -> 203;
+                case 204 -> 172;
+                case 205 -> 93;
+                case 206 -> 186;
+                case 207 -> 231;
+                case 208 -> 218;
+                case 209 -> 52;
+                case 210 -> 77;
+                case 211 -> 219;
+                case 212 -> 48;
+                case 213 -> 6;
+                case 214 -> 122;
+                case 215 -> 20;
+                case 216 -> 191;
+                case 217 -> 16;
+                case 218 -> 82;
+                case 219 -> 136;
+                case 220 -> 242;
+                case 221 -> 39;
+                case 222 -> 96;
+                case 223 -> 182;
+                case 224 -> 169;
+                case 225 -> 67;
+                case 226 -> 33;
+                case 227 -> 145;
+                case 228 -> 241;
+                case 229 -> 250;
+                case 230 -> 24;
+                case 231 -> 183;
+                case 232 -> 115;
+                case 233 -> 128;
+                case 234 -> 27;
+                case 235 -> 251;
+                case 236 -> 228;
+                case 237 -> 84;
+                case 238 -> 179;
+                case 239 -> 237;
+                case 240 -> 214;
+                case 241 -> 56;
+                case 242 -> 86;
+                case 243 -> 42;
+                case 244 -> 227;
+                case 245 -> 185;
+                case 246 -> 106;
+                case 247 -> 194;
+                case 248 -> 200;
+                case 249 -> 210;
+                case 250 -> 216;
+                case 251 -> 111;
+                case 252 -> 232;
+                case 253 -> 181;
+                case 254 -> 134;
+                default -> 29907 - 29696;
+            };
+            short var15 = (short)var1;
+            var14 = (~var15 | 0xFF) - ~var15;
+            int var5 = var14 + ~var4 + 1;
+            if (var5 < 0) {
+                var5 += 256;
+            }
+
+            int var17 = (short)var1;
+            var17 = (~var17 | 65535) - ~var17 >>> 8;
+            int var6 = (var17 ^ var4) - 2 * (~var17 & var4);
+            if (var6 < 0) {
+                var6 += 256;
+            }
+
+            for (int var7 = 0; var7 < var3.length; var7++) {
+                int var8 = var7 % 2;
+                char var10002 = var3[var7];
+                if (var8 == 0) {
+                    int var19 = var10002;
+                    var3[var7] = (char)((var19 | var5) & ~(var19 & var5));
+                    int var30 = var5 >>> 3;
+                    int var13 = var5 << 5;
+                    var19 = var30;
+                    var30 = (var19 & ~var13) + var13;
+                    char var27 = var3[var7];
+                    var19 = var30;
+                    var19 = var19 & ~var27 | ~var19 & var27;
+                    var5 = (~var19 | 0xFF) - ~var19;
+                } else {
+                    int var23 = var10002;
+                    var3[var7] = (char)((var23 | var6) - (var23 & var6));
+                    int var32 = var6 >>> 3;
+                    int var28 = var6 << 5;
+                    var23 = var32;
+                    var32 = (var23 & ~var28) + var28;
+                    char var29 = var3[var7];
+                    var23 = var32;
+                    var23 = (var23 | var29) - (var23 & var29);
+                    var6 = (~var23 | 0xFF) - ~var23;
+                }
+            }
+
+            IIllIIIlIlIIlII[var2] = new String(var3).intern();
+        }
+
+        return IIllIIIlIlIIlII[var2];
+    }
+
+    private File getFile(String var1) {
+        return new File(this.database, var1 + ".yml");
+    }
+}
