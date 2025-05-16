@@ -6,8 +6,7 @@ public class MethodDebugInfoCleanTransformer extends ComposedTransformer {
   public MethodDebugInfoCleanTransformer() {
     super(
         LocalVariableNamesCleanTransformer::new,
-        ParametersInfoCleanTransformer::new,
-        ThrowsExceptionCleanTransformer::new
+        ParametersInfoCleanTransformer::new
     );
   }
 }
