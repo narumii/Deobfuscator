@@ -13,7 +13,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import uwu.narumi.deobfuscator.api.classpath.ClassStorage;
+import uwu.narumi.deobfuscator.api.classpath.ClassInfoStorage;
 import uwu.narumi.deobfuscator.api.classpath.CombinedClassProvider;
 import uwu.narumi.deobfuscator.api.context.Context;
 import uwu.narumi.deobfuscator.api.context.DeobfuscatorOptions;
@@ -48,16 +48,16 @@ public class Deobfuscator {
     }
 
     // Those classes will be loaded by Deobfuscator#loadInput
-    ClassStorage compiledClasses = new ClassStorage();
+    ClassInfoStorage compiledClasses = new ClassInfoStorage();
 
-    ClassStorage libraries = buildLibraries();
+    ClassInfoStorage libraries = buildLibraries();
     LOGGER.info("Loaded {} classes from libraries", libraries.compiledClasses().size());
 
     this.context = new Context(options, compiledClasses, libraries);
   }
 
-  public ClassStorage buildLibraries() {
-    ClassStorage classStorage = new ClassStorage();
+  public ClassInfoStorage buildLibraries() {
+    ClassInfoStorage classStorage = new ClassInfoStorage();
     // Add libraries
     options.libraries().forEach(classStorage::addJar);
 
@@ -94,6 +94,8 @@ public class Deobfuscator {
         LOGGER.error("Could not load external file: {}", externalFile.pathInJar(), e);
       }
     }
+
+    LOGGER.info("Loaded {} classes", this.context.getClassesMap().size());
   }
 
   private void loadClassOrFile(String pathInJar, byte[] bytes) {
@@ -185,9 +187,7 @@ public class Deobfuscator {
    * @param saver a consumer that accepts a path and data to save
    */
   private void save(BiConsumer<String, byte[]> saver) {
-    InheritanceGraph inheritanceGraph = new InheritanceGraph(
-        new CombinedClassProvider(this.context, this.context.getLibraries())
-    );
+    InheritanceGraph inheritanceGraph = new InheritanceGraph(this.context);
 
     // Save classes
     context.getClassesMap().forEach((ignored, classWrapper) -> {

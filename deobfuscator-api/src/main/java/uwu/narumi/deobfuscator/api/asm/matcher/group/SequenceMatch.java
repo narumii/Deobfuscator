@@ -18,11 +18,9 @@ import java.util.List;
 public class SequenceMatch extends Match {
 
   private static final Match FRAME_MATCH = Match.of(context -> context.insn() instanceof FrameNode);
-  private static final Match LABEL_MATCH = Match.of(context -> context.insn() instanceof LabelNode);
-  private static final Match LINE_MATCH = Match.of(context -> context.insn() instanceof LineNumberNode);
 
   private final Match[] matches;
-  private final List<Match> skipMatches = new ArrayList<>(List.of(FRAME_MATCH, LABEL_MATCH, LINE_MATCH));
+  private final List<Match> skipMatches = new ArrayList<>(List.of(FRAME_MATCH));
 
   private SequenceMatch(Match[] matches) {
     this.matches = matches;
@@ -42,23 +40,6 @@ public class SequenceMatch extends Match {
 
   public SequenceMatch doNotSkipFrames() {
     this.skipMatches.remove(FRAME_MATCH);
-    return this;
-  }
-
-  public SequenceMatch doNotSkipLabels() {
-    this.skipMatches.remove(LABEL_MATCH);
-    return this;
-  }
-
-  public SequenceMatch doNotSkipLineNumbers() {
-    this.skipMatches.remove(LINE_MATCH);
-    return this;
-  }
-
-  public SequenceMatch doNotSkip() {
-    doNotSkipLabels();
-    doNotSkipLabels();
-    doNotSkipFrames();
     return this;
   }
 

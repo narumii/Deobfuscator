@@ -1,12 +1,13 @@
 package uwu.narumi.deobfuscator.api.asm;
 
-import org.objectweb.asm.Opcodes;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
+
+import java.util.Set;
 
 /**
  * Instruction context. Holds all information relevant to the current instruction.
@@ -24,11 +25,13 @@ public class InsnContext {
     return new InsnContext(insn, this.methodContext);
   }
 
+  @Nullable
   public Frame<OriginalSourceValue> frame() {
-    if (this.methodContext.frames() == null) {
-      throw new IllegalStateException("Got frameless method context");
-    }
     return this.methodContext.frames().get(this.insn);
+  }
+
+  public Set<AbstractInsnNode> consumers() {
+    return this.methodContext.getConsumersMap().get(this.insn);
   }
 
   public MethodNode methodNode() {
@@ -49,13 +52,16 @@ public class InsnContext {
     return methodContext;
   }
 
+  public int getConsumedStackValuesCount() {
+    return this.insn.getConsumedStackValuesCount(this.frame());
+  }
+
   /**
-   * Pops current instruction's stack values by adding POP instructions before this instruction
-   *
-   * @param count Stack values count to pop
+   * Places POPs instructions before current instruction to remove source values from the stack.
+   * This method automatically calculates how many stack values to pop.
    */
-  public void pop(int count) {
-    for (int i = 0; i < count; i++) {
+  public void placePops() {
+    for (int i = 0; i < this.getConsumedStackValuesCount(); i++) {
       int stackValueIdx = frame().getStackSize() - (i + 1);
       OriginalSourceValue sourceValue = frame().getStack(stackValueIdx);
 

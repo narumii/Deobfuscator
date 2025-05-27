@@ -1,0 +1,583 @@
+package org.json;
+
+import java.io.Reader;
+import java.io.StringReader;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import org.json.XML.1;
+
+public class XML {
+    public static final Character AMP = '&';
+    public static final Character APOS = '\'';
+    public static final Character BANG = '!';
+    public static final Character EQ = '=';
+    public static final Character GT = '>';
+    public static final Character LT = '<';
+    public static final Character QUEST = '?';
+    public static final Character QUOT = '"';
+    public static final Character SLASH = '/';
+    public static final String NULL_ATTR = "xsi:nil";
+    public static final String TYPE_ATTR = "xsi:type";
+    public static final int IIlllllIIIllllIl;
+
+    public XML() {
+        org.json.ParserConfiguration.IIlIIIIlIIII();
+    }
+
+    private static Iterable<Integer> codePointIterator(String var0) {
+        return new 1(var0);
+    }
+
+    public static String escape(String var0) {
+        StringBuilder var1 = new StringBuilder(var0.length());
+
+        for (int var3 : codePointIterator(var0)) {
+            switch (var3) {
+                case 34:
+                    var1.append("&quot;");
+                    break;
+                case 38:
+                    var1.append("&amp;");
+                    break;
+                case 39:
+                    var1.append("&apos;");
+                    break;
+                case 60:
+                    var1.append("&lt;");
+                    break;
+                case 62:
+                    var1.append("&gt;");
+                    break;
+                default:
+                    if (mustEscape(var3)) {
+                        var1.append("&#x");
+                        var1.append(Integer.toHexString(var3));
+                        var1.append(';');
+                    } else {
+                        var1.appendCodePoint(var3);
+                    }
+            }
+        }
+
+        return var1.toString();
+    }
+
+    private static boolean mustEscape(int var0) {
+        return Character.isISOControl(var0) && var0 != 9 && var0 != 10 && var0 != 13
+            || (var0 < 32 || var0 > 55295) && (var0 < 57344 || var0 > 65533) && (var0 < 65536 || var0 > 1114111);
+    }
+
+    public static String unescape(String var0) {
+        StringBuilder var1 = new StringBuilder(var0.length());
+        int var2 = 0;
+
+        for (int var3 = var0.length(); var2 < var3; var2++) {
+            char var4 = var0.charAt(var2);
+            if (var4 == '&') {
+                int var5 = var0.indexOf(59, var2);
+                if (var5 > var2) {
+                    String var6 = var0.substring(var2 + 1, var5);
+                    var1.append(XMLTokener.unescapeEntity(var6));
+                    var2 += var6.length() + 1;
+                } else {
+                    var1.append(var4);
+                }
+            } else {
+                var1.append(var4);
+            }
+        }
+
+        return var1.toString();
+    }
+
+    public static void noSpace(String var0) {
+        int var2 = var0.length();
+        if (var2 == 0) {
+            throw new JSONException("Empty string.");
+        } else {
+            for (int var1 = 0; var1 < var2; var1++) {
+                if (Character.isWhitespace(var0.charAt(var1))) {
+                    throw new JSONException("'" + var0 + "' contains a space character.");
+                }
+            }
+        }
+    }
+
+    private static boolean parse(XMLTokener var0, JSONObject var1, String var2, XMLParserConfiguration var3, int var4) {
+        Object var10 = var0.nextToken();
+        if (var10 == BANG) {
+            char var5 = var0.next();
+            if (var5 == '-') {
+                if (var0.next() == '-') {
+                    var0.skipPast("-->");
+                    return false;
+                }
+
+                var0.back();
+            } else if (var5 == '[') {
+                var10 = var0.nextToken();
+                if ("CDATA".equals(var10) && var0.next() == '[') {
+                    String var14 = var0.nextCDATA();
+                    if (var14.length() > 0) {
+                        var1.accumulate(var3.getcDataTagName(), var14);
+                    }
+
+                    return false;
+                }
+
+                throw var0.syntaxError("Expected 'CDATA['");
+            }
+
+            int var6 = 1;
+
+            do {
+                var10 = var0.nextMeta();
+                if (var10 == null) {
+                    throw var0.syntaxError("Missing '>' after '<!'.");
+                }
+
+                if (var10 == LT) {
+                    var6++;
+                } else if (var10 == GT) {
+                    var6--;
+                }
+            } while (var6 > 0);
+
+            return false;
+        } else if (var10 == QUEST) {
+            var0.skipPast("?>");
+            return false;
+        } else if (var10 == SLASH) {
+            var10 = var0.nextToken();
+            if (var2 == null) {
+                throw var0.syntaxError("Mismatched close tag " + var10);
+            } else if (!var10.equals(var2)) {
+                throw var0.syntaxError("Mismatched " + var2 + " and " + var10);
+            } else if (var0.nextToken() != GT) {
+                throw var0.syntaxError("Misshaped close tag");
+            } else {
+                return true;
+            }
+        } else if (var10 instanceof Character) {
+            throw var0.syntaxError("Misshaped tag");
+        } else {
+            String var9 = (String)var10;
+            var10 = null;
+            JSONObject var7 = new JSONObject();
+            boolean var12 = false;
+            XMLXsiTypeConverter var11 = null;
+
+            while (true) {
+                if (var10 == null) {
+                    var10 = var0.nextToken();
+                }
+
+                if (!(var10 instanceof String)) {
+                    if (var10 == SLASH) {
+                        if (var0.nextToken() != GT) {
+                            throw var0.syntaxError("Misshaped tag");
+                        }
+
+                        if (var3.getForceList().contains(var9)) {
+                            if (var12) {
+                                var1.append(var9, JSONObject.NULL);
+                            } else if (var7.length() > 0) {
+                                var1.append(var9, var7);
+                            } else {
+                                var1.put(var9, new JSONArray());
+                            }
+                        } else if (var12) {
+                            var1.accumulate(var9, JSONObject.NULL);
+                        } else if (var7.length() > 0) {
+                            var1.accumulate(var9, var7);
+                        } else {
+                            var1.accumulate(var9, "");
+                        }
+
+                        return false;
+                    }
+
+                    if (var10 != GT) {
+                        throw var0.syntaxError("Misshaped tag");
+                    }
+
+                    while (true) {
+                        var10 = var0.nextContent();
+                        if (var10 == null) {
+                            if (var9 != null) {
+                                throw var0.syntaxError("Unclosed tag " + var9);
+                            }
+
+                            return false;
+                        }
+
+                        if (var10 instanceof String) {
+                            String var13 = (String)var10;
+                            if (var13.length() > 0) {
+                                if (var11 != null) {
+                                    var7.accumulate(var3.getcDataTagName(), stringToValue(var13, var11));
+                                } else {
+                                    var7.accumulate(var3.getcDataTagName(), var3.isKeepStrings() ? var13 : stringToValue(var13));
+                                }
+                            }
+                        } else if (var10 == LT) {
+                            if (var4 == var3.getMaxNestingDepth()) {
+                                throw var0.syntaxError("Maximum nesting depth of " + var3.getMaxNestingDepth() + " reached");
+                            }
+
+                            if (parse(var0, var7, var9, var3, var4 + 1)) {
+                                if (var3.getForceList().contains(var9)) {
+                                    if (var7.length() == 0) {
+                                        var1.put(var9, new JSONArray());
+                                    } else if (var7.length() == 1 && var7.opt(var3.getcDataTagName()) != null) {
+                                        var1.append(var9, var7.opt(var3.getcDataTagName()));
+                                    } else {
+                                        var1.append(var9, var7);
+                                    }
+                                } else if (var7.length() == 0) {
+                                    var1.accumulate(var9, "");
+                                } else if (var7.length() == 1 && var7.opt(var3.getcDataTagName()) != null) {
+                                    var1.accumulate(var9, var7.opt(var3.getcDataTagName()));
+                                } else {
+                                    if (!var3.shouldTrimWhiteSpace()) {
+                                        removeEmpty(var7, var3);
+                                    }
+
+                                    var1.accumulate(var9, var7);
+                                }
+
+                                return false;
+                            }
+                        }
+                    }
+                }
+
+                String var8 = (String)var10;
+                var10 = var0.nextToken();
+                if (var10 == EQ) {
+                    var10 = var0.nextToken();
+                    if (!(var10 instanceof String)) {
+                        throw (Throwable)var0.syntaxError("Missing value");
+                    }
+
+                    if (var3.isConvertNilAttributeToNull() && "xsi:nil".equals(var8) && Boolean.parseBoolean((String)var10)) {
+                        var12 = true;
+                    } else if (var3.getXsiTypeMap() != null && !var3.getXsiTypeMap().isEmpty() && "xsi:type".equals(var8)) {
+                        var11 = (XMLXsiTypeConverter)var3.getXsiTypeMap().get(var10);
+                    } else if (!var12) {
+                        var7.accumulate(var8, var3.isKeepStrings() ? (String)var10 : stringToValue((String)var10));
+                    }
+
+                    var10 = null;
+                } else {
+                    var7.accumulate(var8, "");
+                }
+            }
+        }
+    }
+
+    private static void removeEmpty(JSONObject var0, XMLParserConfiguration var1) {
+        if (var0.has(var1.getcDataTagName())) {
+            Object var2 = var0.get(var1.getcDataTagName());
+            if (var2 instanceof String) {
+                if (isStringAllWhiteSpace(var2.toString())) {
+                    var0.remove(var1.getcDataTagName());
+                }
+            } else if (var2 instanceof JSONArray) {
+                JSONArray var3 = (JSONArray)var2;
+
+                for (int var4 = var3.length() - 1; var4 >= 0; var4--) {
+                    Object var5 = var3.get(var4);
+                    if (var5 instanceof String) {
+                        String var6 = (String)var5;
+                        if (isStringAllWhiteSpace(var6)) {
+                            var3.remove(var4);
+                        }
+                    }
+                }
+
+                if (var3.isEmpty()) {
+                    var0.remove(var1.getcDataTagName());
+                }
+            }
+        }
+    }
+
+    private static boolean isStringAllWhiteSpace(String var0) {
+        for (int var1 = 0; var1 < var0.length(); var1++) {
+            char var2 = var0.charAt(var1);
+            if (!Character.isWhitespace(var2)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static Number stringToNumber(String var0) throws NumberFormatException {
+        char var1 = var0.charAt(0);
+        if ((var1 < '0' || var1 > '9') && var1 != '-') {
+            throw new NumberFormatException("val [" + var0 + "] is not a valid number.");
+        } else if (isDecimalNotation(var0)) {
+            try {
+                BigDecimal var8 = new BigDecimal(var0);
+                return (Number)(var1 == '-' && BigDecimal.ZERO.compareTo(var8) == 0 ? -0.0 : var8);
+            } catch (NumberFormatException var5) {
+                try {
+                    Double var9 = Double.valueOf(var0);
+                    if (!var9.isNaN() && !var9.isInfinite()) {
+                        return var9;
+                    } else {
+                        throw new NumberFormatException("val [" + var0 + "] is not a valid number.");
+                    }
+                } catch (NumberFormatException var4) {
+                    throw (Throwable)(new NumberFormatException("val [" + var0 + "] is not a valid number."));
+                }
+            }
+        } else {
+            if (var1 == '0' && var0.length() > 1) {
+                char var6 = var0.charAt(1);
+                if (var6 >= '0' && var6 <= '9') {
+                    throw new NumberFormatException("val [" + var0 + "] is not a valid number.");
+                }
+            } else if (var1 == '-' && var0.length() > 2) {
+                char var2 = var0.charAt(1);
+                char var3 = var0.charAt(2);
+                if (var2 == '0' && var3 >= '0' && var3 <= '9') {
+                    throw new NumberFormatException("val [" + var0 + "] is not a valid number.");
+                }
+            }
+
+            BigInteger var7 = new BigInteger(var0);
+            if (var7.bitLength() <= 31) {
+                return var7.intValue();
+            } else {
+                return (Number)(var7.bitLength() <= 63 ? var7.longValue() : var7);
+            }
+        }
+    }
+
+    private static boolean isDecimalNotation(String var0) {
+        return var0.indexOf(46) > -1 || var0.indexOf(101) > -1 || var0.indexOf(69) > -1 || "-0".equals(var0);
+    }
+
+    public static Object stringToValue(String var0, XMLXsiTypeConverter<?> var1) {
+        return var1 != null ? var1.convert(var0) : stringToValue(var0);
+    }
+
+    public static Object stringToValue(String var0) {
+        if ("".equals(var0)) {
+            return var0;
+        } else if ("true".equalsIgnoreCase(var0)) {
+            return Boolean.TRUE;
+        } else if ("false".equalsIgnoreCase(var0)) {
+            return Boolean.FALSE;
+        } else if ("null".equalsIgnoreCase(var0)) {
+            return JSONObject.NULL;
+        } else {
+            char var1 = var0.charAt(0);
+            if (var1 >= '0' && var1 <= '9' || var1 == '-') {
+                try {
+                    return stringToNumber(var0);
+                } catch (Exception var2) {
+                }
+            }
+
+            return var0;
+        }
+    }
+
+    public static JSONObject toJSONObject(String var0) {
+        return toJSONObject(var0, XMLParserConfiguration.ORIGINAL);
+    }
+
+    public static JSONObject toJSONObject(Reader var0) {
+        return toJSONObject(var0, XMLParserConfiguration.ORIGINAL);
+    }
+
+    public static JSONObject toJSONObject(Reader var0, boolean var1) {
+        return var1 ? toJSONObject(var0, XMLParserConfiguration.KEEP_STRINGS) : toJSONObject(var0, XMLParserConfiguration.ORIGINAL);
+    }
+
+    public static JSONObject toJSONObject(Reader var0, XMLParserConfiguration var1) {
+        JSONObject var2 = new JSONObject();
+        XMLTokener var3 = new XMLTokener(var0, var1);
+
+        while (var3.more()) {
+            var3.skipPast("<");
+            if (var3.more()) {
+                parse(var3, var2, null, var1, 0);
+            }
+        }
+
+        return var2;
+    }
+
+    public static JSONObject toJSONObject(String var0, boolean var1) {
+        return toJSONObject(new StringReader(var0), var1);
+    }
+
+    public static JSONObject toJSONObject(String var0, XMLParserConfiguration var1) {
+        return toJSONObject(new StringReader(var0), var1);
+    }
+
+    public static String toString(Object var0) {
+        return toString(var0, null, XMLParserConfiguration.ORIGINAL);
+    }
+
+    public static String toString(Object var0, String var1) {
+        return toString(var0, var1, XMLParserConfiguration.ORIGINAL);
+    }
+
+    public static String toString(Object var0, String var1, XMLParserConfiguration var2) {
+        return toString(var0, var1, var2, 0, 0);
+    }
+
+    private static String toString(Object var0, String var1, XMLParserConfiguration var2, int var3, int var4) {
+        StringBuilder var5 = new StringBuilder();
+        if (var0 instanceof JSONObject) {
+            if (var1 != null) {
+                var5.append(indent(var4));
+                var5.append('<');
+                var5.append(var1);
+                var5.append('>');
+                if (var3 > 0) {
+                    var5.append("\n");
+                    var4 += var3;
+                }
+            }
+
+            JSONObject var7 = (JSONObject)var0;
+
+            for (String var19 : var7.keySet()) {
+                Object var20 = var7.opt(var19);
+                if (var20 == null) {
+                    var20 = "";
+                } else if (var20.getClass().isArray()) {
+                    var20 = new JSONArray(var20);
+                }
+
+                if (var19.equals(var2.getcDataTagName())) {
+                    if (var20 instanceof JSONArray) {
+                        JSONArray var16 = (JSONArray)var20;
+                        int var21 = var16.length();
+
+                        for (int var22 = 0; var22 < var21; var22++) {
+                            if (var22 > 0) {
+                                var5.append('\n');
+                            }
+
+                            Object var23 = var16.opt(var22);
+                            var5.append(escape(var23.toString()));
+                        }
+                    } else {
+                        var5.append(escape(var20.toString()));
+                    }
+                } else if (var20 instanceof JSONArray) {
+                    JSONArray var15 = (JSONArray)var20;
+                    int var12 = var15.length();
+
+                    for (int var13 = 0; var13 < var12; var13++) {
+                        Object var14 = var15.opt(var13);
+                        if (var14 instanceof JSONArray) {
+                            var5.append('<');
+                            var5.append(var19);
+                            var5.append('>');
+                            var5.append(toString(var14, null, var2, var3, var4));
+                            var5.append("</");
+                            var5.append(var19);
+                            var5.append('>');
+                        } else {
+                            var5.append(toString(var14, var19, var2, var3, var4));
+                        }
+                    }
+                } else if ("".equals(var20)) {
+                    if (var2.isCloseEmptyTag()) {
+                        var5.append(indent(var4));
+                        var5.append('<');
+                        var5.append(var19);
+                        var5.append(">");
+                        var5.append("</");
+                        var5.append(var19);
+                        var5.append(">");
+                        if (var3 > 0) {
+                            var5.append("\n");
+                        }
+                    } else {
+                        var5.append(indent(var4));
+                        var5.append('<');
+                        var5.append(var19);
+                        var5.append("/>");
+                        if (var3 > 0) {
+                            var5.append("\n");
+                        }
+                    }
+                } else {
+                    var5.append(toString(var20, var19, var2, var3, var4));
+                }
+            }
+
+            if (var1 != null) {
+                var5.append(indent(var4 - var3));
+                var5.append("</");
+                var5.append(var1);
+                var5.append('>');
+                if (var3 > 0) {
+                    var5.append("\n");
+                }
+            }
+
+            return var5.toString();
+        } else if (var0 == null || !(var0 instanceof JSONArray) && !var0.getClass().isArray()) {
+            String var8 = var0 == null ? "null" : escape(var0.toString());
+            String var17 = var3 > 0 ? "\n" : "";
+            if (var1 == null) {
+                return indent(var4) + "\"" + var8 + "\"" + var17;
+            } else {
+                return var8.length() == 0 ? indent(var4) + "<" + var1 + "/>" + var17 : indent(var4) + "<" + var1 + ">" + var8 + "</" + var1 + ">" + var17;
+            }
+        } else {
+            JSONArray var6;
+            if (var0.getClass().isArray()) {
+                var6 = new JSONArray(var0);
+            } else {
+                var6 = (JSONArray)var0;
+            }
+
+            int var9 = var6.length();
+
+            for (int var10 = 0; var10 < var9; var10++) {
+                Object var11 = var6.opt(var10);
+                var5.append(toString(var11, var1 == null ? "array" : var1, var2, var3, var4));
+            }
+
+            return var5.toString();
+        }
+    }
+
+    public static String toString(Object var0, int var1) {
+        return toString(var0, null, XMLParserConfiguration.ORIGINAL, var1);
+    }
+
+    public static String toString(Object var0, String var1, int var2) {
+        return toString(var0, var1, XMLParserConfiguration.ORIGINAL, var2);
+    }
+
+    public static String toString(Object var0, String var1, XMLParserConfiguration var2, int var3) {
+        return toString(var0, var1, var2, var3, 0);
+    }
+
+    private static final String indent(int var0) {
+        StringBuilder var1 = new StringBuilder();
+
+        for (int var2 = 0; var2 < var0; var2++) {
+            var1.append(' ');
+        }
+
+        return var1.toString();
+    }
+
+    static {
+        org.json.ParserConfiguration.IIlIIIIlIIII();
+    }
+}

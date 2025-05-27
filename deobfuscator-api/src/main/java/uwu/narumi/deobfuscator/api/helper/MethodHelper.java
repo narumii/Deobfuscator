@@ -5,7 +5,6 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.objectweb.asm.tree.analysis.Analyzer;
 import org.objectweb.asm.tree.analysis.BasicInterpreter;
 import org.objectweb.asm.tree.analysis.BasicValue;
-import org.objectweb.asm.tree.analysis.Value;
 import uwu.narumi.deobfuscator.api.asm.NamedOpcodes;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -25,8 +24,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class MethodHelper implements Opcodes {
   /**
@@ -44,9 +45,35 @@ public class MethodHelper implements Opcodes {
     Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = new HashMap<>();
     Frame<OriginalSourceValue>[] framesArray;
     try {
+      framesArray = new Analyzer<>(new OriginalSourceInterpreter()).analyze(classNode.name, methodNode);
+    } catch (AnalyzerException e) {
+      throw new RuntimeException("Error analyzing " + classNode.name + "#" + methodNode.name + methodNode.desc, e);
+    }
+    for (int i = 0; i < framesArray.length; i++) {
+      frames.put(methodNode.instructions.get(i), framesArray[i]);
+    }
+    return Collections.unmodifiableMap(frames);
+  }
+
+  /**
+   * Analyzes the stack frames of the method using {@link OriginalSourceInterpreter}
+   * and predicts jumps
+   *
+   * @param classNode The owner class
+   * @param methodNode Method
+   * @return A map which corresponds to: instruction -> its own stack frame
+   */
+  @NotNull
+  @Unmodifiable
+  public static Map<AbstractInsnNode, Frame<OriginalSourceValue>> analyzeSourcePredictJumps(
+      ClassNode classNode, MethodNode methodNode
+  ) {
+    Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = new HashMap<>();
+    Frame<OriginalSourceValue>[] framesArray;
+    try {
       framesArray = new JumpPredictingAnalyzer(new OriginalSourceInterpreter()).analyze(classNode.name, methodNode);
     } catch (AnalyzerException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Error analyzing " + classNode.name + "#" + methodNode.name + methodNode.desc, e);
     }
     for (int i = 0; i < framesArray.length; i++) {
       frames.put(methodNode.instructions.get(i), framesArray[i]);
@@ -71,12 +98,40 @@ public class MethodHelper implements Opcodes {
     try {
       framesArray = new Analyzer<>(new BasicInterpreter()).analyze(classNode.name, methodNode);
     } catch (AnalyzerException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Error analyzing " + classNode.name + "#" + methodNode.name + methodNode.desc, e);
     }
     for (int i = 0; i < framesArray.length; i++) {
       frames.put(methodNode.instructions.get(i), framesArray[i]);
     }
     return Collections.unmodifiableMap(frames);
+  }
+
+  /**
+   * Computes a map which corresponds to: source value producer -> consumers
+   *
+   * @param frames Frames of the method
+   * @return A map where keys are instructions that produce values and values are
+   *  *      sets of instructions that consume those produced values
+   */
+  public static Map<AbstractInsnNode, Set<AbstractInsnNode>> computeConsumersMap(Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames) {
+    Map<AbstractInsnNode, Set<AbstractInsnNode>> consumers = new HashMap<>();
+    for (var entry : frames.entrySet()) {
+      AbstractInsnNode consumer = entry.getKey();
+      Frame<OriginalSourceValue> frame = entry.getValue();
+      if (frame == null) continue;
+
+      // Loop through stack values and add consumer to them
+      for (int i = 0; i < consumer.getConsumedStackValuesCount(frame); i++) {
+        // Get the value from the stack (first consumed value is at the top)
+        OriginalSourceValue sourceValue = frame.getStack(frame.getStackSize() - (i + 1));
+
+        for (AbstractInsnNode producer : sourceValue.insns) {
+          // Add this consumer to the set of consumers for the producer instruction
+          consumers.computeIfAbsent(producer, k -> new HashSet<>()).add(consumer);
+        }
+      }
+    }
+    return consumers;
   }
 
   public static List<String> prettyInsnList(InsnList insnList) {

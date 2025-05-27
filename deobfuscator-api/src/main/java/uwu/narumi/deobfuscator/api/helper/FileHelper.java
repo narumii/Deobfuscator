@@ -6,7 +6,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.logging.log4j.LogManager;
@@ -19,20 +26,42 @@ public final class FileHelper {
   private FileHelper() {
   }
 
+  /**
+   * Load all files from a zip file asynchronously
+   *
+   * @param path     Path to the zip file
+   * @param consumer Consumer that accepts the file path and the file bytes. This method is called asynchronously
+   */
   public static void loadFilesFromZip(Path path, BiConsumer<String, byte[]> consumer) {
     try (JarFile zipFile = new JarFile(path.toFile())) {
-      zipFile.entries()
-          .asIterator()
-          .forEachRemaining(zipEntry -> {
-            if (zipEntry.isDirectory()) return;
+      ExecutorService executorService = Executors.newFixedThreadPool(5);
+      List<CompletableFuture<Void>> futures = new ArrayList<>();
 
-            try {
-              consumer.accept(zipEntry.getName(), zipFile.getInputStream(zipEntry).readAllBytes());
-            } catch (Exception e) {
-              LOGGER.error("Could not load ZipEntry: {}", zipEntry.getName());
-              LOGGER.debug("Error", e);
-            }
-          });
+      Iterator<JarEntry> it = zipFile.entries().asIterator();
+
+      while (it.hasNext()) {
+        JarEntry zipEntry = it.next();
+
+        String name = zipEntry.getName();
+        byte[] bytes = zipFile.getInputStream(zipEntry).readAllBytes();
+
+        // Skip directories
+        boolean isDirectory = zipEntry.isDirectory() && bytes.length == 0;
+        if (isDirectory) continue;
+
+        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+          try {
+            consumer.accept(name, bytes);
+          } catch (Exception e) {
+            LOGGER.error("Could not load ZipEntry: {}", zipEntry.getName(), e);
+          }
+        }, executorService);
+        futures.add(future);
+      }
+
+      // Wait for all futures to complete
+      CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+      executorService.shutdown();
     } catch (Exception e) {
       LOGGER.error("Could not load file: {}", path);
       throw new RuntimeException(e);

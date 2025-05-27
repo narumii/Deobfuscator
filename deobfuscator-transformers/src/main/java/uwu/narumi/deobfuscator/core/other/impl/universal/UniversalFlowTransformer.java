@@ -8,12 +8,12 @@ import uwu.narumi.deobfuscator.core.other.impl.universal.flow.CleanRedundantSwit
 public class UniversalFlowTransformer extends ComposedTransformer {
   public UniversalFlowTransformer() {
     super(
-        // Resolve all number operations in the first place
-        UniversalNumberTransformer::new,
-
         // Clean up redundant ifs and switches
         CleanRedundantJumpsTransformer::new,
         CleanRedundantSwitchesTransformer::new,
+
+        // Resolve all number operations
+        UniversalNumberTransformer::new,
 
         // Last thing will be to clean up all dead code that is unreachable
         DeadCodeCleanTransformer::new

@@ -13,7 +13,7 @@ import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.MethodMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.NumberMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
-import uwu.narumi.deobfuscator.api.asm.matcher.impl.StackMatch;
+import uwu.narumi.deobfuscator.api.asm.matcher.impl.FrameMatch;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.helper.MethodHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
@@ -59,11 +59,11 @@ public class ZelixParametersTransformer extends Transformer {
         return ((VarInsnNode) context.insn()).var == MethodHelper.getFirstParameterIdx(context.insnContext().methodNode());
       }));
 
-  private static final Match OBJECT_ARRAY_ACCESS = StackMatch.of(0, OpcodeMatch.of(CHECKCAST).capture("cast")
-      .and(StackMatch.of(0, OpcodeMatch.of(AALOAD)
-          .and(StackMatch.of(0, NumberMatch.numInteger().capture("index")
-              .and(StackMatch.of(0, OpcodeMatch.of(DUP)
-                  .and(StackMatch.ofOriginal(0, OBJECT_ARRAY_ALOAD.capture("load-array")))
+  private static final Match OBJECT_ARRAY_ACCESS = FrameMatch.stack(0, OpcodeMatch.of(CHECKCAST).capture("cast")
+      .and(FrameMatch.stack(0, OpcodeMatch.of(AALOAD)
+          .and(FrameMatch.stack(0, NumberMatch.numInteger().capture("index")
+              .and(FrameMatch.stack(0, OpcodeMatch.of(DUP)
+                  .and(FrameMatch.stackOriginal(0, OBJECT_ARRAY_ALOAD.capture("load-array")))
               ))
           ))
       ))
@@ -71,14 +71,14 @@ public class ZelixParametersTransformer extends Transformer {
 
   private static final Match OBJECT_ARRAY_VAR_USAGE = Match.of(ctx -> ctx.insn().isVarStore()).capture("var-store")
       .and(
-          StackMatch.of(0, MethodMatch.invokeVirtual().capture("to-primitive") // Converting to a primitive type
+          FrameMatch.stack(0, MethodMatch.invokeVirtual().capture("to-primitive") // Converting to a primitive type
               .and(OBJECT_ARRAY_ACCESS)
           ).or(OBJECT_ARRAY_ACCESS)
       );
 
   private static final Match OBJECT_ARRAY_POP = OpcodeMatch.of(POP)
       .and(
-          StackMatch.ofOriginal(0, OBJECT_ARRAY_ALOAD.capture("load-array"))
+          FrameMatch.stackOriginal(0, OBJECT_ARRAY_ALOAD.capture("load-array"))
       );
 
   @Override
@@ -86,7 +86,7 @@ public class ZelixParametersTransformer extends Transformer {
     scopedClasses().forEach(classWrapper -> classWrapper.methods().stream()
         .filter(methodNode -> methodNode.desc.startsWith("([Ljava/lang/Object;)"))
         .forEach(methodNode -> {
-          MethodContext methodContext = MethodContext.framed(classWrapper, methodNode);
+          MethodContext methodContext = MethodContext.of(classWrapper, methodNode);
 
           Map<Integer, Integer> newVarIndexes = new HashMap<>(); // old var index -> new var index
 

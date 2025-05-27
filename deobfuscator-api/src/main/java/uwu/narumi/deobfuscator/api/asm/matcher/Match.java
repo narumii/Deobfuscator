@@ -1,5 +1,7 @@
 package uwu.narumi.deobfuscator.api.asm.matcher;
 
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
@@ -29,17 +31,14 @@ public abstract class Match {
     return this.matchResult(insnContext) != null;
   }
 
-  public boolean matches(MethodContext methodContext) {
-    return !this.findAllMatches(methodContext).isEmpty();
-  }
-
   /**
-   * Matches the instrustion and merges if successful
+   * Matches the instruction and merges if successful
    *
    * @param insnContext         Instruction context
    * @param currentMatchContext Match context to merge into
    * @return If matches
    */
+  @ApiStatus.Internal
   public boolean matchAndMerge(InsnContext insnContext, MatchContext currentMatchContext) {
     MatchContext result = this.matchResult(insnContext);
     if (result != null) {
@@ -58,7 +57,7 @@ public abstract class Match {
     List<MatchContext> allMatches = new ArrayList<>();
 
     for (AbstractInsnNode insn : methodContext.methodNode().instructions) {
-      InsnContext insnContext = methodContext.newInsnContext(insn);
+      InsnContext insnContext = methodContext.at(insn);
       MatchContext match = this.matchResult(insnContext);
       if (match != null) {
         allMatches.add(match);
@@ -68,6 +67,7 @@ public abstract class Match {
     return allMatches;
   }
 
+  @Nullable
   public MatchContext findFirstMatch(MethodContext methodContext) {
     return this.findAllMatches(methodContext).stream().findFirst().orElse(null);
   }
@@ -75,6 +75,7 @@ public abstract class Match {
   /**
    * @return {@link MatchContext} if matches or {@code null} if it does not match
    */
+  @Nullable
   public MatchContext matchResult(InsnContext insnContext) {
     // Create MatchContext
     MatchContext context = MatchContext.of(insnContext);

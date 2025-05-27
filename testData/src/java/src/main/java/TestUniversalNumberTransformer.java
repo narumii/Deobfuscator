@@ -6,14 +6,22 @@ public class TestUniversalNumberTransformer {
     float d = 123123.123123f / 12.34f;
 
     System.out.println(a + b + c + d);
+
+    int constant = 69420;
+    for (int i = 0; i < 10; i++) {
+      System.out.println(i + constant);
+    }
   }
 
-  public void divideByZero() {
+  public void illegalOperations() {
     int a = 2;
     if (a == 0) {
       // Transformer shouldn't touch it
       int b = 9 / 0;
       System.out.println(b);
+      System.out.println(Integer.parseInt("aaa"));
+      System.out.println(Float.parseFloat("bbb"));
+      System.out.println(Double.parseDouble("ccc"));
     }
   }
 

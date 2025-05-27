@@ -1,6 +1,5 @@
 package uwu.narumi.deobfuscator.api.asm;
 
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -9,6 +8,7 @@ import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import uwu.narumi.deobfuscator.api.helper.MethodHelper;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Method context
@@ -16,16 +16,20 @@ import java.util.Map;
 public class MethodContext {
   private final ClassWrapper classWrapper;
   private final MethodNode methodNode;
-  private final @Nullable @Unmodifiable Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames;
+  private final FramesProvider framesProvider;
+  // Lazily initialized
+  private Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = null;
+  // Lazily initialized
+  private Map<AbstractInsnNode, Set<AbstractInsnNode>> consumersMap = null;
 
   private MethodContext(
       ClassWrapper classWrapper,
       MethodNode methodNode,
-      @Nullable @Unmodifiable Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames
+      FramesProvider framesProvider
   ) {
     this.classWrapper = classWrapper;
     this.methodNode = methodNode;
-    this.frames = frames;
+    this.framesProvider = framesProvider;
   }
 
   /**
@@ -45,23 +49,41 @@ public class MethodContext {
   /**
    * Frames of the method
    */
-  public @Nullable @Unmodifiable Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames() {
+  @Unmodifiable
+  public synchronized Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames() {
+    if (this.frames == null) {
+      // Lazy initialization
+      this.frames = this.framesProvider.compute(this.classWrapper.classNode(), this.methodNode);
+    }
     return frames;
   }
 
-  public InsnContext newInsnContext(AbstractInsnNode insn) {
-    return new InsnContext(insn, this);
+  public synchronized Map<AbstractInsnNode, Set<AbstractInsnNode>> getConsumersMap() {
+    if (consumersMap == null) {
+      // Lazy initialization
+      this.consumersMap = MethodHelper.computeConsumersMap(this.frames);
+    }
+    return consumersMap;
   }
 
   /**
-   * Creates new {@link MethodContext} and computes its frames
+   * Creates new {@link InsnContext} instance at specified instruction
+   *
+   * @param insn instruction
+   * @return new {@link InsnContext} instance
    */
-  public static MethodContext framed(ClassWrapper classWrapper, MethodNode methodNode) {
-    Map<AbstractInsnNode, Frame<OriginalSourceValue>> frames = MethodHelper.analyzeSource(classWrapper.classNode(), methodNode);
-    return new MethodContext(classWrapper, methodNode, frames);
+  public InsnContext at(AbstractInsnNode insn) {
+    return new InsnContext(insn, this);
   }
 
-  public static MethodContext frameless(ClassWrapper classWrapper, MethodNode methodNode) {
-    return new MethodContext(classWrapper, methodNode, null);
+  public static MethodContext of(ClassWrapper classWrapper, MethodNode methodNode) {
+    return of(classWrapper, methodNode, MethodHelper::analyzeSource);
+  }
+
+  /**
+   * Creates new {@link MethodContext} instance
+   */
+  public static MethodContext of(ClassWrapper classWrapper, MethodNode methodNode, FramesProvider framesProvider) {
+    return new MethodContext(classWrapper, methodNode, framesProvider);
   }
 }

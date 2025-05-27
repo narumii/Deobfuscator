@@ -9,6 +9,7 @@ import org.objectweb.asm.tree.ClassNode;
 import uwu.narumi.deobfuscator.api.classpath.ClassProvider;
 import uwu.narumi.deobfuscator.api.classpath.CombinedClassProvider;
 import uwu.narumi.deobfuscator.api.classpath.JvmClassProvider;
+import uwu.narumi.deobfuscator.api.context.Context;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,12 +34,14 @@ public class InheritanceGraph {
   private final Set<String> stubs = ConcurrentHashMap.newKeySet();
   private final Function<String, InheritanceVertex> vertexProvider = createVertexProvider();
   private final ClassProvider classProvider;
+  private final ClassProvider librariesClassProvider;
 
   /**
    * Create an inheritance graph.
    */
-  public InheritanceGraph(@NotNull ClassProvider classProvider) {
-    this.classProvider = new CombinedClassProvider(classProvider, JvmClassProvider.INSTANCE);
+  public InheritanceGraph(@NotNull Context context) {
+    this.librariesClassProvider = new CombinedClassProvider(context.getLibraries(), JvmClassProvider.INSTANCE);
+    this.classProvider = new CombinedClassProvider(context, this.librariesClassProvider);
 
     // Populate downwards (parent --> child) lookup
     refreshChildLookup();
@@ -310,13 +313,13 @@ public class InheritanceGraph {
       //ResourcePathNode resourcePath = result.getPathOfType(WorkspaceResource.class);
       //boolean isPrimary = resourcePath != null && resourcePath.isPrimary();
       //ClassInfo info = result.getValue();
-      return new InheritanceVertex(result, this::getVertex, this::getDirectChildren);
+      return new InheritanceVertex(result, this::getVertex, this::getDirectChildren, this.librariesClassProvider.getClass(name) == null);
     };
   }
 
   private static class InheritanceStubVertex extends InheritanceVertex {
     private InheritanceStubVertex() {
-      super(new ClassNode(), in -> null, in -> null);
+      super(new ClassNode(), in -> null, in -> null, false);
     }
 
     @Override

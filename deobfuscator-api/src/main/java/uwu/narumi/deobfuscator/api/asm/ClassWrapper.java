@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
@@ -20,8 +21,8 @@ public class ClassWrapper {
   /**
    * Relative path inside jar. Mainly for saving purposes.
    */
-  private final String pathInJar;
-  private final ClassNode classNode;
+  private String pathInJar;
+  private ClassNode classNode;
   private final ConstantPool constantPool;
 
   public ClassWrapper(String pathInJar, ClassReader classReader, int classReaderFlags) {
@@ -36,6 +37,15 @@ public class ClassWrapper {
     return classNode.methods.stream()
         .filter(methodNode -> name == null || methodNode.name.equals(name))
         .filter(methodNode -> desc == null || methodNode.desc.equals(desc))
+        .findFirst();
+  }
+
+  public Optional<MethodNode> findMethod(MethodRef methodRef) {
+    if (!methodRef.owner().equals(classNode.name)) {
+      return Optional.empty();
+    }
+    return classNode.methods.stream()
+        .filter(methodNode -> methodNode.name.equals(methodRef.name()) && methodNode.desc.equals(methodRef.desc()))
         .findFirst();
   }
 
@@ -141,6 +151,16 @@ public class ClassWrapper {
 
   public ClassNode classNode() {
     return classNode;
+  }
+
+  @ApiStatus.Internal
+  public void setClassNode(ClassNode classNode) {
+    this.classNode = classNode;
+  }
+
+  @ApiStatus.Internal
+  public void setPathInJar(String pathInJar) {
+    this.pathInJar = pathInJar;
   }
 
   public ConstantPool getConstantPool() {

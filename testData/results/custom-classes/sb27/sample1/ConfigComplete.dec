@@ -1,0 +1,30 @@
+import java.util.ArrayList;
+import java.util.List;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.util.StringUtil;
+
+public class ConfigComplete implements TabCompleter {
+    private static boolean lIlllIlIIl(int var0, int var1) {
+        return var0 < var1;
+    }
+
+    private static boolean lIlllIlIII(int var0, int var1) {
+        return var0 == var1;
+    }
+
+    public List<String> onTabComplete(CommandSender var1, Command var2, String var3, String[] var4) {
+        ArrayList var5 = new ArrayList();
+        ArrayList var6 = new ArrayList();
+        if (lIlllIlIII(var4.length, 1)) {
+            var6.add("doBedExplode");
+            var6.add("doBrutesSpawn");
+            var6.add("oldPiglinDrop");
+            var6.add("compassOnRespawn");
+            StringUtil.copyPartialMatches(var4[0], var6, var5);
+        }
+
+        return var5;
+    }
+}

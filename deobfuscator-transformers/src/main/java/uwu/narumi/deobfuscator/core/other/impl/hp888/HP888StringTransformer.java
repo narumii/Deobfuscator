@@ -43,7 +43,7 @@ public class HP888StringTransformer extends Transformer {
 
       // Find all encrypted strings
       classWrapper.methods().forEach(methodNode -> {
-        MethodContext methodContext = MethodContext.framed(classWrapper, methodNode);
+        MethodContext methodContext = MethodContext.of(classWrapper, methodNode);
 
         // Find encrypted strings
         ENCRYPTED_STRING.findAllMatches(methodContext).forEach(matchContext -> {
@@ -55,7 +55,7 @@ public class HP888StringTransformer extends Transformer {
           findMethod(classWrapper.classNode(), methodRef).ifPresent(decryptMethod -> {
             String key = keyInsn.asString();
 
-            MethodContext decryptMethodContext = MethodContext.framed(classWrapper, decryptMethod);
+            MethodContext decryptMethodContext = MethodContext.of(classWrapper, decryptMethod);
 
             // Find class for constant pool
             LdcInsnNode constantPoolClassLdc = (LdcInsnNode) CLASS_FOR_CONSTANT_POOL.findAllMatches(decryptMethodContext)

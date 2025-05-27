@@ -35,7 +35,9 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
+import uwu.narumi.deobfuscator.api.asm.MethodlessInsnContext;
 import uwu.narumi.deobfuscator.api.helper.AsmMathHelper;
+import uwu.narumi.deobfuscator.api.helper.SimpleInterpreter;
 
 import java.util.HashSet;
 import java.util.List;
@@ -238,6 +240,21 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
     } else {
       size = Type.getReturnType(((MethodInsnNode) insn).desc).getSize();
     }
+
+    // Narumii start - Predict constant
+    MethodlessInsnContext insnContext = new MethodlessInsnContext(insn, null);
+
+    // Transform method calls on literals
+    for (SimpleInterpreter.MethodInterpreter methodInterpreter : SimpleInterpreter.METHOD_INTERPRETERS) {
+      if (methodInterpreter.match().matches(insnContext)) {
+        OriginalSourceValue.ConstantValue constantValue = methodInterpreter.methodComputation().computeConstant(insn, values);
+        if (constantValue != null) {
+          return new OriginalSourceValue(size, insn, null, constantValue);
+        }
+      }
+    }
+    // Narumii end
+
     return new OriginalSourceValue(size, insn);
   }
 
@@ -249,7 +266,13 @@ public class OriginalSourceInterpreter extends Interpreter<OriginalSourceValue> 
 
   @Override
   public OriginalSourceValue merge(final OriginalSourceValue value1, final OriginalSourceValue value2) {
-    if (value1.size != value2.size || !containsAll(value1.insns, value2.insns) || !Objects.equals(value1.copiedFrom, value2.copiedFrom)) {
+    // Optimized comparing than OriginalSourceValue#equals
+    if (value1.size != value2.size ||
+        !Objects.equals(value1.getConstantValue(), value2.getConstantValue()) ||
+        value1.isMethodParameter() != value2.isMethodParameter() ||
+        !containsAll(value1.insns, value2.insns) ||
+        !Objects.equals(value1.copiedFrom, value2.copiedFrom)
+    ) {
       Set<AbstractInsnNode> setUnion;
       if (value1.insns instanceof SmallSet && value2.insns instanceof SmallSet) {
         // Use optimized merging method

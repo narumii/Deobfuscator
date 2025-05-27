@@ -111,6 +111,11 @@ public class AccessRepairTransformer extends Transformer {
       });
 
       classWrapper.fields().forEach(fieldNode -> {
+        // Remove ACC_ENUM from fields from classes that are not enums
+        if (!isAccess(classWrapper.classNode().access, ACC_ENUM)) {
+          fieldNode.access &= ~ACC_ENUM;
+        }
+
         for (int access : FIELD) {
           if (isAccess(fieldNode.access, access)) {
             fieldNode.access &= ~access;

@@ -1,0 +1,29 @@
+package com.top1;
+
+public class Main$processor {
+    public static int _7PB7gTWTqsehtD/* $VF was: 37PB7gTWTqsehtD*/(int var0, int var1, Main var2, Main var3) {
+        return 196276757 + ((-196276758 | ~var0) - ~var0);
+    }
+
+    public static int wjDBZoykQJ2vrQS(int var0, int var1, Main var2, Main$processor var3) {
+        int var10000 = (var0 | -752862660) - (var0 & -752862660);
+        byte var10006 = -1;
+        int var10003 = (var1 & 0 | -1 & ~var1 | ~var10000) - ~var10000;
+        int var10005 = var10000 | -1;
+        byte var10004 = -1;
+        return var10003 | (var10005 & (0 | ~var10000) | ~var1) - ~var1;
+    }
+
+    public static int GelKdnJMSth8Wit(int var0, int var1, Main var2, Main$processor var3) {
+        return 33021973 + ((-33021974 | ~var0) - ~var0);
+    }
+
+    public static int vfdBmmgDnboaStS(int var0, int var1, Main var2, Main$processor var3) {
+        int var10000 = (var0 | -298877679) - (var0 & -298877679);
+        int var10002 = ((var0 | -298877679) - (var0 & -298877679) | -1)
+            - ((var0 | -298877679) - (var0 & -298877679) & -1)
+            + (var1 & ~(((var0 | -298877679) - (var0 & -298877679) | -1) - ((var0 | -298877679) - (var0 & -298877679) & -1)));
+        byte var10004 = -1;
+        return var10002 - (var10000 & 0 | -1 & ~var10000);
+    }
+}

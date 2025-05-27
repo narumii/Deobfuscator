@@ -16,11 +16,11 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <asm.version>9.7.1</asm.version>
+        <asm.version>9.8</asm.version>
 
         <log4j.version>2.23.1</log4j.version>
         <slf4j.version>2.0.13</slf4j.version>
-        <cafedude.version>2.1.2</cafedude.version>
+        <cafedude.version>2.2.0</cafedude.version>
         <ssvm.version>ca3c3ab713</ssvm.version>
         <jlinker.version>205d8eaa1f</jlinker.version>
     </properties>

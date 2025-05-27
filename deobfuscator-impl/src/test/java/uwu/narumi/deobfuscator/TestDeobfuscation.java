@@ -1,13 +1,20 @@
 package uwu.narumi.deobfuscator;
 
+import uwu.narumi.deobfuscator.api.transformer.ComposedTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.ComposedHP888Transformer;
+import uwu.narumi.deobfuscator.core.other.composed.ComposedSuperblaubeereTransformer;
+import uwu.narumi.deobfuscator.core.other.composed.ComposedUnknownObf1Transformer;
 import uwu.narumi.deobfuscator.core.other.composed.ComposedZelixTransformer;
+import uwu.narumi.deobfuscator.core.other.composed.Composed_qProtectTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedGeneralFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedPeepholeCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.JsrInlinerTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.UselessPopCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineLocalVariablesTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.universal.AccessRepairTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.universal.RemapperTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.universal.StringBuilderTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
 import uwu.narumi.deobfuscator.base.TestDeobfuscationBase;
 import uwu.narumi.deobfuscator.transformer.TestSandboxSecurityTransformer;
@@ -30,6 +37,10 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .transformers(UniversalNumberTransformer::new)
         .input(OutputType.SINGLE_CLASS, InputType.JAVA_CODE, "TestUniversalNumberTransformer.class")
         .register();
+    test("String builder transformer")
+        .transformers(StringBuilderTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.JAVA_CODE, "TestStringBuilderTransformer.class")
+        .register();
     // TODO: Uninitialized static fields should replace with 0?
     test("Inline static fields")
         .transformers(InlineStaticFieldTransformer::new, UselessPopCleanTransformer::new)
@@ -38,6 +49,10 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
     test("Inline static fields with modification")
         .transformers(InlineStaticFieldTransformer::new, UselessPopCleanTransformer::new)
         .input(OutputType.SINGLE_CLASS, InputType.JAVA_CODE, "TestInlineStaticFieldsWithModification.class")
+        .register();
+    test("Remapper")
+        .transformers(RemapperTransformer::new)
+        .input(OutputType.MULTIPLE_CLASSES, InputType.JAVA_CODE, "remap")
         .register();
 
     // Test sandbox security (e.g. not allowing dangerous calls)
@@ -53,10 +68,11 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "JSR.class")
         .register();
 
-    // Samples
-    test("Some flow obf sample")
-        .transformers(ComposedGeneralFlowTransformer::new)
-        .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "FlowObfSample.class")
+    // Unknown obf 1
+    // TODO: If you know the obfuscator used to obfuscate this class, you can make a PR which renames this test
+    test("Unknown obf 1")
+        .transformers(ComposedUnknownObf1Transformer::new)
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "unknown/obf1")
         .register();
 
     // Zelix
@@ -145,9 +161,62 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "hp888")
         .register();
 
+    // qProtect
+    test("qProtect Sample 1")
+        .transformers(Composed_qProtectTransformer::new)
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "qprotect/sample1")
+        .register();
+
+    test("qProtect Sample 2")
+        .transformers(Composed_qProtectTransformer::new, RemapperTransformer::new)
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "qprotect/sample2")
+        .register();
+
+    test("qProtect Sample 3")
+        .transformers(Composed_qProtectTransformer::new)
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "qprotect/sample3")
+        .register();
+
+    test("qProtect-Lite Jar Sample")
+        .transformers(Composed_qProtectTransformer::new)
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_JAR, "qprotect-obf.jar")
+        .register();
+
+    // Superblaubeere
+    test("Superblaubeere Sample 1")
+        .transformers(ComposedSuperblaubeereTransformer::new)
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_CLASS, "sb27/sample1")
+        .register();
+
+    // Grunt
+    test("Grunt Sample 1")
+        .transformers(
+            AccessRepairTransformer::new,
+            () -> new ComposedTransformer(true,
+                ComposedGeneralFlowTransformer::new,
+                InlineStaticFieldTransformer::new
+            ))
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_JAR, "grunt-obf.jar")
+        .register();
+
     test("POP2 Sample")
         .transformers(UselessPopCleanTransformer::new)
         .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "Pop2Sample.class")
+        .register();
+
+    test("Kotlin Sample")
+        .transformers(UselessPopCleanTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "KotlinSample.class")
+        .register();
+
+    test("Kotlin Sample 2")
+        .transformers(UselessPopCleanTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "KotlinSample2.class")
+        .register();
+
+    test("Kotlin Sample 3")
+        .transformers(UselessPopCleanTransformer::new)
+        .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "KotlinSample3.class")
         .register();
   }
 }

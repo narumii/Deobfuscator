@@ -25,7 +25,7 @@ public class UselessGotosCleanTransformer extends Transformer {
 
   @Override
   protected void transform() throws Exception {
-    scopedClasses().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
+    scopedClasses().parallelStream().forEach(classWrapper -> classWrapper.methods().parallelStream().forEach(methodNode -> {
       for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
         if (insn.getOpcode() == GOTO) {
           JumpInsnNode jumpInsn = (JumpInsnNode) insn;

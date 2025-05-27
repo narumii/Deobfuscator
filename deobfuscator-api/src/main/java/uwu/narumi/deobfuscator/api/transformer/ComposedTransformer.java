@@ -23,10 +23,8 @@ public class ComposedTransformer extends Transformer {
   @Override
   protected void transform() {
     transformers.forEach(transformerSupplier -> {
-      boolean changed = Transformer.transform(transformerSupplier, scope(), context());
-      if (changed) {
-        this.markChange();
-      }
+      int changesCount = Transformer.transform(transformerSupplier, scope(), context());
+      this.changes.addAndGet(changesCount);
     });
   }
 }

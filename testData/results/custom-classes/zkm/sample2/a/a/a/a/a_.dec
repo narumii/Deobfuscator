@@ -122,7 +122,7 @@ public class a_<T> implements Serializable {
             this.a = var6;
         }
 
-        if (this.a.compare(var1, var2) < 1) {
+        if (this.a.compare((T)var1, (T)var2) < 1) {
             this.d = (T)var1;
             this.c = (T)var2;
         } else {
@@ -133,7 +133,7 @@ public class a_<T> implements Serializable {
 
     public boolean a(Object var1, long var2) {
         long var10000 = 104039320445854L ^ var2;
-        return var1 == null ? false : this.a.compare(var1, this.d) > -1 && this.a.compare(var1, this.c) < 1;
+        return var1 == null ? false : this.a.compare((T)var1, this.d) > -1 && this.a.compare((T)var1, this.c) < 1;
     }
 
     public boolean b(a_ var1, long var2) {
@@ -154,6 +154,7 @@ public class a_<T> implements Serializable {
         }
     }
 
+    @Override
     public boolean equals(Object var1) {
         if (var1 == this) {
             return true;
@@ -189,8 +190,8 @@ public class a_<T> implements Serializable {
         return this.d;
     }
 
+    @Override
     public int hashCode() {
-        long var1 = 98334368194806L;
         int var3 = this.b;
         if (this.b == 0) {
             int var4 = b<"m">(26604, 8453020672365342500L);
@@ -276,7 +277,7 @@ public class a_<T> implements Serializable {
 
     public boolean c(long var1, Object var3) {
         long var10000 = 104039320445854L ^ var1;
-        return var3 == null ? false : this.a.compare(var3, this.d) < 0;
+        return var3 == null ? false : this.a.compare((T)var3, this.d) < 0;
     }
 
     public boolean d(long var1, a_ var3) {
@@ -292,7 +293,7 @@ public class a_<T> implements Serializable {
 
     public boolean e(Object var1, long var2) {
         long var10000 = 104039320445854L ^ var2;
-        return var1 == null ? false : this.a.compare(var1, this.c) > 0;
+        return var1 == null ? false : this.a.compare((T)var1, this.c) > 0;
     }
 
     public boolean f(long var1, a_ var3) {
@@ -303,7 +304,7 @@ public class a_<T> implements Serializable {
 
     public boolean g(Object var1, long var2) {
         long var10000 = 104039320445854L ^ var2;
-        return var1 == null ? false : this.a.compare(var1, this.c) == 0;
+        return var1 == null ? false : this.a.compare((T)var1, this.c) == 0;
     }
 
     public boolean h(long var1) {
@@ -339,11 +340,11 @@ public class a_<T> implements Serializable {
 
     public boolean j(long var1, Object var3) {
         long var10000 = 104039320445854L ^ var1;
-        return var3 == null ? false : this.a.compare(var3, this.d) == 0;
+        return var3 == null ? false : this.a.compare((T)var3, this.d) == 0;
     }
 
+    @Override
     public String toString() {
-        long var1 = 15341762901975L;
         if (this.e == null) {
             this.e = "[" + this.d + a<"c">(18317, 6648620723262088254L) + this.c + "]";
         }
@@ -532,7 +533,7 @@ public class a_<T> implements Serializable {
         long var5 = (Long)var3[1];
         String var7 = a(var4, var5);
         MethodHandle var8 = MethodHandles.constant(String.class, var7);
-        var1.setTarget(MethodHandles.dropArguments(var8, 0, new Class[]{int.class, long.class}));
+        var1.setTarget(MethodHandles.dropArguments(var8, 0, int.class, long.class));
         return var7;
     }
 
@@ -542,7 +543,7 @@ public class a_<T> implements Serializable {
         try {
             var3.setTarget(
                 MethodHandles.explicitCastArguments(
-                    MethodHandles.insertArguments("a".asCollector(Object[].class, var2.parameterCount()), 0, new Object[]{var0, var3, var1}), var2
+                    MethodHandles.insertArguments("a".asCollector(Object[].class, var2.parameterCount()), 0, var0, var3, var1), var2
                 )
             );
             return var3;
@@ -606,7 +607,7 @@ public class a_<T> implements Serializable {
         long var5 = (Long)var3[1];
         int var7 = b(var4, var5);
         MethodHandle var8 = MethodHandles.constant(int.class, var7);
-        var1.setTarget(MethodHandles.dropArguments(var8, 0, new Class[]{int.class, long.class}));
+        var1.setTarget(MethodHandles.dropArguments(var8, 0, int.class, long.class));
         return var7;
     }
 
@@ -616,7 +617,7 @@ public class a_<T> implements Serializable {
         try {
             var3.setTarget(
                 MethodHandles.explicitCastArguments(
-                    MethodHandles.insertArguments("b".asCollector(Object[].class, var2.parameterCount()), 0, new Object[]{var0, var3, var1}), var2
+                    MethodHandles.insertArguments("b".asCollector(Object[].class, var2.parameterCount()), 0, var0, var3, var1), var2
                 )
             );
             return var3;

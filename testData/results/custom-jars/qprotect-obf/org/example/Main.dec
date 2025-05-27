@@ -1,0 +1,165 @@
+package org.example;
+
+public class Main {
+    public static final int a;
+    public static final boolean b = false;
+
+    public static void main(String[] var0) {
+        test("placek");
+        System.out.println("ihokhCHjv9SiaYuzejy2fJKixynVPRv3nRAfCO5EhnnE2QKDfuC9WbkanWNCI7NDAv0hL2acuz6F2pZ1hpBnjKxXcPMbtipEdUsDyRW7oZEMjAq6");
+        System.out.println("9AtoYb4vKMG5aAxCL04GgiSWpLyG6XVMoMabqnByGRGKuJ0QBPBWvsbU7Sbj8JfEwd8DUo7cDqVhpumVz75mCn8mrKfJKcvC7ZDwzVKV4L35NBCoFCsYwliHR");
+        System.out
+            .println("ktaw64UElpARXLQeB9X236Mp9aQfvWPatUiTPkoWsDBYHIYklvdV67rhcR3Jd7UsYh3sYPvCcGllczuDCwxah8tFaIJhM6vbNKodSLf1sbdvM60BdE31iQhvUCdZCDI6TlpweX");
+        System.out.println("PBhv1xI0YfA4lVZddBfBeBwFW5vECaeAoPW5trBr2Cj9O8M1uxjrMKYYSXJuFYMS1bXElhC1XIITPMgT2tZZ4OEVRO7xesFcHHrzTL");
+        System.out
+            .println("Gf43ZwRbaGwoW4KRIyndxhWS1JcOTECyI4wLkRaOUwPswO3titAUhIfAV8B1K9QxZ8TrGMWosTcSKLl19BbweirEHCRByXuhBgnTI8rVK6OLwwysnmBIIb7A0W4UeH7jwcYdv");
+        System.out.println("w9lP6nT349lhFbpPMzA48l1vwTE1UQ4reetQsgSp4gJ3gIGa0ptuptm5KlSptcOxVNqsbcy8aQDMvFvlO2QuyUDudOb1LzLIQN4kE4px7HuNJqAP1HcfouukiZ");
+        System.out.println("6WuAnpQKqFN08LDXYHpRqschoqGjuRUJKnsqzhnNNe1K1mlgA82oNat6no3niQSBzWzv1hfaNcekn4RYf5ZzWKh8FVUkEgiF07UVw7Eewh2C72SocPENL");
+        System.out.println("8FtJoLjzFQ2SOK3QfHWJzUylzwdOKSjBzWpD5DfaRKd0lJ79Njcr0BpUMmvyYatF6NcIH9tpxtrLjQvF1HMwPh6Gno4vYwI2C5lrNMiiuyPH6");
+        System.out.println("MQetwrtRtlRgBUAYcqBKHUlb2EFaU0y6DO2DxM6EgRxIIHKsfrGPvta3YKnAzXUHi0H0uE05E5vMGPmQ8z6lvDeLjdHjORIjzNZog7B8HXQgaADAoq3kuCb1");
+        System.out.println("m4112CN4qvq2Pb7LDmCUb9sRIpYu0LAcoPKKHoPj5ctqk5AYuyJPhmspMGGSa5vay7xsdik6CrntGwO3SnZaDYzrvbxzMQvGQjWz6SytPnvjtSlQsIpKdTrOtDSphSLt");
+        System.out.println("3nhu1Dbzkpw1NYXJtxrIEtO5eNNPpPzXWN04VelH5RhztyHlJ63dVnrWJMxWd8BtFo1kMSdZZ06e9lPbPr4Ekoy8KKm3QntMGuVpKX7zpiaEnP");
+        System.out.println("StHaxGDRtItmFOoCdcWg5w5MaDDEWdMpooH3LBr0yGFU1l1qHt1hwBuABMC5A6AACHNbsozuftc78PMFtaZAuoXk8bJcmAvTJWm1RfyY3mJ4nsF8fhdc40J7");
+        System.out.println("MUkWOnoG4E3zI1t9tlC9TJxBI7KUnt9FYaPkFVhaEFq26hdh9xq1HEOZ89NuFVCsHzNb1ttFOD0wRPbRgF80mQRUM7TTR2KSIKIbixDh0z5Al7fruneKfNx");
+        System.out.println("F8XCIYrfJGkv9eIW4EFZNUkStO4P8zoJlYEoRDY1UWopxqViEX2nlKrWfWW2jemzJ3kgnDJSj3zWQMmE5zM83cTNpVGr6H3r3deyqwkcO");
+        System.out.println("WsPSIdSv0MdasQscovpZdX2ArkXxbql2hVCIwvtIWzGLHlxWrVI8EQB0hRRm7op44PqfRcjnGqSvaeh0lxWKkkB1gI1YHzUwNIpjH1QncWKocWBVeWynm");
+        System.out.println("89kQg7RZrjHzBDMxVpetbkeREp796Vi3eaT7rFpX4F3kfVSM7gyZAgEzv1hy0tqjz4ydoHW6vHG7z0NNCWRg08t76eb6AUzysKoyGysL38efkGXPVoA1Al9IrPF");
+        System.out.println("qFtxIwYk4aEFrdvcPdQSRdtZmOSeS8j5ubjd2IiAr3caej6jIlcuIXceN2yjgIPdgXMNpKnIHs3KCB7O1QkeCYsgCNfaYf2tMULPY4xXjkWVpppELsArofrhC7uOz7xZ");
+        System.out
+            .println(
+                "rMTVd0eDaJZX1oJ4fdBDjuld9Od87fQ0np08r0YIfXtu5GlfJZ39FrusMt46CSxY9yi8hWYFM5M6xKq1qe7rhCFqNpjmXlcewWPoJDcD7cD7y6ie2oXSzz2g0gCTMIYfeWEXAASj4vUgWqZ"
+            );
+        System.out.println("s2YG8XOchpwXvmva5TEnE9UNTWh7ET6GBL6SXIStMBdTv36OwBaGXvJd1nkytdDxJvjxM3rhAZavi70kAKHXlUlA36uF0binFzJj1Kio6FyHVdXZeVULJ5AOaNsHmApT");
+        System.out.println("eP6xmgWbJNHOlwrFNyNxUOye0azrjU8JOKGhjO5A50QKVZNEqPiDPEGoK96KorWFAfjoASh1wtqsjHmQQbbTuMfrrk9ijYsLUAWQD59cXQHDIe");
+        System.out.println("rhZ34DXxt5bPWAL8cd5VANQiahf8NcLV6aY4ceFpnLFYsNsvhz6WtQbFqpVpW80JPt8tFyuZ2oBPCXE7faShgz5NdpC823L5QsrL");
+        System.out.println("BKMPssKfh2i4MRGuUHp5WCarC6XLtwaozFpoxtLvvET3rcoYkdC6XPWKD2sx5ktluaDnRn7aMW9axAkNvSImsYz1ZnA52MKFRqk2B5UDwE8kWqxnKDHJ7ISFI");
+        System.out
+            .println(
+                "IbrcVyI5ipEIwkQyt81ZGgKkFZcd2Mgz327nQOkaayZPGuUAE59j7kNlTwLlLNx8S89TdAWKMSOgtNNMo2jay0TeYQre2mncnwJRWz6NRWUgwzfT4SnZNNx1zEaelXpYoL9f96RoCZ0oFFaDlo4"
+            );
+        System.out
+            .println(
+                "sqR7tDZl8BlprzkUGp9796VGqESKVzzGPe3TswPdrxGUiIW3rXD6CzEg5GTk1bZ4yQZgcauhFtB56ghnUHvCceeTJl3cxNv8EK6WXbccNA6OgiMXlOiRFb3BDCAAcqGOY5slRryx8kB"
+            );
+        System.out.println("6nYM4E5El3rrd7MGcBqUg0rMwrtM3DItYqFXeZ9wDElgkr91XNCa4sT91ExEimGt6p7TV05WhXugsu1uoe9wZuHoJMjuxd19HSBcHdWhnrLgTqBNA9Vm2uN5");
+        System.out
+            .println(
+                "i3EBDcduYI6YqPmm8jNbpCQhUd5OpXk0f3KmhfMJikxolUXowVN5DBEj0Ny7TcSrLbLkKN14KEuaWYYCRtIN43mDUZOIHd9H07ZTLGzi8IFl1QgSUahIum1ie41knKdROPD3HmQxxfB"
+            );
+        System.out.println("xBlfg0GuDU99vGq6fGdj3cPTDlU7RH3s1FfB0HbORrNTDIPD2X2T80JekqX4lt4Ow799lctoF2bt7NniyZXKFNh20LTwjVZf1j0yJo7p7");
+        System.out.println("oTXRpHSBRUQqYMG5dZrk2JMeRY1Y9Tt7yAZO5wvUGK4vkUvGgKQPhqVFqWo8IydR8Nkyun3EEhDCfZugvs6NzpzOKArKgmregI1iuWVXtl7Qfr");
+        System.out.println("V7aN77kTYccgL6TNdueGwvzyn7m2rauYtstlLNeHefkPX4DEU3i8BlB3k0HB4iNlqWBdzqkoKcJzYmkID4hydJir5yKEsDjJf5McF91qvkumxE");
+        System.out
+            .println("PUcJ8ngNSKvJRpewZa7HfHCUtyywXGKuzhGcT5AcnxhsCZLuagefgA2B644f9SZjiQ8O2wb4nV57cH0wkxHKWT9aDozDatnobMbRhrmarcGrxtCD4NbiGljgj8jfeJ7xyKIBhJ");
+        System.out.println("yIEe5VNGe67Xu6syIjykviZ7XpMPEXRKjSIRDzcP6rSYGAHc6o3en4g8FZUKLk1Jow1geg8XMgubFkeWytM9EXkPR8QPfH8aOhYaWvy");
+        System.out
+            .println(
+                "PKNg7k8Q1aO4p1hyyjZcO9hZr9yPWxVJ39iq7Zf18zGi7lGLzkYc2FN7pobyEUhRODPTAwDSzJtvZlaPiJK7AFkhLToYTnGLiqmmR7KmUGuJyXPzR5GVUyIeyLTm8ctvGcU9X6nfrB5mSupTaNhidc"
+            );
+        System.out
+            .println(
+                "RG9URbiK9Evfy3Jufhmjrp5qeCRGfClbAyOLnC5R4juSUbhMAyQRXKpT7F399EVZ7Py4PPaytevtH44v9ZPugF8Df0ofikGXMYW3KMOGiZGrSUIKjIqJkA8m3kb8ggpznOwoLQub1pbhD8ybTAod"
+            );
+        System.out
+            .println(
+                "QZFs37mrEQR2xLRpWdjiS1dB21DhACb9i87BTSk7cLNPFvnzxrLO7OOUCWPIBPoTB3aKvNivX2fZkYveFm1wkeMhRhTgRh1VC3KIyBs0MtJdpXu4mz2tE0wtLgY3eCqZRDX5QpVgtppqNBEncw"
+            );
+        System.out.println("vs60cBQ3iAU4XVY3gj99tzuG2ldzs3CM0p6G7RqBgj5HYAxq13KYetcCRfLvTBb6HYOUqexc4Zz0jE8ZtaPpxlhDOi1qGQnXTaSCmoYHzdJcQaZM0P7YVxRY8f2qD1");
+        System.out.println("vfNQ5Rx42eQHdB1Ir9Vt8VyoZy0m8UAeQ8ONiP2xMnEprLkZP4gQhybAsXuoWGuRaAneLg2WwobhKfGXIFI0op2Vr0jyPuonF07UPxZKtPm6uZyEr0XgJh2k");
+        System.out.println("oubfWhHHwlv4v7oPv3hizGnZQAp1wQ0JqAboRDzJrDahwXANAvt3OxCYDAlUzlnuPvaCaw6C5FSaDHTL1vLw4hdbPMDbjFacE5DQvtqJwBq5zmD7WTep7JBOl0R4");
+        System.out
+            .println("Mn51HyzC4dQgKu3BOCFElfwU10SXJAtl3b9i1OGtMaqrLC5W59U0A4LqUe5CDLGAngHB2Z1vm3CjRt3nCov3qcJ14HJN2lI20CZQwWR0EAgtzff7pLDmh7oxeDMjBFiDiN");
+        System.out
+            .println(
+                "7C7VgqLf3bnK2wWDa3bw9nmTgQvNVu9zY2KHnTXFDbSl05de5TjtCLjADPJBq8nCcL9Ydg20TjKovuisOud5vh9TLs6VlHgYq5O4rmraiWohraw1mJMfw2f8GA24hwlWjiMYn7uVvtYFG"
+            );
+        System.out.println("CzQPfiyB1yuaDcFvnAuYfUugM5aGPhmD3LiIq1sfufQgtRMYWfZCAoVVHHeZkt3wjNZZ06R8H3eVT4rslWbxMRpxacx37gVOzXlt5Hvjhfa");
+        System.out
+            .println(
+                "HuU558zQwSLpclXOdpb0rTxVRjVt4wSymBzsqNggNLs8TV88W4sbknNTyGUScNa5vVrKQxw02USnr3yyt3bydLIXqTIljeexymZBHxLUyBRlkqota13rjjtW6Sy0BzwuNST9KrdBlAJO86cUO41"
+            );
+        System.out.println("rLDf5QJv5zThdFDOpMt5zMkBWzwh1NehkvMuDmUCTrcwuV6lyiO0VlG6PMes6KzbeOHxISBYEbO9uB9EuEJlDKrHYo2RGS19DAvCiNBgVXMU");
+        System.out.println("nlZRKmBjn7HFfJDhJAg6xHZ3mPfeA79Cq2KaYKjXr5HQ8OJFQ8KeuFJ5tsH3AR7ByH8fc8QOdPtL4dp2lrEx2xGXCXBUWATlZpkcQ12");
+        System.out.println("7SoFDwvPNk00oLDRex9WyxDJBgt8fdGuDP5CNqDP812eNeKy62sdTPqf5r8BNpT6muVHQUxmSkDste1GbNClmllTptILw8zmc9UO5Jaui22XDxDtXrRai81rGz0Hidt");
+        System.out.println("eu08ygUe3GUY1isZkDgspG5vE5h3oZfCeWfcQ3Sj3MHY6MGLo5vlEVagUddB4LXF3L2ca77gs97GciBIGNpMLXzQY0ZLm9OBzjDL7Zbw5wKkDMJITUon");
+        System.out.println("4rejicxT3kibB3lJ4ioHyV9aUXC16QRHUkVGIT3VZXwlszZnuviTAwJb0XbBgCvIA7YnAoEgWZsX4fB7xD9DLDUooDzxDMOeRQIqq7VYovVdW1N4aBR");
+        System.out
+            .println(
+                "7VCiuH2EmWl5Zqu700pw4NVirhVQvKTCOQGeI8U87CXVPTEAFHk1OqH4Yy8fTdCRpdS2cvVGJ09LdOR7ijdHAPrcMPydAgnBZEhYMxGEkp9Ogo8voYdXNlJcGM4eMSS2U2nYitFvmwO8VzX"
+            );
+        System.out.println("haWLW6CRgBYHknITxQXNdiBcwzDmtG3QkbuMhB3ErezNQPTHIJ09BRSSswywAKbPsDvZlsME12ruT80DEBsuxrfzeeQshQ5C3KNhxy");
+        System.out
+            .println(
+                "7weeTYQbSjQJef1KvldcUnzDwClTaJ7S38hRqs6RWkoXyP1uPNxMunq0PyWaGZVqsQ6DsmttvlTZvmNqg6dWtRUmhNiHzbCOzmh1RH46BARsMeq5tEpu8Swb7zjVTwsMovrMTO6aTD9spf9bPvuF"
+            );
+        System.out
+            .println(
+                "TaA7NpbHnwDE3DpSrK6xfX2uuMxEDDGTO09GvZWyrMaOuzS1HqfRWR51S5xaYxBIez21X16oQ7sYgWCBlRcOXp7jDVMLP6tpU1KqAh5Wtw2qFACAAL1ijBYrQ5wN7T3huAeDkB6oP2Vj2yHS5fd"
+            );
+        System.out
+            .println("bHXby99mvTIgkntkA4578xWM3yM9VwAtZhLtoa1n1xTiCBW5qVwLWr0YBXaoIxF8mPWCxnlnbyc5ncKou7PR20uUzRv23bNsniY49KuobpRNQAE00XO0COORjHsQCRP7MqON5");
+        System.out.println("mLfsazkpLSaDfF3mIBLmw6rZtEotRxMHpeUGwP7Cy6hy6YijYA4SzEiax7ZDKyb7OsqXl6gGdKwGOAh9Q1s7QF1O7a2g6vSwre2tBLjNS2fZ1prqRVguXn");
+        System.out.println("XDEdfMa6tfXiiDZhZmwjCYdjfxYpnwTkIZzb6Amyx6IPO9sDadItZH3sfkNlo0VHqpSKefoCcT4lRwUVaojJq6xDumsvR8OhEk1HJuYbL1Zy9aPya");
+        System.out
+            .println("c4Io2lmF2GSKs6fmL8tCuqZABNnviuAqs8Zz5Coim2DJUUPwYF7d7eOWB3U1ZUMnxqJcrBSjwzz9hqxBUpdGWPWjI9Y2AbzHhJHdMQc7hhDplECQGPTzXs9H2xCkIg6UFPj");
+        System.out
+            .println(
+                "RGCTZLFoTabCBFbM39YThKj6RNcaDfJiBAFTRHBi9u8XgXMLn7RHiCsTQZMe9KFFycAUkezE85fHeMWjjZBtbAP2HySmS7QJAXeybXHHjQoEj6sB6w4of3SoIplkYECVu8XaSsLWD2L34niL4Sdu"
+            );
+        System.out
+            .println("bhmH6owrNBrmsodktcif8602F5wudyZuaIabEhfzIL8JSenPPRRwO3XZOvkLCBVJcgEXFmAtybAPn7hRh4j0XhTHcyrwTO54M020taH2iczCQJROnNvaTLHurbaY05ZJgNh");
+        System.out
+            .println(
+                "3tZHUZekSxuxWTTrVnx4ZLGwVIzPz3R4D4jdXfaqIVOylFMrdWRO9nR6T7dZliqIxIbFlln0lq1G4uGwOIvc1DcShZ5fO9NeEwXuughYYxP6ZDaUePNVS6UsO33OaGXG0Xa8afAONA"
+            );
+        System.out.println("bFpF0pmjr2t8wnrmzFb5n9RBvAJS3xMKeDJxz8WHFe4P9ivvRlaMmAzPBREBem9icsP7niPKf6OA1VWtYg65Rk5vu5wlDzeeCr6hugQaCPInzKe5e5e8pecRvMZyXO");
+        System.out
+            .println(
+                "uAP8ZJ3A7AMmmqmn0c9iusyLwsUkM1CJlnz23L9gtInhZWXQ3gmTUZuwyQiIyS6He16E3VDrUvNSNjBnzZ2gUN0MCzhlZpA7C88yZauJ43rbvKX7W1YJYKH2Eyd3tIoDryQMBTGETBnN1koTy"
+            );
+        System.out.println("A98NFPLFjlSaZNSIniqAurAeSLchx51R18K6DP9OEvGYXJeO0B9xhPOSP8IZKdAG8Flch3zobx5yT3cLZ55RNhnDzMsRFdDKhqGZ3Mkq");
+        System.out.println("3H0DEXp6KYET2MzzW16NZD1NLoowlUCXhUEEynONtKtfwIqsaj6YCGJeCHXe8qJGWEsqRBG6SeB7FhkR4VKEkANEKBhfkhzf3E7duBx3VfTy3zS9oVA1Bq");
+        System.out
+            .println(
+                "zgsvMQcCqmtGlwHSaYZYcK77mPZm86nWM5yrnPGon6DyP69R10sUecauTbNnfXXf0wWgbLL5v6ZbQd4CC2Pt32Ehd6VKOEm0jvKEO78TOm4fgrjPmQDo4G2UvG1cdBBVMQ9f7tfR7D214R"
+            );
+        System.out
+            .println(
+                "zceRpzTcAths6qj7ZccShYupbj5uPusdEW3Vbo9rQAsTWtOyMgpM5UHzdqR9LH1Uw3qxfqDrUi9SMc0DmVdBsp1IUboEeWIZ50l5efuql6MOCWC8dD8sRuAHG238lUaF3nFXWCkbtt7DAkPMfaCdx3"
+            );
+        System.out.println("m7ObHQeDkz2OKFo9OwdwxlzOLmQTgW5Gq5yvbKT9pFWmemCd8cdCDBPZelLuhY3smTeZuC6ReoXRe7NIdek5pS4tfZuHrlNIgvSgdygBVSaRt0bNQKoeyJjsDV7bBu");
+        System.out
+            .println("WkbF1y5rBjIbl4JxhFgF8bmCTgUJ3mi0Pq8C2GL77pNpeSFQ5C4ioI7iy09pIWp9Q9iEHKiPpeiq7WdSn8x59nHOa9hyQAN4JmswadmpsdSo6W2NRceZDBNieCyZQ004ecCaZ7");
+        System.out
+            .println("8MGN2HJyJD1TCNj5W6PSbOZmmwZYtz5gfgXenT7FzCteOjTB2VNmPewkeecbD3uk9paQwlJzga1Iob8lLk6jVJ27EvnAmFNokXeQ1NzzuvGZqsFqlpP2iWOpe3m0sad0mXyelt");
+        System.out.println("scpmNB62x4GXDJ6ATcpZARMenY5cPM3HJ9dCTQWFZihNyZIIQfLkLYRzCJMj3N9nQv6xwj4Il8RqKTyQoWt67NaTMQ40e7f7WeR4w3alBLm4CXht");
+        System.out.println("9TcqLaX06C2Ttgd8VzPRQRhK1ZcMPF91lh3uDVGfdxqR7QOQv9dcGidKBkggP4ZB4gkBFZSvcXH38NRiIpApWwdwPJzXmrz9SudT");
+        System.out
+            .println(
+                "HTte7xlVfqI5fvik51Hx8fUUGjamP0SkdjthlxD7x9NSyU8dlGEW8vz50BirgaTAP4dzijNeb7GLxDHqmttBdr6qXhyxtziK1yhGYCLlA7uspu3siSwD7QCJwdOJwjKqUdQLQFtBPP8svab"
+            );
+        System.out.println("ZoP0qBFPnrGwkXg8IsqjyoOYlnirliC6snQhuIYG7ScoVLRtULMmNuWwEP0ngY2V7N0W7VJbgIVEjBJfPA4CBOGwsJvRzFM8678bVQMYAQHgzxndKK9aG70l");
+        System.out.println("v75jbTh8yomyLciwQNLrHQeTJkqbwfDfEPTHZnwlGQEqvkPhE1M0PpY0488vfWQgXiXEJ4hu55CN3dX4ebVTUeuijksn5Yf3j7T9FxYva9XxcgCMBDxi7z");
+        System.out.println("gRz08kPkEOy5epvJFpgx5Hg9H788zzhHNxHIsWP6y567oDBlDB5Ud2PopXuKJ4bj21OzOCj6JKrlWLte3paqz90swEucMx0mRzRzYAQSTeiAjFnenfeX1");
+        System.out.println("ILxUKT8SVyeoNvsO3DrVQK2WKgPLtXKmbCzbskRl6Vo1HSTvaOL6qLjULcr3ykHynmaU4PxNDsEB1g0vXpk16rwFFQjWdej3nMhqWt647TLe8J");
+        System.out.println("3HSaq9kdPsY0XTdTuWtnvuqb8bksMmWUxVc04LAMf8HbzIFLZamGEAmCKQWK86UeBpT1INOrLXnPBfZXHZR06kkAGLSr9FxmB7xIGDMa");
+        System.out.println("OlfCISuu3Ju2qoACq6DD8R7r3Wvi7axvLCFAu6d7FO2fBPGz7Ffp8wFXwSJG5QrchBJqhEn42J0Oc781Ilyr1nPpOgPkwK4ndZXIChuemeSMvfm");
+        System.out.println("GTk7EiXhRuGxT1Y7jC1uI0Y9mYRCMtkp0j8Tc522JcNxqIYIJczQIAOehfFhK1CJmIDuFKQojq91IIEydfpozlE4qTxLS29tW5Oc6BR1TS1WnUKLBN7BPCPg");
+        System.out.println("YDMItKARel7B1iI75bHR38quQTgT7DLF2LI1dBfUwaoCBsYnYKAcXjfYPkR2xfGJlm0ruVFD4zgzu0BK91Iv1iAQPED4ctDhU4udXiQLl");
+        System.out.println("0Z9dQRZfTppoJ7t9BkXso3N9OmAvnxPV83tV5eKWpsN4wqkdApneB6O7uJCeqAaUSL57QXvvhRvPT6VV7wYFWcqtxqhuDejhV2yhvbZC7Xk8QtEtzhbFn");
+        System.out.println("RHPpymxSqT6GaC3eCh9BwzXEg2uBV42Tg1jhKy2jpc6PcuyRkeRwGB6RX1dMy4dRlabGaeGQhe1tTaOjqQXUJNCX9cJQunqVUOsbgB85uYYEG6YMprkEf1ZXgiwVTDx2");
+        System.out.println("YpjYDVj8z9NaxGTF8oZGoGv468Y5obfJlUvPieve4Im1SLI7o2gV6oKOBlQgncDInjT9EIoYvksGZa8BwI6XuaDkbt8GYjJ6WU8TKZkjrC");
+    }
+
+    private static void test(String var0) {
+        if (!var0.equals("tak")) {
+            System.out.println("Wrong Password");
+        } else {
+            System.out.println("Correct password");
+        }
+    }
+
+    static {
+        System.out.println("hello world");
+    }
+}

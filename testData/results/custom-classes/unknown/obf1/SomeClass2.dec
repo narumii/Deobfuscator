@@ -1,0 +1,29 @@
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+public class SomeClass2 implements Listener {
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent var1) {
+        Player var2 = var1.getPlayer();
+        if (lIIlIIIllIIlIlllIIIIllllIIllllIlIlIIlIlllIIlIlIllIlIIIIlIllllIIIIIlllllIIllIIIllIIlllIIlllllIlIIIIIIlIIIIIllIIlllIlllIllIlIlllllIlIlllIIIlIllIIIlIlllIIIIIlllIIIIllIlllIlIlIllllIlIIIIllllIlIlIIlIIlIllI.IllIllIlIllIIIIlllIllIlIlIllIIllIlllllllllIlIIIIIIlllllllIIlIllllIIIlIllIllIlIIIIlllIlllIIlllIIIIIIIIIlIlllIlllIIlIllIllIIlIIllIIlllIIIlllIllIllIIllIlIllllllIIllllIllIIIlllIllllIIlllIIIlIlIIlllIIIIlIl
+                .getConfig()
+                .getBoolean("compassOnRespawn")
+            && !var2.getInventory().contains(Material.COMPASS)) {
+            ItemStack var3 = new ItemStack(Material.COMPASS, 1);
+            var3.addUnsafeEnchantment(Enchantment.VANISHING_CURSE, 1);
+            ItemMeta var4 = var3.getItemMeta();
+            var4.setDisplayName(ChatColor.RED + "[" + ChatColor.AQUA + "" + ChatColor.BOLD + "Compass Tracker" + ChatColor.RESET + "" + ChatColor.RED + "]");
+            var4.addItemFlags(new ItemFlag[]{ItemFlag.HIDE_ENCHANTS});
+            var3.setItemMeta(var4);
+            var2.getInventory().addItem(new ItemStack[]{var3});
+        }
+    }
+}

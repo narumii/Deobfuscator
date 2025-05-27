@@ -1,0 +1,17 @@
+import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
+
+public class SomeClass1 implements Listener {
+    public static int lIIIIlllIlIIllIIIlllllIlllIIllIllIIlIIllIIIllIIlIllllIIIIllIIlIIIIlIllIIlllIllIllllIIIlllIllIllIlllIlllllIIlIIIlllllIIIlIlIllllIllllIllllIIlIIllIlIIllIIllIIlIllIIllllIlllIIIIlIIllIIIIIIIIllllIlIllllIl(
+        int var0
+    ) {
+        Bukkit.getServer();
+        Bukkit.getServer();
+        Bukkit.getServer();
+        Bukkit.getServer();
+        Bukkit.getServer();
+        Bukkit.getServer();
+        Bukkit.getServer();
+        return 0;
+    }
+}

@@ -2,7 +2,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 public class b {
-    ArrayList<Color> a = new ArrayList();
+    ArrayList<Color> a = new ArrayList<>();
     int b;
     f c;
 
@@ -11,10 +11,10 @@ public class b {
         this.a.add(Color.BLUE);
         this.a.add(Color.white);
         this.b = var1;
-        this.c = new f((Color)this.a.get(this.b));
+        this.c = new f(this.a.get(this.b));
     }
 
     public void a(int var1) {
-        this.c.a(new Object[]{(Color)this.a.get(var1)});
+        this.c.a(new Object[]{this.a.get(var1)});
     }
 }

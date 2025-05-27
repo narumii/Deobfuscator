@@ -3,7 +3,6 @@ package uwu.narumi.deobfuscator.core.other.impl.universal;
 import org.objectweb.asm.tree.LabelNode;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-// TODO: Will probably shit itself
 public class TryCatchRepairTransformer extends Transformer {
 
   @Override

@@ -37,6 +37,8 @@ import java.util.function.Predicate;
 
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.tree.analysis.Frame;
+import org.objectweb.asm.tree.analysis.Value;
 import uwu.narumi.deobfuscator.api.asm.NamedOpcodes;
 import org.objectweb.asm.Type;
 
@@ -446,13 +448,9 @@ public abstract class AbstractInsnNode {
     return this.getOpcode() >= ISTORE && this.getOpcode() <= ASTORE;
   }
 
-  public int sizeOnStack() {
-    if (this.isLong() || this.isDouble()) {
-      // Only long and double values take up two stack values
-      return 2;
-    } else {
-      return 1;
-    }
+  public boolean isCompare() {
+    return (this.getOpcode() >= IFEQ && this.getOpcode() <= IF_ACMPNE)
+        || (this.getOpcode() >= IFNULL && this.getOpcode() <= IFNONNULL);
   }
 
   public boolean isJump() {
@@ -461,15 +459,6 @@ public abstract class AbstractInsnNode {
 
   public JumpInsnNode asJump() {
     return (JumpInsnNode) this;
-  }
-
-  public int conditionStackSize() {
-    if (this.getOpcode() >= IF_ICMPEQ && this.getOpcode() <= IF_ICMPLE) return 2;
-
-    if ((this.getOpcode() >= IFEQ && this.getOpcode() <= IFLE)
-        || (this.getOpcode() == IFNULL || this.getOpcode() == IFNONNULL)) return 1;
-
-    return 0;
   }
 
   public MethodInsnNode asMethodInsn() {
@@ -646,6 +635,82 @@ public abstract class AbstractInsnNode {
 
   public String namedOpcode() {
     return NamedOpcodes.map(this.getOpcode());
+  }
+
+  /**
+   * Returns the number of stack values consumed by this instruction
+   */
+  public int getConsumedStackValuesCount(Frame<? extends Value> frame) {
+    return switch (this.getOpcode()) {
+      // Unary operations (one value)
+      case ISTORE, LSTORE, FSTORE, DSTORE, ASTORE, POP, DUP, INEG,
+           LNEG, FNEG, DNEG, I2L, I2F, I2D, L2I, L2F, L2D, F2I, F2L, F2D, D2I, D2L, D2F, I2B, I2C, I2S, IFEQ, IFNE,
+           IFLT, IFGE, IFGT, IFLE, TABLESWITCH, LOOKUPSWITCH, IRETURN, LRETURN, FRETURN, DRETURN, ARETURN, PUTSTATIC,
+           GETFIELD, NEWARRAY, ANEWARRAY, ARRAYLENGTH, ATHROW, CHECKCAST, INSTANCEOF, MONITORENTER, MONITOREXIT, IFNULL,
+           IFNONNULL -> 1;
+      // Binary operations (two values)
+      case IALOAD, LALOAD, FALOAD, DALOAD, AALOAD, BALOAD, CALOAD, SALOAD, IADD, LADD, FADD, DADD, ISUB, LSUB, FSUB,
+           DSUB, IMUL, LMUL, FMUL, DMUL, IDIV, LDIV, FDIV, DDIV, IREM, LREM, FREM, DREM, ISHL, LSHL, ISHR, LSHR, IUSHR,
+           LUSHR, IAND, LAND, IOR, LOR, IXOR, LXOR, LCMP, FCMPL, FCMPG, DCMPL, DCMPG, IF_ICMPEQ, IF_ICMPNE, IF_ICMPLT,
+           IF_ICMPGE, IF_ICMPGT, IF_ICMPLE, IF_ACMPEQ, IF_ACMPNE, PUTFIELD, SWAP, DUP_X1 -> 2;
+      // Ternary operations (three values)
+      case IASTORE, LASTORE, FASTORE, DASTORE, AASTORE, BASTORE, CASTORE, SASTORE -> 3;
+
+      // Method invocation
+      case INVOKEVIRTUAL, INVOKESPECIAL, INVOKESTATIC, INVOKEINTERFACE, INVOKEDYNAMIC -> getRequiredStackValuesCountForMethodInvocation();
+      // Multi-dimensional array creation
+      case MULTIANEWARRAY -> ((MultiANewArrayInsnNode) this).dims;
+
+      // Dynamic forms (uses frame)
+      case POP2, DUP2 -> {
+        Value sourceValue = frame.getStack(frame.getStackSize() - 1);
+        yield sourceValue.getSize() == 2 ? 1 : 2;
+      }
+      case DUP_X2 -> {
+        Value sourceValue2 = frame.getStack(frame.getStackSize() - 2);
+        yield sourceValue2.getSize() == 2 ? 2 : 3;
+      }
+      case DUP2_X1 -> {
+        Value sourceValue1 = frame.getStack(frame.getStackSize() - 1);
+        yield sourceValue1.getSize() == 2 ? 2 : 3;
+      }
+      case DUP2_X2 -> {
+        Value sourceValue1 = frame.getStack(frame.getStackSize() - 1);
+        Value sourceValue2 = frame.getStack(frame.getStackSize() - 2);
+        if (sourceValue1.getSize() == 2 && sourceValue2.getSize() == 2) {
+          yield 2;
+        }
+        Value sourceValue3 = frame.getStack(frame.getStackSize() - 2);
+        if (sourceValue1.getSize() == 2 || sourceValue3.getSize() == 2) {
+          yield 3;
+        }
+        yield 4;
+      }
+
+      // No values required
+      default -> 0;
+    };
+  }
+
+  /**
+   * Calculates the number of stack values required for a method invocation by descriptor.
+   */
+  private int getRequiredStackValuesCountForMethodInvocation() {
+    String desc;
+    if (this instanceof MethodInsnNode methodInsn) {
+      desc = methodInsn.desc;
+    } else if (this instanceof InvokeDynamicInsnNode invokeDynamicInsn) {
+      desc = invokeDynamicInsn.desc;
+    } else {
+      throw new IllegalStateException("Not a method instruction");
+    }
+
+    int count = Type.getArgumentCount(desc); // Arguments count = Stack values count
+    if (this.getOpcode() != INVOKESTATIC && this.getOpcode() != INVOKEDYNAMIC) {
+      count++; // "this" reference
+    }
+
+    return count;
   }
 
   @Override

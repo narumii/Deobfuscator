@@ -57,10 +57,10 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
 
       // Find methods that instantly returns an exception
       classWrapper.methods().forEach(methodNode -> {
-        MethodContext framelessContext = MethodContext.frameless(classWrapper, methodNode);
+        MethodContext methodContext = MethodContext.of(classWrapper, methodNode);
 
         // Check instructions
-        if (methodNode.instructions.size() == 2 && INSTANT_RETURN_EXCEPTION.matches(framelessContext.newInsnContext(methodNode.instructions.getFirst()))) {
+        if (methodNode.instructions.size() == 2 && INSTANT_RETURN_EXCEPTION.matches(methodContext.at(methodNode.instructions.getFirst()))) {
           // Add it to list
           instantReturnExceptionMethods.add(MethodRef.of(classWrapper.classNode(), methodNode));
         }
@@ -70,10 +70,10 @@ public class ZelixUselessTryCatchRemoverTransformer extends Transformer {
 
       // Remove try-catches with these instant return exception methods
       classWrapper.methods().forEach(methodNode -> {
-        MethodContext framelessContext = MethodContext.frameless(classWrapper, methodNode);
+        MethodContext methodContext = MethodContext.of(classWrapper, methodNode);
 
         methodNode.tryCatchBlocks.removeIf(tryBlock -> {
-          InsnContext start = framelessContext.newInsnContext(tryBlock.handler.getNext());
+          InsnContext start = methodContext.at(tryBlock.handler.getNext());
           MatchContext result = INVOKE_AND_RETURN.matchResult(start);
           if (result != null) {
             MethodRef methodRef = MethodRef.of((MethodInsnNode) result.insn());

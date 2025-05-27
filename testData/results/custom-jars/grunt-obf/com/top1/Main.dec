@@ -1,0 +1,98 @@
+package com.top1;
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.printf(hqz1VQsWg9(tWMq7yk14u(btvQBodoND(t4094mjSjm(LKgJwTY44h(Ylhv2OxrVH(Main$processor$ConstantPool.const_nmionQdI1EMWwVW)))))));
+        int i = 1;
+
+        while (i <= 5) {
+            if (Main$processor.vfdBmmgDnboaStS(-455672605, 763702251, null, null) != 142672354) {
+                return;
+            }
+
+            System.out.println("i = " + i);
+            i++;
+            if (Main$processor.37PB7gTWTqsehtD(969969766, -1105239419, null, null) <= 571151377) {
+                return;
+            }
+
+            if (Main$processor.GelKdnJMSth8Wit(1016872952, -722054739, null, null) == 865674987) {
+                return;
+            }
+        }
+
+        if (Main$processor.wjDBZoykQJ2vrQS(-28236214, 865724549, null, null) <= 101821165) {
+            ;
+        }
+    }
+
+    private static String hqz1VQsWg9(String var0) {
+        StringBuilder var1 = new StringBuilder();
+
+        for (int var2 = 0; var2 < var0.length(); var2++) {
+            char var10001 = var0.charAt(var2);
+            var1.append((char)((var10001 | 133) - (var10001 & 133)));
+        }
+
+        return var1.toString();
+    }
+
+    private static String tWMq7yk14u(String var0) {
+        StringBuilder var1 = new StringBuilder();
+
+        for (int var2 = 0; var2 < var0.length(); var2++) {
+            char var10001 = var0.charAt(var2);
+            short var10004 = 1338;
+            var1.append((char)(var10001 & -1339 | 1338 & ~var10001));
+        }
+
+        return var1.toString();
+    }
+
+    private static String btvQBodoND(String var0) {
+        StringBuilder var1 = new StringBuilder();
+
+        for (int var2 = 0; var2 < var0.length(); var2++) {
+            char var10001 = var0.charAt(var2);
+            var1.append((char)((var10001 | 2022) - (var10001 & 2022)));
+        }
+
+        return var1.toString();
+    }
+
+    private static String t4094mjSjm(String var0) {
+        StringBuilder var1 = new StringBuilder();
+
+        for (int var2 = 0; var2 < var0.length(); var2++) {
+            char var10001 = var0.charAt(var2);
+            int var10004 = var10001 | 2033;
+            short var10003 = 2033;
+            var1.append((char)(var10004 & (-2034 | ~var10001)));
+        }
+
+        return var1.toString();
+    }
+
+    private static String LKgJwTY44h(String var0) {
+        StringBuilder var1 = new StringBuilder();
+
+        for (int var2 = 0; var2 < var0.length(); var2++) {
+            char var10001 = var0.charAt(var2);
+            short var10004 = 542;
+            var1.append((char)(var10001 & -543 | 542 & ~var10001));
+        }
+
+        return var1.toString();
+    }
+
+    private static String Ylhv2OxrVH(String var0) {
+        StringBuilder var1 = new StringBuilder();
+
+        for (int var2 = 0; var2 < var0.length(); var2++) {
+            char var10001 = var0.charAt(var2);
+            var1.append((char)((var10001 | 630) - (var10001 & 630)));
+        }
+
+        return var1.toString();
+    }
+}
