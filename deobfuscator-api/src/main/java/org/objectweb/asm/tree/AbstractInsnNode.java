@@ -465,8 +465,8 @@ public abstract class AbstractInsnNode {
     return (MethodInsnNode) this;
   }
 
-  public JumpInsnNode asFieldInsn() {
-    return (JumpInsnNode) this;
+  public FieldInsnNode asFieldInsn() {
+    return (FieldInsnNode) this;
   }
 
   public InvokeDynamicInsnNode asInvokeDynamicInsn() {
