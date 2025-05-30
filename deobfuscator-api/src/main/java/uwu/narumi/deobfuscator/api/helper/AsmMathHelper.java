@@ -28,7 +28,9 @@ public final class AsmMathHelper {
       IFLT, value -> value < 0,
       IFGE, value -> value >= 0,
       IFGT, value -> value > 0,
-      IFLE, value -> value <= 0
+      IFLE, value -> value <= 0,
+      IFNULL, Objects::isNull,
+      IFNONNULL, Objects::nonNull
   );
 
   private static final Map<Integer, BiPredicate<Integer, Integer>> TWO_VALUES_VALUE_CONDITION_PREDICATES = Map.of(
@@ -136,11 +138,11 @@ public final class AsmMathHelper {
     return MATH_UNARY_OPERATIONS.get(opcode).apply(number);
   }
 
-  public static boolean isOneValueCondition(int opcode) {
+  public static boolean isOneValueCondition(Integer opcode) {
     return ONE_VALUE_CONDITION_PREDICATES.containsKey(opcode);
   }
 
-  public static boolean condition(int value, int opcode) {
+  public static boolean condition(Integer value, int opcode) {
     return ONE_VALUE_CONDITION_PREDICATES.get(opcode).test(value);
   }
 
@@ -168,6 +170,13 @@ public final class AsmMathHelper {
       if (constantValue.get() instanceof Integer value) {
         boolean ifResult = AsmMathHelper.condition(
             value, // Value
+            jumpInsn.getOpcode() // Opcode
+        );
+
+        return Optional.of(ifResult);
+      } else if (constantValue.get() == null) {
+        boolean ifResult = AsmMathHelper.condition(
+            null, // Value
             jumpInsn.getOpcode() // Opcode
         );
 
