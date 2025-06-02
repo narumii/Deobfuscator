@@ -7,8 +7,11 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.analysis.Frame;
+import org.objectweb.asm.tree.analysis.OriginalSourceValue;
 import org.objectweb.asm.tree.analysis.Value;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.MethodRef;
 import uwu.narumi.deobfuscator.api.context.Context;
@@ -270,5 +273,41 @@ public class AsmHelper implements Opcodes {
     if (includeEnd) instructions.add(end);
 
     return instructions;
+  }
+
+  /**
+   * Counts variable usages in the method.
+   *
+   * @param methodContext Method context to analyze
+   * @return A map of var store instructions -> usage count (load, iinc) in the method.
+   */
+  public static Map<VarInsnNode, Integer> getVarUsages(MethodContext methodContext) {
+    Map<VarInsnNode, Integer> varUsages = new HashMap<>();
+
+    for (AbstractInsnNode insn : methodContext.methodNode().instructions.toArray()) {
+      if ((insn instanceof VarInsnNode && !insn.isVarStore()) || insn instanceof IincInsnNode) {
+        InsnContext insnContext = methodContext.at(insn);
+
+        Frame<OriginalSourceValue> frame = insnContext.frame();
+        if (frame == null) continue;
+
+        int varIndex;
+        if (insn instanceof VarInsnNode varInsnNode) {
+          varIndex = varInsnNode.var;
+        } else {
+          varIndex = ((IincInsnNode) insn).var;
+        }
+
+        OriginalSourceValue localVariableSourceValue = frame.getLocal(varIndex);
+        for (AbstractInsnNode sourceInsn : localVariableSourceValue.insns) {
+          // Save var stores in use
+          if (sourceInsn.isVarStore()) {
+            varUsages.merge((VarInsnNode) sourceInsn, 1, Integer::sum);
+          }
+        }
+      }
+    }
+
+    return varUsages;
   }
 }
