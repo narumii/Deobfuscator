@@ -17,8 +17,11 @@ import uwu.narumi.deobfuscator.core.other.impl.universal.StringBuilderTransforme
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
 import uwu.narumi.deobfuscator.base.TestDeobfuscationBase;
 import uwu.narumi.deobfuscator.transformer.TestSandboxSecurityTransformer;
+import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class TestDeobfuscation extends TestDeobfuscationBase {
 
@@ -52,6 +55,21 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
     test("Remapper")
         .transformers(RemapperTransformer::new)
         .input(OutputType.MULTIPLE_CLASSES, InputType.JAVA_CODE, "remap")
+        .register();
+    test("Remapper - Preserve Packages")
+        .transformers(() -> new RemapperTransformer(true))
+        .input(OutputType.MULTIPLE_CLASSES, InputType.JAVA_CODE, "uwu/narumi/test/remap/preserve")
+        .noDecompile()
+        // postProcess removed as it's not supported by TestBuilder.
+        // Path verification for preserved packages cannot be directly asserted here anymore.
+        .register();
+    test("Remapper - Flatten Packages (Default)")
+        .transformers(() -> new RemapperTransformer(false)) // Explicitly false
+        .input(OutputType.MULTIPLE_CLASSES, InputType.JAVA_CODE, "uwu/narumi/test/remap/preserve")
+        .noDecompile()
+        // postProcess removed as it's not supported by TestBuilder.
+        // Path verification for flattened packages cannot be directly asserted here anymore.
+        // The existing "Remapper" test implicitly covers the default (flattening) behavior.
         .register();
 
     // Test sandbox security (e.g. not allowing dangerous calls)

@@ -31,15 +31,25 @@ public class RemapperTransformer extends Transformer {
   private final Predicate<String> classPredicate;
   private final Predicate<String> methodPredicate;
   private final Predicate<String> fieldPredicate;
+  private final boolean preservePackages;
 
   public RemapperTransformer() {
-    this(s -> true, s -> true, s -> true);
+    this(s -> true, s -> true, s -> true, false);
+  }
+
+  public RemapperTransformer(boolean preservePackages) {
+    this(s -> true, s -> true, s -> true, preservePackages);
   }
 
   public RemapperTransformer(Predicate<String> classPredicate, Predicate<String> methodPredicate, Predicate<String> fieldPredicate) {
+    this(classPredicate, methodPredicate, fieldPredicate, false);
+  }
+
+  public RemapperTransformer(Predicate<String> classPredicate, Predicate<String> methodPredicate, Predicate<String> fieldPredicate, boolean preservePackages) {
     this.classPredicate = classPredicate;
     this.methodPredicate = methodPredicate;
     this.fieldPredicate = fieldPredicate;
+    this.preservePackages = preservePackages;
   }
 
   @Override
@@ -60,7 +70,13 @@ public class RemapperTransformer extends Transformer {
     sortedClasses.forEach(classWrapper -> {
       // Class
       if (this.classPredicate.test(classWrapper.name()) && !remapper.classMappings.containsKey(classWrapper.name())) {
-        remapper.classMappings.put(classWrapper.name(), "class_" + classCounter.getAndIncrement());
+        String newClassName;
+        if (this.preservePackages) {
+          newClassName = classWrapper.name();
+        } else {
+          newClassName = "class_" + classCounter.getAndIncrement();
+        }
+        remapper.classMappings.put(classWrapper.name(), newClassName);
       }
 
       InheritanceVertex vertex = inheritanceGraph.getVertex(classWrapper.name());
@@ -124,7 +140,15 @@ public class RemapperTransformer extends Transformer {
 
       // Set new class node
       classWrapper.setClassNode(newNode);
-      classWrapper.setPathInJar(newNode.name + ".class");
+      if (this.preservePackages) {
+        // Path should reflect original package structure. newNode.name is already the original name.
+        classWrapper.setPathInJar(newNode.name + ".class");
+      } else {
+        // Current behavior: flatten packages by using only the class name for the path.
+        // The newNode.name here will be the remapped name like "class_0"
+        String simpleClassName = newNode.name.substring(newNode.name.lastIndexOf('/') + 1);
+        classWrapper.setPathInJar(simpleClassName + ".class");
+      }
 
       markChange();
     });
