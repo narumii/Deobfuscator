@@ -17,8 +17,11 @@ import uwu.narumi.deobfuscator.core.other.impl.universal.StringBuilderTransforme
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
 import uwu.narumi.deobfuscator.base.TestDeobfuscationBase;
 import uwu.narumi.deobfuscator.transformer.TestSandboxSecurityTransformer;
+import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class TestDeobfuscation extends TestDeobfuscationBase {
 
@@ -55,8 +58,14 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .register();
     test("Remapper - Preserve Packages")
         .transformers(() -> new RemapperTransformer(true))
-        .input(OutputType.MULTIPLE_CLASSES, InputType.JAVA_CODE, "remappreserve")
-        // Decompilation is enabled by default, will compare against results in testData/results/java/remappreserve
+        .input(OutputType.MULTIPLE_CLASSES, InputType.JAVA_CODE, "uwu/narumi/test/remap/preserve")
+        .noDecompile()
+        .register();
+
+    test("Remapper - Flatten Packages (Default)")
+        .transformers(() -> new RemapperTransformer(false)) // Explicitly false
+        .input(OutputType.MULTIPLE_CLASSES, InputType.JAVA_CODE, "uwu/narumi/test/remap/preserve")
+        .noDecompile()
         .register();
 
     // Test sandbox security (e.g. not allowing dangerous calls)
