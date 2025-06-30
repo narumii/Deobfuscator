@@ -1,0 +1,14 @@
+package remappreserve;
+
+import remappreserve.nes.ted.class_2;
+
+public class class_0 {
+    public void method_0() {
+        System.out.println("AnotherInMain running...");
+        class_1 mc = new class_1();
+        mc.method_1();
+        class_2 dnc = new class_2();
+        mc.method_2(dnc);
+        dnc.method_3();
+    }
+}

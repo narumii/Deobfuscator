@@ -31,15 +31,25 @@ public class RemapperTransformer extends Transformer {
   private final Predicate<String> classPredicate;
   private final Predicate<String> methodPredicate;
   private final Predicate<String> fieldPredicate;
+  private final boolean preservePackages;
 
   public RemapperTransformer() {
-    this(s -> true, s -> true, s -> true);
+    this(s -> true, s -> true, s -> true, false);
+  }
+
+  public RemapperTransformer(boolean preservePackages) {
+    this(s -> true, s -> true, s -> true, preservePackages);
   }
 
   public RemapperTransformer(Predicate<String> classPredicate, Predicate<String> methodPredicate, Predicate<String> fieldPredicate) {
+    this(classPredicate, methodPredicate, fieldPredicate, false);
+  }
+
+  public RemapperTransformer(Predicate<String> classPredicate, Predicate<String> methodPredicate, Predicate<String> fieldPredicate, boolean preservePackages) {
     this.classPredicate = classPredicate;
     this.methodPredicate = methodPredicate;
     this.fieldPredicate = fieldPredicate;
+    this.preservePackages = preservePackages;
   }
 
   @Override
@@ -60,7 +70,22 @@ public class RemapperTransformer extends Transformer {
     sortedClasses.forEach(classWrapper -> {
       // Class
       if (this.classPredicate.test(classWrapper.name()) && !remapper.classMappings.containsKey(classWrapper.name())) {
-        remapper.classMappings.put(classWrapper.name(), "class_" + classCounter.getAndIncrement());
+        String originalName = classWrapper.name();
+        String simpleRemappedName = "class_" + classCounter.getAndIncrement();
+        String newFullName;
+
+        if (this.preservePackages) {
+          int lastSlash = originalName.lastIndexOf('/');
+          if (lastSlash != -1) {
+            newFullName = originalName.substring(0, lastSlash + 1) + simpleRemappedName;
+          } else {
+            // No package, just use the simple remapped name
+            newFullName = simpleRemappedName;
+          }
+        } else {
+          newFullName = simpleRemappedName;
+        }
+        remapper.classMappings.put(originalName, newFullName);
       }
 
       InheritanceVertex vertex = inheritanceGraph.getVertex(classWrapper.name());

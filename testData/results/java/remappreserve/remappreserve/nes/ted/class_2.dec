@@ -1,0 +1,11 @@
+package remappreserve.nes.ted;
+
+import remappreserve.class_1;
+
+public class class_2 {
+    public void method_3() {
+        System.out.println("DeeplyNestedClass reporting in!");
+        System.out.println("Accessing MainClass: " + class_1.field_0);
+        new class_1().method_1();
+    }
+}

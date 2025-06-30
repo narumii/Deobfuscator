@@ -53,6 +53,11 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .transformers(RemapperTransformer::new)
         .input(OutputType.MULTIPLE_CLASSES, InputType.JAVA_CODE, "remap")
         .register();
+    test("Remapper - Preserve Packages")
+        .transformers(() -> new RemapperTransformer(true))
+        .input(OutputType.MULTIPLE_CLASSES, InputType.JAVA_CODE, "remappreserve")
+        // Decompilation is enabled by default, will compare against results in testData/results/java/remappreserve
+        .register();
 
     // Test sandbox security (e.g. not allowing dangerous calls)
     test("Sandbox security")
