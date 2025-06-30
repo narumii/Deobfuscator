@@ -68,16 +68,25 @@ public class RemapperTransformer extends Transformer {
         .toList();
 
     sortedClasses.forEach(classWrapper -> {
-      // Class
-      if (this.classPredicate.test(classWrapper.name()) && !remapper.classMappings.containsKey(classWrapper.name())) {
-        String newClassName;
-        if (this.preservePackages) {
-          newClassName = classWrapper.name();
+    // Class
+    if (this.classPredicate.test(classWrapper.name()) && !remapper.classMappings.containsKey(classWrapper.name())) {
+      String originalName = classWrapper.name();
+      String simpleRemappedName = "class_" + classCounter.getAndIncrement();
+      String newFullName;
+
+      if (this.preservePackages) {
+        int lastSlash = originalName.lastIndexOf('/');
+        if (lastSlash != -1) {
+          newFullName = originalName.substring(0, lastSlash + 1) + simpleRemappedName;
         } else {
-          newClassName = "class_" + classCounter.getAndIncrement();
+          // No package, just use the simple remapped name
+          newFullName = simpleRemappedName;
         }
-        remapper.classMappings.put(classWrapper.name(), newClassName);
+      } else {
+        newFullName = simpleRemappedName;
       }
+      remapper.classMappings.put(originalName, newFullName);
+    }
 
       InheritanceVertex vertex = inheritanceGraph.getVertex(classWrapper.name());
       // Parents and children combined

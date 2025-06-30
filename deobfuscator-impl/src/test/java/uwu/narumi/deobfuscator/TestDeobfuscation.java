@@ -60,16 +60,12 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .transformers(() -> new RemapperTransformer(true))
         .input(OutputType.MULTIPLE_CLASSES, InputType.JAVA_CODE, "uwu/narumi/test/remap/preserve")
         .noDecompile()
-        // postProcess removed as it's not supported by TestBuilder.
-        // Path verification for preserved packages cannot be directly asserted here anymore.
         .register();
+
     test("Remapper - Flatten Packages (Default)")
         .transformers(() -> new RemapperTransformer(false)) // Explicitly false
         .input(OutputType.MULTIPLE_CLASSES, InputType.JAVA_CODE, "uwu/narumi/test/remap/preserve")
         .noDecompile()
-        // postProcess removed as it's not supported by TestBuilder.
-        // Path verification for flattened packages cannot be directly asserted here anymore.
-        // The existing "Remapper" test implicitly covers the default (flattening) behavior.
         .register();
 
     // Test sandbox security (e.g. not allowing dangerous calls)

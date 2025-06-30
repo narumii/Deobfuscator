@@ -1,0 +1,15 @@
+package remappreserve;
+
+import remappreserve.nes.ted.class_2;
+
+public class class_1 {
+    public static String field_0 = "Hello from MainClass";
+
+    public void method_1() {
+        System.out.println(field_0);
+    }
+
+    public void method_2(class_2 dnc) {
+        dnc.method_3();
+    }
+}
