@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.jetbrains.annotations.Nullable;
@@ -631,6 +632,53 @@ public abstract class AbstractInsnNode {
     }
 
     return current;
+  }
+
+  /**
+   * Follows jumps until a condition is met. Follows only GOTO
+   *
+   * @param until Condition to stop walking
+   * @return The instruction that matches the condition or {@code null} if no such instruction is found
+   */
+  @Nullable
+  public AbstractInsnNode followJumpsUntil(
+      Function<AbstractInsnNode, PredicateResult> until,
+      Predicate<AbstractInsnNode> filter,
+      Consumer<AbstractInsnNode> consumer
+  ) {
+    AbstractInsnNode current = this;
+    PredicateResult result = null;
+    while (current != null && (result = until.apply(current)) == PredicateResult.CONTINUE) {
+      if (current instanceof JumpInsnNode jumpInsn) {
+        if (current.getOpcode() == GOTO) {
+          current = jumpInsn.label;
+          continue;
+        } else {
+          // If it's not a GOTO, we stop here
+          return null;
+        }
+      }
+
+      if (filter.test(current)) {
+        consumer.accept(current);
+      }
+
+      current = current.getNext();
+    }
+
+    if (result == PredicateResult.SUCCESS) {
+      return current;
+    } else if (result == PredicateResult.FAILED) {
+      return null; // Failed to find a matching instruction
+    } else {
+      return null;
+    }
+  }
+
+  public enum PredicateResult {
+    FAILED,
+    CONTINUE,
+    SUCCESS
   }
 
   public String namedOpcode() {

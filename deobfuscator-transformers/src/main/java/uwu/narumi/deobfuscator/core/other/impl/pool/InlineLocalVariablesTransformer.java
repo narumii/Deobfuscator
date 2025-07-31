@@ -1,29 +1,23 @@
 package uwu.narumi.deobfuscator.core.other.impl.pool;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.IincInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
+import uwu.narumi.deobfuscator.api.asm.InsnContext;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
-import uwu.narumi.deobfuscator.api.asm.matcher.Match;
-import uwu.narumi.deobfuscator.api.asm.matcher.group.SequenceMatch;
-import uwu.narumi.deobfuscator.api.asm.matcher.impl.VarLoadMatch;
+import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.helper.FramedInstructionsStream;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Inlines constant local variables
+ * Inlines local variables (constants and next to each other var load/store pairs).
  */
 public class InlineLocalVariablesTransformer extends Transformer {
-  private static final Match VAR_STORE_LOAD_PAIR = SequenceMatch.of(
-      // Store
-      Match.of(ctx -> ctx.insn().isVarStore()).capture("store"),
-      // Load
-      Match.of(ctx -> ctx.insn().isVarLoad()).capture("load")
-  );
 
   @Override
   protected void transform() throws Exception {
@@ -49,38 +43,68 @@ public class InlineLocalVariablesTransformer extends Transformer {
           }
         });
 
-    // Find all variable store and load pairs
+    // Inline var load/store pairs that are next to each other and used only once
     scopedClasses().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
+      MethodContext methodContext = MethodContext.of(classWrapper, methodNode);
+
       // Count var usages
-      Map<Integer, Integer> varUsages = new HashMap<>(); // var index -> usage count
+      Map<VarInsnNode, Integer> varUsages = AsmHelper.getVarUsages(methodContext);
+
       for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-        if (insn instanceof VarInsnNode && insn.isVarLoad()) {
-          varUsages.merge(((VarInsnNode) insn).var, 1, Integer::sum);
-        } else if (insn instanceof IincInsnNode) {
-          varUsages.merge(((IincInsnNode) insn).var, 1, Integer::sum);
+        if (insn.isVarStore()) {
+          if (!varUsages.containsKey((VarInsnNode) insn) || varUsages.get((VarInsnNode) insn) > 1) {
+            // If the variable is used more than once, we cannot inline
+            continue;
+          }
+
+          List<VarInsnNode> varStoreOrder = new ArrayList<>();
+          // Collect all variable indexes in order of their usage
+          AbstractInsnNode end = insn.followJumpsUntil(insn2 -> {
+            if (insn2.isVarStore()) {
+              return AbstractInsnNode.PredicateResult.CONTINUE;
+            }
+            return AbstractInsnNode.PredicateResult.SUCCESS;
+          }, AbstractInsnNode::isVarStore, insn2 -> varStoreOrder.add((VarInsnNode)insn2));
+          if (end == null) {
+            // If we cannot find the end of the sequence, we cannot inline
+            continue;
+          }
+
+          // Check if we have var load instructions in the same order
+          List<VarInsnNode> varLoadOrder = new ArrayList<>();
+          end.followJumpsUntil(insn2 -> {
+            if (insn2.isVarLoad()) {
+              InsnContext insnContext = methodContext.at(insn2);
+              OriginalSourceValue localVariableSourceValue = insnContext.frame().getLocal(((VarInsnNode) insn2).var);
+              if (!localVariableSourceValue.isOneWayProduced()) {
+                // If the variable is not one-way produced, we cannot inline
+                return AbstractInsnNode.PredicateResult.FAILED;
+              }
+              return AbstractInsnNode.PredicateResult.CONTINUE;
+            }
+
+            return AbstractInsnNode.PredicateResult.SUCCESS;
+          }, AbstractInsnNode::isVarLoad, insn2 -> varLoadOrder.add((VarInsnNode)insn2));
+
+          List<Integer> varStoreIndexesOrder = varStoreOrder.stream()
+              .map(varInsn -> varInsn.var)
+              .toList();
+          // In reverse order to match the stack order
+          List<Integer> varLoadIndexesOrder = varLoadOrder.stream()
+              .map(varInsn -> varInsn.var)
+              .sorted(Collections.reverseOrder())
+              .toList();
+
+          // Var load and stores are in the same order and next to each other. We can inline them
+          if (varStoreIndexesOrder.equals(varLoadIndexesOrder)) {
+            // Inline (use stack instead of var load/store)
+            varStoreOrder.forEach(varInsn -> methodNode.instructions.remove(varInsn));
+            varLoadOrder.forEach(varInsn -> methodNode.instructions.remove(varInsn));
+
+            markChange();
+          }
         }
       }
-
-      // Now we can find pairs
-      MethodContext methodContext = MethodContext.of(classWrapper, methodNode);
-      VAR_STORE_LOAD_PAIR.findAllMatches(methodContext).forEach(match -> {
-        VarInsnNode varLoadInsn = (VarInsnNode) match.captures().get("load").insn();
-        VarInsnNode varStoreInsn = (VarInsnNode) match.captures().get("store").insn();
-        if (varLoadInsn.var != varStoreInsn.var) {
-          // If they are not the same variable, we cannot inline
-          return;
-        }
-        int varIndex = varLoadInsn.var;
-        if (varUsages.getOrDefault(varIndex, 0) > 1) {
-          // If the variable is used more than once, we cannot inline
-          return;
-        }
-
-        // Remove the variable completely and use stack value instead
-        match.removeAll();
-
-        markChange();
-      });
     }));
   }
 }
