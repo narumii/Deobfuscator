@@ -40,9 +40,10 @@ public class UnUsedLabelCleanTransformer extends Transformer {
                         } else if (node instanceof TableSwitchInsnNode tableSwitchInsnNode) {
                           labelNodes.addAll(tableSwitchInsnNode.labels);
                           labelNodes.add(tableSwitchInsnNode.dflt);
-                        } else if (node instanceof LineNumberNode) {
-                          labelNodes.add(((LineNumberNode) node).start);
                         }
+//                        } else if (node instanceof LineNumberNode) {
+//                          labelNodes.add(((LineNumberNode) node).start);
+//                        }
                       });
 
               // Remove label nodes that are not used

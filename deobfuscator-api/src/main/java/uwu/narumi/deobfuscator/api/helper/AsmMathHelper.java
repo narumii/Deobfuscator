@@ -182,7 +182,8 @@ public final class AsmMathHelper {
 
         return Optional.of(ifResult);
       }
-    } else if (AsmMathHelper.isTwoValuesCondition(jumpInsn.getOpcode())) {
+    }
+    else if (AsmMathHelper.isTwoValuesCondition(jumpInsn.getOpcode())) {
       // Two-value if statements
 
       // Get instructions from stack that are passed to if statement
