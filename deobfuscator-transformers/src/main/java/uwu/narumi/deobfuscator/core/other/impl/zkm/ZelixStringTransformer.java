@@ -1,271 +1,202 @@
 package uwu.narumi.deobfuscator.core.other.impl.zkm;
 
+import dev.xdark.ssvm.invoke.Argument;
+import dev.xdark.ssvm.mirror.type.InstanceClass;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
+import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.asm.MethodContext;
+import uwu.narumi.deobfuscator.api.asm.matcher.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
+import uwu.narumi.deobfuscator.api.asm.matcher.group.SequenceMatch;
+import uwu.narumi.deobfuscator.api.asm.matcher.impl.FieldMatch;
+import uwu.narumi.deobfuscator.api.asm.matcher.impl.MethodMatch;
+import uwu.narumi.deobfuscator.api.asm.matcher.impl.NumberMatch;
+import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
+import uwu.narumi.deobfuscator.api.execution.SandBox;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ZelixStringTransformer extends Transformer {
+    private static final Match ZELIX_STRING_CLINIT_MATCH = SequenceMatch.of(
+        OpcodeMatch.of(ALOAD),
+        FieldMatch.create().desc("[Ljava/lang/String;").capture("field-1"),
+        NumberMatch.of(),
+        OpcodeMatch.of(ANEWARRAY),
+        FieldMatch.create().desc("[Ljava/lang/String;").capture("field-2"),
+        OpcodeMatch.of(GOTO)
+    );
 
-    HashMap<String, Integer> keyType1 = new HashMap<>();
-    HashMap<String, List<Byte>> keyType2 = new HashMap<>();
-    HashMap<String, Integer> staticArraySize = new HashMap<>();
-    HashMap<String, List<Integer>> offsets = new HashMap<>();
+    private static final Match INVOKE_NUMBER_MATCH = SequenceMatch.of(
+        NumberMatch.numInteger().capture("key1"),
+        NumberMatch.numInteger().capture("key2"),
+        MethodMatch.create().desc("(II)Ljava/lang/String;").capture("method-node")
+    );
 
-    HashMap<String, List<String>> encryptedStrings = new HashMap<>();
 
-    /* Written by https://github.com/Lampadina17 | OG 19/07/2024, Rewritten 09/08/2024 */
     @Override
     protected void transform() throws Exception {
-        scopedClasses().forEach(classWrapper -> {
-            /* Extract key type 1 from hardcoded xor encryption */
-            classWrapper.methods().stream()
-                    .filter(methodNode -> methodNode.desc.equals("(Ljava/lang/String;)[C"))
-                    .forEach(methodNode ->
-                            Arrays.stream(methodNode.instructions.toArray())
-                                    .filter(ain -> ain instanceof IntInsnNode)
-                                    .filter(ain -> ain.getNext() instanceof InsnNode)
-                                    .filter(ain -> ain.getNext().getOpcode() == IXOR)
-                                    .map(IntInsnNode.class::cast)
-                                    .forEach(iin -> keyType1.put(classWrapper.name(), iin.operand)));
+        List<ClassWrapper> encryptedClassWrapper = new ArrayList<>();
 
-            /* Temporary variable */
-            List<Byte> key2 = new ArrayList<>();
+        for (ClassWrapper classWrapper: scopedClasses()) {
+            if (classWrapper.findClInit().isEmpty())
+                continue;
 
-            /* Extract key type 2 from hardcoded switch case xor encryption */
-            classWrapper.methods().stream()
-                    .filter(methodNode -> methodNode.desc.equals("([C)Ljava/lang/String;"))
-                    .forEach(methodNode ->
-                            Arrays.stream(methodNode.instructions.toArray())
-                                    .filter(ain -> ain instanceof IntInsnNode)
-                                    .map(IntInsnNode.class::cast)
-                                    .forEach(iin -> key2.add((byte) iin.operand)));
+            MethodNode clinitMethod = classWrapper.findClInit().get();
+            MethodContext methodContext = MethodContext.of(classWrapper, clinitMethod);
+            MatchContext match = ZELIX_STRING_CLINIT_MATCH.findFirstMatch(methodContext);
 
-            /* Store the key data by class */
-            if (!key2.isEmpty()) keyType2.put(classWrapper.name(), key2);
+            if (match == null)
+                continue;
 
-            /* Retrieve array length (static block) */
-            classWrapper.methods().stream()
-                    .filter(methodNode -> methodNode.name.equals("<clinit>"))
-                    .forEach(methodNode -> {
-                        if (methodNode.instructions.getFirst() instanceof IntInsnNode && methodNode.instructions.getFirst().getNext() instanceof TypeInsnNode) {
-                            staticArraySize.put(classWrapper.name(), ((IntInsnNode) methodNode.instructions.getFirst()).operand);
-                        }
+            // copy clinitMethod
+            byte[] clonedClass = cloneClassWithClinit(classWrapper, clinitMethod, match);
+            byte[] removedInsnByte = removeDependantInsn(classWrapper, clonedClass);
+            byte[] modified = renameInvoke(classWrapper, removedInsnByte);
+
+            context().addCompiledClass("tmp/" + classWrapper.name() + ".class", modified);
+            encryptedClassWrapper.add(classWrapper);
+        }
+
+        SandBox sandBox = new SandBox(context());
+
+        for (ClassWrapper classWrapper : encryptedClassWrapper) {
+            try {
+                InstanceClass clazz = sandBox.getHelper().loadClass("tmp." + classWrapper.canonicalName());
+
+                for (MethodNode method : classWrapper.methods()) {
+                    MethodContext methodContext = MethodContext.of(classWrapper, method);
+                    INVOKE_NUMBER_MATCH.findAllMatches(methodContext).forEach(matchContext -> {
+                        int key1 = matchContext.captures().get("key1").insn().asInteger();
+                        int key2 = matchContext.captures().get("key2").insn().asInteger();
+                        MethodInsnNode decryptedMethod = matchContext.captures().get("method-node").insn().asMethodInsn();
+
+                        String value = sandBox.getInvocationUtil().invokeStringReference(
+                            clazz.getMethod(decryptedMethod.name, "(II)Ljava/lang/String;"),
+                            Argument.int32(key1),
+                            Argument.int32(key2)
+                        );
+
+                        System.out.println(value);
                     });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-            /* Temporary variable */
-            List<String> strings = new ArrayList<>();
+    private byte[] cloneClassWithClinit(ClassWrapper classWrapper, MethodNode clinit, MatchContext match) {
+        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+        ClassNode classNode = new ClassNode();
 
-            /* Retrieve ciphered strings (static block) */
-            classWrapper.methods().stream()
-                    .filter(methodNode -> methodNode.name.equals("<clinit>"))
-                    .forEach(methodNode -> Arrays.stream(methodNode.instructions.toArray())
-                            .filter(ain -> ain instanceof LdcInsnNode)
-                            .map(LdcInsnNode.class::cast)
-                            .filter(ldc -> ldc.cst instanceof String)
-                            .forEach(ldc -> strings.add((String) ldc.cst)));
+        classNode.access = ACC_PUBLIC | ACC_STATIC;
+        classNode.name = "tmp/" + classWrapper.name();
+        classNode.version = classWrapper.classNode().version;
+        classNode.superName = "java/lang/Object";
 
-            if (!strings.isEmpty()) encryptedStrings.put(classWrapper.name(), strings);
+        classNode.methods.add(clinit);
 
-            /* Temporary Variable */
-            List<Integer> offsets = new ArrayList<>();
+        addArrayField(classWrapper, classNode, match, "field-1");
+        addArrayField(classWrapper, classNode, match, "field-2");
 
-            /* Retrieve weird zkm "offsets" */
-            classWrapper.methods().stream()
-                    .filter(methodNode -> methodNode.name.equals("<clinit>"))
-                    .forEach(methodNode ->
-                            Arrays.stream(methodNode.instructions.toArray())
-                                    .forEach(ain -> {
-                                        AbstractInsnNode prev = ain.getPrevious();
-                                        if (prev != null && prev.getPrevious() != null && prev.previous() instanceof MethodInsnNode min && min.name.equals("length")) {
-                                            if (ain instanceof IntInsnNode iin) {
-                                                offsets.add(iin.operand);
-                                            } else if (ain instanceof InsnNode in && in.getOpcode() >= ICONST_M1 && in.getOpcode() <= ICONST_5) {
-                                                offsets.add(getValue(in));
-                                            }
-                                        }
-                                    }));
+        classNode.accept(cw);
+        return cw.toByteArray();
+    }
 
-            if (!offsets.isEmpty()) this.offsets.put(classWrapper.name(), offsets);
+    private void addArrayField(ClassWrapper classWrapper, ClassNode classNode, MatchContext matchContext, String key) {
+        FieldInsnNode field1 = matchContext.captures().get(key).insn().asFieldInsn();
+        FieldNode fieldNode1 = classWrapper.findField(field1.name, field1.desc).get();
+        classNode.fields.add(fieldNode1);
+    }
+
+    private byte[] removeDependantInsn(ClassWrapper classWrapper, byte[] classByte) {
+        ClassReader cr = new ClassReader(classByte);
+        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+        ClassNode classNode = new ClassNode();
+
+        cr.accept(classNode, 0);
+
+        MethodNode clinitMethod = classNode.methods.stream()
+            .filter(methodNode -> methodNode.name.equals("<clinit>"))
+            .findFirst()
+            .get();
+
+        /**
+         * Remove all instructions after executing "putstatic" 2 arrays. They can cause compiling issue as it must load on other classes.
+         * TODO: Is it better if we can remove all instructions that embedded on label?
+         */
+
+        Iterator<AbstractInsnNode> iterator = clinitMethod.instructions.iterator();
+
+        LabelNode returnLabelnode = null;
+        boolean markToRemove = false;
+
+        List<AbstractInsnNode> removedInsn = new ArrayList<>();
+
+        while (iterator.hasNext()) {
+            AbstractInsnNode insn = iterator.next();
+
+            if (insn.getOpcode() == Opcodes.ALOAD &&
+                insn.getNext() instanceof FieldInsnNode fieldNode1 && fieldNode1.desc.equals("[Ljava/lang/String;") &&
+                fieldNode1.getNext().isNumber() &&
+                fieldNode1.getNext(2).getOpcode() == Opcodes.ANEWARRAY &&
+                fieldNode1.getNext(3) instanceof FieldInsnNode fieldNode2 && fieldNode2.desc.equals("[Ljava/lang/String;") &&
+                fieldNode2.getNext() instanceof JumpInsnNode jumpInsnNode) {
+
+                returnLabelnode = jumpInsnNode.label;
+            }
+
+            if (returnLabelnode != null && insn instanceof LabelNode labelNode1 && labelNode1.getLabel() == returnLabelnode.getLabel()) {
+                markToRemove = true;
+                iterator.next();
+            } else if (markToRemove && insn.getOpcode() != Opcodes.RETURN)
+                removedInsn.add(insn);
+        }
+
+        removedInsn.forEach(insn -> clinitMethod.instructions.remove(insn));
+        removedInsn.clear();
+
+        for (AbstractInsnNode insn : clinitMethod.instructions) {
+            if (insn.getOpcode() == Opcodes.INVOKESTATIC)
+                removedInsn.add(insn);
+        }
+
+        removedInsn.forEach(insn -> clinitMethod.instructions.remove(insn));
+
+        classWrapper.findMethod(methodNode -> methodNode.desc.equals("(II)Ljava/lang/String;")).ifPresent(method -> {
+            if (!classNode.methods.contains(method)) classNode.methods.add(method);
         });
 
-        /* Decrypt and cleanup */
-        scopedClasses().forEach(classWrapper -> {
-            classWrapper.methods().stream()
-                    .forEach(methodNode -> {
-                        List<String> encrypted = encryptedStrings.get(classWrapper.name());
-                        List<Integer> offsets = this.offsets.get(classWrapper.name());
-
-                        if (encrypted != null && encrypted.size() == 2 && offsets != null && offsets.size() == 2) {
-                            /* for classes that has big static block */
-                            Arrays.stream(methodNode.instructions.toArray())
-                                    .filter(ain -> ain.getOpcode() == AALOAD)
-                                    .filter(ain -> ain.getPrevious().getPrevious().getOpcode() == ALOAD)
-                                    .forEach(ain -> {
-                                        int index = 0;
-                                        if (ain.getPrevious() instanceof IntInsnNode iin) index = getValue(iin);
-                                        else if (ain.getPrevious() instanceof InsnNode in) index = getValue(in);
-
-                                        List<Byte> key2 = keyType2.get(classWrapper.name());
-
-                                        if (key2 != null)
-                                            try {
-                                                String[] decryptedStrings = ZKMCipher.StaticInit(
-                                                        encrypted.get(0),
-                                                        encrypted.get(1),
-                                                        keyType1.get(classWrapper.name()),
-                                                        shiftBytes(key2),
-                                                        offsets.get(0),
-                                                        offsets.get(1),
-                                                        staticArraySize.get(classWrapper.name()),
-                                                        key2.get(0));
-
-                                                /* Re-insert original string back to its place */
-                                                methodNode.instructions.insert(ain, new LdcInsnNode(decryptedStrings[index]));
-                                                /* Cleanup */
-                                                methodNode.instructions.remove(ain.getPrevious().getPrevious());
-                                                methodNode.instructions.remove(ain.getPrevious());
-                                                methodNode.instructions.remove(ain);
-                                                this.markChange();
-                                            } catch (Exception e) {
-                                            }
-                                    });
-                        } else {
-                            AtomicBoolean cleanup = new AtomicBoolean(false);
-
-                            List<Byte> key2 = keyType2.get(classWrapper.name());
-
-                            if (key2 != null) {
-                                Arrays.stream(methodNode.instructions.toArray())
-                                        .filter(ain -> ain instanceof LdcInsnNode)
-                                        .map(LdcInsnNode.class::cast)
-                                        .filter(ldc -> ldc.cst instanceof String)
-                                        .forEach(ldc -> {
-                                            try {
-                                                ldc.cst = ZKMCipher.cipher2(ZKMCipher.cipher1((String) ldc.cst, keyType1.get(classWrapper.name())), shiftBytes(key2), key2.get(0));
-                                                cleanup.set(true);
-                                            } catch (Exception e) {
-                                            }
-                                        });
-
-                                if (cleanup.get())
-                                    Arrays.stream(methodNode.instructions.toArray())
-                                            .filter(ain -> ain.getOpcode() == SWAP)
-                                            .filter(ain -> ain.getNext() != null && ain.getNext() instanceof MethodInsnNode)
-                                            .filter(ain -> ain.getNext().getNext() != null && ain.getNext().getNext() instanceof MethodInsnNode)
-                                            .filter(ain -> ain.getNext().getNext().getNext() != null && ain.getNext().getNext().getNext().getOpcode() == SWAP)
-                                            .forEach(ain -> {
-                                                /* Do cleanup */
-                                                methodNode.instructions.remove(ain.getNext().getNext().getNext());
-                                                methodNode.instructions.remove(ain.getNext().getNext());
-                                                methodNode.instructions.remove(ain.getNext());
-                                                methodNode.instructions.remove(ain);
-                                                this.markChange();
-                                            });
-                            }
-                        }
-                    });
-        });
-        LOGGER.info("Decrypted {} strings in {} classes", this.getChangesCount(), scopedClasses().size());
+        classNode.accept(cw);
+        return cw.toByteArray();
     }
 
-    /* Convert arraylist to array and shift values, when a bug transform into a feature (Key type 2) */
-    private byte[] shiftBytes(List<Byte> input) {
-        byte[] keyBytes = new byte[input.size() - 1];
+    private byte[] renameInvoke(ClassWrapper classWrapper, byte[] classByte) {
+        ClassReader cr = new ClassReader(classByte);
+        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+        ClassNode classNode = new ClassNode();
 
-        int j = 1;
-        for (int i = 0; i < keyBytes.length; i++) {
-            keyBytes[i] = input.get(j);
-            j++;
-        }
-        return keyBytes;
-    }
+        cr.accept(classNode, 0);
 
-    public int getValue(AbstractInsnNode in) {
-        int opcode = in.getOpcode();
-        return switch (opcode) {
-            case ICONST_M1 -> -1;
-            case ICONST_0 -> 0;
-            case ICONST_1 -> 1;
-            case ICONST_2 -> 2;
-            case ICONST_3 -> 3;
-            case ICONST_4 -> 4;
-            case ICONST_5 -> 5;
-            case SIPUSH, BIPUSH -> ((IntInsnNode) in).operand;
-            default -> throw new RuntimeException("Unsupported opcode");
-        };
-    }
-
-    public static class ZKMCipher {
-
-        public static char[] cipher1(final String var0, final int key) { // All old versions
-            final char[] input = var0.toCharArray();
-            if (input.length < 2) {
-                input[0] ^= key;
-            }
-            return input;
-        }
-
-        public static String cipher2(final char[] input, final byte[] keys, final int length) throws Exception {
-            if (keys.length != length) throw new Exception("Key is invalid");
-            for (int i = 0; input.length > i; ++i) {
-                input[i] ^= (char) keys[i % length];
-            }
-            return (new String(input)).intern();
-        }
-
-        public static String[] StaticInit(String encrypted1, String encrypted2, int key1, byte[] key2, int offset, int offset2, int arraysize, int length) throws Exception {
-            final String[] h2 = new String[arraysize];
-            int n = 0;
-            String s;
-            int n2 = (s = encrypted1).length();
-            int n3 = offset;
-            int n4 = -1;
-
-            Label_0023:
-            while (true) {
-                while (true) {
-                    ++n4;
-                    final String s2 = s;
-                    final int n5 = n4;
-                    String s3 = s2.substring(n5, n5 + n3);
-                    int n6 = -1;
-                    while (true) {
-                        final String a = ZKMCipher.cipher2(ZKMCipher.cipher1(s3, key1), key2, length);
-                        switch (n6) {
-                            default: {
-                                h2[n++] = a;
-                                if ((n4 += n3) < n2) {
-                                    n3 = s.charAt(n4);
-                                    continue Label_0023;
-                                }
-                                n2 = (s = encrypted2).length();
-                                n3 = offset2;
-                                n4 = -1;
-                                break;
-                            }
-                            case 0: {
-                                h2[n++] = a;
-                                if ((n4 += n3) < n2) {
-                                    n3 = s.charAt(n4);
-                                    break;
-                                }
-                                break Label_0023;
-                            }
-                        }
-                        ++n4;
-                        final String s4 = s;
-                        final int n7 = n4;
-                        s3 = s4.substring(n7, n7 + n3);
-                        n6 = 0;
-                    }
+        for (MethodNode methodNode : classNode.methods) {
+            for (AbstractInsnNode insn : methodNode.instructions) {
+                if (insn instanceof MethodInsnNode methodInsnNode && methodInsnNode.owner.equals(classWrapper.name())) {
+                    methodInsnNode.owner = "tmp/" + methodInsnNode.owner;
+                } else if (insn instanceof FieldInsnNode fieldInsnNode && fieldInsnNode.owner.equals(classWrapper.name())) {
+                    fieldInsnNode.owner = "tmp/" + fieldInsnNode.owner;
                 }
             }
-            return h2;
         }
+
+        classNode.accept(cw);
+        return cw.toByteArray();
     }
 }
