@@ -1,5 +1,6 @@
 package uwu.narumi.deobfuscator.api.asm.remapper;
 
+import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.Remapper;
 import uwu.narumi.deobfuscator.api.asm.FieldRef;
 import uwu.narumi.deobfuscator.api.asm.MethodRef;
@@ -28,5 +29,12 @@ public class NamesRemapper extends Remapper {
   public String map(String internalName) {
     String newName = this.classMappings.get(internalName);
     return newName != null ? newName : internalName;
+  }
+
+  @Override
+  public String mapAnnotationAttributeName(String descriptor, String name) {
+    String owner = Type.getType(descriptor).getInternalName();
+    String newName = this.methodMappings.get(new MethodRef(owner, name, descriptor)); 
+    return newName != null ? newName : name;
   }
 }
