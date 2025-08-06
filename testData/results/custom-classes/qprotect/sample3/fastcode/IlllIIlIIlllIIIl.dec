@@ -365,16 +365,15 @@ public class IlllIIlIIlllIIIl {
                 case 254 -> 134;
                 default -> 29907 - 29696;
             };
-            short var15 = (short)var1;
-            var14 = (~var15 | 0xFF) - ~var15;
-            int var5 = var14 + ~var4 + 1;
+            int var15 = (short)var1;
+            int var5 = (~var15 | 0xFF) - ~var15 + ~var4 + 1;
             if (var5 < 0) {
                 var5 += 256;
             }
 
-            int var17 = (short)var1;
-            var17 = (~var17 | 65535) - ~var17 >>> 8;
-            int var6 = (var17 ^ var4) - 2 * (~var17 & var4);
+            var15 = (short)var1;
+            var14 = (~var15 | 65535) - ~var15 >>> 8;
+            int var6 = (var14 ^ var4) - 2 * (~var14 & var4);
             if (var6 < 0) {
                 var6 += 256;
             }
@@ -383,27 +382,27 @@ public class IlllIIlIIlllIIIl {
                 int var8 = var7 % 2;
                 char var10002 = var3[var7];
                 if (var8 == 0) {
-                    int var19 = var10002;
-                    var3[var7] = (char)((var19 | var5) & ~(var19 & var5));
-                    int var30 = var5 >>> 3;
+                    char var18 = var10002;
+                    var3[var7] = (char)((var18 | var5) & ~(var18 & var5));
+                    int var29 = var5 >>> 3;
                     int var13 = var5 << 5;
-                    var19 = var30;
-                    var30 = (var19 & ~var13) + var13;
-                    char var27 = var3[var7];
-                    var19 = var30;
-                    var19 = var19 & ~var27 | ~var19 & var27;
-                    var5 = (~var19 | 0xFF) - ~var19;
+                    var15 = var29;
+                    var29 = (var15 & ~var13) + var13;
+                    char var26 = var3[var7];
+                    var15 = var29;
+                    var15 = var15 & ~var26 | ~var15 & var26;
+                    var5 = (~var15 | 0xFF) - ~var15;
                 } else {
-                    int var23 = var10002;
-                    var3[var7] = (char)((var23 | var6) - (var23 & var6));
-                    int var32 = var6 >>> 3;
-                    int var28 = var6 << 5;
-                    var23 = var32;
-                    var32 = (var23 & ~var28) + var28;
-                    char var29 = var3[var7];
-                    var23 = var32;
-                    var23 = (var23 | var29) - (var23 & var29);
-                    var6 = (~var23 | 0xFF) - ~var23;
+                    int var22 = var10002;
+                    var3[var7] = (char)((var22 | var6) - (var22 & var6));
+                    int var31 = var6 >>> 3;
+                    int var27 = var6 << 5;
+                    var22 = var31;
+                    var31 = (var22 & ~var27) + var27;
+                    char var28 = var3[var7];
+                    var22 = var31;
+                    var22 = (var22 | var28) - (var22 & var28);
+                    var6 = (~var22 | 0xFF) - ~var22;
                 }
             }
 
