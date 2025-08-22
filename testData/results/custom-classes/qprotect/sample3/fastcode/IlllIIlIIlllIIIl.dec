@@ -107,7 +107,7 @@ public class IlllIIlIIlllIIIl {
             char[] var3 = IlIIlIlIIIIIlll[var2].toCharArray();
             int var14 = var3[0];
 
-            int var4 = switch ((~var14 | 0xFF) - ~var14) {
+            short var4 = switch ((~var14 | 0xFF) - ~var14) {
                 case 0 -> 55;
                 case 1 -> 95;
                 case 2 -> 0;
@@ -363,7 +363,7 @@ public class IlllIIlIIlllIIIl {
                 case 252 -> 232;
                 case 253 -> 181;
                 case 254 -> 134;
-                default -> 29907 - 29696;
+                default -> 211;
             };
             int var15 = (short)var1;
             int var5 = (~var15 | 0xFF) - ~var15 + ~var4 + 1;
