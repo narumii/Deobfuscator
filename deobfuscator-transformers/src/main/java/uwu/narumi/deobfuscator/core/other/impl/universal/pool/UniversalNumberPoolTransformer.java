@@ -75,6 +75,10 @@ public class UniversalNumberPoolTransformer extends Transformer {
 
       // Get whole number pool
       Number[] numberPool = getFieldNumberPool(numberPoolMatchCtx.insnContext().methodContext(), numberPoolSize, fieldRefPool);
+      if (numberPool == null) {
+        LOGGER.warn("Number pool is not fully initialized for {}#{}{}", numberPoolMatchCtx.insnContext().methodContext().classWrapper().name(), numberPoolMatchCtx.insnContext().methodContext().methodNode().name, numberPoolMatchCtx.insnContext().methodContext().methodNode().desc);
+        return;
+      }
 
       Match numberPoolReferenceMatch;
       if (isPrimitiveArray) {
@@ -159,7 +163,7 @@ public class UniversalNumberPoolTransformer extends Transformer {
     for (Number number : numberPool) {
       if (number == null) {
         // Number pool is not fully initialized
-        throw new IllegalStateException("Number pool is not fully initialized");
+        return null;
       }
     }
 
