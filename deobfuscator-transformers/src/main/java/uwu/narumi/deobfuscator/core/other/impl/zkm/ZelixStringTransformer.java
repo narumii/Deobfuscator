@@ -18,11 +18,7 @@ import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
 import uwu.narumi.deobfuscator.api.execution.SandBox;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class ZelixStringTransformer extends Transformer {
     private static final Match ZELIX_STRING_CLINIT_MATCH = SequenceMatch.of(
@@ -43,9 +39,9 @@ public class ZelixStringTransformer extends Transformer {
 
     @Override
     protected void transform() throws Exception {
-        List<ClassWrapper> encryptedClassWrapper = new ArrayList<>();
+        Map<ClassWrapper, ClassWrapper> encryptedClassWrapper = new HashMap<>();
 
-        for (ClassWrapper classWrapper: scopedClasses()) {
+        for (ClassWrapper classWrapper : scopedClasses()) {
             if (classWrapper.findClInit().isEmpty())
                 continue;
 
@@ -61,13 +57,15 @@ public class ZelixStringTransformer extends Transformer {
             byte[] removedInsnByte = removeDependantInsn(classWrapper, clonedClass);
             byte[] modified = renameInvoke(classWrapper, removedInsnByte);
 
-            context().addCompiledClass("tmp/" + classWrapper.name() + ".class", modified);
-            encryptedClassWrapper.add(classWrapper);
+            ClassWrapper tmpClassWrapper = context().addCompiledClass("tmp/" + classWrapper.name() + ".class", modified);
+            if (tmpClassWrapper == null)
+                continue;
+
+            encryptedClassWrapper.put(classWrapper, tmpClassWrapper);
         }
 
         SandBox sandBox = new SandBox(context());
-
-        for (ClassWrapper classWrapper : encryptedClassWrapper) {
+        encryptedClassWrapper.forEach((classWrapper, tmpClassWrapper) -> {
             try {
                 InstanceClass clazz = sandBox.getHelper().loadClass("tmp." + classWrapper.canonicalName());
 
@@ -84,13 +82,17 @@ public class ZelixStringTransformer extends Transformer {
                             Argument.int32(key2)
                         );
 
-                        System.out.println(value);
+                        matchContext.insnContext().methodNode().instructions.insert(matchContext.insn(), new LdcInsnNode(value));
+                        matchContext.removeAll();
+                        markChange();
                     });
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+
+            context().removeCompiledClass(tmpClassWrapper);
+        });
     }
 
     private byte[] cloneClassWithClinit(ClassWrapper classWrapper, MethodNode clinit, MatchContext match) {

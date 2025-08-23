@@ -108,7 +108,7 @@ public class Context implements ClassProvider {
         .toList();
   }
 
-  public void addCompiledClass(String pathInJar, byte[] bytes) {
+  public ClassWrapper addCompiledClass(String pathInJar, byte[] bytes) {
     try {
       // Fix class bytes
       bytes = ClassHelper.fixClass(bytes);
@@ -120,9 +120,17 @@ public class Context implements ClassProvider {
       this.classesMap.putIfAbsent(classWrapper.name(), classWrapper);
 
       this.compiledClasses.addRawClass(bytes);
+      return classWrapper;
     } catch (InvalidClassException e) {
       LOGGER.error("Failed to load class {}", pathInJar);
     }
+
+    return null;
+  }
+
+  public void removeCompiledClass(ClassWrapper classWrapper) {
+    this.classesMap.remove(classWrapper.name());
+    this.compiledClasses.removeRawClass(classWrapper.classNode());
   }
 
   public void addFile(String path, byte[] bytes) {
