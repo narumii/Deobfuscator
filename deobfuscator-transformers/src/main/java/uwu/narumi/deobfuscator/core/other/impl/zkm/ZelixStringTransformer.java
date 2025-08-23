@@ -69,6 +69,8 @@ public class ZelixStringTransformer extends Transformer {
             try {
                 InstanceClass clazz = sandBox.getHelper().loadClass("tmp." + classWrapper.canonicalName());
 
+                List<MethodInsnNode> methods = new ArrayList<>();
+
                 for (MethodNode method : classWrapper.methods()) {
                     MethodContext methodContext = MethodContext.of(classWrapper, method);
                     INVOKE_NUMBER_MATCH.findAllMatches(methodContext).forEach(matchContext -> {
@@ -84,9 +86,13 @@ public class ZelixStringTransformer extends Transformer {
 
                         matchContext.insnContext().methodNode().instructions.insert(matchContext.insn(), new LdcInsnNode(value));
                         matchContext.removeAll();
+                        methods.add(decryptedMethod);
                         markChange();
                     });
                 }
+                methods.forEach(decryptedMethod -> {
+                    classWrapper.methods().removeIf(methodNode -> methodNode.name.equals(decryptedMethod.name) && methodNode.desc.equals(decryptedMethod.desc));
+                });
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -119,29 +125,13 @@ public class ZelixStringTransformer extends Transformer {
         classNode.fields.add(fieldNode1);
     }
 
-    private byte[] removeDependantInsn(ClassWrapper classWrapper, byte[] classByte) {
-        ClassReader cr = new ClassReader(classByte);
-        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        ClassNode classNode = new ClassNode();
-
-        cr.accept(classNode, 0);
-
-        MethodNode clinitMethod = classNode.methods.stream()
-            .filter(methodNode -> methodNode.name.equals("<clinit>"))
-            .findFirst()
-            .get();
-
-        /**
-         * Remove all instructions after executing "putstatic" 2 arrays. They can cause compiling issue as it must load on other classes.
-         * TODO: Is it better if we can remove all instructions that embedded on label?
-         */
-
-        Iterator<AbstractInsnNode> iterator = clinitMethod.instructions.iterator();
+    private List<AbstractInsnNode> getLeftOfEncryptionInsns(Iterable<AbstractInsnNode> instructions) {
+        Iterator<AbstractInsnNode> iterator = instructions.iterator();
 
         LabelNode returnLabelnode = null;
         boolean markToRemove = false;
 
-        List<AbstractInsnNode> removedInsn = new ArrayList<>();
+        List<AbstractInsnNode> insns = new ArrayList<>();
 
         while (iterator.hasNext()) {
             AbstractInsnNode insn = iterator.next();
@@ -160,8 +150,29 @@ public class ZelixStringTransformer extends Transformer {
                 markToRemove = true;
                 iterator.next();
             } else if (markToRemove && insn.getOpcode() != Opcodes.RETURN)
-                removedInsn.add(insn);
+                insns.add(insn);
         }
+
+        return insns;
+    }
+
+    private byte[] removeDependantInsn(ClassWrapper classWrapper, byte[] classByte) {
+        ClassReader cr = new ClassReader(classByte);
+        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+        ClassNode classNode = new ClassNode();
+
+        cr.accept(classNode, 0);
+
+        MethodNode clinitMethod = classNode.methods.stream()
+            .filter(methodNode -> methodNode.name.equals("<clinit>"))
+            .findFirst()
+            .get();
+
+        /**
+         * Remove all instructions after executing "putstatic" 2 arrays. They can cause compiling issue as it must load on other classes.
+         * TODO: Is it better if we can remove all instructions that embedded on label?
+         */
+        List<AbstractInsnNode> removedInsn = getLeftOfEncryptionInsns(clinitMethod.instructions);
 
         removedInsn.forEach(insn -> clinitMethod.instructions.remove(insn));
         removedInsn.clear();
