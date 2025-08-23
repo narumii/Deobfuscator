@@ -283,9 +283,9 @@ public record DeobfuscatorOptions(
      */
     @Nullable
     private Path findRtJarPath() {
-      String userDefinedrtJarPath = System.getProperty("rtJarPath");
-      if (userDefinedrtJarPath != null) {
-        return Path.of(userDefinedrtJarPath);
+      String userDefinedRtJarPath = System.getProperty("rtJarPath");
+      if (userDefinedRtJarPath != null) {
+        return Path.of(userDefinedRtJarPath);
       }
 
       Optional<JavaInstall> javaInstall = JavaEnv.getJavaInstalls().stream()
