@@ -4,6 +4,7 @@ import dev.xdark.ssvm.LinkResolver;
 import dev.xdark.ssvm.RuntimeResolver;
 import dev.xdark.ssvm.VirtualMachine;
 import dev.xdark.ssvm.api.VMInterface;
+import dev.xdark.ssvm.classloading.BootClassFinder;
 import dev.xdark.ssvm.classloading.SupplyingClassLoaderInstaller;
 import dev.xdark.ssvm.execution.ExecutionEngine;
 import dev.xdark.ssvm.filesystem.FileManager;
@@ -16,6 +17,7 @@ import dev.xdark.ssvm.symbol.Symbols;
 import dev.xdark.ssvm.thread.ThreadManager;
 import dev.xdark.ssvm.util.Reflection;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -41,11 +43,24 @@ public class SandBox {
     this(new ClasspathDataSupplier(
         // We need to use compiled classes as they are already compiled
         new CombinedClassProvider(context.getCompiledClasses(), context.getLibraries())
-    ));
+    ), context.getOptions().rtJarPath());
   }
 
-  public SandBox(SupplyingClassLoaderInstaller.DataSupplier dataSupplier) {
-    this(dataSupplier, new VirtualMachine());
+  public SandBox(SupplyingClassLoaderInstaller.DataSupplier dataSupplier, Path rtJarPath) {
+    this(dataSupplier, new VirtualMachine() {
+      @Override
+      protected BootClassFinder createBootClassFinder() {
+        if (rtJarPath == null) {
+          throw new IllegalStateException("rt.jar is required for sandbox to run. Please see README.md for instructions");
+        }
+        return new JarBootClassFinder(rtJarPath);
+      }
+
+      @Override
+      public int getJvmVersion() {
+        return 8; // Java 8
+      }
+    });
   }
 
   public SandBox(SupplyingClassLoaderInstaller.DataSupplier dataSupplier, VirtualMachine vm) {
