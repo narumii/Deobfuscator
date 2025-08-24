@@ -69,6 +69,8 @@ public class ZelixStringTransformer extends Transformer {
 
         SandBox sandBox = new SandBox(context());
         encryptedClassWrapper.forEach((classWrapper, tmpClassWrapper) -> {
+            AtomicBoolean isDecryptedFully = new AtomicBoolean(true);
+
             try {
                 InstanceClass clazz = sandBox.getHelper().loadClass("tmp." + classWrapper.canonicalName());
 
@@ -81,26 +83,65 @@ public class ZelixStringTransformer extends Transformer {
                         int key2 = matchContext.captures().get("key2").insn().asInteger();
                         MethodInsnNode decryptedMethod = matchContext.captures().get("method-node").insn().asMethodInsn();
 
-                      String value = sandBox.getInvocationUtil().invokeStringReference(
-                          clazz.getMethod(decryptedMethod.name, decryptedMethod.desc),
-                          Argument.int32(key1),
-                          Argument.int32(key2)
-                      );
+                        try {
+                            String value = sandBox.getInvocationUtil().invokeStringReference(
+                                clazz.getMethod(decryptedMethod.name, decryptedMethod.desc),
+                                Argument.int32(key1),
+                                Argument.int32(key2)
+                            );
 
-                      matchContext.insnContext().methodNode().instructions.insert(matchContext.insn(), new LdcInsnNode(value));
-                      matchContext.removeAll();
-                      methods.add(decryptedMethod);
-                      markChange();
+                            matchContext.insnContext().methodNode().instructions.insert(matchContext.insn(), new LdcInsnNode(value));
+                            matchContext.removeAll();
+                            methods.add(decryptedMethod);
+                            markChange();
+                        } catch (Exception e) {
+                            isDecryptedFully.set(false);
+                        }
                     });
                 }
 
-                  methods.forEach(decryptedMethod -> classWrapper.methods().removeIf(methodNode -> methodNode.name.equals(decryptedMethod.name) && methodNode.desc.equals(decryptedMethod.desc)));
+                if (isDecryptedFully.get())
+                    methods.forEach(decryptedMethod -> classWrapper.methods().removeIf(methodNode -> methodNode.name.equals(decryptedMethod.name) && methodNode.desc.equals(decryptedMethod.desc)));
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
             context().removeCompiledClass(tmpClassWrapper);
+
+            if (isDecryptedFully.get())
+                cleanUpFunction(classWrapper);
         });
+    }
+
+    private void cleanUpFunction(ClassWrapper classWrapper) {
+        MethodNode clinitMethod = classWrapper.findClInit().get();
+        MethodContext methodContext = MethodContext.of(classWrapper, clinitMethod);
+        List<MatchContext> matches = CLINIT_DETECTION.findAllMatches(methodContext);
+        MatchContext match = matches.get(matches.size() - 1);
+
+        JumpInsnNode jumpInsnNode = match.captures().get("label").insn().asJump();
+        AbstractInsnNode currentInsn = jumpInsnNode.label;
+
+        List<AbstractInsnNode> removedInsns = new ArrayList<>();
+        LabelNode firstLabel = null;
+
+        for (AbstractInsnNode insn: clinitMethod.instructions.toArray()) {
+            if (insn instanceof LabelNode labelNode) {
+                firstLabel = labelNode;
+                break;
+            }
+        }
+
+        if (firstLabel == null)
+            return;
+
+        while (currentInsn != firstLabel) {
+            currentInsn = currentInsn.getPrevious();
+            removedInsns.add(currentInsn);
+        }
+
+        removedInsns.forEach(insn -> clinitMethod.instructions.remove(insn));
+        classWrapper.methods().removeIf(methodNode -> methodNode.desc.equals("(II)Ljava/lang/String;"));
     }
 
     private byte[] cloneClassWithClinit(ClassWrapper classWrapper, MethodNode clinit, MatchContext match) {
@@ -131,11 +172,9 @@ public class ZelixStringTransformer extends Transformer {
         return cw.toByteArray();
     }
 
-    private List<AbstractInsnNode> getLeftOfEncryptionInsns(MatchContext match) {
+    private void setReturnOpcode(MatchContext match) {
         JumpInsnNode jumpInsnNode = match.captures().get("label").insn().asJump();
         AbstractInsnNode insn = jumpInsnNode.label;
-
-        List<AbstractInsnNode> insns = new ArrayList<>();
 
         while (insn != null) {
             if (insn.getOpcode() == Opcodes.GOTO) {
@@ -146,8 +185,16 @@ public class ZelixStringTransformer extends Transformer {
 
             insn = insn.getNext();
         }
+    }
 
-        return insns;
+    private void removeInvokeOnFirstLabel(InsnList instructions) {
+        for (AbstractInsnNode insn: instructions.toArray()) {
+            if (insn instanceof LabelNode)
+                break;
+
+            if (insn.getOpcode() == Opcodes.INVOKESTATIC)
+                instructions.remove(insn);
+        }
     }
 
     private byte[] removeDependantInsn(ClassWrapper classWrapper, byte[] classByte) {
@@ -165,17 +212,8 @@ public class ZelixStringTransformer extends Transformer {
         MethodContext methodContext = MethodContext.of(classNode, clinitMethod);
         List<MatchContext> matches = CLINIT_DETECTION.findAllMatches(methodContext);
 
-        List<AbstractInsnNode> removedInsn = getLeftOfEncryptionInsns(matches.get(matches.size() - 1));
-
-        removedInsn.forEach(insn -> clinitMethod.instructions.remove(insn));
-        removedInsn.clear();
-
-        for (AbstractInsnNode insn : clinitMethod.instructions) {
-            if (insn.getOpcode() == Opcodes.INVOKESTATIC)
-                removedInsn.add(insn);
-        }
-
-        removedInsn.forEach(insn -> clinitMethod.instructions.remove(insn));
+        setReturnOpcode(matches.get(matches.size() - 1));
+        removeInvokeOnFirstLabel(clinitMethod.instructions);
 
         classWrapper.findMethod(methodNode -> methodNode.desc.equals("(II)Ljava/lang/String;")).ifPresent(method -> {
             if (!classNode.methods.contains(method))
