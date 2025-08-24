@@ -8,6 +8,7 @@ import uwu.narumi.deobfuscator.core.other.composed.ComposedZelixTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.Composed_qProtectTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedGeneralFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedPeepholeCleanTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.branchlock.BranchlockCompabilityStringTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.JsrInlinerTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.UselessPopCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineLocalVariablesTransformer;
@@ -211,6 +212,11 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
     test("Kotlin Sample 3")
         .transformers(UselessPopCleanTransformer::new)
         .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "KotlinSample3.class")
+        .register();
+
+    test("Branchlock String")
+        .transformers(UniversalNumberTransformer::new, () -> new BranchlockCompabilityStringTransformer(true))
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_JAR, "branchlock-string.jar")
         .register();
   }
 }

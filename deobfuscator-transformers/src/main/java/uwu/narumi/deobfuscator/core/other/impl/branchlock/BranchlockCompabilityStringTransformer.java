@@ -11,7 +11,6 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class BranchlockCompabilityStringTransformer extends Transformer {
 
@@ -194,6 +193,11 @@ public class BranchlockCompabilityStringTransformer extends Transformer {
             Match getString = SequenceMatch.of(FieldMatch.getStatic().owner(stringArray.owner).name(stringArray.name).desc(stringArray.desc), NumberMatch.numInteger().capture("array-index"), OpcodeMatch.of(AALOAD));
             getString.findAllMatches(methodContext).forEach(matchContext -> {
               int arrayIndex = matchContext.captures().get("array-index").insn().asInteger();
+              if (decryptedStrings.length <= arrayIndex) {
+                LOGGER.error("Number on GETSTATIC isnt properly deobfuscated");
+                return;
+
+              }
               methodNode.instructions.insert(matchContext.insn(), new LdcInsnNode(decryptedStrings[arrayIndex]));
               matchContext.removeAll();
               markChange();
