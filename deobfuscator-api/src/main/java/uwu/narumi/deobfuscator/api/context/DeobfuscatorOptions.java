@@ -1,9 +1,14 @@
 package uwu.narumi.deobfuscator.api.context;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.ClassWriter;
+import uwu.narumi.deobfuscator.api.environment.JavaEnv;
+import uwu.narumi.deobfuscator.api.environment.JavaInstall;
+import uwu.narumi.deobfuscator.api.execution.SandBox;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.io.IOException;
@@ -15,6 +20,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -25,6 +31,7 @@ public record DeobfuscatorOptions(
     @Nullable Path inputJar,
     List<ExternalFile> externalFiles,
     Set<Path> libraries,
+    @Nullable Path rtJarPath,
 
     @Nullable Path outputJar,
     @Nullable Path outputDir,
@@ -53,11 +60,15 @@ public record DeobfuscatorOptions(
    * Builder for {@link DeobfuscatorOptions}
    */
   public static class Builder {
+    private static final Logger LOGGER = LogManager.getLogger();
+
     // Inputs
     @Nullable
     private Path inputJar = null;
     private final List<ExternalFile> externalFiles = new ArrayList<>();
     private final Set<Path> libraries = new HashSet<>();
+    @Nullable
+    private Path rtJarPath = null;
 
     // Outputs
     @Nullable
@@ -162,6 +173,18 @@ public record DeobfuscatorOptions(
     }
 
     /**
+     * Path to rt.jar from Java 8 binaries. Required for sandbox to work properly.
+     * Examples:
+     * - Oracle JDK 8: <code>C:/Program Files/Java/jdk1.8.0_202/jre/lib/rt.jar</code>
+     * - Eclipse Adoptium JDK 8: <code>C:/Program Files/Eclipse Adoptium/jdk-8.0.462.8-hotspot/jre/lib/rt.jar</code>
+     */
+    @Contract("_ -> this")
+    public DeobfuscatorOptions.Builder rtJarPath(@Nullable Path rtJarPath) {
+      this.rtJarPath = rtJarPath;
+      return this;
+    }
+
+    /**
      * Output jar for deobfuscated classes. Automatically filled when input jar is set
      */
     @Contract("_ -> this")
@@ -256,6 +279,30 @@ public record DeobfuscatorOptions(
     }
 
     /**
+     * Try to find rt.jar from Java 8 installation
+     */
+    @Nullable
+    private Path findRtJarPath() {
+      String userDefinedRtJarPath = System.getProperty("rtJarPath");
+      if (userDefinedRtJarPath != null) {
+        return Path.of(userDefinedRtJarPath);
+      }
+
+      Optional<JavaInstall> javaInstall = JavaEnv.getJavaInstalls().stream()
+          .filter(javaInstall1 -> javaInstall1.version() == 8)
+          .findFirst();
+
+      if (javaInstall.isPresent()) {
+        JavaInstall install = javaInstall.get();
+        Path possibleRtJarPath = install.javaExecutable().getParent().getParent().resolve("jre").resolve("lib").resolve("rt.jar");
+        if (Files.exists(possibleRtJarPath)) {
+          return possibleRtJarPath;
+        }
+      }
+      return null;
+    }
+
+    /**
      * Build immutable {@link DeobfuscatorOptions} with options verification
      */
     public DeobfuscatorOptions build() {
@@ -269,12 +316,23 @@ public record DeobfuscatorOptions(
       if (this.outputJar != null && this.outputDir != null) {
         throw new IllegalStateException("Output jar and output dir cannot be set at the same time");
       }
+      // Try to auto-detect rt.jar path
+      if (this.rtJarPath == null) {
+        Path rtJar = findRtJarPath();
+        if (rtJar != null) {
+          System.out.println("Auto-detected rt.jar path: " + rtJar);
+          this.rtJarPath = rtJar;
+        } else {
+          LOGGER.warn("Failed to auto-detect rt.jar path. Please provide path to rt.jar from Java 8 binaries, otherwise sandbox will not work.");
+        }
+      }
 
       return new DeobfuscatorOptions(
           // Input
           inputJar,
           externalFiles,
           libraries,
+          rtJarPath,
           // Output
           outputJar,
           outputDir,
