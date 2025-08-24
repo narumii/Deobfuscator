@@ -13,6 +13,13 @@ public class TestUniversalNumberTransformer {
     }
   }
 
+  public void charMath() {
+    int a = 49152;
+    int b = 14828;
+    int c = (char) a >>> b;
+    System.out.println(c);
+  }
+
   public void illegalOperations() {
     int a = 2;
     if (a == 0) {

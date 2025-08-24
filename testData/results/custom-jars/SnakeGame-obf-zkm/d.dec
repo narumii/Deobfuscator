@@ -194,7 +194,7 @@ public class d extends Thread {
                 return;
             }
 
-            System.out.println(a(879106065, -879064062, (int)var1));
+            System.out.println(a(879106065, -879129598, (int)var1));
             this.c++;
             this.g = this.a(new Object[]{var4});
         }
@@ -203,7 +203,7 @@ public class d extends Thread {
     }
 
     private void c(long var1) {
-        System.out.println(a(672771037, -672779940, (int)var1));
+        System.out.println(a(672836573, -672845476, (int)var1));
 
         while (true) {
             this.a(new Object[0]);
