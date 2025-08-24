@@ -96,7 +96,7 @@ public final class AsmMathHelper {
       // Integer
       Map.entry(INEG, number -> -number.intValue()),
       Map.entry(I2B, Number::byteValue),
-      Map.entry(I2C, Number::shortValue),
+      Map.entry(I2C, (number) -> (int) (char) number.intValue()),
       Map.entry(I2D, Number::doubleValue),
       Map.entry(I2F, Number::floatValue),
       Map.entry(I2L, Number::longValue),
