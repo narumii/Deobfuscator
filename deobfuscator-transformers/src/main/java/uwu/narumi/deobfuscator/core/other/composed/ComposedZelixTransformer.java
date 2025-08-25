@@ -8,6 +8,7 @@ import uwu.narumi.deobfuscator.core.other.impl.universal.RecoverSyntheticsTransf
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.zkm.ZelixLongEncryptionMPCTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.zkm.ZelixParametersTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.zkm.ZelixStringTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.zkm.ZelixUselessTryCatchRemoverTransformer;
 
 import java.util.HashMap;
@@ -42,6 +43,8 @@ public class ComposedZelixTransformer extends ComposedTransformer {
         () -> new ZelixLongEncryptionMPCTransformer(classInitializationOrder),
         InlineStaticFieldTransformer::new,
         UniversalNumberTransformer::new,
+
+        ZelixStringTransformer::new,
 
         // Cleanup
         ComposedPeepholeCleanTransformer::new

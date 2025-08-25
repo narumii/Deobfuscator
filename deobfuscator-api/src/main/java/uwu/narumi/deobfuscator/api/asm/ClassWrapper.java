@@ -14,6 +14,8 @@ import org.objectweb.asm.tree.*;
 import uwu.narumi.deobfuscator.api.classpath.InheritanceClassWriter;
 import uwu.narumi.deobfuscator.api.inheritance.InheritanceGraph;
 
+import static org.objectweb.asm.Opcodes.ACC_ENUM;
+
 public class ClassWrapper {
 
   protected static final Logger LOGGER = LogManager.getLogger(ClassWrapper.class);
@@ -121,6 +123,10 @@ public class ClassWrapper {
 
   public String canonicalName() {
     return classNode.name.replace('/', '.');
+  }
+
+  public boolean isEnumClass() {
+      return (classNode.access & ACC_ENUM) != 0;
   }
 
   /**

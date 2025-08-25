@@ -2,6 +2,8 @@ package uwu.narumi.deobfuscator.core.other.impl.zkm;
 
 import dev.xdark.ssvm.invoke.Argument;
 import dev.xdark.ssvm.mirror.type.InstanceClass;
+import dev.xdark.ssvm.value.ObjectValue;
+import dev.xdark.ssvm.value.SimpleArrayValue;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -16,11 +18,19 @@ import uwu.narumi.deobfuscator.api.asm.matcher.impl.MethodMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.NumberMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
 import uwu.narumi.deobfuscator.api.execution.SandBox;
+import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * A comprehensive string transformer using temp class to deobfuscate
+ * @author toidicakhia
+ */
 public class ZelixStringTransformer extends Transformer {
     private static final Match CLINIT_DETECTION = SequenceMatch.of(
         OpcodeMatch.of(ILOAD),
@@ -36,6 +46,12 @@ public class ZelixStringTransformer extends Transformer {
         NumberMatch.numInteger().capture("key1"),
         NumberMatch.numInteger().capture("key2"),
         MethodMatch.create().desc("(II)Ljava/lang/String;").capture("method-node")
+    );
+
+    private static final Match STRING_ARRAY_MATCH = SequenceMatch.of(
+        NumberMatch.numInteger(),
+        OpcodeMatch.of(ANEWARRAY),
+        OpcodeMatch.of(ASTORE).capture("inject-insn")
     );
 
     @Override
@@ -57,10 +73,9 @@ public class ZelixStringTransformer extends Transformer {
 
             // copy clinitMethod
             byte[] clonedClass = cloneClassWithClinit(classWrapper, clinitMethod, match);
-            byte[] removedInsnByte = removeDependantInsn(classWrapper, clonedClass);
-            byte[] modified = renameInvoke(classWrapper, removedInsnByte);
+            byte[] modifiedClass = modifyByteCode(classWrapper, clonedClass);
 
-            ClassWrapper tmpClassWrapper = context().addCompiledClass("tmp/" + classWrapper.name() + ".class", modified);
+            ClassWrapper tmpClassWrapper = context().addCompiledClass("tmp/" + classWrapper.name() + ".class", modifiedClass);
             if (tmpClassWrapper == null)
                 continue;
 
@@ -74,8 +89,6 @@ public class ZelixStringTransformer extends Transformer {
             try {
                 InstanceClass clazz = sandBox.getHelper().loadClass("tmp." + classWrapper.canonicalName());
 
-                List<MethodInsnNode> methods = new ArrayList<>();
-
                 for (MethodNode method : classWrapper.methods()) {
                     MethodContext methodContext = MethodContext.of(classWrapper, method);
                     DECRYPTION_MATCH.findAllMatches(methodContext).forEach(matchContext -> {
@@ -84,15 +97,14 @@ public class ZelixStringTransformer extends Transformer {
                         MethodInsnNode decryptedMethod = matchContext.captures().get("method-node").insn().asMethodInsn();
 
                         try {
-                            String value = sandBox.getInvocationUtil().invokeStringReference(
+                            String decryptedString = sandBox.getInvocationUtil().invokeStringReference(
                                 clazz.getMethod(decryptedMethod.name, decryptedMethod.desc),
                                 Argument.int32(key1),
                                 Argument.int32(key2)
                             );
 
-                            matchContext.insnContext().methodNode().instructions.insert(matchContext.insn(), new LdcInsnNode(value));
+                            matchContext.insnContext().methodNode().instructions.insert(matchContext.insn(), new LdcInsnNode(decryptedString));
                             matchContext.removeAll();
-                            methods.add(decryptedMethod);
                             markChange();
                         } catch (Exception e) {
                             isDecryptedFully.set(false);
@@ -100,8 +112,34 @@ public class ZelixStringTransformer extends Transformer {
                     });
                 }
 
-                if (isDecryptedFully.get())
-                    methods.forEach(decryptedMethod -> classWrapper.methods().removeIf(methodNode -> methodNode.name.equals(decryptedMethod.name) && methodNode.desc.equals(decryptedMethod.desc)));
+                if (classWrapper.isEnumClass()) {
+                    SimpleArrayValue arrayValue = (SimpleArrayValue) sandBox.getInvocationUtil().invokeReference(
+                        clazz.getMethod("getArr", "()[Ljava/lang/String;")
+                    );
+
+                    int length = arrayValue.getLength();
+
+                    MethodNode clinitMethod = classWrapper.findClInit().get();
+                    MethodContext methodContext = MethodContext.of(classWrapper, clinitMethod);
+                    MatchContext match2 = STRING_ARRAY_MATCH.findFirstMatch(methodContext);
+                    VarInsnNode fieldNode = (VarInsnNode) match2.captures().get("inject-insn").insn();
+                    InsnList insnList = new InsnList();
+
+                    for (int i = 0; i < length; i++) {
+                        ObjectValue value = arrayValue.getReference(i);
+                        String decryptedString = sandBox.vm().getOperations().readUtf8(value);
+
+                        // insert data
+                        insnList.add(new VarInsnNode(Opcodes.ALOAD, fieldNode.var));
+                        insnList.add(AsmHelper.numberInsn(i));
+                        insnList.add(new LdcInsnNode(decryptedString));
+                        insnList.add(new InsnNode(Opcodes.AASTORE));
+                    }
+
+                    match2.insnContext().methodNode().instructions.insert(fieldNode, insnList);
+                    markChange();
+                }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -125,7 +163,7 @@ public class ZelixStringTransformer extends Transformer {
         List<AbstractInsnNode> removedInsns = new ArrayList<>();
         LabelNode firstLabel = null;
 
-        for (AbstractInsnNode insn: clinitMethod.instructions.toArray()) {
+        for (AbstractInsnNode insn : clinitMethod.instructions.toArray()) {
             if (insn instanceof LabelNode labelNode) {
                 firstLabel = labelNode;
                 break;
@@ -148,12 +186,28 @@ public class ZelixStringTransformer extends Transformer {
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         ClassNode classNode = new ClassNode();
 
+        String tmpClassName = "tmp/" + classWrapper.name();
+
         classNode.access = ACC_PUBLIC | ACC_STATIC;
-        classNode.name = "tmp/" + classWrapper.name();
+        classNode.name = tmpClassName;
         classNode.version = classWrapper.classNode().version;
         classNode.superName = "java/lang/Object";
 
         classNode.methods.add(clinit);
+
+        if (classWrapper.isEnumClass()) {
+            classNode.fields.add(new FieldNode(ACC_PUBLIC | ACC_STATIC, "arr", "[Ljava/lang/String;", null, null));
+
+            // add function
+            MethodNode getMethodNode = new MethodNode(ACC_PUBLIC | ACC_STATIC, "getArr", "()[Ljava/lang/String;", null, new String[0]);
+            getMethodNode.visitCode();
+            getMethodNode.visitFieldInsn(Opcodes.GETSTATIC, tmpClassName, "arr", "[Ljava/lang/String;");
+            getMethodNode.visitInsn(Opcodes.ARETURN);
+            getMethodNode.visitMaxs(1, 0);
+            getMethodNode.visitEnd();
+
+            classNode.methods.add(getMethodNode);
+        }
 
         // copy array
         JumpInsnNode jumpInsnNode = match.captures().get("label").insn().asJump();
@@ -172,37 +226,15 @@ public class ZelixStringTransformer extends Transformer {
         return cw.toByteArray();
     }
 
-    private void setReturnOpcode(MatchContext match) {
-        JumpInsnNode jumpInsnNode = match.captures().get("label").insn().asJump();
-        AbstractInsnNode insn = jumpInsnNode.label;
 
-        while (insn != null) {
-            if (insn.getOpcode() == Opcodes.GOTO) {
-                match.insnContext().methodNode().instructions.insert(insn, new InsnNode(Opcodes.RETURN));
-                match.insnContext().methodNode().instructions.remove(insn);
-                break;
-            }
-
-            insn = insn.getNext();
-        }
-    }
-
-    private void removeInvokeOnFirstLabel(InsnList instructions) {
-        for (AbstractInsnNode insn: instructions.toArray()) {
-            if (insn instanceof LabelNode)
-                break;
-
-            if (insn.getOpcode() == Opcodes.INVOKESTATIC)
-                instructions.remove(insn);
-        }
-    }
-
-    private byte[] removeDependantInsn(ClassWrapper classWrapper, byte[] classByte) {
+    private byte[] modifyByteCode(ClassWrapper classWrapper, byte[] classByte) {
         ClassReader cr = new ClassReader(classByte);
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         ClassNode classNode = new ClassNode();
 
         cr.accept(classNode, 0);
+
+        String tmpClassName = "tmp/" + classWrapper.name();
 
         MethodNode clinitMethod = classNode.methods.stream()
             .filter(methodNode -> methodNode.name.equals("<clinit>"))
@@ -211,25 +243,42 @@ public class ZelixStringTransformer extends Transformer {
 
         MethodContext methodContext = MethodContext.of(classNode, clinitMethod);
         List<MatchContext> matches = CLINIT_DETECTION.findAllMatches(methodContext);
+        MatchContext match = matches.get(matches.size() - 1);
 
-        setReturnOpcode(matches.get(matches.size() - 1));
-        removeInvokeOnFirstLabel(clinitMethod.instructions);
+        JumpInsnNode jumpInsnNode = match.captures().get("label").insn().asJump();
+        AbstractInsnNode currentInsn = jumpInsnNode.label;
+
+        while (currentInsn != null) {
+            if (currentInsn.getOpcode() == Opcodes.GOTO) {
+                if (classWrapper.isEnumClass()) {
+                    MatchContext match2 = STRING_ARRAY_MATCH.findFirstMatch(methodContext);
+                    VarInsnNode fieldNode = (VarInsnNode) match2.captures().get("inject-insn").insn();
+                    MethodNode methodNode = match2.insnContext().methodNode();
+                    methodNode.instructions.insertBefore(currentInsn, new VarInsnNode(Opcodes.ALOAD, fieldNode.var));
+                    methodNode.instructions.insertBefore(currentInsn, new FieldInsnNode(Opcodes.PUTSTATIC, tmpClassName, "arr", "[Ljava/lang/String;"));
+                }
+
+                match.insnContext().methodNode().instructions.insert(currentInsn, new InsnNode(Opcodes.RETURN));
+                match.insnContext().methodNode().instructions.remove(currentInsn);
+                break;
+            }
+
+            currentInsn = currentInsn.getNext();
+        }
+
+
+        for (AbstractInsnNode insn : clinitMethod.instructions.toArray()) {
+            if (insn instanceof LabelNode)
+                break;
+
+            if (insn.getOpcode() == Opcodes.INVOKESTATIC)
+                clinitMethod.instructions.remove(insn);
+        }
 
         classWrapper.findMethod(methodNode -> methodNode.desc.equals("(II)Ljava/lang/String;")).ifPresent(method -> {
             if (!classNode.methods.contains(method))
                 classNode.methods.add(method);
         });
-
-        classNode.accept(cw);
-        return cw.toByteArray();
-    }
-
-    private byte[] renameInvoke(ClassWrapper classWrapper, byte[] classByte) {
-        ClassReader cr = new ClassReader(classByte);
-        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        ClassNode classNode = new ClassNode();
-
-        cr.accept(classNode, 0);
 
         for (MethodNode methodNode : classNode.methods) {
             for (AbstractInsnNode insn : methodNode.instructions) {
