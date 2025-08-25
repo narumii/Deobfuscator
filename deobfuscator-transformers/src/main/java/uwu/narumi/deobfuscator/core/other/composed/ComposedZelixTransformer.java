@@ -44,7 +44,7 @@ public class ComposedZelixTransformer extends ComposedTransformer {
         InlineStaticFieldTransformer::new,
         UniversalNumberTransformer::new,
 
-        ZelixStringTransformer::new,
+//        ZelixStringTransformer::new,
 
         // Cleanup
         ComposedPeepholeCleanTransformer::new

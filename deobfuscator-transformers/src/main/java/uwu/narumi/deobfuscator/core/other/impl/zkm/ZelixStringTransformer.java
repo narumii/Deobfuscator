@@ -91,6 +91,7 @@ public class ZelixStringTransformer extends Transformer {
 
                 for (MethodNode method : classWrapper.methods()) {
                     MethodContext methodContext = MethodContext.of(classWrapper, method);
+
                     DECRYPTION_MATCH.findAllMatches(methodContext).forEach(matchContext -> {
                         int key1 = matchContext.captures().get("key1").insn().asInteger();
                         int key2 = matchContext.captures().get("key2").insn().asInteger();
@@ -146,7 +147,7 @@ public class ZelixStringTransformer extends Transformer {
 
             context().removeCompiledClass(tmpClassWrapper);
 
-            if (isDecryptedFully.get())
+            if (isDecryptedFully.get() )
                 cleanUpFunction(classWrapper);
         });
     }
