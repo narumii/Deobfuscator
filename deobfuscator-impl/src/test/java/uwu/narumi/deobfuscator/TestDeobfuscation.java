@@ -218,5 +218,10 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .transformers(UniversalNumberTransformer::new, () -> new BranchlockCompabilityStringTransformer(true))
         .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_JAR, "branchlock-string.jar")
         .register();
+
+    test("Branchlock String Class")
+        .transformers(UniversalNumberTransformer::new, () -> new BranchlockCompabilityStringTransformer(true))
+        .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "branchlock/Main.class")
+        .register();
   }
 }
