@@ -1,0 +1,7 @@
+package pack.tests.basics.sub;
+
+public class SolAdd {
+    public static int get() {
+        return (new med(1, 2)).result;
+    }
+}

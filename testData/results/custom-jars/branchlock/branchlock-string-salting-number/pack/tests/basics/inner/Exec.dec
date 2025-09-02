@@ -1,0 +1,29 @@
+package pack.tests.basics.inner;
+
+public class Exec {
+    public int fuss = 1;
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public Exec(int var1) {
+    }
+
+    public void addF(int var1) {
+        this.fuss += 2;
+    }
+
+    public class Inner {
+        int i;
+        final Exec this$0;
+        public int BRANCHLOCK_DOT_NET_DEMO;
+
+        public Inner(Exec var1, int var2, int var3) {
+            this.this$0 = var1;
+            this.i = var2;
+        }
+
+        public void doAdd(int var1) {
+            this.this$0.addF(18951);
+            this.this$0.fuss = this.this$0.fuss + this.i;
+        }
+    }
+}

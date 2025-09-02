@@ -1,0 +1,219 @@
+package pack.tests.basics.overwirte;
+
+public abstract class Super implements Face {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public Super(int var1) {
+    }
+
+    public void run(int var1) {
+        System.out.println(d[var1 ^ 25940]);
+    }
+
+    static {
+        // $VF: Couldn't be decompiled
+        // Please report this to the Vineflower issue tracker, at https://github.com/Vineflower/vineflower/issues with a copy of the class file (if you have the rights to distribute it!)
+        // java.lang.RuntimeException: parsing failure!
+        //   at org.jetbrains.java.decompiler.modules.decompiler.decompose.DomHelper.parseGraph(DomHelper.java:211)
+        //   at org.jetbrains.java.decompiler.main.rels.MethodProcessor.codeToJava(MethodProcessor.java:166)
+        //
+        // Bytecode:
+        // 000: ldc "\u0e78\u0e75\u0019\u001eￜ<"
+        // 002: invokevirtual java/lang/String.toCharArray ()[C
+        // 005: astore 0
+        // 006: bipush 0
+        // 007: istore 1
+        // 008: aload 0
+        // 009: dup
+        // 00a: bipush 1
+        // 00b: swap
+        // 00c: bipush 0
+        // 00d: caload
+        // 00e: aload 0
+        // 00f: dup
+        // 010: bipush 0
+        // 011: swap
+        // 012: bipush 1
+        // 013: caload
+        // 014: castore
+        // 015: castore
+        // 016: aload 0
+        // 017: dup
+        // 018: bipush 5
+        // 019: swap
+        // 01a: bipush 7
+        // 01c: caload
+        // 01d: aload 0
+        // 01e: dup
+        // 01f: bipush 7
+        // 021: swap
+        // 022: bipush 5
+        // 023: caload
+        // 024: castore
+        // 025: castore
+        // 026: aload 0
+        // 027: dup
+        // 028: bipush 4
+        // 029: swap
+        // 02a: bipush 1
+        // 02b: caload
+        // 02c: aload 0
+        // 02d: dup
+        // 02e: bipush 1
+        // 02f: swap
+        // 030: bipush 4
+        // 031: caload
+        // 032: castore
+        // 033: castore
+        // 034: goto 155
+        // 037: invokevirtual java/lang/Throwable.getStackTrace ()[Ljava/lang/StackTraceElement;
+        // 03a: bipush 0
+        // 03b: aaload
+        // 03c: astore 4
+        // 03e: aload 4
+        // 040: invokevirtual java/lang/StackTraceElement.getMethodName ()Ljava/lang/String;
+        // 043: invokevirtual java/lang/String.hashCode ()I
+        // 046: ldc 65535
+        // 048: iand
+        // 049: istore 5
+        // 04b: aload 4
+        // 04d: invokevirtual java/lang/StackTraceElement.getClassName ()Ljava/lang/String;
+        // 050: invokevirtual java/lang/String.toCharArray ()[C
+        // 053: astore 6
+        // 055: aload 0
+        // 056: iload 1
+        // 057: iinc 1 1
+        // 05a: caload
+        // 05b: sipush 221
+        // 05e: ixor
+        // 05f: iload 5
+        // 061: ixor
+        // 062: anewarray 35
+        // 065: astore 7
+        // 067: bipush 0
+        // 068: istore 8
+        // 06a: aload 0
+        // 06b: iload 1
+        // 06c: iinc 1 1
+        // 06f: caload
+        // 070: sipush 213
+        // 073: ixor
+        // 074: iload 5
+        // 076: ixor
+        // 077: istore 2
+        // 078: iload 2
+        // 079: newarray 5
+        // 07b: astore 9
+        // 07d: bipush 0
+        // 07e: istore 10
+        // 080: iload 2
+        // 081: ifle 136
+        // 084: aload 0
+        // 085: iload 1
+        // 086: caload
+        // 087: istore 11
+        // 089: aload 6
+        // 08b: iload 1
+        // 08c: aload 6
+        // 08e: arraylength
+        // 08f: irem
+        // 090: caload
+        // 091: bipush 92
+        // 093: ixor
+        // 094: lookupswitch 140 16 15 259 40 196 41 209 42 215 43 228 44 234 46 247 47 253 51 273 53 286 55 293 57 300 61 307 62 314 63 321 114 266
+        // 120: aload 9
+        // 122: iload 10
+        // 124: iload 11
+        // 126: castore
+        // 127: iinc 10 1
+        // 12a: iinc 1 1
+        // 12d: iinc 2 -1
+        // 130: bipush 0
+        // 131: istore 12
+        // 133: goto 1df
+        // 136: aload 7
+        // 138: iload 8
+        // 13a: iinc 8 1
+        // 13d: new java/lang/String
+        // 140: dup
+        // 141: aload 9
+        // 143: invokespecial java/lang/String.<init> ([C)V
+        // 146: invokevirtual java/lang/String.intern ()Ljava/lang/String;
+        // 149: aastore
+        // 14a: iload 1
+        // 14b: aload 0
+        // 14c: arraylength
+        // 14d: if_icmplt 06a
+        // 150: aload 7
+        // 152: putstatic pack/tests/basics/overwirte/Super.d [Ljava/lang/String;
+        // 155: goto 228
+        // 158: iload 11
+        // 15a: bipush 112
+        // 15c: ixor
+        // 15d: istore 11
+        // 15f: bipush 1
+        // 160: istore 12
+        // 162: goto 1df
+        // 165: bipush 2
+        // 166: istore 12
+        // 168: goto 1df
+        // 16b: iload 11
+        // 16d: bipush -107
+        // 16f: ixor
+        // 170: istore 11
+        // 172: bipush 1
+        // 173: istore 12
+        // 175: goto 1df
+        // 178: bipush 3
+        // 179: istore 12
+        // 17b: goto 1df
+        // 17e: iload 11
+        // 180: bipush 95
+        // 182: ixor
+        // 183: istore 11
+        // 185: bipush 1
+        // 186: istore 12
+        // 188: goto 1df
+        // 18b: bipush 4
+        // 18c: istore 12
+        // 18e: goto 1df
+        // 191: bipush 5
+        // 192: istore 12
+        // 194: goto 1df
+        // 197: bipush 6
+        // 199: istore 12
+        // 19b: goto 1df
+        // 19e: bipush 7
+        // 1a0: istore 12
+        // 1a2: goto 1df
+        // 1a5: iload 11
+        // 1a7: bipush 39
+        // 1a9: ixor
+        // 1aa: istore 11
+        // 1ac: bipush 1
+        // 1ad: istore 12
+        // 1af: goto 1df
+        // 1b2: bipush 8
+        // 1b4: istore 12
+        // 1b6: goto 1df
+        // 1b9: bipush 9
+        // 1bb: istore 12
+        // 1bd: goto 1df
+        // 1c0: bipush 10
+        // 1c2: istore 12
+        // 1c4: goto 1df
+        // 1c7: bipush 11
+        // 1c9: istore 12
+        // 1cb: goto 1df
+        // 1ce: bipush 12
+        // 1d0: istore 12
+        // 1d2: goto 1df
+        // 1d5: bipush 13
+        // 1d7: istore 12
+        // 1d9: goto 1df
+        // 1dc: goto 037
+        // 1df: iload 12
+        // 1e1: tableswitch -353 0 13 -353 -193 -137 -124 -99 -86 -80 -118 -74 -47 -60 -40 -33 -26
+        // 228: return
+    }
+}

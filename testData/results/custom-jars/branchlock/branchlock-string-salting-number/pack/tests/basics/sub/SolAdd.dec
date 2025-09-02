@@ -1,0 +1,12 @@
+package pack.tests.basics.sub;
+
+public class SolAdd {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public SolAdd(int var1) {
+    }
+
+    public static int get(int var0) {
+        return (new med(1, 2, 14490)).result;
+    }
+}
