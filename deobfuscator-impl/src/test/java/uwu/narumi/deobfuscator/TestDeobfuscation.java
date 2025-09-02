@@ -1,11 +1,6 @@
 package uwu.narumi.deobfuscator;
 
-import uwu.narumi.deobfuscator.core.other.composed.ComposedGruntTransformer;
-import uwu.narumi.deobfuscator.core.other.composed.ComposedHP888Transformer;
-import uwu.narumi.deobfuscator.core.other.composed.ComposedSuperblaubeereTransformer;
-import uwu.narumi.deobfuscator.core.other.composed.ComposedUnknownObf1Transformer;
-import uwu.narumi.deobfuscator.core.other.composed.ComposedZelixTransformer;
-import uwu.narumi.deobfuscator.core.other.composed.Composed_qProtectTransformer;
+import uwu.narumi.deobfuscator.core.other.composed.*;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedGeneralFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedPeepholeCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.branchlock.BranchlockCompabilityStringTransformer;
@@ -216,12 +211,12 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
 
     test("Branchlock String")
         .transformers(UniversalNumberTransformer::new, () -> new BranchlockCompabilityStringTransformer(true))
-        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_JAR, "branchlock-string.jar")
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_JAR, "branchlock/branchlock-string.jar")
         .register();
 
-    test("Branchlock String Class")
-        .transformers(UniversalNumberTransformer::new, () -> new BranchlockCompabilityStringTransformer(true))
-        .input(OutputType.SINGLE_CLASS, InputType.CUSTOM_CLASS, "branchlock/Main.class")
+    test("Branchlock String + Salting + Number")
+        .transformers(ComposedBranchlockTransformer::new)
+        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_JAR, "branchlock/branchlock-string-salting-number.jar")
         .register();
   }
 }
