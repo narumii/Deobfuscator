@@ -14,13 +14,14 @@ import java.util.List;
 /**
  * Matches instructions in sequence
  */
-// TODO: backwards match?
 public class SequenceMatch extends Match {
 
   private static final Match FRAME_MATCH = Match.of(context -> context.insn() instanceof FrameNode);
+  private static final Match LABEL_MATCH = Match.of(context -> context.insn() instanceof LabelNode);
+  private static final Match LINE_MATCH = Match.of(context -> context.insn() instanceof LineNumberNode);
 
   private final Match[] matches;
-  private final List<Match> skipMatches = new ArrayList<>(List.of(FRAME_MATCH));
+  private final List<Match> skipMatches = new ArrayList<>(List.of(FRAME_MATCH, LABEL_MATCH, LINE_MATCH));
 
   private SequenceMatch(Match[] matches) {
     this.matches = matches;
@@ -43,8 +44,27 @@ public class SequenceMatch extends Match {
     return this;
   }
 
+  public SequenceMatch doNotSkipLabels() {
+    this.skipMatches.remove(LABEL_MATCH);
+    return this;
+  }
+
+  public SequenceMatch doNotSkipLineNumbers() {
+    this.skipMatches.remove(LINE_MATCH);
+    return this;
+  }
+
+  public SequenceMatch doNotSkip() {
+    this.skipMatches.clear();
+    return this;
+  }
+
   @Override
   protected boolean test(MatchContext context) {
+    if (this.skipMatches.stream().anyMatch(match -> match.matches(context.insnContext()))) {
+      return false;
+    }
+
     AbstractInsnNode currentInsn = context.insn();
     int matchIdx = 0;
 

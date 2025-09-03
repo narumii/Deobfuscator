@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
-import org.junit.jupiter.api.Timeout;
 import org.opentest4j.TestAbortedException;
 import uwu.narumi.deobfuscator.Deobfuscator;
 import uwu.narumi.deobfuscator.api.context.DeobfuscatorOptions;
@@ -20,12 +19,14 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-@Timeout(60)
+import static org.junit.jupiter.api.Assertions.*;
+
 public abstract class TestDeobfuscationBase {
   public static final Path TEST_DATA_PATH = Path.of("..", "testData");
   public static final Path COMPILED_PATH = TEST_DATA_PATH.resolve("compiled");
@@ -73,7 +74,8 @@ public abstract class TestDeobfuscationBase {
      * Build test
      */
     public DynamicTest buildTest() {
-      return DynamicTest.dynamicTest(this.testName, this::runTest);
+      return DynamicTest.dynamicTest(this.testName,
+          () -> assertTimeoutPreemptively(Duration.ofSeconds(300), this::runTest));
     }
 
     /**
