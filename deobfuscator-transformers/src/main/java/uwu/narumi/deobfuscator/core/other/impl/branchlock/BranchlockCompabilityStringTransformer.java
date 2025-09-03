@@ -8,17 +8,14 @@ import uwu.narumi.deobfuscator.api.asm.matcher.group.SequenceMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.*;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BranchlockCompabilityStringTransformer extends Transformer {
 
   private final boolean deleteClinit;
-  String[] decryptedStrings;
-  FieldInsnNode stringArray;
-
-
+  private String[] decryptedStrings;
+  private FieldInsnNode stringArray;
 
   public BranchlockCompabilityStringTransformer(boolean deleteClinit) {
     this.deleteClinit = deleteClinit;
@@ -41,7 +38,7 @@ public class BranchlockCompabilityStringTransformer extends Transformer {
               Match stringArr = OpcodeMatch.of(PUTSTATIC).capture("string-arr");
               stringArray = stringArr.findFirstMatch(methodContext).insn().asFieldInsn();
 
-              String encryptedString = new String(((String) ldc.cst).getBytes(), StandardCharsets.UTF_8);
+              String encryptedString = (String) ldc.cst;
               char[] encryptedStringArray = encryptedString.toCharArray();
               Match match = SequenceMatch.of(OpcodeMatch.of(DUP), NumberMatch.numInteger().capture("array-to"), OpcodeMatch.of(SWAP), NumberMatch.numInteger().capture("array-from"), OpcodeMatch.of(CALOAD), OpcodeMatch.of(CASTORE), OpcodeMatch.of(CASTORE));
 

@@ -22,15 +22,11 @@ public class Main {
     public Main(int var1) {
     }
 
-    // $VF: Could not create synchronized statement, marking monitor enters and exits
-    // Please report this to the Vineflower issue tracker, at https://github.com/Vineflower/vineflower/issues with a copy of the class file (if you have the rights to distribute it!)
     public static void main(String[] var0) {
         System.out
             .println(
                 "-----------------------------------------------------------------------------------------\n| This java application has been obfuscated using a demo version of Branchlock 4.       |\n| Did you know that anyone can read the source code of your exported java software?     |\n| For more information about how to protect your projects, visit https://branchlock.net |\n-----------------------------------------------------------------------------------------\n"
             );
-        synchronized (var0){} // $VF: monitorenter 
-        synchronized (var0){} // $VF: monitorenter 
         System.out.println("Obfuscator Test Program");
         System.out.println("Author: huzpsb");
         System.out.println("Version: 1.0r");
