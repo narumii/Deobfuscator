@@ -261,6 +261,30 @@ public abstract class TestDeobfuscationBase {
       return this;
     }
 
+    /**
+     * Alias for {@link #input(OutputType, InputType, String)} with {@link OutputType#SINGLE_CLASS}
+     */
+    @Contract("_,_ -> this")
+    public TestBuilder inputClass(InputType inputType, String path) {
+      return this.input(OutputType.SINGLE_CLASS, inputType, path);
+    }
+
+    /**
+     * Alias for {@link #input(OutputType, InputType, String)} with {@link OutputType#MULTIPLE_CLASSES}
+     */
+    @Contract("_,_ -> this")
+    public TestBuilder inputClassesDir(InputType inputType, String path) {
+      return this.input(OutputType.MULTIPLE_CLASSES, inputType, path);
+    }
+
+    /**
+     * Alias for {@link #input(OutputType, InputType, String)} with {@link OutputType#MULTIPLE_CLASSES} and {@link InputType#CUSTOM_JAR}
+     */
+    @Contract("_ -> this")
+    public TestBuilder inputJar(String path) {
+      return this.input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_JAR, path);
+    }
+
     @Contract(" -> this")
     public TestBuilder noDecompile() {
       this.decompile = false;
