@@ -1,0 +1,9 @@
+package pack.tests.basics.sub;
+
+class med {
+    int result;
+
+    med(int a, int b) {
+        this.result = new flo().solve(a, b);
+    }
+}

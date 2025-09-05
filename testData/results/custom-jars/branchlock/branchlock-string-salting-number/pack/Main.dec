@@ -1,0 +1,359 @@
+package pack;
+
+import java.io.File;
+import pack.tests.basics.accu.Digi;
+import pack.tests.basics.ctrl.Ctrl;
+import pack.tests.basics.inner.Test;
+import pack.tests.basics.overwirte.Sub;
+import pack.tests.basics.runable.Task;
+import pack.tests.basics.sub.Solver;
+import pack.tests.bench.Calc;
+import pack.tests.reflects.annot.annot;
+import pack.tests.reflects.counter.Count;
+import pack.tests.reflects.field.FTest;
+import pack.tests.reflects.loader.LRun;
+import pack.tests.reflects.res.Accesor;
+import pack.tests.reflects.retrace.Tracer;
+import pack.tests.security.SecTest;
+
+public class Main {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public Main(int var1) {
+    }
+
+    public static void main(String[] var0) {
+        System.out
+            .println(
+                "-----------------------------------------------------------------------------------------\n| This java application has been obfuscated using a demo version of Branchlock 4.       |\n| Did you know that anyone can read the source code of your exported java software?     |\n| For more information about how to protect your projects, visit https://branchlock.net |\n-----------------------------------------------------------------------------------------\n"
+            );
+        System.out.println("Obfuscator Test Program");
+        System.out.println("Author: huzpsb");
+        System.out.println("Version: 1.0r");
+        System.out.println("Link: https://github.com/huzpsb/JavaObfuscatorTest");
+        File var1 = new File("IK");
+        if (!var1.exists()) {
+            var1.createNewFile();
+            System.out.println();
+            System.out.println("[HINT]");
+            System.out.println("Only compatibility and efficiency are tested here!");
+            System.out.println("For most users, pass all of the basics means the obfuscator is good enough.");
+            System.out.println("The Test #2 is for SpringBoot and Android like environment.");
+            System.out.println("Choose wisely among strength, compatibility, efficiency, size, and price.");
+            System.out.println("[HINT]");
+            System.out.println();
+        }
+
+        System.out.println("-------------Test #1: Basics-------------");
+        System.out.print("Test 1.1: Inheritance ");
+
+        try {
+            new Sub(3029).run(25940);
+        } catch (Throwable var15) {
+            System.out.println("ERROR");
+        }
+
+        System.out.print("Test 1.2: Cross ");
+
+        try {
+            new Sub(3029).run(25940);
+        } catch (Throwable var14) {
+            System.out.println("ERROR");
+        }
+
+        System.out.print("Test 1.3: Throw ");
+
+        try {
+            new Ctrl(27377).run(19379);
+        } catch (Throwable var13) {
+            System.out.println("ERROR");
+        }
+
+        System.out.print("Test 1.4: Accuracy ");
+
+        try {
+            new Digi(25546).run(32070);
+        } catch (Throwable var12) {
+            System.out.println("ERROR");
+        }
+
+        System.out.print("Test 1.5: SubClass ");
+
+        try {
+            new Solver(24869);
+        } catch (Throwable var11) {
+            System.out.println("ERROR");
+        }
+
+        System.out.print("Test 1.6: Pool ");
+
+        try {
+            new Task(9283).run(5640);
+        } catch (Throwable var10) {
+            System.out.println("ERROR");
+        }
+
+        System.out.print("Test 1.7: InnerClass ");
+
+        try {
+            new Test(13942).run(22721);
+        } catch (Throwable var9) {
+            System.out.println("ERROR");
+        }
+
+        System.out.println("-------------Test #2: Reflects-------------");
+        System.out.print("Test 2.1: Counter ");
+
+        try {
+            new Count(9552).run(19387);
+        } catch (Throwable var8) {
+            System.out.println("ERROR");
+        }
+
+        System.out.print("Test 2.2: Chinese 通过LMAO\b\b\b\b    \n");
+        System.out.print("Test 2.3: Resource ");
+
+        try {
+            new Accesor(10500).run(27006);
+        } catch (Throwable var7) {
+            System.out.println("ERROR");
+        }
+
+        System.out.print("Test 2.4: Field ");
+
+        try {
+            new FTest(11858).run(16102);
+        } catch (Throwable var6) {
+            System.out.println("ERROR");
+        }
+
+        System.out.print("Test 2.5: Loader ");
+
+        try {
+            new LRun(28149).run(4303);
+        } catch (Throwable var5) {
+            System.out.println("ERROR");
+        }
+
+        System.out.print("Test 2.6: ReTrace ");
+
+        try {
+            new Tracer(29896).run(27515);
+        } catch (Throwable var4) {
+            System.out.println("ERROR");
+        }
+
+        System.out.print("Test 2.7: Annotation ");
+
+        try {
+            new annot(19677).run(22804);
+        } catch (Throwable var3) {
+            System.out.println("ERROR");
+        }
+
+        System.out.print("Test 2.8: Sec ");
+
+        try {
+            new SecTest(9795).run(196);
+        } catch (Throwable var2) {
+            System.out.println("ERROR");
+        }
+
+        System.out.println("-------------Test #3: Efficiency-------------");
+        Calc.runAll(8983);
+        System.out.println("-------------Tests r Finished-------------");
+    }
+
+    static {
+        // $VF: Couldn't be decompiled
+        // Please report this to the Vineflower issue tracker, at https://github.com/Vineflower/vineflower/issues with a copy of the class file (if you have the rights to distribute it!)
+        // java.lang.RuntimeException: parsing failure!
+        //   at org.jetbrains.java.decompiler.modules.decompiler.decompose.DomHelper.parseGraph(DomHelper.java:211)
+        //   at org.jetbrains.java.decompiler.main.rels.MethodProcessor.codeToJava(MethodProcessor.java:166)
+        //
+        // Bytecode:
+        // 000: ldc "￬๕\u0011\ufffa￬￫\uffbfPﾱﾪﾥeￓ\ufff0\ufffe\ufffb\u0007￭\uffbf็v\ufff5\ufff8๊\uffde\u0017￫\ufff7\ufff07ﾥ\uffbf\ufff7￪\u0018\uffef￬�\u0e65ￋ\ufffa￬￫Bﾭﾱﾭ\u007f\uffbfￜ\ufff7\ufff6\f\ufffa￬\ufffae澅灘ￓￒ#\uffd0ﾗﾗMﾗ\uffbf\uffbf\uffbfBﾕ\u0e6fﾲhﾲﾲﾲﾲOﾲﾲﾲhﾲ\uffbfￋ\ufffa\u0011￫\uffbfﾼwﾥ\uffbfￍ\ufffa\u0004\ufff3\ufffa￼1￬ﾲﾲﾲOﾲﾲﾲhﾲﾲﾲﾲOโￄￗ\f\uffd1ￋￂ\u0e76-\ufff1\ufff3￦e￼\ufff0\ufff2\uffef\u0003￫\ufff6�,\ufff3\ufff6￫￦B\ufffe\ufff1\ufffbe\ufffa\ufff9\ufff9\ufff6\u0001\ufff6\ufffa\ufff1&￦\uffbf\ufffe￭\u0007\uffbf￫\ufffa6￫\ufffa\ufffb\uffbf\n\ufffa￭\ufffad็￼￪\ufff2๔ￋ\ufffa￬1\uffbfﾮﾱﾬX\uffbfￋ\ufff77\ufff0￨\uffbf๑6\ufffa￬￫eﾭﾱﾨﾥB\uffde\ufff1\ufff1*￫\ufffe￫\ufff6\r\ufff1\uffbf๒\u0011\ufffa￬￫\uffbfSﾱﾮﾥeￖ\ufff1\ufff7\ufffa\u0010\ufff6￫\ufffe+￼\ufffa\uffbf้4\ufffa￭￬,\ufff0\ufff1ﾥ\uffbfSﾱﾯ￭๖ￋ\ufffa￬￫Bﾭﾱﾮ\u007f\uffbfￜ\ufff0￪\f￫\ufffa￭eเﾮﾮ\ufff5\bๆￖￔฏ\uffd9\ufff0￭\uffbf\u000f\ufff0￬￫e￪￬\ufffa￭\u0011ﾳ\uffbf\uffef$￬￬\uffbf\ufffe\u000e\ufff3\uffbf\ufff0#\uffbf￫\ufff7\ufffaB�\ufffe￬,￼￬\uffbf\ufff2\u0007\ufffe\ufff1￬e￫\ufff7\ufffa\uffbf\r�\ufff9￪6￼\ufffe￫\ufff0\u0010\uffbf\ufff6￬e\ufff8\ufff0\ufff0\ufffbB\ufffa\ufff1\ufff00\ufff8\ufff7ﾱๆ\udb22⏢\u0e6dﾲhﾲﾲﾲﾲOﾲﾲﾲhﾲﾲￋ\ufffa\u0011￫\uffbfﾼtﾥ\uffbf\uffdd\ufffe\u0011\ufff6￼￬hﾲﾲﾲﾲOﾲﾲﾲhﾲﾲﾲ๔6\ufffa￬￫eﾮﾱﾭﾥBￜ￭\ufff06￬\uffbf\u0e69ﾲOﾲﾲﾲhﾲﾲﾲﾲOﾲﾲￋ ￬￫\uffbfﾼQﾥ\uffbfￚ#\ufff9\ufff6￼\ufff6\u0007\ufff1￼￦hﾲﾲﾲﾲOﾲﾲﾲhﾲﾲﾲ\u0e6eOﾲﾲﾲhﾲﾲﾲﾲOﾲﾲﾲ\u0011\ufffa￬￫￬B￭\uffbf\uffd9,\ufff1\ufff6￬\ufff7\u0007\ufffbﾲﾲhﾲﾲﾲﾲOﾲﾲﾲhﾲแￚￍ0\uffd0ￍ๑\u0011\ufffa￬￫\uffbfSﾱﾨﾥeￖ\ufff1\ufff1\ufffa\u0010ￜ\ufff3\ufffe6ໞ\uffbf๓\uffd0\u0000\ufff9￪￬&\ufffeￌ\ufff0￭Bￋ\ufffa￬1\uffbfￏ￭\ufff0\u0005￭\ufffe\ufff2๗ￋ\ufffa￬￫Bﾭﾱﾬ\u007f\uffbfￍ\ufffa￬\r￪￭￼ \uffbf๖ￋ\ufffa\u0011￫\uffbfﾭkﾩﾥ\uffbfￍ\u0007ￋ￭\ufffe&\ufffa\uffbf๔ￋ\u0007￬￫\uffbfwﾱﾫﾥ\uffbf$\ufff6\ufffa\ufff3!\uffbf๊ￋ\ufffa\u0011￫\uffbfﾭkﾧﾥ\uffbf￫\u0007￼\uffbfญ\u0006\ufff7\ufff0\ufff0￬\u0007\uffbf￨\ufff66\ufffa\ufff3￦\uffbf\u0003\ufff2\ufff0\ufff1\"\uffbf￬￫￭\u0007\ufff1\ufff8￫-ﾳ\uffbf￼\ufff0\u000f\uffef\ufffe￫,�\ufff6\ufff3\ufff6\u0016￦ﾳ\uffbf \ufff9\ufff9\ufff6￼\u000b\ufffa\ufff1￼<ﾳ\uffbf￬\ufff6\u0018\ufffaﾳ\uffbf$\ufff1\ufffb\uffbf\uffef\u0010\ufff6￼\ufffak๗ￋ\ufffa￬\u0016\uffbfﾮﾱpﾥ\uffbfￌ￪\u0000ￜ\ufff3\ufffe6￬\uffbf\u0e7fￋ\n\ufffa\uffbfￋ ￬￫\uffbfﾼP\uffbf\ufff6￬e\ufff9\ufff0￭\uffbf1\uffef￭\ufff6+\ufff8\uffdd\ufff0\ufff0\u0016\uffbf\ufffe\ufff1!\uffbf\uffde\ufff1\ufffb\u0010\ufff0\ufff6\ufffbe\ufff3\ufff6\ufff4\ufffaB\ufffa\ufff1￩,￭\ufff0\ufff1\ufff2\u0007\ufff1￫ﾱ๗ￋ\ufffa￬￫Bﾮﾱﾫ\u007f\uffbf\uffde￼￼\u0017￭\ufffe￼<\uffbf๋ￋ\ufffa\u0011￫\uffbfﾮkﾩﾥﾲￏ\r\ufff0\ufff3\uffbf"
+        // 002: invokevirtual java/lang/String.toCharArray ()[C
+        // 005: astore 0
+        // 006: bipush 0
+        // 007: istore 1
+        // 008: aload 0
+        // 009: dup
+        // 00a: sipush 627
+        // 00d: swap
+        // 00e: sipush 544
+        // 011: caload
+        // 012: aload 0
+        // 013: dup
+        // 014: sipush 544
+        // 017: swap
+        // 018: sipush 627
+        // 01b: caload
+        // 01c: castore
+        // 01d: castore
+        // 01e: aload 0
+        // 01f: dup
+        // 020: sipush 815
+        // 023: swap
+        // 024: bipush 85
+        // 026: caload
+        // 027: aload 0
+        // 028: dup
+        // 029: bipush 85
+        // 02b: swap
+        // 02c: sipush 815
+        // 02f: caload
+        // 030: castore
+        // 031: castore
+        // 032: aload 0
+        // 033: dup
+        // 034: sipush 534
+        // 037: swap
+        // 038: bipush 0
+        // 039: caload
+        // 03a: aload 0
+        // 03b: dup
+        // 03c: bipush 0
+        // 03d: swap
+        // 03e: sipush 534
+        // 041: caload
+        // 042: castore
+        // 043: castore
+        // 044: aload 0
+        // 045: dup
+        // 046: sipush 196
+        // 049: swap
+        // 04a: sipush 1205
+        // 04d: caload
+        // 04e: aload 0
+        // 04f: dup
+        // 050: sipush 1205
+        // 053: swap
+        // 054: sipush 196
+        // 057: caload
+        // 058: castore
+        // 059: castore
+        // 05a: goto 139
+        // 05d: invokevirtual java/lang/Throwable.getStackTrace ()[Ljava/lang/StackTraceElement;
+        // 060: bipush 0
+        // 061: aaload
+        // 062: astore 4
+        // 064: aload 4
+        // 066: invokevirtual java/lang/StackTraceElement.getMethodName ()Ljava/lang/String;
+        // 069: invokevirtual java/lang/String.hashCode ()I
+        // 06c: ldc 65535
+        // 06e: iand
+        // 06f: istore 5
+        // 071: aload 4
+        // 073: invokevirtual java/lang/StackTraceElement.getClassName ()Ljava/lang/String;
+        // 076: invokevirtual java/lang/String.toCharArray ()[C
+        // 079: astore 6
+        // 07b: aload 0
+        // 07c: iload 1
+        // 07d: iinc 1 1
+        // 080: caload
+        // 081: bipush 86
+        // 083: ixor
+        // 084: iload 5
+        // 086: ixor
+        // 087: anewarray 169
+        // 08a: astore 7
+        // 08c: bipush 0
+        // 08d: istore 8
+        // 08f: aload 0
+        // 090: iload 1
+        // 091: iinc 1 1
+        // 094: caload
+        // 095: sipush 237
+        // 098: ixor
+        // 099: iload 5
+        // 09b: ixor
+        // 09c: istore 2
+        // 09d: iload 2
+        // 09e: newarray 5
+        // 0a0: astore 9
+        // 0a2: bipush 0
+        // 0a3: istore 10
+        // 0a5: iload 2
+        // 0a6: ifle 11a
+        // 0a9: aload 0
+        // 0aa: iload 1
+        // 0ab: caload
+        // 0ac: istore 11
+        // 0ae: aload 6
+        // 0b0: iload 1
+        // 0b1: aload 6
+        // 0b3: arraylength
+        // 0b4: irem
+        // 0b5: caload
+        // 0b6: sipush 133
+        // 0b9: ixor
+        // 0ba: lookupswitch 74 8 171 168 200 162 228 130 230 149 235 174 236 180 238 193 245 143
+        // 104: aload 9
+        // 106: iload 10
+        // 108: iload 11
+        // 10a: castore
+        // 10b: iinc 10 1
+        // 10e: iinc 1 1
+        // 111: iinc 2 -1
+        // 114: bipush 0
+        // 115: istore 12
+        // 117: goto 185
+        // 11a: aload 7
+        // 11c: iload 8
+        // 11e: iinc 8 1
+        // 121: new java/lang/String
+        // 124: dup
+        // 125: aload 9
+        // 127: invokespecial java/lang/String.<init> ([C)V
+        // 12a: invokevirtual java/lang/String.intern ()Ljava/lang/String;
+        // 12d: aastore
+        // 12e: iload 1
+        // 12f: aload 0
+        // 130: arraylength
+        // 131: if_icmplt 08f
+        // 134: aload 7
+        // 136: putstatic pack/Main.d [Ljava/lang/String;
+        // 139: goto 1b0
+        // 13c: iload 11
+        // 13e: bipush -97
+        // 140: ixor
+        // 141: istore 11
+        // 143: bipush 1
+        // 144: istore 12
+        // 146: goto 185
+        // 149: bipush 2
+        // 14a: istore 12
+        // 14c: goto 185
+        // 14f: iload 11
+        // 151: bipush 69
+        // 153: ixor
+        // 154: istore 11
+        // 156: bipush 1
+        // 157: istore 12
+        // 159: goto 185
+        // 15c: bipush 3
+        // 15d: istore 12
+        // 15f: goto 185
+        // 162: bipush 4
+        // 163: istore 12
+        // 165: goto 185
+        // 168: bipush 5
+        // 169: istore 12
+        // 16b: goto 185
+        // 16e: iload 11
+        // 170: bipush 98
+        // 172: ixor
+        // 173: istore 11
+        // 175: bipush 1
+        // 176: istore 12
+        // 178: goto 185
+        // 17b: bipush 6
+        // 17d: istore 12
+        // 17f: goto 185
+        // 182: goto 05d
+        // 185: iload 12
+        // 187: tableswitch -75 0 6 -226 -131 -75 -62 -43 -37 -31
+        // 1b0: return
+    }
+}

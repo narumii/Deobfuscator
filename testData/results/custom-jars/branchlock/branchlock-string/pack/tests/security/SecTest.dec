@@ -1,0 +1,35 @@
+package pack.tests.security;
+
+import java.lang.reflect.Method;
+
+public class SecTest {
+    public void run() {
+        System.setSecurityManager(new Sman());
+        System.out.print("FAIL");
+
+        try {
+            Method m = SecExec.class.getDeclaredMethod("doShutdown");
+            m.setAccessible(true);
+            m.invoke(null);
+        } catch (Throwable var5) {
+            Throwable f = var5;
+
+            while (true) {
+                Throwable r = f.getCause();
+                if (r == null) {
+                    String str = f.getMessage();
+                    if (str == null) {
+                        return;
+                    }
+
+                    if (str.contains("HOOK")) {
+                        System.out.println("\b\b\b\bPASS");
+                    }
+                    break;
+                }
+
+                f = r;
+            }
+        }
+    }
+}

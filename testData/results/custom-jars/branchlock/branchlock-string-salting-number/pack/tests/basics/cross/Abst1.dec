@@ -1,0 +1,14 @@
+package pack.tests.basics.cross;
+
+public abstract class Abst1 {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public Abst1(int var1) {
+    }
+
+    public abstract int add(int var1, int var2, int var3);
+
+    public int mul(int var1, int var2, int var3) {
+        return var1 * var2;
+    }
+}
