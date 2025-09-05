@@ -54,6 +54,13 @@ public class ClassInfoStorage implements ClassProvider {
     classesInfo.putIfAbsent(className, classNode);
   }
 
+  public void removeRawClass(ClassNode classNode) {
+    String className = classNode.name;
+
+    compiledClasses.remove(className);
+    classesInfo.remove(className);
+  }
+
   @Override
   public byte @Nullable [] getClass(String name) {
     return compiledClasses.get(name);
