@@ -211,12 +211,12 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
 
     test("Branchlock String")
         .transformers(UniversalNumberTransformer::new, () -> new BranchlockCompabilityStringTransformer(true))
-        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_JAR, "branchlock/branchlock-string.jar")
+        .inputJar("branchlock/branchlock-string.jar")
         .register();
 
     test("Branchlock String + Salting + Number")
         .transformers(ComposedBranchlockTransformer::new)
-        .input(OutputType.MULTIPLE_CLASSES, InputType.CUSTOM_JAR, "branchlock/branchlock-string-salting-number.jar")
+        .inputJar("branchlock/branchlock-string-salting-number.jar")
         .register();
   }
 }
