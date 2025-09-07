@@ -21,10 +21,7 @@ import uwu.narumi.deobfuscator.api.execution.SandBox;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -78,7 +75,7 @@ public class ZelixStringTransformer extends Transformer {
 
         SandBox sandBox = new SandBox(context());
         encryptedClassWrapper.forEach((classWrapper, tmpClassWrapper) -> {
-            AtomicBoolean isDecryptedFully = new AtomicBoolean(true);
+            AtomicBoolean shouldCleanArray = new AtomicBoolean(true);
 
             try {
                 InstanceClass clazz = sandBox.getHelper().loadClass("tmp." + classWrapper.canonicalName());
@@ -102,11 +99,12 @@ public class ZelixStringTransformer extends Transformer {
                             matchContext.removeAll();
                             markChange();
                         } catch (Exception e) {
-                            isDecryptedFully.set(false);
+                            shouldCleanArray.set(false);
                         }
                     });
                 }
 
+                // TODO: Access directly array without getter
                 SimpleArrayValue arrayValue = (SimpleArrayValue) sandBox.getInvocationUtil().invokeReference(
                     clazz.getMethod("getArr", "()[Ljava/lang/String;")
                 );
@@ -155,7 +153,7 @@ public class ZelixStringTransformer extends Transformer {
 
             context().removeCompiledClass(tmpClassWrapper);
 
-            if (isDecryptedFully.get())
+            if (shouldCleanArray.get())
                 cleanUpFunction(classWrapper);
         });
     }
@@ -167,27 +165,19 @@ public class ZelixStringTransformer extends Transformer {
         MatchContext match = matches.get(matches.size() - 1);
 
         JumpInsnNode jumpInsnNode = match.captures().get("label").insn().asJump();
-        AbstractInsnNode currentInsn = jumpInsnNode.label;
 
-        List<AbstractInsnNode> removedInsns = new ArrayList<>();
-        LabelNode firstLabel = null;
+        Arrays.stream(clinitMethod.instructions.toArray()).filter(insn -> insn instanceof LabelNode).map(insn -> (LabelNode) insn).findFirst().ifPresent(firstLabel -> {
+            AbstractInsnNode currentInsn = jumpInsnNode.label;
 
-        for (AbstractInsnNode insn : clinitMethod.instructions.toArray()) {
-            if (insn instanceof LabelNode labelNode) {
-                firstLabel = labelNode;
-                break;
+            List<AbstractInsnNode> removedInsns = new ArrayList<>();
+            while (currentInsn != firstLabel) {
+                currentInsn = currentInsn.getPrevious();
+                removedInsns.add(currentInsn);
             }
-        }
 
-        if (firstLabel == null)
-            return;
+            removedInsns.forEach(insn -> clinitMethod.instructions.remove(insn));
+        });
 
-        while (currentInsn != firstLabel) {
-            currentInsn = currentInsn.getPrevious();
-            removedInsns.add(currentInsn);
-        }
-
-        removedInsns.forEach(insn -> clinitMethod.instructions.remove(insn));
         classWrapper.methods().removeIf(methodNode -> methodNode.desc.equals("(II)Ljava/lang/String;"));
     }
 
@@ -205,6 +195,7 @@ public class ZelixStringTransformer extends Transformer {
         classNode.methods.add(clinit);
 
         // create a tmp array for getting data
+        // TODO: Can we find a way to access direcly variable without getter?
         classNode.fields.add(new FieldNode(ACC_PUBLIC | ACC_STATIC, "arr", "[Ljava/lang/String;", null, null));
 
         MethodNode getMethodNode = new MethodNode(ACC_PUBLIC | ACC_STATIC, "getArr", "()[Ljava/lang/String;", null, new String[0]);
@@ -229,7 +220,7 @@ public class ZelixStringTransformer extends Transformer {
             }
         }
 
-        classWrapper.findMethod(methodNode -> methodNode.desc.equals("(II)Ljava/lang/String;")).ifPresent(method -> {
+        classWrapper.findMethod(this::isDecryptMethod).ifPresent(method -> {
             if (!classNode.methods.contains(method))
                 classNode.methods.add(method);
         });
@@ -238,6 +229,15 @@ public class ZelixStringTransformer extends Transformer {
         return cw.toByteArray();
     }
 
+    private boolean isDecryptMethod(MethodNode methodNode) {
+        if (!methodNode.desc.equals("(II)Ljava/lang/String;"))
+            return false;
+
+        if ((methodNode.access & (ACC_PRIVATE | ACC_STATIC)) == 0)
+            return false;
+
+        return Arrays.stream(methodNode.instructions.toArray()).anyMatch(abstractInsnNode -> abstractInsnNode.getOpcode() == TABLESWITCH);
+    }
 
     private byte[] modifyByteCode(ClassWrapper classWrapper, byte[] classByte) {
         ClassReader cr = new ClassReader(classByte);
@@ -273,9 +273,11 @@ public class ZelixStringTransformer extends Transformer {
             if (insn instanceof LabelNode)
                 break;
 
-            if (insn.getOpcode() == Opcodes.INVOKESTATIC)
+            if (insn.getOpcode() == Opcodes.INVOKESTATIC) {
                 clinitMethod.instructions.remove(insn);
-            else if (insn instanceof VarInsnNode varInsnNode &&
+            } else if (insn instanceof TypeInsnNode typeInsnNode && typeInsnNode.getOpcode() == Opcodes.ANEWARRAY && !typeInsnNode.desc.equals("java/lang/String")) {
+                typeInsnNode.desc = "java/lang/String";
+            } else if (insn instanceof VarInsnNode varInsnNode &&
                 insn.getPrevious() instanceof TypeInsnNode typeInsnNode && typeInsnNode.getOpcode() == Opcodes.ANEWARRAY && typeInsnNode.desc.equals("java/lang/String") &&
                 insn.getPrevious().getPrevious() != null && insn.getPrevious().getPrevious().isInteger()
             ) {
