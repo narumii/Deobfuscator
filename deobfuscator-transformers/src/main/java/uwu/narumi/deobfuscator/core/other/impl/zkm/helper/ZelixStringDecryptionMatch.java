@@ -29,15 +29,14 @@ public class ZelixStringDecryptionMatch extends Match {
             return false;
         }
 
-        ClassWrapper classWrapper = ctx.insnContext().methodContext().classWrapper(); // never match if the method's owner is not equals to classwrapper's name
-        if (!call.owner.equals(classWrapper.name()))
+        MethodContext mc = ctx.insnContext().methodContext();
+
+        if (!call.owner.equals(mc.classWrapper().name()))
             return false;
 
         if (call.getOpcode() != INVOKESTATIC) {
             return false;
         }
-
-        MethodContext mc = ctx.insnContext().methodContext();
 
         Map<AbstractInsnNode, Frame<OriginalSourceValue>> frms = mc.frames();
         Frame<OriginalSourceValue> f = frms.get(insn);

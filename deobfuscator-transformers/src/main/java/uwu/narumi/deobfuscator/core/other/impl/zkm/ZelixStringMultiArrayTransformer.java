@@ -12,9 +12,7 @@ import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.group.SequenceMatch;
-import uwu.narumi.deobfuscator.api.asm.matcher.impl.JumpMatch;
-import uwu.narumi.deobfuscator.api.asm.matcher.impl.MethodMatch;
-import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
+import uwu.narumi.deobfuscator.api.asm.matcher.impl.*;
 import uwu.narumi.deobfuscator.api.execution.SandBox;
 import uwu.narumi.deobfuscator.api.helper.AsmHelper;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
@@ -24,13 +22,12 @@ import uwu.narumi.deobfuscator.core.other.impl.zkm.helper.ZelixStringDecryptionM
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A comprehensive string transformer using temp class to deobfuscate
  * @author toidicakhia
  */
-public class ZelixStringTransformer extends Transformer {
+public class ZelixStringMultiArrayTransformer extends Transformer {
     private static final Match CLINIT_DETECTION = SequenceMatch.of(
         OpcodeMatch.of(ILOAD),
         JumpMatch.of(IF_ICMPGE).capture("label"),
@@ -73,7 +70,6 @@ public class ZelixStringTransformer extends Transformer {
         SandBox sandBox = new SandBox(context());
 
         for (ClassData classData : encryptedClassWrapper) {
-            AtomicBoolean shouldCleanArray = new AtomicBoolean(false);
 
             try {
                 InstanceClass clazz = sandBox.getHelper().loadClass("tmp." + classData.classWrapper.canonicalName());
@@ -84,7 +80,7 @@ public class ZelixStringTransformer extends Transformer {
                     List<MatchContext> matches = DECRYPTION_MATCH.findAllMatches(methodContext);
 
                     if (!matches.isEmpty()) {
-                        shouldCleanArray.set(true);
+                        classData.canCleanUp = true;
                         matches.forEach(matchContext -> {
                             int key1 = matchContext.captures().get("key1").insn().asInteger();
                             int key2 = matchContext.captures().get("key2").insn().asInteger();
@@ -101,7 +97,7 @@ public class ZelixStringTransformer extends Transformer {
                                 matchContext.removeAll();
                                 markChange();
                             } catch (Exception e) {
-                                shouldCleanArray.set(false);
+                                classData.isCaughtFromException = true;
                             }
                         });
                     }
@@ -114,6 +110,12 @@ public class ZelixStringTransformer extends Transformer {
                 );
 
                 int length = arrayValue.getLength();
+                String[] decryptedArray = new String[length];
+                for (int i = 0; i < length; i++) {
+                    ObjectValue value = arrayValue.getReference(i);
+                    String decryptedString = sandBox.vm().getOperations().readUtf8(value);
+                    decryptedArray[i] = decryptedString;
+                }
 
                 VarInsnNode startArrayInsn = null;
 
@@ -121,42 +123,26 @@ public class ZelixStringTransformer extends Transformer {
                     if (insn instanceof LabelNode)
                         break;
 
-                    if (insn.getOpcode() == Opcodes.INVOKESTATIC)
-                        classData.clinitMethod.instructions.remove(insn);
-                    else if (insn instanceof VarInsnNode varInsnNode &&
+                    if (insn instanceof VarInsnNode varInsnNode &&
                         insn.getPrevious() instanceof TypeInsnNode typeInsnNode && typeInsnNode.getOpcode() == Opcodes.ANEWARRAY && typeInsnNode.desc.equals("java/lang/String") &&
-                        insn.getPrevious().getPrevious() != null && insn.getPrevious().getPrevious().isInteger()
+                        typeInsnNode.getPrevious() != null && typeInsnNode.getPrevious().isInteger()
                     ) {
                         startArrayInsn = varInsnNode;
                         break;
                     }
                 }
 
-                if (startArrayInsn != null) {
-                    InsnList insnList = new InsnList();
-
-                    for (int i = 0; i < length; i++) {
-                        ObjectValue value = arrayValue.getReference(i);
-                        String decryptedString = sandBox.vm().getOperations().readUtf8(value);
-
-                        // insert data
-                        insnList.add(new VarInsnNode(Opcodes.ALOAD, startArrayInsn.var));
-                        insnList.add(AsmHelper.numberInsn(i));
-                        insnList.add(new LdcInsnNode(decryptedString));
-                        insnList.add(new InsnNode(Opcodes.AASTORE));
-                    }
-
-                    classData.clinitMethod.instructions.insert(startArrayInsn, insnList);
-                    markChange();
-                }
+                inlineValueOnArray(classData, startArrayInsn, decryptedArray);
+                classData.canCleanUp = true;
 
             } catch (Exception e) {
                 e.printStackTrace();
+                classData.isCaughtFromException = true;
             }
 
             context().removeCompiledClass(classData.tempClassWrapper);
 
-            if (shouldCleanArray.get())
+            if (classData.canCleanUp && !classData.isCaughtFromException)
                 cleanUpFunction(classData);
         }
     }
@@ -177,6 +163,25 @@ public class ZelixStringTransformer extends Transformer {
         });
 
         classData.classWrapper.methods().removeIf(ZelixAsmHelper::isStringDecryptMethod);
+    }
+
+    private void inlineValueOnArray(ClassData classData, VarInsnNode startArrayInsn, String[] decryptedArray) {
+        Match LOCAL_GET_ARRAY_MATCH = SequenceMatch.of(
+            OpcodeMatch.of(matchContext -> matchContext.insn() instanceof VarInsnNode varInsnNode && varInsnNode.getOpcode() == ALOAD && varInsnNode.var == startArrayInsn.var),
+            NumberMatch.numInteger().capture("idx"),
+            OpcodeMatch.of(AALOAD)
+        );
+
+        MethodContext methodContext = MethodContext.of(classData.classWrapper, classData.clinitMethod);
+        LOCAL_GET_ARRAY_MATCH.findAllMatches(methodContext).forEach(matchContext -> {
+            int idx = matchContext.captures().get("idx").insn().asInteger();
+            String decryptedString = decryptedArray[idx];
+
+            matchContext.insnContext().methodNode().instructions.insertBefore(matchContext.insn(), new LdcInsnNode(decryptedString));
+            matchContext.removeAll();
+
+            markChange();
+        });
     }
 
     private byte[] copyToTempClass(ClassWrapper classWrapper, MethodNode clinit, MatchContext match) {
@@ -232,13 +237,13 @@ public class ZelixStringTransformer extends Transformer {
             if (insn instanceof LabelNode)
                 break;
 
-            if (insn.getOpcode() == Opcodes.INVOKESTATIC) {
+            if (insn.getOpcode() == Opcodes.INVOKESTATIC)
                 copiedClinit.instructions.remove(insn);
-            } else if (insn instanceof TypeInsnNode typeInsnNode && typeInsnNode.getOpcode() == Opcodes.ANEWARRAY && !typeInsnNode.desc.equals("java/lang/String")) {
+            if (insn instanceof TypeInsnNode typeInsnNode && typeInsnNode.getOpcode() == Opcodes.ANEWARRAY && !typeInsnNode.desc.equals("java/lang/String")) {
                 typeInsnNode.desc = "java/lang/String";
             } else if (insn instanceof VarInsnNode varInsnNode &&
                 insn.getPrevious() instanceof TypeInsnNode typeInsnNode && typeInsnNode.getOpcode() == Opcodes.ANEWARRAY && typeInsnNode.desc.equals("java/lang/String") &&
-                insn.getPrevious().getPrevious() != null && insn.getPrevious().getPrevious().isInteger()
+                typeInsnNode.getPrevious() != null && typeInsnNode.getPrevious().isInteger()
             ) {
                 InsnList list = new InsnList();
                 list.add(new VarInsnNode(Opcodes.ALOAD, varInsnNode.var));
@@ -253,5 +258,21 @@ public class ZelixStringTransformer extends Transformer {
         return cw.toByteArray();
     }
 
-    record ClassData(ClassWrapper classWrapper, MethodNode clinitMethod, ClassWrapper tempClassWrapper, MatchContext match) { }
+    static class ClassData {
+        public ClassWrapper classWrapper;
+        public MethodNode clinitMethod;
+        public ClassWrapper tempClassWrapper;
+        public MatchContext match;
+
+        public boolean canCleanUp = false;
+        public boolean isCaughtFromException = false;
+
+        public ClassData(ClassWrapper classWrapper, MethodNode clinitMethod, ClassWrapper tempClassWrapper, MatchContext match) {
+            this.classWrapper = classWrapper;
+            this.clinitMethod = clinitMethod;
+            this.tempClassWrapper = tempClassWrapper;
+            this.match = match;
+        }
+
+    }
 }

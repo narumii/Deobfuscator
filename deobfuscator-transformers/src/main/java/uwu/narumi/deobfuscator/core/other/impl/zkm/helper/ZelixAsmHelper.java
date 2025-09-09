@@ -10,6 +10,7 @@ import static org.objectweb.asm.Opcodes.*;
 
 public class ZelixAsmHelper {
 
+    // TODO: Can we find a way to access direcly variable without getter?
     public static void createTempFieldForSSVM(ClassNode classNode, String tmpClassName, String name, String getterName, String desc) {
         classNode.fields.add(new FieldNode(ACC_PUBLIC | ACC_STATIC, name, desc, null, null));
 
@@ -32,8 +33,6 @@ public class ZelixAsmHelper {
 
         return Arrays.stream(methodNode.instructions.toArray()).anyMatch(abstractInsnNode -> abstractInsnNode.getOpcode() == TABLESWITCH);
     }
-
-    // TODO: Can we find a way to access direcly variable without getter?
 
     public static void renameOwner(ClassNode classNode, ClassWrapper classWrapper) {
         for (MethodNode methodNode : classNode.methods) {
