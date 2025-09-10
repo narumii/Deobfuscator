@@ -41,15 +41,16 @@ public class GuardProtectorFlowTransformer extends Transformer {
             int loadedVarIndex = ((VarInsnNode) jumpEquation.captures().get("loaded-var").insn()).var;
             JumpInsnNode jump = jumpEquation.captures().get("stored-jump").insn().asJump();
             if ((ifNeJump && jump.getOpcode() == IFNE) || (!ifNeJump && jump.getOpcode() == IFEQ) && varIndex == loadedVarIndex) {
-              if (jump.label != null) {
-                toRemove.add(jump.label);
-                markChange();
-                methodNode.instructions.forEach(insn -> {
-                  if (isInsnInLabelRange(methodNode, jump.label, insn)) {
-                    toRemove.add(insn);
-                  }
-                });
-              }
+//              if (jump.label != null) {
+//                toRemove.add(jump.label);
+//                markChange();
+//                methodNode.instructions.forEach(insn -> {
+//                  if (isInsnInLabelRange(methodNode, jump.label, insn)) {
+//                    toRemove.add(insn);
+//                  }
+//                });
+//              }
+              methodNode.instructions.insert(jump, new JumpInsnNode(GOTO, jump.label));
               toRemove.addAll(jumpEquation.collectedInsns());
               markChange();
             }
