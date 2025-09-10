@@ -9,6 +9,7 @@ import uwu.narumi.deobfuscator.api.asm.matcher.group.SequenceMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.NumberMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
+import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
 
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -53,6 +54,7 @@ public class GuardProtectorNumberTransformer extends Transformer {
           }
         });
       });
+      Transformer.transform(UniversalNumberTransformer::new, classWrapper, context());
     });
   }
 }
