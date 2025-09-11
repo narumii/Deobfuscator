@@ -64,7 +64,6 @@ public class BranchlockFlowTransformer extends Transformer {
   @Override
   protected void transform() throws Exception {
     scopedClasses().forEach(classWrapper -> classWrapper.methods().forEach(methodNode -> {
-      if (methodNode.name.equals("<clinit>")) return;
       MethodContext methodContext = MethodContext.of(classWrapper, methodNode);
       List<TryCatchBlockNode> tryCatchBlocks = methodNode.tryCatchBlocks;
       if (tryCatchBlocks != null && !tryCatchBlocks.isEmpty()) {
@@ -165,13 +164,14 @@ public class BranchlockFlowTransformer extends Transformer {
               trashLabels.add(label);
             }
             next = next.getNext();
-
           }
         } catch (Exception ignored) {}
 
         toRemove.forEach(
             methodNode.instructions::remove
         );
+
+        boolean changed = true;
 
         if (jumpInsnNode != null) {
           AbstractInsnNode next = jumpInsnNode.label;
@@ -180,7 +180,6 @@ public class BranchlockFlowTransformer extends Transformer {
               trashLabels.add(label);
             }
             next = next.getNext();
-
           }
           while (jumpInsnNode.label.getNext() != null && !(jumpInsnNode.label.getNext() instanceof JumpInsnNode)) {
             AbstractInsnNode abstractInsnNode = jumpInsnNode.label.getNext();
@@ -190,10 +189,16 @@ public class BranchlockFlowTransformer extends Transformer {
             }
             methodNode.instructions.remove(abstractInsnNode);
             methodNode.instructions.insertBefore(jumpInsnNode, abstractInsnNode);
+            markChange();
           }
 
           methodNode.instructions.remove(jumpInsnNode);
+          markChange();
+        } else {
+          changed = !toRemove.isEmpty();
         }
+
+        if (!changed) return;
 
         Set<TryCatchBlockNode> tryCatchBlockNodes = new HashSet<>();
 
