@@ -1,0 +1,9 @@
+package pack.tests.basics.sub;
+
+class flo {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    int solve(int var1, int var2) {
+        return var1 + var2;
+    }
+}

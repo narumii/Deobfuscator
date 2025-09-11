@@ -1,0 +1,13 @@
+package pack.tests.basics.overwirte;
+
+public class Sub extends Super {
+    @Override
+    public void run() {
+        System.out.println(this.face(1));
+    }
+
+    @Override
+    public String face(int var1) {
+        return var1 == 1 ? "PASS" : "FAIL";
+    }
+}

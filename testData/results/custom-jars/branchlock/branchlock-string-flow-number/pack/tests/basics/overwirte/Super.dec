@@ -1,0 +1,202 @@
+package pack.tests.basics.overwirte;
+
+public abstract class Super implements Face {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public void run() {
+        System.out.println("FAIL");
+    }
+
+    static {
+        // $VF: Couldn't be decompiled
+        // Please report this to the Vineflower issue tracker, at https://github.com/Vineflower/vineflower/issues with a copy of the class file (if you have the rights to distribute it!)
+        // java.lang.RuntimeException: parsing failure!
+        //   at org.jetbrains.java.decompiler.modules.decompiler.decompose.DomHelper.parseGraph(DomHelper.java:211)
+        //   at org.jetbrains.java.decompiler.main.rels.MethodProcessor.codeToJava(MethodProcessor.java:166)
+        //
+        // Bytecode:
+        // 000: ldc "G\u0eefH\ufff1ຉP"
+        // 002: invokevirtual java/lang/String.toCharArray ()[C
+        // 005: astore 0
+        // 006: bipush 0
+        // 007: istore 1
+        // 008: aload 0
+        // 009: dup
+        // 00a: bipush 4
+        // 00b: swap
+        // 00c: bipush 0
+        // 00d: caload
+        // 00e: aload 0
+        // 00f: dup
+        // 010: bipush 0
+        // 011: swap
+        // 012: bipush 4
+        // 013: caload
+        // 014: castore
+        // 015: castore
+        // 016: aload 0
+        // 017: dup
+        // 018: bipush 5
+        // 019: swap
+        // 01a: bipush 8
+        // 01c: caload
+        // 01d: aload 0
+        // 01e: dup
+        // 01f: bipush 8
+        // 021: swap
+        // 022: bipush 5
+        // 023: caload
+        // 024: castore
+        // 025: castore
+        // 026: goto 145
+        // 029: invokevirtual java/lang/Throwable.getStackTrace ()[Ljava/lang/StackTraceElement;
+        // 02c: bipush 0
+        // 02d: aaload
+        // 02e: astore 4
+        // 030: aload 4
+        // 032: invokevirtual java/lang/StackTraceElement.getMethodName ()Ljava/lang/String;
+        // 035: invokevirtual java/lang/String.hashCode ()I
+        // 038: ldc 65535
+        // 03a: iand
+        // 03b: istore 5
+        // 03d: aload 4
+        // 03f: invokevirtual java/lang/StackTraceElement.getClassName ()Ljava/lang/String;
+        // 042: invokevirtual java/lang/String.toCharArray ()[C
+        // 045: astore 6
+        // 047: aload 0
+        // 048: iload 1
+        // 049: iinc 1 1
+        // 04c: caload
+        // 04d: bipush 33
+        // 04f: ixor
+        // 050: iload 5
+        // 052: ixor
+        // 053: anewarray 32
+        // 056: astore 7
+        // 058: bipush 0
+        // 059: istore 8
+        // 05b: aload 0
+        // 05c: iload 1
+        // 05d: iinc 1 1
+        // 060: caload
+        // 061: bipush 66
+        // 063: ixor
+        // 064: iload 5
+        // 066: ixor
+        // 067: istore 2
+        // 068: iload 2
+        // 069: newarray 5
+        // 06b: astore 9
+        // 06d: bipush 0
+        // 06e: istore 10
+        // 070: iload 2
+        // 071: ifle 126
+        // 074: aload 0
+        // 075: iload 1
+        // 076: caload
+        // 077: istore 11
+        // 079: aload 6
+        // 07b: iload 1
+        // 07c: aload 6
+        // 07e: arraylength
+        // 07f: irem
+        // 080: caload
+        // 081: sipush 160
+        // 084: ixor
+        // 085: lookupswitch 139 16 142 259 193 195 194 208 195 221 197 234 201 240 203 253 207 265 208 271 210 278 211 285 212 299 213 306 214 313 215 320 243 292
+        // 110: aload 9
+        // 112: iload 10
+        // 114: iload 11
+        // 116: castore
+        // 117: iinc 10 1
+        // 11a: iinc 1 1
+        // 11d: iinc 2 -1
+        // 120: bipush 0
+        // 121: istore 12
+        // 123: goto 1cf
+        // 126: aload 7
+        // 128: iload 8
+        // 12a: iinc 8 1
+        // 12d: new java/lang/String
+        // 130: dup
+        // 131: aload 9
+        // 133: invokespecial java/lang/String.<init> ([C)V
+        // 136: invokevirtual java/lang/String.intern ()Ljava/lang/String;
+        // 139: aastore
+        // 13a: iload 1
+        // 13b: aload 0
+        // 13c: arraylength
+        // 13d: if_icmplt 05b
+        // 140: aload 7
+        // 142: putstatic pack/tests/basics/overwirte/Super.d [Ljava/lang/String;
+        // 145: goto 218
+        // 148: iload 11
+        // 14a: bipush 28
+        // 14c: ixor
+        // 14d: istore 11
+        // 14f: bipush 1
+        // 150: istore 12
+        // 152: goto 1cf
+        // 155: iload 11
+        // 157: bipush -5
+        // 159: ixor
+        // 15a: istore 11
+        // 15c: bipush 1
+        // 15d: istore 12
+        // 15f: goto 1cf
+        // 162: iload 11
+        // 164: bipush 14
+        // 166: ixor
+        // 167: istore 11
+        // 169: bipush 1
+        // 16a: istore 12
+        // 16c: goto 1cf
+        // 16f: bipush 2
+        // 170: istore 12
+        // 172: goto 1cf
+        // 175: iload 11
+        // 177: bipush -80
+        // 179: ixor
+        // 17a: istore 11
+        // 17c: bipush 1
+        // 17d: istore 12
+        // 17f: goto 1cf
+        // 182: bipush 3
+        // 183: istore 12
+        // 185: goto 1cf
+        // 188: bipush 4
+        // 189: istore 12
+        // 18b: goto 1cf
+        // 18e: bipush 5
+        // 18f: istore 12
+        // 191: goto 1cf
+        // 194: bipush 6
+        // 196: istore 12
+        // 198: goto 1cf
+        // 19b: bipush 7
+        // 19d: istore 12
+        // 19f: goto 1cf
+        // 1a2: bipush 8
+        // 1a4: istore 12
+        // 1a6: goto 1cf
+        // 1a9: bipush 9
+        // 1ab: istore 12
+        // 1ad: goto 1cf
+        // 1b0: bipush 10
+        // 1b2: istore 12
+        // 1b4: goto 1cf
+        // 1b7: bipush 11
+        // 1b9: istore 12
+        // 1bb: goto 1cf
+        // 1be: bipush 12
+        // 1c0: istore 12
+        // 1c2: goto 1cf
+        // 1c5: bipush 13
+        // 1c7: istore 12
+        // 1c9: goto 1cf
+        // 1cc: goto 029
+        // 1cf: iload 12
+        // 1d1: tableswitch -124 0 13 -353 -193 -137 -92 -111 -98 -124 -79 -54 -73 -67 -47 -33 -26
+        // 218: return
+    }
+}
