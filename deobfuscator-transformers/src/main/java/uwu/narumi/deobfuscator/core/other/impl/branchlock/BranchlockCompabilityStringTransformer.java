@@ -6,14 +6,13 @@ import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.group.SequenceMatch;
-import uwu.narumi.deobfuscator.api.asm.matcher.impl.FieldMatch;
-import uwu.narumi.deobfuscator.api.asm.matcher.impl.NumberMatch;
-import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
+import uwu.narumi.deobfuscator.api.asm.matcher.impl.*;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BranchlockCompabilityStringTransformer extends Transformer {
@@ -38,103 +37,141 @@ public class BranchlockCompabilityStringTransformer extends Transformer {
           MethodContext methodContext = MethodContext.of(classWrapper, clinit);
           String className = classWrapper.name().replace("/", ".");
           String methodName = clinit.name;
-          Arrays.stream(clinit.instructions.toArray())
-              .filter(ain -> ain instanceof LdcInsnNode)
-              .map(LdcInsnNode.class::cast)
-              .filter(ldc -> ldc.cst instanceof String)
-              .findFirst().ifPresent(ldc -> {
-                Match stringArr = OpcodeMatch.of(PUTSTATIC).capture("string-arr");
-                stringArray = stringArr.findFirstMatch(methodContext).insn().asFieldInsn();
+          Match stringEncryptionMatch = SequenceMatch.of(
+              StringMatch.of().capture("encrypted-string"),
+              MethodMatch.invokeVirtual().name("toCharArray").owner("java/lang/String"),
+              OpcodeMatch.of(ASTORE)
+          );
+          MatchContext stringEncryption = stringEncryptionMatch.findFirstMatch(methodContext);
+          if (stringEncryption != null) {
+              Match stringArr = OpcodeMatch.of(PUTSTATIC).capture("string-arr");
+              stringArray = stringArr.findFirstMatch(methodContext).insn().asFieldInsn();
 
-                String encryptedString = (String) ldc.cst;
-                char[] encryptedStringArray = encryptedString.toCharArray();
-                Match match = SequenceMatch.of(OpcodeMatch.of(DUP), NumberMatch.numInteger().capture("array-to"), OpcodeMatch.of(SWAP), NumberMatch.numInteger().capture("array-from"), OpcodeMatch.of(CALOAD), OpcodeMatch.of(CASTORE), OpcodeMatch.of(CASTORE));
+              LdcInsnNode encryptedStringInsn = (LdcInsnNode) stringEncryption.captures().get("encrypted-string").insn();
+              String encryptedString = encryptedStringInsn.asString();
 
-                /* First "char swapper" salting */
-                for (MatchContext allMatch : match.findAllMatches(methodContext)) {
-                  int arrayFrom = allMatch.captures().get("array-from").insn().asInteger();
-                  int arrayTo = allMatch.captures().get("array-to").insn().asInteger();
-                  try {
-                    char store = encryptedStringArray[arrayFrom];
-                    encryptedStringArray[arrayFrom] = encryptedStringArray[arrayTo];
-                    encryptedStringArray[arrayTo] = store;
-                  } catch (Exception e) {
-                    break;
-                  }
+              char[] encryptedStringArray = encryptedString.toCharArray();
+              Match match = SequenceMatch.of(OpcodeMatch.of(DUP), NumberMatch.numInteger().capture("array-to"), OpcodeMatch.of(SWAP), NumberMatch.numInteger().capture("array-from"), OpcodeMatch.of(CALOAD), OpcodeMatch.of(CASTORE), OpcodeMatch.of(CASTORE));
+
+              /* First "char swapper" salting */
+              for (MatchContext allMatch : match.findAllMatches(methodContext)) {
+                int arrayFrom = allMatch.captures().get("array-from").insn().asInteger();
+                int arrayTo = allMatch.captures().get("array-to").insn().asInteger();
+                try {
+                  char store = encryptedStringArray[arrayFrom];
+                  encryptedStringArray[arrayFrom] = encryptedStringArray[arrayTo];
+                  encryptedStringArray[arrayTo] = store;
+                } catch (Exception e) {
+                  break;
                 }
+              }
 
-                int encCharIndex = 0; // Under LDC
+              int encCharIndex = 0; // Under LDC
 
-                int decStrIndex = 0; // Under new StringArr
+              int decStrIndex = 0; // Under new StringArr
 
-                /* Finding new String Array creator for decrypted Strings */
-                Match newArray = SequenceMatch.of(NumberMatch.numInteger().capture("salt"), OpcodeMatch.of(IXOR), OpcodeMatch.of(ILOAD), OpcodeMatch.of(IXOR), OpcodeMatch.of(ANEWARRAY));
-                int salt = newArray.findFirstMatch(methodContext).captures().get("salt").insn().asInteger();
-                int methodSalt = (methodName.hashCode() & 0xFFFF);
+              /* Finding new String Array creator for decrypted Strings */
+              Match newArray = SequenceMatch.of(NumberMatch.numInteger().capture("salt"), OpcodeMatch.of(IXOR), OpcodeMatch.of(ILOAD), OpcodeMatch.of(IXOR), OpcodeMatch.of(ANEWARRAY));
+              int salt = newArray.findFirstMatch(methodContext).captures().get("salt").insn().asInteger();
+              int methodSalt = (methodName.hashCode() & 0xFFFF);
 
-                char[] classNameArray = className.toCharArray();
+              char[] classNameArray = className.toCharArray();
 
-                decryptedStrings = new String[encryptedStringArray[encCharIndex++] ^ salt ^ methodSalt];
+              decryptedStrings = new String[encryptedStringArray[encCharIndex++] ^ salt ^ methodSalt];
 
-                Match saltOfStrLen = SequenceMatch.of(OpcodeMatch.of(IINC), OpcodeMatch.of(CALOAD), NumberMatch.numInteger().capture("salt"), OpcodeMatch.of(IXOR), OpcodeMatch.of(ILOAD), OpcodeMatch.of(IXOR), OpcodeMatch.of(ISTORE));
-                int salt2 = saltOfStrLen.findFirstMatch(methodContext).captures().get("salt").insn().asInteger();
+              Match saltOfStrLen = SequenceMatch.of(OpcodeMatch.of(IINC), OpcodeMatch.of(CALOAD), NumberMatch.numInteger().capture("salt"), OpcodeMatch.of(IXOR), OpcodeMatch.of(ILOAD), OpcodeMatch.of(IXOR), OpcodeMatch.of(ISTORE));
+              int salt2 = saltOfStrLen.findFirstMatch(methodContext).captures().get("salt").insn().asInteger();
 
-                Match switchMatch = SequenceMatch.of(NumberMatch.numInteger().capture("switch-salt"), OpcodeMatch.of(IXOR), OpcodeMatch.of(LOOKUPSWITCH).capture("switch-table"));
-                MatchContext switchContext = switchMatch.findFirstMatch(methodContext);
-                int switchSalt = switchContext.captures().get("switch-salt").insn().asInteger();
-                LookupSwitchInsnNode switchInsnNode = (LookupSwitchInsnNode) switchContext.captures().get("switch-table").insn();
+              Match switchMatch = SequenceMatch.of(NumberMatch.numInteger().capture("switch-salt"), OpcodeMatch.of(IXOR), OpcodeMatch.of(LOOKUPSWITCH).capture("switch-table"));
+              MatchContext switchContext = switchMatch.findFirstMatch(methodContext);
+              int switchSalt = switchContext.captures().get("switch-salt").insn().asInteger();
+              LookupSwitchInsnNode switchInsnNode = (LookupSwitchInsnNode) switchContext.captures().get("switch-table").insn();
 
-                Match switch2Match = SequenceMatch.of(OpcodeMatch.of(ILOAD), OpcodeMatch.of(TABLESWITCH).capture("switch-table"));
-                MatchContext switch2Context = switch2Match.findFirstMatch(methodContext);
-                TableSwitchInsnNode tableSwitchInsnNode = (TableSwitchInsnNode) switch2Context.captures().get("switch-table").insn();
+              Match switch2Match = SequenceMatch.of(OpcodeMatch.of(ILOAD), OpcodeMatch.of(TABLESWITCH).capture("switch-table"));
+              MatchContext switch2Context = switch2Match.findFirstMatch(methodContext);
+              TableSwitchInsnNode tableSwitchInsnNode = (TableSwitchInsnNode) switch2Context.captures().get("switch-table").insn();
 
 
-                /* Creating same simulation */
-                while (encCharIndex < encryptedStringArray.length) {
-                  int strLength = encryptedStringArray[encCharIndex++] ^ salt2 ^ methodSalt;
-                  char[] toDecrypt = new char[strLength];
-                  int decCharIndex = 0; // Under var9_8 = new char[var2_2];
+              /* Creating same simulation */
+              while (encCharIndex < encryptedStringArray.length) {
+                int strLength = encryptedStringArray[encCharIndex++] ^ salt2 ^ methodSalt;
+                char[] toDecrypt = new char[strLength];
+                int decCharIndex = 0; // Under var9_8 = new char[var2_2];
 
-                  while (strLength > 0) {
-                    char nowDecrypted = encryptedStringArray[encCharIndex];
-                    int switch2Value = 0;
+                while (strLength > 0) {
+                  char nowDecrypted = encryptedStringArray[encCharIndex];
+                  int switch2Value = 0;
 
-                    Match swapKey = SequenceMatch.of(NumberMatch.numInteger().capture("swap-key"), OpcodeMatch.of(ISTORE), OpcodeMatch.of(GOTO));
-                    Match xorKey = SequenceMatch.of(OpcodeMatch.of(ILOAD), NumberMatch.numInteger().capture("xor-key"), OpcodeMatch.of(IXOR));
+                  Match swapKey = SequenceMatch.of(NumberMatch.numInteger().capture("swap-key"), OpcodeMatch.of(ISTORE), OpcodeMatch.of(GOTO));
+                  Match xorKey = SequenceMatch.of(OpcodeMatch.of(ILOAD), NumberMatch.numInteger().capture("xor-key"), OpcodeMatch.of(IXOR));
 
-                    int switchValue = classNameArray[encCharIndex % classNameArray.length] ^ switchSalt;
-                    LabelNode switchCase = getLabelByKey(switchInsnNode, switchValue);
-                    AtomicInteger s2v = new AtomicInteger(-1337);
+                  int switchValue = classNameArray[encCharIndex % classNameArray.length] ^ switchSalt;
+                  LabelNode switchCase = getLabelByKey(switchInsnNode, switchValue);
+                  AtomicInteger s2v = new AtomicInteger(-1337);
+                  swapKey.findAllMatches(methodContext).forEach(matchContext -> {
+                    MatchContext capturedSwapKey = matchContext.captures().get("swap-key");
+                    if (isInsnInLabelRange(clinit, switchCase, capturedSwapKey.insn())) {
+                      s2v.set(capturedSwapKey.insn().asInteger());
+                    }
+                  });
+
+                  if (s2v.get() != -1337) {
+                    switch2Value = s2v.get();
+                  }
+
+                  AtomicInteger xor = new AtomicInteger(-1337);
+                  xorKey.findAllMatches(methodContext).forEach(matchContext -> {
+                    MatchContext capturedXorKey = matchContext.captures().get("xor-key");
+                    if (isInsnInLabelRange(clinit, switchCase, capturedXorKey.insn())) {
+                      xor.set(capturedXorKey.insn().asInteger());
+                    }
+                  });
+
+                  if (xor.get() != -1337) {
+                    nowDecrypted ^= xor.get();
+                  }
+
+                  if (switch2Value == 0 && xor.get() == -1337) {
+                    toDecrypt[decCharIndex] = nowDecrypted;
+                    ++decCharIndex;
+                    ++encCharIndex;
+                    --strLength;
+                    switch2Value = 0;
+                    continue;
+                  }
+
+                  if (switch2Value == 1) {
+                    toDecrypt[decCharIndex] = nowDecrypted;
+                    ++decCharIndex;
+                    ++encCharIndex;
+                    --strLength;
+                    switch2Value = 0;
+                    continue;
+                  }
+
+                  while (true) {
+                    LabelNode tableCase = getLabelByKey(tableSwitchInsnNode, switch2Value);
+
+                    AtomicInteger s2v2 = new AtomicInteger(-1337);
                     swapKey.findAllMatches(methodContext).forEach(matchContext -> {
                       MatchContext capturedSwapKey = matchContext.captures().get("swap-key");
-                      if (isInsnInLabelRange(clinit, switchCase, capturedSwapKey.insn())) {
-                        s2v.set(capturedSwapKey.insn().asInteger());
+                      if (isInsnInLabelRange(clinit, tableCase, capturedSwapKey.insn())) {
+                        s2v2.set(capturedSwapKey.insn().asInteger());
                       }
                     });
 
-                    if (s2v.get() != -1337) {
-                      switch2Value = s2v.get();
-                    }
+                    switch2Value = s2v2.get();
 
-                    AtomicInteger xor = new AtomicInteger(-1337);
+                    AtomicInteger xor2 = new AtomicInteger(-1337);
                     xorKey.findAllMatches(methodContext).forEach(matchContext -> {
                       MatchContext capturedXorKey = matchContext.captures().get("xor-key");
-                      if (isInsnInLabelRange(clinit, switchCase, capturedXorKey.insn())) {
-                        xor.set(capturedXorKey.insn().asInteger());
+                      if (isInsnInLabelRange(clinit, tableCase, capturedXorKey.insn())) {
+                        xor2.set(capturedXorKey.insn().asInteger());
                       }
                     });
 
-                    if (xor.get() != -1337) {
-                      nowDecrypted ^= xor.get();
-                    }
-
-                    if (switch2Value == 0 && xor.get() == -1337) {
-                      toDecrypt[decCharIndex] = nowDecrypted;
-                      ++decCharIndex;
-                      ++encCharIndex;
-                      --strLength;
-                      switch2Value = 0;
-                      continue;
+                    if (xor2.get() != -1337) {
+                      nowDecrypted ^= xor2.get();
                     }
 
                     if (switch2Value == 1) {
@@ -143,47 +180,29 @@ public class BranchlockCompabilityStringTransformer extends Transformer {
                       ++encCharIndex;
                       --strLength;
                       switch2Value = 0;
-                      continue;
-                    }
-
-                    while (true) {
-                      LabelNode tableCase = getLabelByKey(tableSwitchInsnNode, switch2Value);
-
-                      AtomicInteger s2v2 = new AtomicInteger(-1337);
-                      swapKey.findAllMatches(methodContext).forEach(matchContext -> {
-                        MatchContext capturedSwapKey = matchContext.captures().get("swap-key");
-                        if (isInsnInLabelRange(clinit, tableCase, capturedSwapKey.insn())) {
-                          s2v2.set(capturedSwapKey.insn().asInteger());
-                        }
-                      });
-
-                      switch2Value = s2v2.get();
-
-                      AtomicInteger xor2 = new AtomicInteger(-1337);
-                      xorKey.findAllMatches(methodContext).forEach(matchContext -> {
-                        MatchContext capturedXorKey = matchContext.captures().get("xor-key");
-                        if (isInsnInLabelRange(clinit, tableCase, capturedXorKey.insn())) {
-                          xor2.set(capturedXorKey.insn().asInteger());
-                        }
-                      });
-
-                      if (xor2.get() != -1337) {
-                        nowDecrypted ^= xor2.get();
-                      }
-
-                      if (switch2Value == 1) {
-                        toDecrypt[decCharIndex] = nowDecrypted;
-                        ++decCharIndex;
-                        ++encCharIndex;
-                        --strLength;
-                        switch2Value = 0;
-                        break;
-                      }
+                      break;
                     }
                   }
-                  decryptedStrings[decStrIndex++] = new String(toDecrypt).intern();
                 }
-              });
+                decryptedStrings[decStrIndex++] = new String(toDecrypt).intern();
+              }
+              Set<LabelNode> labelsInStringDecryption = new HashSet<>();
+              Set<AbstractInsnNode> toRemove = new HashSet<>();
+              AbstractInsnNode firstNode = encryptedStringInsn;
+              while (firstNode != null) {
+                if (firstNode instanceof LabelNode label) {
+                  labelsInStringDecryption.add(label);
+                } else {
+                  toRemove.add(firstNode);
+                }
+                if (firstNode instanceof TableSwitchInsnNode) {
+                  break;
+                }
+                firstNode = firstNode.getNext();
+              }
+              toRemove.forEach(clinit.instructions::remove);
+              clinit.tryCatchBlocks.removeIf(tryCatchBlockNode -> labelsInStringDecryption.contains(tryCatchBlockNode.start) || labelsInStringDecryption.contains(tryCatchBlockNode.handler) || labelsInStringDecryption.contains(tryCatchBlockNode.end));
+            }
         });
       }
 
