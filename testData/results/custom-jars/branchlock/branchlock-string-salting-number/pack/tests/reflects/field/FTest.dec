@@ -13,246 +13,28 @@ public class FTest {
     public void run(int var1) {
         Constructor var2 = FObject.class.getDeclaredConstructor(int.class);
         if (var2.isAccessible()) {
-            System.out.println("FAIL");
+            System.out.println(d[1]);
         } else {
             var2.setAccessible(true);
             FObject var3 = (FObject)var2.newInstance(1);
-            Method var4 = FObject.class.getDeclaredMethod("add", null);
+            Method var4 = FObject.class.getDeclaredMethod(d[2], null);
             if (var4.isAccessible()) {
-                System.out.println("FAIL");
+                System.out.println(d[1]);
             } else {
                 var4.setAccessible(true);
                 var4.invoke(var3);
-                Field var5 = FObject.class.getDeclaredField("i");
+                Field var5 = FObject.class.getDeclaredField(d[3]);
                 if (var5.isAccessible()) {
-                    System.out.println("FAIL");
+                    System.out.println(d[1]);
                 } else {
                     var5.setAccessible(true);
                     if (var5.getInt(var3) != 4) {
-                        System.out.println("FAIL");
+                        System.out.println(d[1]);
                     } else {
-                        System.out.println("PASS");
+                        System.out.println(d[0]);
                     }
                 }
             }
         }
-    }
-
-    static {
-        // $VF: Couldn't be decompiled
-        // Please report this to the Vineflower issue tracker, at https://github.com/Vineflower/vineflower/issues with a copy of the class file (if you have the rights to distribute it!)
-        // java.lang.RuntimeException: parsing failure!
-        //   at org.jetbrains.java.decompiler.modules.decompiler.decompose.DomHelper.parseGraph(DomHelper.java:211)
-        //   at org.jetbrains.java.decompiler.main.rels.MethodProcessor.codeToJava(MethodProcessor.java:166)
-        //
-        // Bytecode:
-        // 000: ldc "ﾕໝໝ￼ﾢ\ufffeห￫￬￤ﾽ\u0eda\u001a+\uffc9໘\u0012"
-        // 002: invokevirtual java/lang/String.toCharArray ()[C
-        // 005: astore 0
-        // 006: bipush 0
-        // 007: istore 1
-        // 008: aload 0
-        // 009: dup
-        // 00a: bipush 2
-        // 00b: swap
-        // 00c: bipush 6
-        // 00e: caload
-        // 00f: aload 0
-        // 010: dup
-        // 011: bipush 6
-        // 013: swap
-        // 014: bipush 2
-        // 015: caload
-        // 016: castore
-        // 017: castore
-        // 018: aload 0
-        // 019: dup
-        // 01a: bipush 13
-        // 01c: swap
-        // 01d: bipush 0
-        // 01e: caload
-        // 01f: aload 0
-        // 020: dup
-        // 021: bipush 0
-        // 022: swap
-        // 023: bipush 13
-        // 025: caload
-        // 026: castore
-        // 027: castore
-        // 028: aload 0
-        // 029: dup
-        // 02a: bipush 2
-        // 02b: swap
-        // 02c: bipush 0
-        // 02d: caload
-        // 02e: aload 0
-        // 02f: dup
-        // 030: bipush 0
-        // 031: swap
-        // 032: bipush 2
-        // 033: caload
-        // 034: castore
-        // 035: castore
-        // 036: aload 0
-        // 037: dup
-        // 038: bipush 3
-        // 039: swap
-        // 03a: bipush 27
-        // 03c: caload
-        // 03d: aload 0
-        // 03e: dup
-        // 03f: bipush 27
-        // 041: swap
-        // 042: bipush 3
-        // 043: caload
-        // 044: castore
-        // 045: castore
-        // 046: goto 15d
-        // 049: invokevirtual java/lang/Throwable.getStackTrace ()[Ljava/lang/StackTraceElement;
-        // 04c: bipush 0
-        // 04d: aaload
-        // 04e: astore 4
-        // 050: aload 4
-        // 052: invokevirtual java/lang/StackTraceElement.getMethodName ()Ljava/lang/String;
-        // 055: invokevirtual java/lang/String.hashCode ()I
-        // 058: ldc 65535
-        // 05a: iand
-        // 05b: istore 5
-        // 05d: aload 4
-        // 05f: invokevirtual java/lang/StackTraceElement.getClassName ()Ljava/lang/String;
-        // 062: invokevirtual java/lang/String.toCharArray ()[C
-        // 065: astore 6
-        // 067: aload 0
-        // 068: iload 1
-        // 069: iinc 1 1
-        // 06c: caload
-        // 06d: sipush 134
-        // 070: ixor
-        // 071: iload 5
-        // 073: ixor
-        // 074: anewarray 93
-        // 077: astore 7
-        // 079: bipush 0
-        // 07a: istore 8
-        // 07c: aload 0
-        // 07d: iload 1
-        // 07e: iinc 1 1
-        // 081: caload
-        // 082: bipush 112
-        // 084: ixor
-        // 085: iload 5
-        // 087: ixor
-        // 088: istore 2
-        // 089: iload 2
-        // 08a: newarray 5
-        // 08c: astore 9
-        // 08e: bipush 0
-        // 08f: istore 10
-        // 091: iload 2
-        // 092: ifle 13e
-        // 095: aload 0
-        // 096: iload 1
-        // 097: caload
-        // 098: istore 11
-        // 09a: aload 6
-        // 09c: iload 1
-        // 09d: aload 6
-        // 09f: arraylength
-        // 0a0: irem
-        // 0a1: caload
-        // 0a2: sipush 140
-        // 0a5: ixor
-        // 0a6: lookupswitch 130 15 162 199 202 256 216 283 224 186 229 212 231 218 232 231 233 237 234 250 237 262 239 269 248 276 252 290 254 297 255 304
-        // 128: aload 9
-        // 12a: iload 10
-        // 12c: iload 11
-        // 12e: castore
-        // 12f: iinc 10 1
-        // 132: iinc 1 1
-        // 135: iinc 2 -1
-        // 138: bipush 0
-        // 139: istore 12
-        // 13b: goto 1e0
-        // 13e: aload 7
-        // 140: iload 8
-        // 142: iinc 8 1
-        // 145: new java/lang/String
-        // 148: dup
-        // 149: aload 9
-        // 14b: invokespecial java/lang/String.<init> ([C)V
-        // 14e: invokevirtual java/lang/String.intern ()Ljava/lang/String;
-        // 151: aastore
-        // 152: iload 1
-        // 153: aload 0
-        // 154: arraylength
-        // 155: if_icmplt 07c
-        // 158: aload 7
-        // 15a: putstatic pack/tests/reflects/field/FTest.d [Ljava/lang/String;
-        // 15d: goto 224
-        // 160: iload 11
-        // 162: bipush -83
-        // 164: ixor
-        // 165: istore 11
-        // 167: bipush 1
-        // 168: istore 12
-        // 16a: goto 1e0
-        // 16d: iload 11
-        // 16f: bipush -15
-        // 171: ixor
-        // 172: istore 11
-        // 174: bipush 1
-        // 175: istore 12
-        // 177: goto 1e0
-        // 17a: bipush 2
-        // 17b: istore 12
-        // 17d: goto 1e0
-        // 180: iload 11
-        // 182: bipush -67
-        // 184: ixor
-        // 185: istore 11
-        // 187: bipush 1
-        // 188: istore 12
-        // 18a: goto 1e0
-        // 18d: bipush 3
-        // 18e: istore 12
-        // 190: goto 1e0
-        // 193: iload 11
-        // 195: bipush 123
-        // 197: ixor
-        // 198: istore 11
-        // 19a: bipush 1
-        // 19b: istore 12
-        // 19d: goto 1e0
-        // 1a0: bipush 4
-        // 1a1: istore 12
-        // 1a3: goto 1e0
-        // 1a6: bipush 5
-        // 1a7: istore 12
-        // 1a9: goto 1e0
-        // 1ac: bipush 6
-        // 1ae: istore 12
-        // 1b0: goto 1e0
-        // 1b3: bipush 7
-        // 1b5: istore 12
-        // 1b7: goto 1e0
-        // 1ba: bipush 8
-        // 1bc: istore 12
-        // 1be: goto 1e0
-        // 1c1: bipush 9
-        // 1c3: istore 12
-        // 1c5: goto 1e0
-        // 1c8: bipush 10
-        // 1ca: istore 12
-        // 1cc: goto 1e0
-        // 1cf: bipush 11
-        // 1d1: istore 12
-        // 1d3: goto 1e0
-        // 1d6: bipush 12
-        // 1d8: istore 12
-        // 1da: goto 1e0
-        // 1dd: goto 049
-        // 1e0: iload 12
-        // 1e2: tableswitch -40 0 12 -337 -186 -117 -98 -104 -66 -85 -79 -130 -40 -33 -60 -26
-        // 224: return
     }
 }
