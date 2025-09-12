@@ -3,43 +3,7 @@ package pack.tests.basics.runable;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import pack.tests.reflects.annot.annot;
 
 public class Pool {
-    public static ThreadPoolExecutor tpe;
-
-    // $VF: Handled exception range with multiple entry points by splitting it
-    // $VF: Inserted dummy exception handlers to handle obfuscated exceptions
-    static {
-        NoSuchMethodException var10000;
-        label36: {
-            Object var0;
-            try {
-                var0 = null;
-            } catch (NoSuchMethodException var2) {
-                var10000 = var2;
-                boolean var10001 = false;
-                break label36;
-            }
-
-            while (var0 != null) {
-            }
-
-            ThreadPoolExecutor var3 = new ThreadPoolExecutor;
-
-            try {
-                var3./* $VF: Unable to resugar constructor */<init>(0, 1, 1L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(1));
-                tpe = var3;
-                return;
-            } catch (NoSuchMethodException var1) {
-                var10000 = var1;
-                boolean var4 = false;
-            }
-        }
-
-        while (var10000 == null) {
-        }
-
-        throw annot.I(var10000);
-    }
+    public static ThreadPoolExecutor tpe = new ThreadPoolExecutor(0, 1, 1L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(1));
 }

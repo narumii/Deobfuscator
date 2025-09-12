@@ -11,15 +11,19 @@ public class Loader extends ClassLoader {
     }
 
     public static byte[] readAllBytes(InputStream var0, int var1) {
-        ByteArrayOutputStream var2 = new ByteArrayOutputStream();
-        byte[] var3 = new byte[1024];
+        try {
+            ByteArrayOutputStream var2 = new ByteArrayOutputStream();
+            byte[] var3 = new byte[1024];
 
-        int var4;
-        while ((var4 = var0.read(var3)) != -1) {
-            var2.write(var3, 0, var4);
+            int var4;
+            while ((var4 = var0.read(var3)) != -1) {
+                var2.write(var3, 0, var4);
+            }
+
+            return var2.toByteArray();
+        } catch (Exception var5) {
+            return null;
         }
-
-        return var2.toByteArray();
     }
 
     @Override
@@ -139,7 +143,7 @@ public class Loader extends ClassLoader {
         // 084: ixor
         // 085: iload 5
         // 087: ixor
-        // 088: anewarray 38
+        // 088: anewarray 40
         // 08b: astore 7
         // 08d: bipush 0
         // 08e: istore 8

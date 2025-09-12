@@ -7,14 +7,22 @@ public class Accesor {
     }
 
     public void run(int var1) {
-        if (Accesor.class.getResourceAsStream("/pack/tests/reflects/res/file").read() != 97) {
-            throw new RuntimeException();
-        } else if (Accesor.class.getResourceAsStream("file2").read() != 114) {
-            throw new RuntimeException();
-        } else if (Accesor.class.getClassLoader().getResourceAsStream("pack/tests/reflects/res/file3").read() != 99) {
-            throw new RuntimeException();
-        } else {
+        try {
+            if (Accesor.class.getResourceAsStream("/pack/tests/reflects/res/file").read() != 97) {
+                throw new RuntimeException();
+            }
+
+            if (Accesor.class.getResourceAsStream("file2").read() != 114) {
+                throw new RuntimeException();
+            }
+
+            if (Accesor.class.getClassLoader().getResourceAsStream("pack/tests/reflects/res/file3").read() != 99) {
+                throw new RuntimeException();
+            }
+
             System.out.println("PASS");
+        } catch (Exception var2) {
+            System.out.println("FAIL");
         }
     }
 
@@ -124,7 +132,7 @@ public class Accesor {
         // 088: ixor
         // 089: iload 5
         // 08b: ixor
-        // 08c: anewarray 59
+        // 08c: anewarray 63
         // 08f: astore 7
         // 091: bipush 0
         // 092: istore 8
