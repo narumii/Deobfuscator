@@ -11,13 +11,13 @@ public class Digi {
         int var4 = 0;
 
         do {
-            var2 += Double.longBitsToDouble(4337655139195544067L + (-806592087L << Integer.parseInt(d[1], 32)));
+            var2 += 1.0E-18;
         } while (++var4 <= 100 && (float)var2 != 2.0E-17F);
 
         if (var4 == 20) {
-            System.out.println(d[0]);
+            System.out.println("PASS");
         } else {
-            System.out.println(d[2]);
+            System.out.println("FAIL");
         }
     }
 }

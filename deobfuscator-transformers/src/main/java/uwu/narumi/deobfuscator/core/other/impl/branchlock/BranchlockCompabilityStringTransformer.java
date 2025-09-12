@@ -186,6 +186,9 @@ public class BranchlockCompabilityStringTransformer extends Transformer {
                 }
                 decryptedStrings[decStrIndex++] = new String(toDecrypt).intern();
               }
+
+              decryptedDataMap.put(classWrapper, new DecryptedStringData(stringArray, decryptedStrings));
+
               Set<LabelNode> labelsInStringDecryption = new HashSet<>();
               Set<AbstractInsnNode> toRemove = new HashSet<>();
               AbstractInsnNode firstNode = encryptedStringInsn;

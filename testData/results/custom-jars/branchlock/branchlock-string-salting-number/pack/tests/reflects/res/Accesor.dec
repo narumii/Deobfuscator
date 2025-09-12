@@ -8,21 +8,21 @@ public class Accesor {
 
     public void run(int var1) {
         try {
-            if (Accesor.class.getResourceAsStream(d[2]).read() != 97) {
+            if (Accesor.class.getResourceAsStream("/pack/tests/reflects/res/file").read() != 97) {
                 throw new RuntimeException();
             }
 
-            if (Accesor.class.getResourceAsStream(d[3]).read() != 114) {
+            if (Accesor.class.getResourceAsStream("file2").read() != 114) {
                 throw new RuntimeException();
             }
 
-            if (Accesor.class.getClassLoader().getResourceAsStream(d[1]).read() != 99) {
+            if (Accesor.class.getClassLoader().getResourceAsStream("pack/tests/reflects/res/file3").read() != 99) {
                 throw new RuntimeException();
             }
 
-            System.out.println(d[0]);
+            System.out.println("PASS");
         } catch (Exception var2) {
-            System.out.println(d[4]);
+            System.out.println("FAIL");
         }
     }
 }

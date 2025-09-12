@@ -1,14 +1,14 @@
 package pack.tests.basics.ctrl;
 
 public class Ctrl {
-    private String ret = d[3];
+    private String ret = "FAIL";
     public int BRANCHLOCK_DOT_NET_DEMO;
 
     public Ctrl(int var1) {
     }
 
     public void runt(int var1) {
-        if (!d[1].equals(d[0])) {
+        if (!"a".equals("b")) {
             throw new UnsupportedOperationException();
         }
     }
@@ -17,12 +17,12 @@ public class Ctrl {
         try {
             this.runt(8206);
         } catch (RuntimeException var3) {
-            this.ret = d[2];
+            this.ret = "PASS";
         }
 
         try {
             this.runt(8206);
-            this.ret = d[3];
+            this.ret = "FAIL";
         } catch (Exception var2) {
         }
     }

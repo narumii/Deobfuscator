@@ -11,9 +11,9 @@ public class Count {
             && Countee.class.getDeclaredFields().length == 4
             && Countee.class.getMethods().length > 4
             && Countee.class.getDeclaredMethods().length == 4) {
-            System.out.println(d[0]);
+            System.out.println("PASS");
         } else {
-            System.out.println(d[1]);
+            System.out.println("FAIL");
         }
     }
 }

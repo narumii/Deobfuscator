@@ -16,9 +16,9 @@ public class Calc {
             runStr(31405);
         }
 
-        System.out.println(d[6] + (System.currentTimeMillis() - var1) + d[1]);
+        System.out.println("Calc: " + (System.currentTimeMillis() - var1) + "ms");
         if (count != 30000) {
-            throw new RuntimeException(d[4]);
+            throw new RuntimeException("[ERROR]: Errors occurred in calc!");
         }
     }
 
@@ -33,18 +33,18 @@ public class Calc {
     private static void runAdd(int var0) {
         double var1 = 0.0;
 
-        while (var1 < Double.longBitsToDouble(-292662827L + (Long.parseLong(d[3], 25) ^ 4636744327457716328L))) {
-            var1 += Double.longBitsToDouble((4607092347051790635L ^ Long.parseLong(d[2], 27)) - 824017068L);
+        while (var1 < 100.1) {
+            var1 += 0.99;
         }
 
         count++;
     }
 
     private static void runStr(int var0) {
-        String var1 = d[5];
+        String var1 = "";
 
         while (var1.length() < 101) {
-            var1 = var1 + d[0];
+            var1 = var1 + "ax";
         }
 
         count++;

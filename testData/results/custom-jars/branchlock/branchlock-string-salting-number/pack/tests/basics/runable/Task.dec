@@ -35,9 +35,9 @@ public class Task {
 
         Thread.sleep(300L);
         if (Exec.i == 30) {
-            System.out.println(d[1]);
+            System.out.println("PASS");
         } else {
-            System.out.println(d[0]);
+            System.out.println("FAIL");
         }
     }
 

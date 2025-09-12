@@ -14,7 +14,7 @@ public class annot {
         for (Method var6 : annoe.class.getDeclaredMethods()) {
             var6.setAccessible(true);
             anno var7 = var6.getAnnotation(anno.class);
-            if (var7 != null && var7.val().equals(d[0])) {
+            if (var7 != null && var7.val().equals("yes")) {
                 var6.invoke(var2);
             }
         }

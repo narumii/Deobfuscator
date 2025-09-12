@@ -5,9 +5,9 @@ public class Solver {
 
     public Solver(int var1) {
         if (SolAdd.get(3122) == 3) {
-            System.out.println(d[1]);
+            System.out.println("PASS");
         } else {
-            System.out.println(d[0]);
+            System.out.println("FAIL");
         }
     }
 }

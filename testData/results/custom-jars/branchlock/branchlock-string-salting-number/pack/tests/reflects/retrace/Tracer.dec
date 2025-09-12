@@ -9,9 +9,9 @@ public class Tracer {
     public void run(int var1) {
         new Tracee(5704).toTrace(5);
         if (Tracee.p == 5) {
-            System.out.println(d[0]);
+            System.out.println("PASS");
         } else {
-            System.out.println(d[1]);
+            System.out.println("FAIL");
         }
     }
 }

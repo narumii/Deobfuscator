@@ -10,10 +10,10 @@ public class SecTest {
 
     public void run(int var1) {
         System.setSecurityManager(new Sman(31850));
-        System.out.print(d[3]);
+        System.out.print("FAIL");
 
         try {
-            Method var2 = SecExec.class.getDeclaredMethod(d[0]);
+            Method var2 = SecExec.class.getDeclaredMethod("doShutdown");
             var2.setAccessible(true);
             var2.invoke(null);
         } catch (Throwable var6) {
@@ -27,8 +27,8 @@ public class SecTest {
                         return;
                     }
 
-                    if (var5.contains(d[2])) {
-                        System.out.println(d[1]);
+                    if (var5.contains("HOOK")) {
+                        System.out.println("\b\b\b\bPASS");
                     }
                     break;
                 }

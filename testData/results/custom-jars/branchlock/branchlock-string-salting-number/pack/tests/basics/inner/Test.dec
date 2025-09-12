@@ -13,9 +13,9 @@ public class Test {
         Exec.Inner var4 = var2.new Inner(var2, 100, 14056);
         var4.doAdd(15081);
         if (var2.fuss == 108) {
-            System.out.println(d[1]);
+            System.out.println("PASS");
         } else {
-            System.out.println(d[0]);
+            System.out.println("ERROR");
         }
     }
 }
