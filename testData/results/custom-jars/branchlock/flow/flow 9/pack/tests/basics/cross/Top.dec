@@ -1,0 +1,16 @@
+package pack.tests.basics.cross;
+
+public class Top extends Abst1 implements Inte {
+    public void run() {
+        if (this.add(1, 2) == 3 && this.mul(2, 3) == 6) {
+            System.out.println("PASS");
+        } else {
+            System.out.println("FAIL");
+        }
+    }
+
+    @Override
+    public int add(int a, int b) {
+        return a + b;
+    }
+}

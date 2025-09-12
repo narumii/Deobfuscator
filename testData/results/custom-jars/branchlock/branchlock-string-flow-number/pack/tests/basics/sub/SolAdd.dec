@@ -1,0 +1,20 @@
+package pack.tests.basics.sub;
+
+import pack.tests.basics.overwirte.Sub;
+import pack.tests.reflects.annot.annoe;
+
+public class SolAdd {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public static int get() {
+        return (new med(1, 2)).result;
+    }
+
+    public static Throwable P(Throwable var0) {
+        if (annoe.P != null) {
+            Sub.P = var0;
+        }
+
+        return var0;
+    }
+}

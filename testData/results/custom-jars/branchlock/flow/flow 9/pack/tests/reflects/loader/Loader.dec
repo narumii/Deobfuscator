@@ -1,0 +1,30 @@
+package pack.tests.reflects.loader;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+
+public class Loader extends ClassLoader {
+    public static byte[] readAllBytes(InputStream var0) {
+        ByteArrayOutputStream var1 = new ByteArrayOutputStream();
+        byte[] var2 = new byte[1024];
+
+        int var3;
+        while ((var3 = var0.read(var2)) != -1) {
+            var1.write(var2, 0, var3);
+        }
+
+        return var1.toByteArray();
+    }
+
+    @Override
+    public InputStream getResourceAsStream(String var1) {
+        return (InputStream)(var1.contains("TEST") ? new ByteArrayInputStream("PASS".getBytes()) : super.getResourceAsStream(var1));
+    }
+
+    @Override
+    public Class<?> findClass(String var1) throws ClassNotFoundException {
+        byte[] var2 = readAllBytes(Loader.class.getClassLoader().getResourceAsStream("pack/tests/reflects/loader/LTest.class"));
+        return this.defineClass(var1, var2, 0, var2.length);
+    }
+}

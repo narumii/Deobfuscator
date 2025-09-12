@@ -1,0 +1,16 @@
+package pack.tests.basics.runable;
+
+public class Exec {
+    public static int i = 1;
+    private int d;
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public Exec(int var1) {
+        this.d = var1;
+    }
+
+    void doAdd() {
+        Thread.sleep(200L);
+        i = i + this.d;
+    }
+}

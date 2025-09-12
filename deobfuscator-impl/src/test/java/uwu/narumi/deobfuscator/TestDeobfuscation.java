@@ -4,6 +4,7 @@ import uwu.narumi.deobfuscator.core.other.composed.*;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedGeneralFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedPeepholeCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.branchlock.BranchlockCompabilityStringTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.branchlock.BranchlockFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.JsrInlinerTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.UselessPopCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineLocalVariablesTransformer;
@@ -210,13 +211,28 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .register();
 
     test("Branchlock String")
-        .transformers(UniversalNumberTransformer::new, () -> new BranchlockCompabilityStringTransformer(true))
+        .transformers(UniversalNumberTransformer::new, BranchlockCompabilityStringTransformer::new)
         .inputJar("branchlock/branchlock-string.jar")
         .register();
 
     test("Branchlock String + Salting + Number")
         .transformers(ComposedBranchlockTransformer::new)
         .inputJar("branchlock/branchlock-string-salting-number.jar")
+        .register();
+
+    test("Branchlock String + Flow + Number")
+        .transformers(ComposedBranchlockTransformer::new)
+        .inputJar("branchlock/branchlock-string-flow-number.jar")
+        .register();
+
+//    test("Branchlock String + Salting + Flow + Number")
+//        .transformers(ComposedBranchlockTransformer::new)
+//        .inputJar("branchlock/branchlock-string-salting-flow-number.jar")
+//        .register();
+
+    test("Branchlock Flow 9")
+        .transformers(BranchlockFlowTransformer::new)
+        .inputJar("branchlock/flow/flow 9.jar")
         .register();
   }
 }

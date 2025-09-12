@@ -1,6 +1,7 @@
 package uwu.narumi.deobfuscator.core.other.impl.branchlock;
 
 import org.objectweb.asm.tree.*;
+import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
@@ -8,37 +9,47 @@ import uwu.narumi.deobfuscator.api.asm.matcher.group.SequenceMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.*;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BranchlockCompabilityStringTransformer extends Transformer {
 
-  private final boolean deleteClinit;
   private String[] decryptedStrings;
   private FieldInsnNode stringArray;
 
-  public BranchlockCompabilityStringTransformer(boolean deleteClinit) {
-    this.deleteClinit = deleteClinit;
-  }
+  private record DecryptedStringData(FieldInsnNode fieldInsnNode, String[] decryptedStrings) {}
+
+  private static final Map<ClassWrapper, DecryptedStringData> decryptedDataMap = new HashMap<>();
 
   @Override
   protected void transform() throws Exception {
     scopedClasses().forEach(classWrapper -> {
       decryptedStrings = null;
       stringArray = null;
-      classWrapper.findClInit().ifPresent(clinit -> {
-        MethodContext methodContext = MethodContext.of(classWrapper, clinit);
-        String className = classWrapper.name().replace("/", ".");
-        String methodName = clinit.name;
-        Arrays.stream(clinit.instructions.toArray())
-            .filter(ain -> ain instanceof LdcInsnNode)
-            .map(LdcInsnNode.class::cast)
-            .filter(ldc -> ldc.cst instanceof String)
-            .findFirst().ifPresent(ldc -> {
+      if (decryptedDataMap.containsKey(classWrapper)) {
+        decryptedStrings = decryptedDataMap.get(classWrapper).decryptedStrings();
+        stringArray = decryptedDataMap.get(classWrapper).fieldInsnNode();
+      } else {
+        classWrapper.findClInit().ifPresent(clinit -> {
+          MethodContext methodContext = MethodContext.of(classWrapper, clinit);
+          String className = classWrapper.name().replace("/", ".");
+          String methodName = clinit.name;
+          Match stringEncryptionMatch = SequenceMatch.of(
+              StringMatch.of().capture("encrypted-string"),
+              MethodMatch.invokeVirtual().name("toCharArray").owner("java/lang/String"),
+              OpcodeMatch.of(ASTORE)
+          );
+          MatchContext stringEncryption = stringEncryptionMatch.findFirstMatch(methodContext);
+          if (stringEncryption != null) {
               Match stringArr = OpcodeMatch.of(PUTSTATIC).capture("string-arr");
               stringArray = stringArr.findFirstMatch(methodContext).insn().asFieldInsn();
 
-              String encryptedString = (String) ldc.cst;
+              LdcInsnNode encryptedStringInsn = (LdcInsnNode) stringEncryption.captures().get("encrypted-string").insn();
+              String encryptedString = encryptedStringInsn.asString();
+
               char[] encryptedStringArray = encryptedString.toCharArray();
               Match match = SequenceMatch.of(OpcodeMatch.of(DUP), NumberMatch.numInteger().capture("array-to"), OpcodeMatch.of(SWAP), NumberMatch.numInteger().capture("array-from"), OpcodeMatch.of(CALOAD), OpcodeMatch.of(CASTORE), OpcodeMatch.of(CASTORE));
 
@@ -175,13 +186,30 @@ public class BranchlockCompabilityStringTransformer extends Transformer {
                 }
                 decryptedStrings[decStrIndex++] = new String(toDecrypt).intern();
               }
-            });
-      });
+
+              decryptedDataMap.put(classWrapper, new DecryptedStringData(stringArray, decryptedStrings));
+
+              Set<LabelNode> labelsInStringDecryption = new HashSet<>();
+              Set<AbstractInsnNode> toRemove = new HashSet<>();
+              AbstractInsnNode firstNode = encryptedStringInsn;
+              while (firstNode != null) {
+                if (firstNode instanceof LabelNode label) {
+                  labelsInStringDecryption.add(label);
+                } else {
+                  toRemove.add(firstNode);
+                }
+                if (firstNode instanceof TableSwitchInsnNode) {
+                  break;
+                }
+                firstNode = firstNode.getNext();
+              }
+              toRemove.forEach(clinit.instructions::remove);
+              clinit.tryCatchBlocks.removeIf(tryCatchBlockNode -> labelsInStringDecryption.contains(tryCatchBlockNode.start) || labelsInStringDecryption.contains(tryCatchBlockNode.handler) || labelsInStringDecryption.contains(tryCatchBlockNode.end));
+            }
+        });
+      }
 
       if (stringArray != null) {
-        if (deleteClinit) {
-          classWrapper.methods().remove(classWrapper.findClInit().get());
-        }
         classWrapper.fields().removeIf(fieldNode -> fieldNode.name.equals(stringArray.name) && fieldNode.desc.equals(stringArray.desc));
 
         classWrapper.methods().forEach(methodNode -> {

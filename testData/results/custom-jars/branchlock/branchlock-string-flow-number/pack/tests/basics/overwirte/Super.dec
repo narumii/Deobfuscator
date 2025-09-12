@@ -1,0 +1,9 @@
+package pack.tests.basics.overwirte;
+
+public abstract class Super implements Face {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public void run() {
+        System.out.println("FAIL");
+    }
+}

@@ -1,0 +1,42 @@
+package pack.tests.basics.runable;
+
+import java.util.concurrent.RejectedExecutionException;
+
+public class Task {
+    public void run() throws Exception {
+        Exec var1 = new Exec(2);
+        Exec var2 = new Exec(3);
+        Exec var3 = new Exec(100);
+
+        try {
+            Pool.tpe.submit(var2::doAdd);
+
+            try {
+                Thread.sleep(50L);
+            } catch (InterruptedException var6) {
+            }
+
+            Pool.tpe.submit(() -> {
+                int var1x = Exec.i;
+                var1.doAdd();
+                Exec.i += var1x;
+            });
+
+            try {
+                Thread.sleep(50L);
+            } catch (InterruptedException var5) {
+            }
+
+            Pool.tpe.submit(var3::doAdd);
+        } catch (RejectedExecutionException var7) {
+            Exec.i += 10;
+        }
+
+        Thread.sleep(300L);
+        if (Exec.i == 30) {
+            System.out.println("PASS");
+        } else {
+            System.out.println("FAIL");
+        }
+    }
+}

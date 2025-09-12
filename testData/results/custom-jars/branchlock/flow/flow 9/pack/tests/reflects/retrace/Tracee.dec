@@ -1,0 +1,17 @@
+package pack.tests.reflects.retrace;
+
+public class Tracee {
+    public static int p = 0;
+
+    private void doTrace(int var1) throws Exception {
+        p++;
+        StackTraceElement var2 = new Throwable().getStackTrace()[1];
+        Tracee.class.getDeclaredMethod(var2.getMethodName(), int.class).invoke(this, var1 - 1);
+    }
+
+    public void toTrace(int var1) throws Exception {
+        if (var1 != 0) {
+            this.doTrace(var1);
+        }
+    }
+}

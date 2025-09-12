@@ -1,0 +1,46 @@
+package pack.tests.basics.runable;
+
+import java.util.concurrent.RejectedExecutionException;
+
+public class Task {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public void run() {
+        Exec var1 = new Exec(2);
+        Exec var2 = new Exec(3);
+        Exec var3 = new Exec(100);
+
+        try {
+            Pool.tpe.submit(var2::doAdd);
+
+            try {
+                Thread.sleep(50L);
+            } catch (InterruptedException var5) {
+            }
+
+            Pool.tpe.submit(Task::lambda$run$0);
+
+            try {
+                Thread.sleep(50L);
+            } catch (InterruptedException var4) {
+            }
+
+            Pool.tpe.submit(var3::doAdd);
+        } catch (RejectedExecutionException var6) {
+            Exec.i += 10;
+        }
+
+        Thread.sleep(300L);
+        if (Exec.i == 30) {
+            System.out.println("PASS");
+        } else {
+            System.out.println("FAIL");
+        }
+    }
+
+    private static void lambda$run$0(Exec var0) {
+        int var1 = Exec.i;
+        var0.doAdd();
+        Exec.i += var1;
+    }
+}

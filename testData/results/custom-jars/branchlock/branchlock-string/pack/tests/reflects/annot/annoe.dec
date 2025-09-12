@@ -6,7 +6,7 @@ public class annoe {
     @anno(
         val = "PASS"
     )
-    private static final String fail;
+    private static final String fail = "WHAT";
 
     @anno
     public void dox() throws Exception {

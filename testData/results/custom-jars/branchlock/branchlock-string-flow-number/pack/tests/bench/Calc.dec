@@ -1,0 +1,49 @@
+package pack.tests.bench;
+
+public class Calc {
+    public static int count = 0;
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public static void runAll() {
+        long var0 = System.currentTimeMillis();
+
+        for (int var2 = 0; var2 < 10000; var2++) {
+            call(100);
+            runAdd();
+            runStr();
+        }
+
+        System.out.println("Calc: " + (System.currentTimeMillis() - var0) + "ms");
+        if (count != 30000) {
+            throw new RuntimeException("[ERROR]: Errors occurred in calc!");
+        }
+    }
+
+    private static void call(int var0) {
+        if (var0 == 0) {
+            count++;
+        } else {
+            call(99);
+        }
+    }
+
+    private static void runAdd() {
+        double var0 = 0.0;
+
+        while (var0 < 100.1) {
+            var0 += 0.99;
+        }
+
+        count++;
+    }
+
+    private static void runStr() {
+        String var0 = "";
+
+        while (var0.length() < 101) {
+            var0 = var0 + "ax";
+        }
+
+        count++;
+    }
+}

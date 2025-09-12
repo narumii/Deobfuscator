@@ -1,0 +1,34 @@
+package pack.tests.reflects.annot;
+
+import java.lang.reflect.Field;
+
+public class annoe {
+    @anno(
+        val = "PASS"
+    )
+    private static final String fail = "WHAT";
+    public int BRANCHLOCK_DOT_NET_DEMO;
+    public static Throwable P;
+
+    @anno
+    public void dox() {
+        String var1 = "FAIL";
+
+        for (Field var5 : annoe.class.getDeclaredFields()) {
+            var5.setAccessible(true);
+            anno var6 = var5.getAnnotation(anno.class);
+            if (var6 != null) {
+                var1 = var6.val();
+            }
+        }
+
+        System.out.println(var1);
+    }
+
+    @anno(
+        val = "no"
+    )
+    public void dov() {
+        System.out.println("FAIL");
+    }
+}

@@ -1,0 +1,11 @@
+package pack.tests.reflects.res;
+
+public class Accesor {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public void run() {
+        Accesor.class.getResourceAsStream("/pack/tests/reflects/res/file").read();
+        byte var10001 = 97;
+        throw new RuntimeException();
+    }
+}

@@ -1,0 +1,10 @@
+package pack.tests.basics.sub;
+
+class med {
+    int result;
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    med(int var1, int var2) {
+        this.result = new flo().solve(var1, var2);
+    }
+}

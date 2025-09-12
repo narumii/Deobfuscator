@@ -1,0 +1,18 @@
+package pack.tests.reflects.retrace;
+
+public class Tracee {
+    public static int p = 0;
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    private void doTrace(int var1) {
+        p++;
+        StackTraceElement var2 = new Throwable().getStackTrace()[1];
+        Tracee.class.getDeclaredMethod(var2.getMethodName(), int.class).invoke(this, var1 - 1);
+    }
+
+    public void toTrace(int var1) {
+        if (var1 != 0) {
+            this.doTrace(var1);
+        }
+    }
+}
