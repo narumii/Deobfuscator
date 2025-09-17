@@ -1,0 +1,12 @@
+package pack.tests.reflects.loader;
+
+public class LRun {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public void run() {
+        Loader var1 = new Loader();
+        Class var2 = var1.findClass("pack.tests.reflects.loader.LTest");
+        Object var3 = var2.newInstance();
+        var2.getMethod("run").invoke(var3);
+    }
+}

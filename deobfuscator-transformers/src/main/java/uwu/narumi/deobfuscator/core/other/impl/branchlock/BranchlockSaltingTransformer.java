@@ -22,6 +22,8 @@ public class BranchlockSaltingTransformer extends Transformer {
 
   private final Map<MethodInsnNode, Integer> salts = new WeakHashMap<>();
 
+  //TODO: Fix superClass`s / interface`s overridden methods not being deobfuscated
+
   @Override
   protected void transform() throws Exception {
     scopedClasses().forEach(classWrapper -> {

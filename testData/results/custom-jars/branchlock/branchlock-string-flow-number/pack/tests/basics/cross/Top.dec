@@ -1,0 +1,18 @@
+package pack.tests.basics.cross;
+
+public class Top extends Abst1 implements Inte {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public void run() {
+        if (this.add(1, 2) == 3 && this.mul(2, 3) == 6) {
+            System.out.println("PASS");
+        } else {
+            System.out.println("FAIL");
+        }
+    }
+
+    @Override
+    public int add(int var1, int var2) {
+        return var1 + var2;
+    }
+}
