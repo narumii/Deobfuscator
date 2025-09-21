@@ -218,5 +218,10 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .transformers(ComposedBranchlockTransformer::new)
         .inputJar("branchlock/branchlock-string-salting-number.jar")
         .register();
+
+    test("GuardProtector 1.0")
+        .transformers(ComposedGuardProtectorTransformer::new)
+        .inputClass(InputType.CUSTOM_CLASS, "guardprotector/Class951.class")
+        .register();
   }
 }
