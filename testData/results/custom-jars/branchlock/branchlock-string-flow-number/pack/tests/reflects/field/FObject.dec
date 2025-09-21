@@ -1,0 +1,14 @@
+package pack.tests.reflects.field;
+
+public class FObject extends Throwable {
+    private int i;
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    private FObject(int var1) {
+        this.i = var1;
+    }
+
+    private void add() {
+        this.i += 3;
+    }
+}

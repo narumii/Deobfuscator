@@ -1,7 +1,7 @@
 package pack.tests.bench;
 
 public class Calc {
-    public static int count;
+    public static int count = 0;
 
     public static void runAll() {
         long start = System.currentTimeMillis();
