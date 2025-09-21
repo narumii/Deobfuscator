@@ -6,6 +6,7 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.group.SequenceMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.MethodMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.NumberMatch;
@@ -48,17 +49,19 @@ public class GuardProtectorStringTransformer extends Transformer {
             String key = keyInsn.asString();
 
             MethodContext decryptMethodContext = MethodContext.of(classWrapper, decryptMethod);
-            int hash = ENCRYPTED_STRING_HASH.findFirstMatch(decryptMethodContext).captures().get("hash").insn().asNumber().intValue();
+            MatchContext matchContext1 = ENCRYPTED_STRING_HASH.findFirstMatch(decryptMethodContext);
+            if (matchContext1 != null) {
+              int hash = matchContext1.captures().get("hash").insn().asNumber().intValue();
+              String methodName = decryptMethod.name;
 
-            String methodName = decryptMethod.name;
+              String decryptedString = decrypt(key, methodName, hash);
 
-            String decryptedString = decrypt(key, methodName, hash);
+              methodNode.instructions.remove(keyInsn);
+              methodNode.instructions.set(decryptMethodInsn, new LdcInsnNode(decryptedString));
+              markChange();
 
-            methodNode.instructions.remove(keyInsn);
-            methodNode.instructions.set(decryptMethodInsn, new LdcInsnNode(decryptedString));
-            markChange();
-
-            toRemove.add(decryptMethod);
+              toRemove.add(decryptMethod);
+            }
           });
         });
       });
