@@ -2,6 +2,7 @@ package uwu.narumi.deobfuscator.core.other.composed;
 
 import uwu.narumi.deobfuscator.api.transformer.ComposedTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedGeneralFlowTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.grunt.GruntStringTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.AccessRepairTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.InlinePureFunctionsTransformer;
@@ -21,7 +22,8 @@ public class ComposedGruntTransformer extends ComposedTransformer {
             InlineStaticFieldTransformer::new,
             // Inline pure functions
             InlinePureFunctionsTransformer::new
-        )
+        ),
+        GruntStringTransformer::new
     );
   }
 }
