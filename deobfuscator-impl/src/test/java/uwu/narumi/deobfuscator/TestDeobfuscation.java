@@ -234,5 +234,10 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .transformers(BranchlockFlowTransformer::new)
         .inputJar("branchlock/flow/flow 9.jar")
         .register();
+
+    test("GuardProtector 1.0")
+        .transformers(ComposedGuardProtectorTransformer::new)
+        .inputClass(InputType.CUSTOM_CLASS, "guardprotector/Class951.class")
+        .register();
   }
 }
