@@ -3,6 +3,7 @@ package uwu.narumi.deobfuscator.core.other.impl.branchlock;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
+import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.group.SequenceMatch;
@@ -11,8 +12,7 @@ import uwu.narumi.deobfuscator.api.asm.matcher.impl.NumberMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.*;
 
 public class BranchlockSaltingTransformer extends Transformer {
 
@@ -21,8 +21,6 @@ public class BranchlockSaltingTransformer extends Transformer {
   public Match saltingXor = SequenceMatch.of(OpcodeMatch.of(ILOAD).capture("param"), NumberMatch.numInteger(), Match.of(ctx -> ctx.insn().isMathOperator() || ctx.insn().isMathOperator()));
 
   private final Map<MethodInsnNode, Integer> salts = new WeakHashMap<>();
-
-  //TODO: Fix superClass`s / interface`s overridden methods not being deobfuscated
 
   @Override
   protected void transform() throws Exception {
@@ -48,6 +46,21 @@ public class BranchlockSaltingTransformer extends Transformer {
       });
     });
     /* Replace ILOAD var with saved salts */
+    salts.forEach((min, salt) -> {
+      resolvePossibleTargets(min, context().getClassesMap(), buildSubclassMap(context().getClassesMap())).forEach(resolvedMethod -> {
+        MethodNode methodNode = resolvedMethod.mn();
+        ClassNode cn = resolvedMethod.cn();
+        int lastParamIndex = getLastParameterSlot(methodNode.access, methodNode.desc);
+        MethodContext methodContext = MethodContext.of(context().getClassesMap().get(cn.name), methodNode);
+        saltingXor.findAllMatches(methodContext).forEach(matchContext -> {
+          VarInsnNode varInsnNode = (VarInsnNode) matchContext.insn();
+          if (varInsnNode.var == lastParamIndex) {
+            methodNode.instructions.set(matchContext.insn(), pushInt(salt));
+            markChange();
+          }
+        });
+      });
+    });
     scopedClasses().forEach(classWrapper -> {
       classWrapper.methods().forEach(methodNode -> {
         int lastParamIndex = getLastParameterSlot(methodNode.access, methodNode.desc);
@@ -77,6 +90,64 @@ public class BranchlockSaltingTransformer extends Transformer {
     }
   }
 
+  public static Map<String, List<String>> buildSubclassMap(Map<String, ClassWrapper> classMap) {
+    Map<String, List<String>> subclassMap = new HashMap<>();
+
+    for (ClassWrapper cw : classMap.values()) {
+      ClassNode cn = cw.classNode();
+      if (cn.superName != null) {
+        subclassMap.computeIfAbsent(cn.superName, k -> new ArrayList<>()).add(cn.name);
+      }
+      if (cn.interfaces != null) {
+        for (String iface : cn.interfaces) {
+          subclassMap.computeIfAbsent(iface, k -> new ArrayList<>()).add(cn.name);
+        }
+      }
+    }
+
+    return subclassMap;
+  }
+
+  public static List<ResolvedMethod> resolvePossibleTargets(MethodInsnNode methodInsn, Map<String, ClassWrapper> classMap, Map<String, List<String>> subclassMap) {
+    String methodName = methodInsn.name;
+    String methodDesc = methodInsn.desc;
+    String ownerInternalName = methodInsn.owner;
+
+    Set<String> visited = new HashSet<>();
+    Queue<String> toVisit = new ArrayDeque<>();
+    List<ResolvedMethod> results = new ArrayList<>();
+
+    toVisit.add(ownerInternalName);
+
+    while (!toVisit.isEmpty()) {
+      String className = toVisit.poll();
+      if (!visited.add(className)) continue;
+
+      ClassWrapper cw = classMap.get(className);
+      if (cw == null) continue;
+      ClassNode cn = cw.classNode();
+
+      for (MethodNode mn : cn.methods) {
+        if (mn.name.equals(methodName) && mn.desc.equals(methodDesc)) {
+          results.add(new ResolvedMethod(cn, mn));
+        }
+      }
+
+      if (cn.superName != null) {
+        toVisit.add(cn.superName);
+      }
+      if (cn.interfaces != null) {
+        toVisit.addAll(cn.interfaces);
+      }
+
+      List<String> subclasses = subclassMap.getOrDefault(className, Collections.emptyList());
+      toVisit.addAll(subclasses);
+    }
+
+    return results;
+  }
+
+
   public int getLastParameterSlot(int access, String desc) {
     Type[] args = Type.getArgumentTypes(desc);
     int index = ((access & Opcodes.ACC_STATIC) != 0) ? 0 : 1;
@@ -85,5 +156,8 @@ public class BranchlockSaltingTransformer extends Transformer {
       index += args[i].getSize();
     }
     return index;
+  }
+
+  public record ResolvedMethod(ClassNode cn, MethodNode mn) {
   }
 }

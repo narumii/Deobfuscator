@@ -1,0 +1,32 @@
+package pack.tests.basics.ctrl;
+
+public class Ctrl {
+    private String ret = "FAIL";
+    public String BRANCHLOCK_DOT_NET_DEMO;
+
+    public Ctrl(int var1) {
+    }
+
+    public void runt(int var1) {
+        if (var1 >= 0) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public void runf(int var1) {
+        this.runt(29872);
+
+        try {
+            this.runt(29872);
+            this.ret = "FAIL";
+        } catch (Exception var2) {
+        }
+    }
+
+    public void run(int var1) {
+        do {
+            this.runf(950);
+            System.out.println(this.ret);
+        } while (var1 < 0);
+    }
+}

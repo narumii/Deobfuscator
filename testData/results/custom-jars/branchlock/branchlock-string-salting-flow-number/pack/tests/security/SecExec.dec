@@ -1,0 +1,12 @@
+package pack.tests.security;
+
+public class SecExec {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public SecExec(int var1) {
+    }
+
+    private static void doShutdown() {
+        System.exit(-1);
+    }
+}

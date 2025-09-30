@@ -1,0 +1,8 @@
+package pack;
+
+public class Clazz {
+    public String BRANCHLOCK_DOT_NET_DEMO;
+
+    public Clazz(int var1) {
+    }
+}
