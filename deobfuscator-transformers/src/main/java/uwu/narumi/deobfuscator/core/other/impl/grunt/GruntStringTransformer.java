@@ -2,26 +2,35 @@ package uwu.narumi.deobfuscator.core.other.impl.grunt;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
+import uwu.narumi.deobfuscator.api.asm.FieldRef;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
+import uwu.narumi.deobfuscator.api.asm.MethodlessInsnContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.group.SequenceMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.*;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 // TODO: string array support
 public class GruntStringTransformer extends Transformer {
 
   /**
-   getstatic Main.GDIaAJBllbXLY5N9 [Ljava/lang/String;
-   iconst_0
-   ldc "⥋脞\uECB2옧蔃氆"
-   invokevirtual java/lang/String.toCharArray ()[C
-   ldc 46256L
-   ldc 468949809
-   invokestatic Main.gL3Vqtvj62G5xf3H ([CJI)Ljava/lang/String;
-   aastore
+   * getstatic Main.GDIaAJBllbXLY5N9 [Ljava/lang/String;
+   * iconst_0
+   * ldc "⥋脞\uECB2옧蔃氆"
+   * invokevirtual java/lang/String.toCharArray ()[C
+   * ldc 46256L
+   * ldc 468949809
+   * invokestatic Main.gL3Vqtvj62G5xf3H ([CJI)Ljava/lang/String;
+   * aastore
    */
 
   private static final Match stringPoolAdditionMatch = SequenceMatch.of(
@@ -44,14 +53,19 @@ public class GruntStringTransformer extends Transformer {
       OpcodeMatch.of(ISTORE)
   );
 
+  /**
+   * class name to string pool map
+   **/
+  private final Map<String, String[]> classNameToStringPool = new HashMap<>();
+
   @Contract("_, _, _, _ -> new")
   private static @NotNull String decrypt(int classKey, char @NotNull [] encrypted, long seed, int key) {
     int cat = classKey ^ key;
     for (int i = 0; i < encrypted.length; ++i) {
-      cat = cat ^ (int)seed ^ ~i;
+      cat = cat ^ (int) seed ^ ~i;
       cat ^= key - i * encrypted.length;
       cat = -cat * key | i;
-      encrypted[i] = (char)(encrypted[i] ^ cat);
+      encrypted[i] = (char) (encrypted[i] ^ cat);
       int i2 = i & 0xFF;
       key = key << i2 | key >>> -i2;
       seed ^= i2;
@@ -67,10 +81,11 @@ public class GruntStringTransformer extends Transformer {
     return m.captures().get("key").insn().asInteger();
   }
 
-  private static void imobfuscatingdogclientrnmightratittrust(@NotNull ClassWrapper c) {
+  private void imobfuscatingdogclientrnmightratittrust(@NotNull ClassWrapper c) {
     final var initOpt = c.findClInit();
     if (initOpt.isEmpty()) return;
     final var init = initOpt.get();
+    FieldRef stringPoolRef = null;
     for (final var insn : init.instructions) {
       if (insn instanceof MethodInsnNode min) {
         final var resolved = c.findMethod(min);
@@ -82,27 +97,63 @@ public class GruntStringTransformer extends Transformer {
           return;
         }
         Integer classKey = null;
+        var pool = new String[ms.size()];
         for (var m : ms) {
           var cap = m.captures();
-//            var i = cap.get("index").insn().asNumber();
+          var i = cap.get("index").insn().asInteger();
           var enc = cap.get("enc").insn().asString();
-          var seed = cap.get("seed").insn().asNumber().longValue();
-          var key = cap.get("key").insn().asNumber().intValue();
+          var seed = cap.get("seed").insn().asLong();
+          var key = cap.get("key").insn().asInteger();
           var dm = cap.get("decryptMethod").insn().asMethodInsn();
-//            var sp = cap.get("stringPool").insn().asFieldInsn();
+          var sp = cap.get("stringPool").insn().asFieldInsn();
+          stringPoolRef = FieldRef.of(sp);
           final var resolved2 = c.findMethod(dm);
           if (resolved2.isEmpty()) return;
           var r2 = resolved2.get();
           if (classKey == null) classKey = getClassKey(MethodContext.of(c, r2));
           if (classKey == null) return;
-          LOGGER.info("decrypted: {}", decrypt(classKey, enc.toCharArray(), seed, key));
+          var str = decrypt(classKey, enc.toCharArray(), seed, key);
+          pool[i] = str;
+        }
+        this.classNameToStringPool.put(c.name(), pool);
+        Match lol = SequenceMatch.of(
+            NumberMatch.numInteger(),
+            OpcodeMatch.of(ANEWARRAY),
+            FieldMatch.putStatic().fieldRef(stringPoolRef),
+            MethodMatch.invokeStatic().owner(min.owner).name(min.name).desc(min.desc)
+        );
+        lol.findFirstMatch(MethodContext.of(c, init))
+            .removeAll();
+      }
+    }
+    FieldRef spr = stringPoolRef;
+    c.methods().forEach(method -> {
+      if (method.instructions.size() <= 0) {
+        return;
+      }
+      for (final var insn : method.instructions) {
+        if (spr != null
+            && insn instanceof FieldInsnNode fin
+            && spr.equals(FieldRef.of(fin))) {
+          var idxInsn = fin.next(1);
+          var aaload = fin.next(2);
+          if (aaload.getOpcode() != AALOAD) return;
+          var idx = idxInsn.asInteger();
+          init.instructions.insertBefore(insn, new LdcInsnNode(this.classNameToStringPool.get(c.name())[idx]));
+          init.instructions.remove(insn);
+          init.instructions.remove(idxInsn);
+          init.instructions.remove(aaload);
+          markChange();
         }
       }
+    });
+    if (init.instructions.size() <= 0) {
+      c.methods().remove(init);
     }
   }
 
   @Override
   protected void transform() throws Exception {
-    scopedClasses().forEach(GruntStringTransformer::imobfuscatingdogclientrnmightratittrust);
+    scopedClasses().forEach(this::imobfuscatingdogclientrnmightratittrust);
   }
 }

@@ -1,8 +1,11 @@
 package uwu.narumi.deobfuscator.api.asm;
 
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
+
+import java.util.Objects;
 
 /**
  * @param owner Class that owns this field
@@ -19,7 +22,18 @@ public record FieldRef(String owner, String name, String desc) {
   }
 
   @Override
-  public String toString() {
+  public @NotNull String toString() {
     return owner + "." + name + desc;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof FieldRef fieldRef)) return false;
+    return Objects.equals(name, fieldRef.name) && Objects.equals(desc, fieldRef.desc) && Objects.equals(owner, fieldRef.owner);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(owner, name, desc);
   }
 }
