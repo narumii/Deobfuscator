@@ -1,21 +1,15 @@
 package uwu.narumi.deobfuscator.core.other.impl.universal.pool;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.LdcInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.*;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
-import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
-import uwu.narumi.deobfuscator.api.asm.matcher.impl.FieldMatch;
-import uwu.narumi.deobfuscator.api.asm.matcher.impl.FrameMatch;
-import uwu.narumi.deobfuscator.api.asm.matcher.impl.NumberMatch;
-import uwu.narumi.deobfuscator.api.asm.matcher.impl.OpcodeMatch;
-import uwu.narumi.deobfuscator.api.asm.matcher.impl.StringMatch;
+import uwu.narumi.deobfuscator.api.asm.matcher.impl.*;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Replaces string pool references with actual values.
@@ -33,73 +27,79 @@ public class UniversalStringPoolTransformer extends Transformer {
   @Override
   protected void transform() throws Exception {
     scopedClasses().forEach(classWrapper -> {
-      MatchContext stringPoolMatchCtx = classWrapper.methods().stream()
+      Set<MethodNode> toRemoveMn = new HashSet<>();
+      Set<FieldNode> toRemoveFn = new HashSet<>();
+      classWrapper.methods().stream()
           .map(methodNode -> STRING_POOL_METHOD_MATCH.findFirstMatch(MethodContext.of(classWrapper, methodNode)))
-          .filter(Objects::nonNull)
-          .findFirst()
-          .orElse(null);
+          .filter(Objects::nonNull).forEach(stringPoolMatchCtx -> {
+            AtomicBoolean changedForThisContext = new AtomicBoolean(false);
+            //System.out.println("Found string pool method in " + classWrapper.name() + "." + stringPoolMatchCtx.insnContext().methodNode().name);
 
-      // No number pool method found
-      if (stringPoolMatchCtx == null) return;
+            int stringPoolSize = stringPoolMatchCtx.captures().get("size").insn().asInteger();
+            FieldInsnNode stringPoolFieldInsn = (FieldInsnNode) stringPoolMatchCtx.captures().get("stringPoolField").insn();
 
-      //System.out.println("Found string pool method in " + classWrapper.name() + "." + stringPoolMatchCtx.insnContext().methodNode().name);
+            // Get whole number pool
+            String[] stringPool = new String[stringPoolSize];
+            STORE_STRING_TO_ARRAY_MATCH.findAllMatches(stringPoolMatchCtx.insnContext().methodContext()).forEach(storeNumberMatchCtx -> {
+              int index = storeNumberMatchCtx.captures().get("index").insn().asInteger();
+              String value = storeNumberMatchCtx.captures().get("value").insn().asString();
+              //System.out.println(classWrapper.name());
+              stringPool[index] = value;
+            });
 
-      int stringPoolSize = stringPoolMatchCtx.captures().get("size").insn().asInteger();
-      FieldInsnNode stringPoolFieldInsn = (FieldInsnNode) stringPoolMatchCtx.captures().get("stringPoolField").insn();
+            for (String string : stringPool) {
+              if (string == null) {
+                // String pool is not fully initialized
+                return;
+              }
+            }
 
-      // Get whole number pool
-      String[] stringPool = new String[stringPoolSize];
-      STORE_STRING_TO_ARRAY_MATCH.findAllMatches(stringPoolMatchCtx.insnContext().methodContext()).forEach(storeNumberMatchCtx -> {
-        int index = storeNumberMatchCtx.captures().get("index").insn().asInteger();
-        String value = storeNumberMatchCtx.captures().get("value").insn().asString();
+            Match stringPoolReferenceMatch = OpcodeMatch.of(AALOAD) // AALOAD - Load array reference
+                // Index
+                .and(FrameMatch.stack(0, NumberMatch.of().capture("index")
+                    // Load number pool field
+                    .and(FrameMatch.stack(0, FieldMatch.getStatic().owner(stringPoolFieldInsn.owner).name(stringPoolFieldInsn.name).desc(stringPoolFieldInsn.desc)))
+                ));
 
-        stringPool[index] = value;
-      });
+            // Replace number pool references with actual values
+            classWrapper.methods().forEach(methodNode -> {
+              MethodContext methodContext = MethodContext.of(classWrapper, methodNode);
 
-      for (String string : stringPool) {
-        if (string == null) {
-          // String pool is not fully initialized
-          return;
-        }
-      }
+              stringPoolReferenceMatch.findAllMatches(methodContext).forEach(numberPoolReferenceCtx -> {
+                int index = numberPoolReferenceCtx.captures().get("index").insn().asInteger();
+                String value = stringPool[index];
 
-      Match stringPoolReferenceMatch = OpcodeMatch.of(AALOAD) // AALOAD - Load array reference
-          // Index
-          .and(FrameMatch.stack(0, NumberMatch.of().capture("index")
-              // Load number pool field
-              .and(FrameMatch.stack(0, FieldMatch.getStatic().owner(stringPoolFieldInsn.owner).name(stringPoolFieldInsn.name).desc(stringPoolFieldInsn.desc)))
-          ));
+                // Value
+                methodNode.instructions.insert(numberPoolReferenceCtx.insn(), new LdcInsnNode(value));
+                numberPoolReferenceCtx.removeAll();
+                markChange();
+                changedForThisContext.set(true);
+              });
+            });
 
-      // Replace number pool references with actual values
-      classWrapper.methods().forEach(methodNode -> {
-        MethodContext methodContext = MethodContext.of(classWrapper, methodNode);
-
-        stringPoolReferenceMatch.findAllMatches(methodContext).forEach(numberPoolReferenceCtx -> {
-          int index = numberPoolReferenceCtx.captures().get("index").insn().asInteger();
-          String value = stringPool[index];
-
-          // Value
-          methodNode.instructions.insert(numberPoolReferenceCtx.insn(), new LdcInsnNode(value));
-          numberPoolReferenceCtx.removeAll();
-          markChange();
-        });
-      });
-
-      // Cleanup
-      classWrapper.methods().remove(stringPoolMatchCtx.insnContext().methodNode());
-      classWrapper.fields().removeIf(fieldNode -> fieldNode.name.equals(stringPoolFieldInsn.name) && fieldNode.desc.equals(stringPoolFieldInsn.desc));
-      // Remove string pool initialization from clinit
-      classWrapper.findClInit().ifPresent(clinit -> {
-        for (AbstractInsnNode insn : clinit.instructions.toArray()) {
-          if (insn.getOpcode() == INVOKESTATIC && insn instanceof MethodInsnNode methodInsn &&
-              methodInsn.name.equals(stringPoolMatchCtx.insnContext().methodNode().name) && methodInsn.desc.equals(stringPoolMatchCtx.insnContext().methodNode().desc) &&
-              methodInsn.owner.equals(classWrapper.name())
-          ) {
-            // Remove invocation
-            clinit.instructions.remove(insn);
-          }
-        }
-      });
+            if (changedForThisContext.get()) {
+              toRemoveMn.add(stringPoolMatchCtx.insnContext().methodNode());
+              classWrapper.fields().forEach(fieldNode -> {
+                if (fieldNode.name.equals(stringPoolFieldInsn.name) && fieldNode.desc.equals(stringPoolFieldInsn.desc)) {
+                  toRemoveFn.add(fieldNode);
+                }
+              });
+              // Remove string pool initialization from clinit
+              classWrapper.findClInit().ifPresent(clinit -> {
+                for (AbstractInsnNode insn : clinit.instructions.toArray()) {
+                  if (insn.getOpcode() == INVOKESTATIC && insn instanceof MethodInsnNode methodInsn &&
+                      methodInsn.name.equals(stringPoolMatchCtx.insnContext().methodNode().name) && methodInsn.desc.equals(stringPoolMatchCtx.insnContext().methodNode().desc) &&
+                      methodInsn.owner.equals(classWrapper.name())
+                  ) {
+                    // Remove invocation
+                    clinit.instructions.remove(insn);
+                  }
+                }
+              });
+            }
+          });
+      classWrapper.methods().removeAll(toRemoveMn);
+      classWrapper.fields().removeAll(toRemoveFn);
     });
   }
 }
