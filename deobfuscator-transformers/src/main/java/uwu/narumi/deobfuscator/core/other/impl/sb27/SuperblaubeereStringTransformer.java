@@ -71,6 +71,13 @@ public class SuperblaubeereStringTransformer extends Transformer {
       MethodMatch.invokeSpecial().owner("javax/crypto/spec/SecretKeySpec").name("<init>").desc("([BLjava/lang/String;)V")
   );
 
+  private static final Match STRING_DECRYPT_AES_MATCH = SequenceMatch.of(
+      MethodMatch.invokeVirtual().owner("java/lang/String").name("getBytes").desc("(Ljava/nio/charset/Charset;)[B"),
+      MethodMatch.invokeVirtual().owner("java/security/MessageDigest").name("digest").desc("([B)[B"),
+      StringMatch.of("AES"),
+      MethodMatch.invokeSpecial().owner("javax/crypto/spec/SecretKeySpec").name("<init>").desc("([BLjava/lang/String;)V")
+  );
+
   /*
   new java/lang/String
   dup
@@ -108,6 +115,8 @@ public class SuperblaubeereStringTransformer extends Transformer {
           decryptMethods.put(MethodRef.of(classWrapper.classNode(), methodNode), SuperblaubeereStringTransformer::decryptStringBlowfish);
         } else if (STRING_DECRYPT_DES_MATCH.findFirstMatch(methodContext) != null) {
           decryptMethods.put(MethodRef.of(classWrapper.classNode(), methodNode), SuperblaubeereStringTransformer::decryptStringDES);
+        } else if (STRING_DECRYPT_AES_MATCH.findFirstMatch(methodContext) != null) {
+          decryptMethods.put(MethodRef.of(classWrapper.classNode(), methodNode), SuperblaubeereStringTransformer::decryptStringAES);
         } else if (STRING_DECRYPT_XOR_MATCH.findFirstMatch(methodContext) != null) {
           decryptMethods.put(MethodRef.of(classWrapper.classNode(), methodNode), SuperblaubeereStringTransformer::decryptXOR);
         }
@@ -166,6 +175,17 @@ public class SuperblaubeereStringTransformer extends Transformer {
     try {
       SecretKeySpec secretKeySpec = new SecretKeySpec(Arrays.copyOf(MessageDigest.getInstance("MD5").digest(key.getBytes(StandardCharsets.UTF_8)), 8), "DES");
       Cipher cipher = Cipher.getInstance("DES");
+      cipher.init(2, secretKeySpec);
+      return new String(cipher.doFinal(Base64.getDecoder().decode(encryptedString.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8);
+    } catch (Exception ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+
+  private static String decryptStringAES(String encryptedString, String key) {
+    try {
+      SecretKeySpec secretKeySpec = new SecretKeySpec(MessageDigest.getInstance("SHA-256").digest(key.getBytes(StandardCharsets.UTF_8)), "AES");
+      Cipher cipher = Cipher.getInstance("AES");
       cipher.init(2, secretKeySpec);
       return new String(cipher.doFinal(Base64.getDecoder().decode(encryptedString.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8);
     } catch (Exception ex) {
