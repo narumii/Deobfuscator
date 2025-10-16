@@ -17,7 +17,7 @@ public class SuperblaubeereInvokeDynamicTransformer extends Transformer {
   Match indyMatch = SequenceMatch.of(
       FieldMatch.getStatic().capture("type"),
       NumberMatch.numInteger().capture("position"),
-      Match.of(ctx -> ctx.insn() instanceof LdcInsnNode ldc && ldc.cst instanceof Type).or(StringMatch.of()).capture("ldc"),
+      Match.of(ctx -> ctx.insn().isType()).or(StringMatch.of()).capture("ldc"),
       OpcodeMatch.of(AASTORE)
   );
 
@@ -63,8 +63,11 @@ public class SuperblaubeereInvokeDynamicTransformer extends Transformer {
           String desc = parts[2];
           int type = parts[3].length();
 
-          Type fieldType = types.get(Integer.parseInt(desc));
-
+          Type fieldType = null;
+          if (type > 2) {
+            fieldType = types.get(Integer.parseInt(desc));
+            if (fieldType == null) return;
+          }
           switch (type) {
             case 2:
               methodNode.instructions.set(node, new MethodInsnNode(INVOKEVIRTUAL, owner, name, desc, false));
