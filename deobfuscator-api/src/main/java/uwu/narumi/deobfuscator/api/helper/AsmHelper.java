@@ -98,6 +98,10 @@ public class AsmHelper implements Opcodes {
     return (access & opcode) != 0;
   }
 
+  public static boolean isAccess(int opcode, int... access) {
+    return Arrays.stream(access).allMatch(access1 -> (access1 & opcode) != 0);
+  }
+
   /**
    * Convert constant value to instruction that represents this constant
    *
