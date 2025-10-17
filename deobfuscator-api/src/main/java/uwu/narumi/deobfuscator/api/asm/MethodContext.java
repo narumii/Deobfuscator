@@ -2,6 +2,7 @@ package uwu.narumi.deobfuscator.api.asm;
 
 import org.jetbrains.annotations.Unmodifiable;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.OriginalSourceValue;
@@ -15,6 +16,7 @@ import java.util.Set;
  */
 public class MethodContext {
   private final ClassWrapper classWrapper;
+  private final ClassNode classNode; // for copied method without classWrapper
   private final MethodNode methodNode;
   private final FramesProvider framesProvider;
   // Lazily initialized
@@ -22,12 +24,16 @@ public class MethodContext {
   // Lazily initialized
   private Map<AbstractInsnNode, Set<AbstractInsnNode>> consumersMap = null;
 
-  private MethodContext(
-      ClassWrapper classWrapper,
-      MethodNode methodNode,
-      FramesProvider framesProvider
-  ) {
+  private MethodContext(ClassWrapper classWrapper, MethodNode methodNode, FramesProvider framesProvider) {
     this.classWrapper = classWrapper;
+    this.classNode = classWrapper.classNode();
+    this.methodNode = methodNode;
+    this.framesProvider = framesProvider;
+  }
+
+  private MethodContext(ClassNode classNode, MethodNode methodNode, FramesProvider framesProvider) {
+    this.classWrapper = null;
+    this.classNode = classNode;
     this.methodNode = methodNode;
     this.framesProvider = framesProvider;
   }
@@ -44,6 +50,13 @@ public class MethodContext {
    */
   public MethodNode methodNode() {
     return methodNode;
+  }
+
+  /**
+   * Class node
+   */
+  public ClassNode classNode() {
+    return classNode;
   }
 
   /**
@@ -85,5 +98,9 @@ public class MethodContext {
    */
   public static MethodContext of(ClassWrapper classWrapper, MethodNode methodNode, FramesProvider framesProvider) {
     return new MethodContext(classWrapper, methodNode, framesProvider);
+  }
+
+  public static MethodContext of(ClassNode classNode, MethodNode methodNode) {
+    return new MethodContext(classNode, methodNode, MethodHelper::analyzeSource);
   }
 }
