@@ -1,0 +1,5 @@
+package pack.tests.basics.cross;
+
+public interface Inte {
+    int mul(int var1, int var2, int var3);
+}

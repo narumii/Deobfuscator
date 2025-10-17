@@ -225,10 +225,10 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .inputJar("branchlock/branchlock-string-flow-number.jar")
         .register();
 
-//    test("Branchlock String + Salting + Flow + Number")
-//        .transformers(ComposedBranchlockTransformer::new)
-//        .inputJar("branchlock/branchlock-string-salting-flow-number.jar")
-//        .register();
+    test("Branchlock String + Salting + Flow + Number")
+        .transformers(ComposedBranchlockTransformer::new)
+        .inputJar("branchlock/branchlock-string-salting-flow-number.jar")
+        .register();
 
     test("Branchlock Flow 9")
         .transformers(BranchlockFlowTransformer::new)

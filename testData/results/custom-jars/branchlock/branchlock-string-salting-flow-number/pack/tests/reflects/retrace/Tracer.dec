@@ -1,0 +1,31 @@
+package pack.tests.reflects.retrace;
+
+public class Tracer {
+    public String BRANCHLOCK_DOT_NET_DEMO;
+
+    public Tracer(int var1) {
+    }
+
+    // $VF: Irreducible bytecode was duplicated to produce valid code
+    public void run(int var1) {
+        while (true) {
+            new Tracee(29130).toTrace(5);
+            if (var1 < 0 || Tracee.p == 5) {
+                if (var1 >= 0) {
+                    System.out.println("PASS");
+                }
+
+                if (var1 >= 0) {
+                    return;
+                }
+            }
+
+            while (var1 >= 0) {
+                System.out.println("FAIL");
+                if (var1 >= 0) {
+                    return;
+                }
+            }
+        }
+    }
+}
