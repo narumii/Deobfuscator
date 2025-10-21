@@ -1,9 +1,6 @@
 package uwu.narumi.deobfuscator.core.other.impl.skidfuscator;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.TryCatchBlockNode;
+import org.objectweb.asm.tree.*;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
@@ -59,37 +56,40 @@ public class SkidTryCatchRemoveTransformer extends Transformer {
     Set<TryCatchBlockNode> tcbToRemove = new HashSet<>();
     Set<AbstractInsnNode> toRemove = new HashSet<>();
     methodNode.tryCatchBlocks.forEach(tcb -> {
-      if (tcb.handler.equals(tcb.end)) {
-        /* Checking if start block has throw null */
-        SequenceMatch.of(
-            AnyMatch.of(OpcodeMatch.of(ILOAD), OpcodeMatch.of(LDC)).and(Match.of(ctx -> isInsnInLabelRange(methodNode, tcb.start, ctx.insn()))),
-            MethodMatch.invokeStatic(),
-            OpcodeMatch.of(LDC),
-            JumpMatch.of().capture("throw-label"),
-            OpcodeMatch.of(ACONST_NULL),
-            OpcodeMatch.of(ATHROW)
-        ).findAny(methodContext).ifPresent(matchContext -> {
-          /* Clearing "else" block which throws exception */
-          toRemove.addAll(matchContext.collectedInsns());
-          LabelNode fakeJump = matchContext.captures().get("throw-label").insn().asJump().label;
+      /* Checking if start block has throw null */
+      SequenceMatch.of(
+          AnyMatch.of(OpcodeMatch.of(ILOAD), OpcodeMatch.of(LDC)).and(Match.of(ctx -> isInsnInLabelRange(methodNode, tcb.start, ctx.insn()))),
+          MethodMatch.invokeStatic(),
+          OpcodeMatch.of(LDC),
+          JumpMatch.of().capture("throw-label"),
+          OpcodeMatch.of(ACONST_NULL),
+          OpcodeMatch.of(ATHROW)
+      ).or(
           SequenceMatch.of(
-              OpcodeMatch.of(NEW).and(Match.of(ctx -> isInsnInLabelRange(methodNode, fakeJump, ctx.insn()))),
+              OpcodeMatch.of(NEW).and(Match.of(ctx -> isInsnInLabelRange(methodNode, tcb.start, ctx.insn()))),
               OpcodeMatch.of(DUP),
               MethodMatch.invokeSpecial(),
               OpcodeMatch.of(ATHROW)
-          ).findAny(methodContext).ifPresent(matchContext1 -> {
-            toRemove.addAll(matchContext1.collectedInsns());
-          });
+          )
+      ).findAny(methodContext).ifPresent(matchContext -> {
+        /* Clearing "else" block which throws exception */
+        toRemove.addAll(matchContext.collectedInsns());
+        LabelNode fakeJump;
+        if (matchContext.captures().containsKey("throw-label")) {
+          fakeJump = matchContext.captures().get("throw-label").insn().asJump().label;
           toRemove.add(fakeJump);
-          AbstractInsnNode abstractInsnNode = fakeJump;
-          while (abstractInsnNode.getNext() != null && abstractInsnNode.getOpcode() != POP) {
-            abstractInsnNode = abstractInsnNode.getNext();
-          }
-          toRemove.add(abstractInsnNode);
-          tcbToRemove.add(tcb);
-          markChange();
-        });
-      }
+        } else {
+          fakeJump = tcb.handler;
+        }
+        AbstractInsnNode abstractInsnNode = fakeJump;
+        while (abstractInsnNode.getNext() != null && abstractInsnNode.getOpcode() != POP) {
+          abstractInsnNode = abstractInsnNode.getNext();
+        }
+        toRemove.add(abstractInsnNode);
+        tcbToRemove.add(tcb);
+        methodNode.instructions.insert(tcb.start, new JumpInsnNode(GOTO, tcb.handler));
+        markChange();
+      });
     });
     toRemove.forEach(methodNode.instructions::remove);
     methodNode.tryCatchBlocks.removeAll(tcbToRemove);
