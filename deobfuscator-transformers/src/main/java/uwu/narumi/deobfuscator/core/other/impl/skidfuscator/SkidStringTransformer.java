@@ -41,7 +41,7 @@ public class SkidStringTransformer extends Transformer {
       classWrapper.methods().stream().filter(methodNode -> methodNode.name.length() == 10 && methodNode.desc.endsWith("I)Ljava/lang/String;")).forEach(decryptionMethod -> {
         MethodContext methodContext = MethodContext.of(classWrapper, decryptionMethod);
         int methodSize = Match.of(ctx -> ctx.insn().isMathOperator()).findAllMatches(methodContext).size();
-        if (methodSize == 24) {
+        if (methodSize == 24 || methodSize == 23) {
           classWrapper.findClInit().ifPresent(clinitNode -> {
             MethodContext clinitContext = MethodContext.of(classWrapper, clinitNode);
             MatchContext byteBufferMatch = fieldPutStaticString.findFirstMatch(clinitContext);
@@ -59,6 +59,7 @@ public class SkidStringTransformer extends Transformer {
                     )
                 )
             ).asCharBuffer().toString();
+            classWrapper.fields().removeIf(fieldNode -> fieldNode.name.equals(byteBufferMatch.captures().get("field").insn().asFieldInsn().name));
             trashMethods.add(toRemove);
             byteBufferMatch.removeAll();
             classWrapper.methods().forEach(methodNode -> {
@@ -88,7 +89,7 @@ public class SkidStringTransformer extends Transformer {
               });
             });
           });
-        } else if (methodSize == 5) {
+        } else if (methodSize == 5 || methodSize == 4) {
           if (decryptionMethod.desc.equals("([B[BI)Ljava/lang/String;")) {
             classWrapper.methods().forEach(methodNode -> {
               MethodContext methodContext1 = MethodContext.of(classWrapper, methodNode);
@@ -112,10 +113,11 @@ public class SkidStringTransformer extends Transformer {
                     )
                 );
                 trashMethods.add(toRemove1);
+                MethodNode toRemove;
                 byte[] decryptBytes = resolveByteArrayFromMethod(
                     MethodContext.of(
                         classWrapper,
-                        toRemove1 = findMethod(
+                        toRemove = findMethod(
                             classWrapper.classNode(),
                             MethodRef.of(
                                 matchContext.captures().get("byte-array2").insn().asMethodInsn()
@@ -123,7 +125,7 @@ public class SkidStringTransformer extends Transformer {
                         ).get()
                     )
                 );
-                trashMethods.add(toRemove1);
+                trashMethods.add(toRemove);
                 methodNode.instructions.insertBefore(matchContext.insn(), new LdcInsnNode(method5(stringBytes, decryptBytes, salt)));
                 markChange();
                 matchContext.removeAll();
@@ -145,6 +147,8 @@ public class SkidStringTransformer extends Transformer {
                       ).get()
                   )
               );
+              trashMethods.add(toRemove);
+              classWrapper.fields().removeIf(fieldNode -> fieldNode.name.equals(bytesMatch.captures().get("field").insn().asFieldInsn().name));
               classWrapper.methods().forEach(methodNode -> {
                 MethodContext methodContext1 = MethodContext.of(classWrapper, methodNode);
                 SequenceMatch.of(
@@ -171,7 +175,6 @@ public class SkidStringTransformer extends Transformer {
                   matchContext.removeAll();
                 });
               });
-              trashMethods.add(toRemove);
               bytesMatch.removeAll();
             });
           }
