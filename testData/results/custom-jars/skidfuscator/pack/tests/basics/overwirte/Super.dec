@@ -1,0 +1,7 @@
+package pack.tests.basics.overwirte;
+
+public abstract class Super implements Face {
+    public void run(int var1) {
+        System.out.println("FAIL");
+    }
+}

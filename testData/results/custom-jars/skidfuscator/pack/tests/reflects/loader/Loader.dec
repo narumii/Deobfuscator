@@ -1,0 +1,77 @@
+package pack.tests.reflects.loader;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
+public class Loader extends ClassLoader {
+    public static byte[] readAllBytes(InputStream param0, int param1) {
+        // $VF: Couldn't be decompiled
+        // Please report this to the Vineflower issue tracker, at https://github.com/Vineflower/vineflower/issues with a copy of the class file (if you have the rights to distribute it!)
+        // java.lang.RuntimeException: parsing failure!
+        //   at org.jetbrains.java.decompiler.modules.decompiler.decompose.DomHelper.parseGraph(DomHelper.java:211)
+        //   at org.jetbrains.java.decompiler.main.rels.MethodProcessor.codeToJava(MethodProcessor.java:166)
+        //
+        // Bytecode:
+        // 00: new java/io/ByteArrayOutputStream
+        // 03: astore 2
+        // 04: aload 2
+        // 05: invokespecial java/io/ByteArrayOutputStream.<init> ()V
+        // 08: aload 2
+        // 09: astore 5
+        // 0b: sipush 1024
+        // 0e: newarray 8
+        // 10: astore 6
+        // 12: aload 0
+        // 13: astore 10
+        // 15: aload 6
+        // 17: astore 17
+        // 19: aload 10
+        // 1b: aload 17
+        // 1d: invokevirtual java/io/InputStream.read ([B)I
+        // 20: istore 11
+        // 22: iload 11
+        // 24: istore 7
+        // 26: iload 11
+        // 28: bipush -1
+        // 29: if_icmpeq 52
+        // 2c: aload 5
+        // 2e: astore 16
+        // 30: aload 6
+        // 32: astore 19
+        // 34: iload 7
+        // 36: istore 4
+        // 38: aload 16
+        // 3a: aload 19
+        // 3c: bipush 0
+        // 3d: iload 4
+        // 3f: invokevirtual java/io/ByteArrayOutputStream.write ([BII)V
+        // 42: goto 4f
+        // 45: aload 5
+        // 47: invokevirtual java/io/ByteArrayOutputStream.toByteArray ()[B
+        // 4a: astore 13
+        // 4c: aload 13
+        // 4e: areturn
+        // 4f: goto 12
+        // 52: goto 45
+        // 55: pop
+        // 56: aconst_null
+        // 57: areturn
+    }
+
+    @Override
+    public InputStream getResourceAsStream(String var1) {
+        if (var1.contains("TEST")) {
+            byte[] var10 = "PASS".getBytes();
+            return new ByteArrayInputStream(var10);
+        } else {
+            return super.getResourceAsStream(var1);
+        }
+    }
+
+    @Override
+    public Class<?> findClass(String var1) throws ClassNotFoundException {
+        byte[] var7 = readAllBytes(Loader.class.getClassLoader().getResourceAsStream("pack/tests/reflects/loader/LTest.class"), 52053976);
+        int var14 = var7.length;
+        return this.defineClass(var1, var7, 0, var14);
+    }
+}

@@ -1,0 +1,19 @@
+package pack.tests.reflects.annot;
+
+import java.lang.reflect.Method;
+
+public class annot {
+    public void run(int var1) throws Exception {
+        annoe var2 = new annoe();
+        annoe var4 = var2;
+
+        for (Method var8 : annoe.class.getDeclaredMethods()) {
+            var8.setAccessible(true);
+            anno var9 = var8.getAnnotation(anno.class);
+            if (var9 != null && var9.val().equals("yes")) {
+                Object[] var34 = new Object[0];
+                var8.invoke(var4, var34);
+            }
+        }
+    }
+}
