@@ -1,6 +1,7 @@
 package uwu.narumi.deobfuscator.core.other.composed;
 
 import uwu.narumi.deobfuscator.api.transformer.ComposedTransformer;
+import uwu.narumi.deobfuscator.core.other.composed.general.ComposedGeneralFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.*;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineLocalVariablesTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
@@ -15,6 +16,7 @@ public class ComposedSkidTransformer extends ComposedTransformer {
           UniversalNumberTransformer::new,
           SkidNumberTransformer::new,
           SkidTryCatchRemoveTransformer::new,
+          ComposedGeneralFlowTransformer::new,
           InlineStaticFieldTransformer::new,
           () -> new ComposedTransformer(true,
               InlineLocalVariablesTransformer::new, /* Passthrough Hash */
