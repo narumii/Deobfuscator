@@ -52,7 +52,7 @@ public class SkidCleanTransformer extends Transformer {
         AbstractInsnNode firstInsn = clinit.instructions.getFirst();
         boolean hasASCII = false;
         while (firstInsn.getNext() != null) {
-          if (firstInsn.isInteger() && firstInsn.getNext().getOpcode() == ANEWARRAY && firstInsn.getNext(2).asFieldInsn().name.equalsIgnoreCase("nothing_to_see_here")) {
+          if (firstInsn.isInteger() && firstInsn.getNext().getOpcode() == ANEWARRAY && firstInsn.getNext(2).isFieldInsn() && firstInsn.getNext(2).asFieldInsn().name.equalsIgnoreCase("nothing_to_see_here")) {
             hasASCII = true;
             break;
           }
