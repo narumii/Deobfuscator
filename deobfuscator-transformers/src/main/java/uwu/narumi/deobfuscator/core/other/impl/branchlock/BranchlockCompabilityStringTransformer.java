@@ -248,24 +248,4 @@ public class BranchlockCompabilityStringTransformer extends Transformer {
     int index = key - tsi.min;
     return tsi.labels.get(index);
   }
-
-  public boolean isInsnInLabelRange(MethodNode method, LabelNode startLabel, AbstractInsnNode insn) {
-    InsnList instructions = method.instructions;
-
-    int startIndex = instructions.indexOf(startLabel);
-    if (startIndex == -1) return false;
-
-    int insnIndex = instructions.indexOf(insn);
-    if (insnIndex == -1) return false;
-
-    int endIndex = instructions.size();
-    for (int i = startIndex + 1; i < instructions.size(); i++) {
-      if (instructions.get(i) instanceof LabelNode) {
-        endIndex = i;
-        break;
-      }
-    }
-
-    return insnIndex > startIndex && insnIndex < endIndex;
-  }
 }

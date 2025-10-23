@@ -79,26 +79,6 @@ public class GuardProtectorFlowTransformer extends Transformer {
     }));
   }
 
-  public boolean isInsnInLabelRange(MethodNode method, LabelNode startLabel, AbstractInsnNode insn) {
-    InsnList instructions = method.instructions;
-
-    int startIndex = instructions.indexOf(startLabel);
-    if (startIndex == -1) return false;
-
-    int insnIndex = instructions.indexOf(insn);
-    if (insnIndex == -1) return false;
-
-    int endIndex = instructions.size();
-    for (int i = startIndex + 1; i < instructions.size(); i++) {
-      if (instructions.get(i) instanceof LabelNode) {
-        endIndex = i;
-        break;
-      }
-    }
-
-    return insnIndex > startIndex && insnIndex < endIndex;
-  }
-
   boolean hasPutStatic(ClassNode classNode, FieldInsnNode target) {
     for (MethodNode method : classNode.methods) {
       for (AbstractInsnNode insn : method.instructions) {

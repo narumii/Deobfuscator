@@ -1,0 +1,60 @@
+package pack.tests.bench;
+
+import java.io.PrintStream;
+
+public class Calc {
+    public static int count = 0;
+
+    public static void runAll(int var0) {
+        long var6 = System.currentTimeMillis();
+
+        for (int var8 = 0; var8 < 10000; var8++) {
+            call(100, 1301919330);
+            runAdd(1390077608);
+            runStr(1564474936);
+        }
+
+        PrintStream var11 = System.out;
+        StringBuilder var15 = new StringBuilder();
+        String var21 = "Calc: ";
+        StringBuilder var16 = var15.append(var21);
+        long var22 = System.currentTimeMillis();
+        long var24 = var22 - var6;
+        String var19 = var16.append(var24).append("ms").toString();
+        var11.println(var19);
+        if (count != 30000) {
+            String var27 = "[ERROR]: Errors occurred in calc!";
+            RuntimeException var13 = new RuntimeException(var27);
+            throw var13;
+        }
+    }
+
+    private static void call(int var0, int var1) {
+        if (var0 == 0) {
+            count++;
+        } else {
+            call(var0 - 1, 1301919330);
+        }
+    }
+
+    private static void runAdd(int var0) {
+        double var6 = 0.0;
+
+        while (var6 < 100.1) {
+            var6 += 0.99;
+        }
+
+        count++;
+    }
+
+    private static void runStr(int var0) {
+        String var3 = "";
+
+        while (var3.length() < 101) {
+            StringBuilder var8 = new StringBuilder();
+            var3 = var8.append(var3).append("ax").toString();
+        }
+
+        count++;
+    }
+}

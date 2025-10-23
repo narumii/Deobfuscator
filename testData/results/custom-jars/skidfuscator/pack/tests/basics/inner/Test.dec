@@ -1,0 +1,16 @@
+package pack.tests.basics.inner;
+
+public class Test {
+    public void run(int var1) {
+        Exec var2 = new Exec();
+        Exec.Inner var7 = var2.new Inner(3, 1527845619);
+        var7.doAdd(790770962);
+        Exec.Inner var9 = var2.new Inner(100, 1527845619);
+        var9.doAdd(790770962);
+        if (var2.fuss == 108) {
+            System.out.println("PASS");
+        } else {
+            System.out.println("ERROR");
+        }
+    }
+}

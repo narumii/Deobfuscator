@@ -1,0 +1,68 @@
+package pack.tests.reflects.res;
+
+public class Accesor {
+    public void run(int param1) {
+        // $VF: Couldn't be decompiled
+        // Please report this to the Vineflower issue tracker, at https://github.com/Vineflower/vineflower/issues with a copy of the class file (if you have the rights to distribute it!)
+        // java.lang.RuntimeException: parsing failure!
+        //   at org.jetbrains.java.decompiler.modules.decompiler.decompose.DomHelper.parseGraph(DomHelper.java:211)
+        //   at org.jetbrains.java.decompiler.main.rels.MethodProcessor.codeToJava(MethodProcessor.java:166)
+        //
+        // Bytecode:
+        // 00: ldc "/pack/tests/reflects/res/file"
+        // 02: astore 3
+        // 03: ldc pack/tests/reflects/res/Accesor
+        // 05: aload 3
+        // 06: invokevirtual java/lang/Class.getResourceAsStream (Ljava/lang/String;)Ljava/io/InputStream;
+        // 09: invokevirtual java/io/InputStream.read ()I
+        // 0c: bipush 97
+        // 0e: if_icmpeq 7e
+        // 11: new java/lang/RuntimeException
+        // 14: astore 19
+        // 16: aload 19
+        // 18: invokespecial java/lang/RuntimeException.<init> ()V
+        // 1b: aload 19
+        // 1d: athrow
+        // 1e: ldc "file2"
+        // 20: astore 21
+        // 22: ldc pack/tests/reflects/res/Accesor
+        // 24: aload 21
+        // 26: invokevirtual java/lang/Class.getResourceAsStream (Ljava/lang/String;)Ljava/io/InputStream;
+        // 29: invokevirtual java/io/InputStream.read ()I
+        // 2c: bipush 114
+        // 2e: if_icmpeq 68
+        // 31: new java/lang/RuntimeException
+        // 34: astore 18
+        // 36: aload 18
+        // 38: invokespecial java/lang/RuntimeException.<init> ()V
+        // 3b: aload 18
+        // 3d: athrow
+        // 3e: ldc pack/tests/reflects/res/Accesor
+        // 40: invokevirtual java/lang/Class.getClassLoader ()Ljava/lang/ClassLoader;
+        // 43: ldc "pack/tests/reflects/res/file3"
+        // 45: invokevirtual java/lang/ClassLoader.getResourceAsStream (Ljava/lang/String;)Ljava/io/InputStream;
+        // 48: invokevirtual java/io/InputStream.read ()I
+        // 4b: bipush 99
+        // 4d: if_icmpeq 7b
+        // 50: new java/lang/RuntimeException
+        // 53: astore 14
+        // 55: aload 14
+        // 57: invokespecial java/lang/RuntimeException.<init> ()V
+        // 5a: aload 14
+        // 5c: athrow
+        // 5d: getstatic java/lang/System.out Ljava/io/PrintStream;
+        // 60: ldc "PASS"
+        // 62: invokevirtual java/io/PrintStream.println (Ljava/lang/String;)V
+        // 65: goto 6e
+        // 68: goto 3e
+        // 6b: goto 71
+        // 6e: goto 7a
+        // 71: pop
+        // 72: getstatic java/lang/System.out Ljava/io/PrintStream;
+        // 75: ldc "FAIL"
+        // 77: invokevirtual java/io/PrintStream.println (Ljava/lang/String;)V
+        // 7a: return
+        // 7b: goto 5d
+        // 7e: goto 1e
+    }
+}

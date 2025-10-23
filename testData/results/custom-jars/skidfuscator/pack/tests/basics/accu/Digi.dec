@@ -1,0 +1,22 @@
+package pack.tests.basics.accu;
+
+public class Digi {
+    public void run(int var1) {
+        double var7 = 0.0;
+        int var9 = 0;
+
+        do {
+            var7 += 1.0E-18;
+        } while (++var9 <= 100 && (float)var7 != 2.0E-17F);
+
+        if (var9 == 20) {
+            System.out.println("PASS");
+        } else {
+            System.out.println("FAIL");
+        }
+    }
+
+    private static byte[] kqlfjamyycsynra() {
+        return new byte[]{-125, -75, 14, 106, 0, 98, 92, 21, 1, 51};
+    }
+}

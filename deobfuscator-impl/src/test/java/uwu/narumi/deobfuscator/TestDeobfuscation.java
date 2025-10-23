@@ -239,5 +239,10 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .transformers(ComposedGuardProtectorTransformer::new)
         .inputClass(InputType.CUSTOM_CLASS, "guardprotector/Class951.class")
         .register();
+
+    test("SkidFuscator 2.0.11 - Pure hash encryption")
+        .transformers(ComposedSkidTransformer::new)
+        .inputJar("skidfuscator.jar")
+        .register();
   }
 }

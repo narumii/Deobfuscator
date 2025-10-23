@@ -1,0 +1,11 @@
+package pack.tests.basics.sub;
+
+class med {
+    int result;
+
+    med(int var1, int var2, int var3) {
+        flo var5 = new flo();
+        int var8 = var5.solve(var1, var2, 638043422);
+        this.result = var8;
+    }
+}

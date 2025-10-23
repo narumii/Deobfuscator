@@ -1,0 +1,13 @@
+package pack.tests.reflects.retrace;
+
+public class Tracer {
+    public void run(int var1) throws Exception {
+        Tracee var2 = new Tracee();
+        var2.toTrace(5, 1697579845);
+        if (Tracee.p == 5) {
+            System.out.println("PASS");
+        } else {
+            System.out.println("FAIL");
+        }
+    }
+}

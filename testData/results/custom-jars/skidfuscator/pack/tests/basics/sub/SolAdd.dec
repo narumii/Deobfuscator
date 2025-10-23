@@ -1,0 +1,8 @@
+package pack.tests.basics.sub;
+
+public class SolAdd {
+    public static int get(int var0) {
+        med var1 = new med(1, 2, 1753962384);
+        return var1.result;
+    }
+}
