@@ -1,0 +1,106 @@
+package pack.tests.basics.runable;
+
+public class Task {
+    public void run(int param1) throws Exception {
+        // $VF: Couldn't be decompiled
+        // Please report this to the Vineflower issue tracker, at https://github.com/Vineflower/vineflower/issues with a copy of the class file (if you have the rights to distribute it!)
+        // java.lang.RuntimeException: parsing failure!
+        //   at org.jetbrains.java.decompiler.modules.decompiler.decompose.DomHelper.parseGraph(DomHelper.java:211)
+        //   at org.jetbrains.java.decompiler.main.rels.MethodProcessor.codeToJava(MethodProcessor.java:166)
+        //
+        // Bytecode:
+        // 00: new pack/tests/basics/runable/Exec
+        // 03: astore 2
+        // 04: aload 2
+        // 05: bipush 2
+        // 06: ldc 1800938360
+        // 08: invokespecial pack/tests/basics/runable/Exec.<init> (II)V
+        // 0b: aload 2
+        // 0c: astore 4
+        // 0e: new pack/tests/basics/runable/Exec
+        // 11: astore 8
+        // 13: aload 8
+        // 15: bipush 3
+        // 16: ldc 1800938360
+        // 18: invokespecial pack/tests/basics/runable/Exec.<init> (II)V
+        // 1b: aload 8
+        // 1d: astore 5
+        // 1f: new pack/tests/basics/runable/Exec
+        // 22: astore 9
+        // 24: aload 9
+        // 26: bipush 100
+        // 28: ldc 1800938360
+        // 2a: invokespecial pack/tests/basics/runable/Exec.<init> (II)V
+        // 2d: aload 9
+        // 2f: astore 6
+        // 31: getstatic pack/tests/basics/runable/Pool.tpe Ljava/util/concurrent/ThreadPoolExecutor;
+        // 34: astore 10
+        // 36: aload 5
+        // 38: astore 30
+        // 3a: aload 30
+        // 3c: invokevirtual java/lang/Object.getClass ()Ljava/lang/Class;
+        // 3f: pop
+        // 40: aload 30
+        // 42: invokedynamic run (Lpack/tests/basics/runable/Exec;)Ljava/lang/Runnable; bsm=java/lang/invoke/LambdaMetafactory.metafactory (Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite; args=[ ()V, pack/tests/basics/runable/Exec.doAdd ()V, ()V ]
+        // 47: astore 31
+        // 49: aload 10
+        // 4b: aload 31
+        // 4d: invokevirtual java/util/concurrent/ThreadPoolExecutor.submit (Ljava/lang/Runnable;)Ljava/util/concurrent/Future;
+        // 50: pop
+        // 51: ldc2_w 50
+        // 54: invokestatic java/lang/Thread.sleep (J)V
+        // 57: goto a1
+        // 5a: pop
+        // 5b: getstatic pack/tests/basics/runable/Pool.tpe Ljava/util/concurrent/ThreadPoolExecutor;
+        // 5e: astore 15
+        // 60: aload 4
+        // 62: invokedynamic run (Lpack/tests/basics/runable/Exec;)Ljava/lang/Runnable; bsm=java/lang/invoke/LambdaMetafactory.metafactory (Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite; args=[ ()V, pack/tests/basics/runable/Task.lambda$run$0 (Lpack/tests/basics/runable/Exec;)V, ()V ]
+        // 67: astore 33
+        // 69: aload 15
+        // 6b: aload 33
+        // 6d: invokevirtual java/util/concurrent/ThreadPoolExecutor.submit (Ljava/lang/Runnable;)Ljava/util/concurrent/Future;
+        // 70: pop
+        // 71: ldc2_w 50
+        // 74: invokestatic java/lang/Thread.sleep (J)V
+        // 77: goto 9e
+        // 7a: pop
+        // 7b: getstatic pack/tests/basics/runable/Pool.tpe Ljava/util/concurrent/ThreadPoolExecutor;
+        // 7e: astore 20
+        // 80: aload 6
+        // 82: astore 34
+        // 84: aload 34
+        // 86: invokevirtual java/lang/Object.getClass ()Ljava/lang/Class;
+        // 89: pop
+        // 8a: aload 34
+        // 8c: invokedynamic run (Lpack/tests/basics/runable/Exec;)Ljava/lang/Runnable; bsm=java/lang/invoke/LambdaMetafactory.metafactory (Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite; args=[ ()V, pack/tests/basics/runable/Exec.doAdd ()V, ()V ]
+        // 91: astore 35
+        // 93: aload 20
+        // 95: aload 35
+        // 97: invokevirtual java/util/concurrent/ThreadPoolExecutor.submit (Ljava/lang/Runnable;)Ljava/util/concurrent/Future;
+        // 9a: pop
+        // 9b: goto a7
+        // 9e: goto 7b
+        // a1: goto 5b
+        // a4: goto 5a
+        // a7: goto b4
+        // aa: pop
+        // ab: getstatic pack/tests/basics/runable/Exec.i I
+        // ae: bipush 10
+        // b0: iadd
+        // b1: putstatic pack/tests/basics/runable/Exec.i I
+        // b4: ldc2_w 300
+        // b7: invokestatic java/lang/Thread.sleep (J)V
+        // ba: getstatic pack/tests/basics/runable/Exec.i I
+        // bd: bipush 30
+        // bf: if_icmpne cd
+        // c2: getstatic java/lang/System.out Ljava/io/PrintStream;
+        // c5: ldc "PASS"
+        // c7: invokevirtual java/io/PrintStream.println (Ljava/lang/String;)V
+        // ca: goto d5
+        // cd: getstatic java/lang/System.out Ljava/io/PrintStream;
+        // d0: ldc "FAIL"
+        // d2: invokevirtual java/io/PrintStream.println (Ljava/lang/String;)V
+        // d5: return
+        // d6: goto 7a
+    }
+}

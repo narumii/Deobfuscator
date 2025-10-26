@@ -1,0 +1,27 @@
+package pack.tests.basics.inner;
+
+public class Exec {
+    public int fuss = 1;
+
+    public void addF(int var1) {
+        int var5 = this.fuss + 2;
+        this.fuss = var5;
+    }
+
+    public class Inner {
+        int i;
+
+        public Inner(int var2, int var3) {
+            this.i = var2;
+        }
+
+        public void doAdd(int var1) {
+            Exec.this.addF(985687609);
+            Exec var6 = Exec.this;
+            int var7 = var6.fuss;
+            int var9 = this.i;
+            int var8 = var7 + var9;
+            var6.fuss = var8;
+        }
+    }
+}

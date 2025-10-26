@@ -1,0 +1,31 @@
+package pack.tests.reflects.loader;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+
+public class LTest {
+    public static byte[] readAllBytes(InputStream var0, int var1) throws IOException {
+        ByteArrayOutputStream var2 = new ByteArrayOutputStream();
+        ByteArrayOutputStream var5 = var2;
+        byte[] var6 = new byte[1024];
+
+        while (true) {
+            int var11 = var0.read(var6);
+            if (var11 == -1) {
+                return var5.toByteArray();
+            }
+
+            var5.write(var6, 0, var11);
+        }
+    }
+
+    public void run() throws Exception {
+        PrintStream var1 = System.out;
+        String var4 = "TEST";
+        byte[] var6 = readAllBytes(LTest.class.getResourceAsStream(var4), 1160298099);
+        String var2 = new String(var6);
+        var1.println(var2);
+    }
+}

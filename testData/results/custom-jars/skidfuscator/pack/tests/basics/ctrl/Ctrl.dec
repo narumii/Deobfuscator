@@ -1,0 +1,40 @@
+package pack.tests.basics.ctrl;
+
+import java.io.PrintStream;
+
+public class Ctrl {
+    private String ret = "FAIL";
+
+    public void runt(int var1) {
+        if (!"a".equals("b")) {
+            UnsupportedOperationException var5 = new UnsupportedOperationException();
+            throw var5;
+        }
+    }
+
+    public void runf(int var1) {
+        try {
+            this.runt(1192047436);
+        } catch (RuntimeException var12) {
+            String var10 = "PASS";
+            this.ret = var10;
+        }
+
+        try {
+            this.runt(1192047436);
+            String var3 = "FAIL";
+            this.ret = var3;
+        } catch (Exception var11) {
+            return;
+        }
+
+        throw new IllegalAccessException("Error in hash");
+    }
+
+    public void run(int var1) {
+        this.runf(1311545484);
+        PrintStream var4 = System.out;
+        String var5 = this.ret;
+        var4.println(var5);
+    }
+}

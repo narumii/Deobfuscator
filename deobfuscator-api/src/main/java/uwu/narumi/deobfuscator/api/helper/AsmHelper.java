@@ -141,6 +141,26 @@ public class AsmHelper implements Opcodes {
     return value.getSize() == 1 ? new InsnNode(POP) : new InsnNode(POP2);
   }
 
+  public boolean isInsnInLabelRange(MethodNode method, LabelNode startLabel, AbstractInsnNode insn) {
+    InsnList instructions = method.instructions;
+
+    int startIndex = instructions.indexOf(startLabel);
+    if (startIndex == -1) return false;
+
+    int insnIndex = instructions.indexOf(insn);
+    if (insnIndex == -1) return false;
+
+    int endIndex = instructions.size();
+    for (int i = startIndex + 1; i < instructions.size(); i++) {
+      if (instructions.get(i) instanceof LabelNode) {
+        endIndex = i;
+        break;
+      }
+    }
+
+    return insnIndex > startIndex && insnIndex < endIndex;
+  }
+
   /**
    * Update method descriptor in the current class, a superclass and interfaces
    *
