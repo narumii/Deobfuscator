@@ -32,8 +32,7 @@ public class GuardProtectorFlowTransformer extends Transformer {
       flowVarStore.findAllMatches(methodContext).forEach(varStore -> {
         FieldInsnNode fieldInsn = varStore.captures().get("stored-type").insn().asFieldInsn();
         if (!hasPutStatic(classWrapper.classNode(), fieldInsn)) {
-//          FieldRef fieldRef = FieldRef.of(fieldInsn); //This doesn`t work. Fields are still present in classes (maybe because they are private static final)
-//          context().removeField(fieldRef);
+          classWrapper.fields().removeIf(fieldNode -> fieldNode.name.equals(fieldInsn.name) && fieldNode.desc.equals(fieldInsn.desc));
           boolean ifNeJump = fieldInsn.desc.equals("Z");
           int varIndex = ((VarInsnNode) varStore.captures().get("stored-var").insn()).var;
           toRemove.addAll(varStore.collectedInsns());
@@ -41,16 +40,7 @@ public class GuardProtectorFlowTransformer extends Transformer {
             int loadedVarIndex = ((VarInsnNode) jumpEquation.captures().get("loaded-var").insn()).var;
             JumpInsnNode jump = jumpEquation.captures().get("stored-jump").insn().asJump();
             if ((ifNeJump && jump.getOpcode() == IFNE) || (!ifNeJump && jump.getOpcode() == IFEQ) && varIndex == loadedVarIndex) {
-//              if (jump.label != null) {
-//                toRemove.add(jump.label);
-//                markChange();
-//                methodNode.instructions.forEach(insn -> {
-//                  if (isInsnInLabelRange(methodNode, jump.label, insn)) {
-//                    toRemove.add(insn);
-//                  }
-//                });
-//              }
-              methodNode.instructions.insert(jump, new JumpInsnNode(GOTO, jump.label));
+              //methodNode.instructions.insert(jump, new JumpInsnNode(GOTO, jump.label));
               toRemove.addAll(jumpEquation.collectedInsns());
               markChange();
             }
