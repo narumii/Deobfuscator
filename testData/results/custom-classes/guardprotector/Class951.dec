@@ -16,8 +16,6 @@ public class Class951 {
     private static final ScheduledExecutorService field2971 = Executors.newScheduledThreadPool(1);
     private static int field2972 = 325170080;
     private static long[] field2973;
-    private static final int field2974;
-    private static final int field2975;
 
     @Class295
     public static synchronized void method3419(Class320 var0) {
