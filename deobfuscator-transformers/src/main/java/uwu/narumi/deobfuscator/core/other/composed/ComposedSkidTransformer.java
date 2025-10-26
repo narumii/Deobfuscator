@@ -9,6 +9,11 @@ import uwu.narumi.deobfuscator.core.other.impl.skidfuscator.*;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
 
+/**
+ * SkidFuscator 2.0.11 Community version
+ * https://github.com/skidfuscatordev/skidfuscator-java-obfuscator
+ */
+
 public class ComposedSkidTransformer extends ComposedTransformer {
 
     public ComposedSkidTransformer() {
