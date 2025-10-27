@@ -76,10 +76,12 @@ public class SkidFlowTransformer extends Transformer {
       JumpMatch.of().capture("jump").findAllMatches(methodContext).forEach(matchContext -> {
         JumpInsnNode jumpInsnNode = matchContext.captures().get("jump").insn().asJump();
         if (jumpInsnNode.label.getNext() instanceof LdcInsnNode intLdc && jumpInsnNode.label.getNext(2) instanceof VarInsnNode varStore && jumpInsnNode.label.getNext(3) instanceof JumpInsnNode jump1) {
+          if (blessedJumpLabels.contains(jump1.label)) return;
           methodNode.instructions.remove(varStore);
           methodNode.instructions.remove(intLdc);
           methodNode.instructions.insert(jump1.label, varStore);
           methodNode.instructions.insert(jump1.label, intLdc);
+          blessedJumpLabels.add(jump1.label);
           markChange();
         }
         LdcInsnNode lastLdcOfLabel = null;
@@ -95,8 +97,11 @@ public class SkidFlowTransformer extends Transformer {
           setVarJump.findAllMatches(methodContext).forEach(matchContext1 -> {
             if (finalLastLdcOfLabel.cst instanceof Integer && matchContext1.captures().get("salt1").insn().asInteger() == (int) finalLastLdcOfLabel.cst) {
               VarInsnNode var = (VarInsnNode) matchContext1.captures().get("var").insn();
+              LabelNode blessedLabel = matchContext1.captures().get("jump").insn().asJump().label;
+              if (blessedJumpLabels.contains(blessedLabel)) return;
               methodNode.instructions.insert(matchContext1.captures().get("jump").insn().asJump().label, new VarInsnNode(ISTORE, var.var));
               methodNode.instructions.insert(matchContext1.captures().get("jump").insn().asJump().label, new LdcInsnNode(finalLastLdcOfLabel.cst));
+              blessedJumpLabels.add(blessedLabel);
             }
           });
         }
@@ -134,6 +139,7 @@ public class SkidFlowTransformer extends Transformer {
   }
 
   private final static Set<LabelNode> blessedLabels = new HashSet<>();
+  private final static Set<LabelNode> blessedJumpLabels = new HashSet<>();
 
   public int m1(int n) {
     if (n != 0) {
