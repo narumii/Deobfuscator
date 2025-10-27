@@ -60,9 +60,9 @@ public class SkidFlowTransformer extends Transformer {
       });
 
       /** Example
-        *   ldc 952006311
-        *   invokestatic ikjlkypytwnvkuzi/erfobcthglyygbhq.jwmyqfvhltjhsidh (I)I
-      * */
+       *   ldc 952006311
+       *   invokestatic ikjlkypytwnvkuzi/erfobcthglyygbhq.jwmyqfvhltjhsidh (I)I
+       * */
       staticDecryption.findAllMatches(methodContext).forEach(matchContext -> {
         MethodInsnNode methodInsnNode = matchContext.captures().get("predicate-method").insn().asMethodInsn();
         AbstractInsnNode salt = matchContext.captures().get("salt").insn();
@@ -76,10 +76,12 @@ public class SkidFlowTransformer extends Transformer {
       JumpMatch.of().capture("jump").findAllMatches(methodContext).forEach(matchContext -> {
         JumpInsnNode jumpInsnNode = matchContext.captures().get("jump").insn().asJump();
         if (jumpInsnNode.label.getNext() instanceof LdcInsnNode intLdc && jumpInsnNode.label.getNext(2) instanceof VarInsnNode varStore && jumpInsnNode.label.getNext(3) instanceof JumpInsnNode jump1) {
+          if (blessedJumpLabels.contains(jump1.label)) return;
           methodNode.instructions.remove(varStore);
           methodNode.instructions.remove(intLdc);
           methodNode.instructions.insert(jump1.label, varStore);
           methodNode.instructions.insert(jump1.label, intLdc);
+          blessedJumpLabels.add(jump1.label);
           markChange();
         }
         LdcInsnNode lastLdcOfLabel = null;
@@ -95,45 +97,49 @@ public class SkidFlowTransformer extends Transformer {
           setVarJump.findAllMatches(methodContext).forEach(matchContext1 -> {
             if (finalLastLdcOfLabel.cst instanceof Integer && matchContext1.captures().get("salt1").insn().asInteger() == (int) finalLastLdcOfLabel.cst) {
               VarInsnNode var = (VarInsnNode) matchContext1.captures().get("var").insn();
+              LabelNode blessedLabel = matchContext1.captures().get("jump").insn().asJump().label;
+              if (blessedJumpLabels.contains(blessedLabel)) return;
               methodNode.instructions.insert(matchContext1.captures().get("jump").insn().asJump().label, new VarInsnNode(ISTORE, var.var));
               methodNode.instructions.insert(matchContext1.captures().get("jump").insn().asJump().label, new LdcInsnNode(finalLastLdcOfLabel.cst));
+              blessedJumpLabels.add(blessedLabel);
             }
           });
         }
       });
 
       if (!isChanged()) {
-          MatchContext matchContext = SequenceMatch.of(NumberMatch.numInteger().capture("hash"), OpcodeMatch.of(ISTORE).capture("param"), Match.of(ctx -> ctx.insn() instanceof LabelNode).capture("label")).doNotSkipLabels().findFirstMatch(methodContext);
-          if (matchContext != null) {
-            int salt = matchContext.captures().get("hash").insn().asInteger();
-            int param = ((VarInsnNode)matchContext.captures().get("param").insn()).var;
-            LabelNode label = (LabelNode) matchContext.captures().get("label").insn();
-            if (label.getNext() instanceof JumpInsnNode jumpInsnNode) label = jumpInsnNode.label;
-            if (blessedLabels.contains(label)) return;
-            LabelNode finalLabel = label;
-            methodNode.tryCatchBlocks.forEach(tcb -> {
-              if (finalLabel.equals(tcb.start) || finalLabel.equals(tcb.handler) || finalLabel.equals(tcb.end)) {
-                methodNode.instructions.insert(tcb.start, new VarInsnNode(ISTORE, param));
-                methodNode.instructions.insert(tcb.start, new LdcInsnNode(salt));
-                methodNode.instructions.insert(tcb.handler, new VarInsnNode(ISTORE, param));
-                methodNode.instructions.insert(tcb.handler, new LdcInsnNode(salt));
-                methodNode.instructions.insert(tcb.end, new VarInsnNode(ISTORE, param));
-                methodNode.instructions.insert(tcb.end, new LdcInsnNode(salt));
-                blessedLabels.add(tcb.start);
-                blessedLabels.add(tcb.handler);
-                blessedLabels.add(tcb.end);
-              }
-            });
-            methodNode.instructions.insert(label, new VarInsnNode(ISTORE, param));
-            methodNode.instructions.insert(label, new LdcInsnNode(salt));
-            markChange();
-            blessedLabels.add(label);
-          }
+        MatchContext matchContext = SequenceMatch.of(NumberMatch.numInteger().capture("hash"), OpcodeMatch.of(ISTORE).capture("param"), Match.of(ctx -> ctx.insn() instanceof LabelNode).capture("label")).doNotSkipLabels().findFirstMatch(methodContext);
+        if (matchContext != null) {
+          int salt = matchContext.captures().get("hash").insn().asInteger();
+          int param = ((VarInsnNode)matchContext.captures().get("param").insn()).var;
+          LabelNode label = (LabelNode) matchContext.captures().get("label").insn();
+          if (label.getNext() instanceof JumpInsnNode jumpInsnNode) label = jumpInsnNode.label;
+          if (blessedLabels.contains(label)) return;
+          LabelNode finalLabel = label;
+          methodNode.tryCatchBlocks.forEach(tcb -> {
+            if (finalLabel.equals(tcb.start) || finalLabel.equals(tcb.handler) || finalLabel.equals(tcb.end)) {
+              methodNode.instructions.insert(tcb.start, new VarInsnNode(ISTORE, param));
+              methodNode.instructions.insert(tcb.start, new LdcInsnNode(salt));
+              methodNode.instructions.insert(tcb.handler, new VarInsnNode(ISTORE, param));
+              methodNode.instructions.insert(tcb.handler, new LdcInsnNode(salt));
+              methodNode.instructions.insert(tcb.end, new VarInsnNode(ISTORE, param));
+              methodNode.instructions.insert(tcb.end, new LdcInsnNode(salt));
+              blessedLabels.add(tcb.start);
+              blessedLabels.add(tcb.handler);
+              blessedLabels.add(tcb.end);
+            }
+          });
+          methodNode.instructions.insert(label, new VarInsnNode(ISTORE, param));
+          methodNode.instructions.insert(label, new LdcInsnNode(salt));
+          markChange();
+          blessedLabels.add(label);
+        }
       }
     }));
   }
 
   private final static Set<LabelNode> blessedLabels = new HashSet<>();
+  private final static Set<LabelNode> blessedJumpLabels = new HashSet<>();
 
   public int m1(int n) {
     if (n != 0) {
