@@ -6,6 +6,7 @@ import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.*;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineLocalVariablesTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.skidfuscator.*;
+import uwu.narumi.deobfuscator.core.other.impl.universal.StringBuilderTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
 
@@ -39,7 +40,8 @@ public class ComposedSkidTransformer extends ComposedTransformer {
               )
           ),
           SkidStringTransformer::new,
-          SkidCleanTransformer::new
+          SkidCleanTransformer::new,
+          StringBuilderTransformer::new /* Sometimes SkidFuscator replaces concat's with StringBuilder for "optimization" */
       );
     }
 }
