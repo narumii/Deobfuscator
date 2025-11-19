@@ -8,16 +8,13 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.FieldRef;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
-import uwu.narumi.deobfuscator.api.asm.MethodlessInsnContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
 import uwu.narumi.deobfuscator.api.asm.matcher.group.SequenceMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.*;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 // TODO: string array support
 public class GruntStringTransformer extends Transformer {
@@ -35,7 +32,7 @@ public class GruntStringTransformer extends Transformer {
 
   private static final Match stringPoolAdditionMatch = SequenceMatch.of(
       FieldMatch.getStatic().capture("stringPool"),
-      NumberMatch.of().capture("index"), // index
+      NumberMatch.of().capture("index"),
       StringMatch.of().capture("enc"),
       MethodMatch.invokeVirtual().owner("java/lang/String").name("toCharArray").desc("()[C"),
       NumberMatch.numLong().capture("seed"),
@@ -81,7 +78,7 @@ public class GruntStringTransformer extends Transformer {
     return m.captures().get("key").insn().asInteger();
   }
 
-  private void imobfuscatingdogclientrnmightratittrust(@NotNull ClassWrapper c) {
+  private void deobfClass(@NotNull ClassWrapper c) {
     final var initOpt = c.findClInit();
     if (initOpt.isEmpty()) return;
     final var init = initOpt.get();
@@ -129,17 +126,22 @@ public class GruntStringTransformer extends Transformer {
     FieldRef spr = stringPoolRef;
     c.methods().forEach(method -> {
       if (method.instructions.size() <= 0) {
+//        LOGGER.info("awesome library");
         return;
       }
       for (final var insn : method.instructions) {
         if (spr != null
-            && insn instanceof FieldInsnNode fin
-            && spr.equals(FieldRef.of(fin))) {
+            && insn instanceof FieldInsnNode fin) {
           var idxInsn = fin.next(1);
           var aaload = fin.next(2);
-          if (aaload.getOpcode() != AALOAD) return;
           var idx = idxInsn.asInteger();
-          init.instructions.insertBefore(insn, new LdcInsnNode(this.classNameToStringPool.get(c.name())[idx]));
+          var dec = this.classNameToStringPool.get(c.name())[idx];
+          if (aaload.getOpcode() != AALOAD) {
+//            LOGGER.info("not an aaload for {} -> {}", idx, dec);
+            return;
+          }
+//          LOGGER.info("{} -> {}", idx, dec);
+          init.instructions.insertBefore(insn, new LdcInsnNode(dec));
           init.instructions.remove(insn);
           init.instructions.remove(idxInsn);
           init.instructions.remove(aaload);
@@ -154,6 +156,6 @@ public class GruntStringTransformer extends Transformer {
 
   @Override
   protected void transform() throws Exception {
-    scopedClasses().forEach(this::imobfuscatingdogclientrnmightratittrust);
+    scopedClasses().forEach(this::deobfClass);
   }
 }
