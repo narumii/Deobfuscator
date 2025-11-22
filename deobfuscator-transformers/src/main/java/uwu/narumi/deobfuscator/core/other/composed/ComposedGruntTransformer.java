@@ -8,9 +8,9 @@ import uwu.narumi.deobfuscator.core.other.impl.universal.AccessRepairTransformer
 import uwu.narumi.deobfuscator.core.other.impl.universal.InlinePureFunctionsTransformer;
 
 /**
- * https://github.com/SpartanB312/Grunt
+ * <a href="https://github.com/SpartanB312/Grunt">https://github.com/SpartanB312/Grunt</a>
+ * This was tested for Grunt 2.x (Gruntpocalypse), it may not work on newer versions.
  */
-// TODO: String encryption
 public class ComposedGruntTransformer extends ComposedTransformer {
   public ComposedGruntTransformer() {
     super(
@@ -23,6 +23,7 @@ public class ComposedGruntTransformer extends ComposedTransformer {
             // Inline pure functions
             InlinePureFunctionsTransformer::new
         ),
+        // Decrypt strings
         GruntStringTransformer::new
     );
   }

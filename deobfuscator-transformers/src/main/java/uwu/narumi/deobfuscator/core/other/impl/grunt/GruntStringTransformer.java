@@ -20,6 +20,10 @@ import java.util.Map;
 import java.util.Optional;
 
 // TODO: string array support
+
+/**
+ * A string transformer for Gruntpocalypse (2.x / the main branch in their repo)
+ */
 public class GruntStringTransformer extends Transformer {
 
   /**
