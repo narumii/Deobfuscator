@@ -2,7 +2,6 @@ package uwu.narumi.deobfuscator.core.other.impl.grunt;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
@@ -113,7 +112,7 @@ public class GruntStringTransformer extends Transformer {
           pool[i] = str;
         }
         this.classNameToStringPool.put(c.name(), pool);
-        Match lol = SequenceMatch.of(
+        var lol = SequenceMatch.of(
             NumberMatch.numInteger(),
             OpcodeMatch.of(ANEWARRAY),
             FieldMatch.putStatic().fieldRef(stringPoolRef),
@@ -123,30 +122,25 @@ public class GruntStringTransformer extends Transformer {
             .removeAll();
       }
     }
-    FieldRef spr = stringPoolRef;
+    var spr = stringPoolRef;
+    var stringPoolUse = SequenceMatch.of(
+        FieldMatch.getStatic().fieldRef(spr),
+        NumberMatch.numInteger().capture("index"),
+        OpcodeMatch.of(AALOAD)
+    );
+    final var pool = this.classNameToStringPool.get(c.name());
     c.methods().forEach(method -> {
-      if (method.instructions.size() <= 0) {
-//        LOGGER.info("awesome library");
-        return;
-      }
-      for (final var insn : method.instructions) {
-        if (spr != null
-            && insn instanceof FieldInsnNode fin) {
-          var idxInsn = fin.next(1);
-          var aaload = fin.next(2);
-          var idx = idxInsn.asInteger();
-          var dec = this.classNameToStringPool.get(c.name())[idx];
-          if (aaload.getOpcode() != AALOAD) {
-//            LOGGER.info("not an aaload for {} -> {}", idx, dec);
-            return;
-          }
-//          LOGGER.info("{} -> {}", idx, dec);
-          init.instructions.insertBefore(insn, new LdcInsnNode(dec));
-          init.instructions.remove(insn);
-          init.instructions.remove(idxInsn);
-          init.instructions.remove(aaload);
-          markChange();
+      var ms = stringPoolUse.findAllMatches(MethodContext.of(c, method));
+      for (final var m : ms) {
+        final var i = m.captures().get("index").insn().asInteger();
+        final var dec = pool[i];
+        if (dec == null) {
+          LOGGER.warn("Couldn't find a string in the string pool for encrypted string at {}", i);
+          continue;
         }
+        method.instructions.insertBefore(m.insn(), new LdcInsnNode(dec));
+        m.removeAll();
+        markChange();
       }
     });
     if (init.instructions.size() <= 0) {
