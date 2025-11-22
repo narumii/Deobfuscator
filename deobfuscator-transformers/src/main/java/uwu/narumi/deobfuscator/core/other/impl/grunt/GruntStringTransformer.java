@@ -118,8 +118,9 @@ public class GruntStringTransformer extends Transformer {
             FieldMatch.putStatic().fieldRef(stringPoolRef),
             MethodMatch.invokeStatic().owner(min.owner).name(min.name).desc(min.desc)
         );
-        lol.findFirstMatch(MethodContext.of(c, init))
-            .removeAll();
+        final var ffm = lol.findFirstMatch(MethodContext.of(c, init));
+        if (ffm != null)
+            ffm.removeAll();
       }
     }
     var spr = stringPoolRef;
