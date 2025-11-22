@@ -8,6 +8,7 @@ import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.FieldRef;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.Match;
+import uwu.narumi.deobfuscator.api.asm.matcher.MatchContext;
 import uwu.narumi.deobfuscator.api.asm.matcher.group.SequenceMatch;
 import uwu.narumi.deobfuscator.api.asm.matcher.impl.*;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
@@ -110,6 +111,7 @@ public class GruntStringTransformer extends Transformer {
           if (classKey == null) return;
           var str = decrypt(classKey, enc.toCharArray(), seed, key);
           pool[i] = str;
+          // TODO: remove decrypt method
         }
         this.classNameToStringPool.put(c.name(), pool);
         var lol = SequenceMatch.of(
@@ -121,6 +123,8 @@ public class GruntStringTransformer extends Transformer {
         final var ffm = lol.findFirstMatch(MethodContext.of(c, init));
         if (ffm != null)
             ffm.removeAll();
+        ms.forEach(MatchContext::removeAll);
+        c.methods().remove(r);
       }
     }
     var spr = stringPoolRef;
@@ -144,6 +148,8 @@ public class GruntStringTransformer extends Transformer {
         markChange();
       }
     });
+    // owner check is useless I think
+    c.fields().removeIf(f -> f.name.equals(spr.name()) && f.desc.equals(spr.desc()));
     if (init.instructions.size() <= 0) {
       c.methods().remove(init);
     }
