@@ -85,7 +85,7 @@ public class GruntStringTransformer extends Transformer {
     return m.captures().get("key").insn().asInteger();
   }
 
-  // removes everything matched AND the decrypt metho
+  // removes everything matched AND the decrypt method
   private void removeAll(MatchContext ctx) {
     ctx.removeAll();
     final var m = ctx.captures().get("decryptMethod").insn().asMethodInsn();
