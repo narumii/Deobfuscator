@@ -4,7 +4,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 import uwu.narumi.deobfuscator.api.asm.ClassWrapper;
 import uwu.narumi.deobfuscator.api.asm.FieldRef;
 import uwu.narumi.deobfuscator.api.asm.MethodContext;
@@ -17,7 +16,6 @@ import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 // TODO: string array support
 
@@ -92,11 +90,6 @@ public class GruntStringTransformer extends Transformer {
     context().removeMethod(MethodRef.of(m));
   }
 
-  private Optional<MethodNode> resolve(MethodInsnNode m) {
-    ClassWrapper classWrapper = context().getClassesMap().get(m.owner);
-    return classWrapper.findMethod(m);
-  }
-
 
   private void deobfClass(@NotNull ClassWrapper c) {
     final var initOpt = c.findClInit();
@@ -105,7 +98,7 @@ public class GruntStringTransformer extends Transformer {
     FieldRef stringPoolRef = null;
     for (final var insn : init.instructions) {
       if (insn instanceof MethodInsnNode min) {
-        final var resolved = resolve(min);
+        final var resolved = context().resolveMethod(min);
         if (resolved.isEmpty()) return;
         var r = resolved.get();
         var ms = stringPoolAdditionMatch.findAllMatches(MethodContext.of(c, r));
@@ -144,6 +137,7 @@ public class GruntStringTransformer extends Transformer {
             ffm.removeAll();
         ms.forEach(this::removeAll);
         c.methods().remove(r);
+        break;
       }
     }
     var spr = stringPoolRef;
