@@ -3,6 +3,7 @@ package uwu.narumi.deobfuscator.core.other.composed;
 import uwu.narumi.deobfuscator.api.transformer.ComposedTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedGeneralFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.grunt.GruntConstantPoolTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.grunt.GruntInvokeDynamicTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.grunt.GruntStringTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.AccessRepairTransformer;
@@ -24,10 +25,12 @@ public class ComposedGruntTransformer extends ComposedTransformer {
             // Inline pure functions
             InlinePureFunctionsTransformer::new
         ),
+        // Fix invoke dynamics (BEFORE decrypting strings)
+        GruntInvokeDynamicTransformer::new,
         // Decrypt strings
-        GruntStringTransformer::new,
+        GruntStringTransformer::new
         // Decrypt constant pool
-        GruntConstantPoolTransformer::new
+//        GruntConstantPoolTransformer::new
     );
   }
 }
