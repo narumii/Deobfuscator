@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 // TODO: implement more than just string decryption
+// FIXME: integer overflow thing lol
 
 public class GruntConstantPoolTransformer extends Transformer {
 
@@ -44,7 +45,7 @@ public class GruntConstantPoolTransformer extends Transformer {
     invokestatic Main$ConstantPool.oWK5cSQDnT (Ljava/lang/String;)Ljava/lang/String;
     putstatic Main$ConstantPool.const_z9Fqaiy9srSMb26 Ljava/lang/String;
   */
-  private static final Match lol = SequenceMatch.of(
+  private static final Match strConstantInitializer = SequenceMatch.of(
       StringMatch.of().capture("enc"),
       MethodMatch.invokeStatic().desc("(Ljava/lang/String;)Ljava/lang/String;").capture("decryptMethod"),
       FieldMatch.putStatic().desc("Ljava/lang/String;").capture("field")
@@ -102,7 +103,7 @@ public class GruntConstantPoolTransformer extends Transformer {
   );
 
   private static @NotNull String strDecInit(char[] e, int classKey, long k1, long k2) {
-    int n2 = Math.toIntExact(classKey ^ k2);
+    int n2 = classKey ^ (int)k2;
     for (int i = 0; i < e.length; ++i) {
       n2 = n2 ^ (int)k1 ^ ~i;
       n2 = Math.toIntExact(-(n2 ^ k2 - (long) i * e.length) * k2 | i);
@@ -124,67 +125,84 @@ public class GruntConstantPoolTransformer extends Transformer {
     return b.toString();
   }
 
-  private static @NotNull Map<String, String> getConstantPoolFromConstantPoolClass(ClassWrapper constantPool) {
+  private @NotNull Map<String, String> getConstantPoolFromConstantPoolClass(ClassWrapper constantPool) {
     final var a = constantPool.findClInit();
     if (a.isEmpty()) return Collections.emptyMap();
     final var clInit = a.get();
     final var map = new HashMap<String, String>();
-    for (final var insn : clInit.instructions) {
-      if (!(insn instanceof MethodInsnNode min)) continue;
-      // TODO: lazy lol
+    final var matches = strConstantInitializer.findAllMatches(MethodContext.of(constantPool, clInit));
+    for (final var m : matches) {
+      final var c = m.captures();
+      final var enc = c.get("enc").insn().asString();
+      final var decryptMethod = c.get("decryptMethod").insn().asMethodInsn();
+      final var field = c.get("field").insn().asFieldInsn();
+      final var ctxO = context().resolveMethodCtx(decryptMethod);
+      if (ctxO.isEmpty()) {
+        LOGGER.warn("Couldn't find decrypt method when iterating through constants");
+        continue;
+      }
+      final var ctx = ctxO.orElseThrow();
+      final var ffm = finalDecMatch.findFirstMatch(ctx);
+      if (ffm == null) {
+        LOGGER.error("Couldn't match the final decrypt method when iterating through constants");
+        continue;
+      }
+      final var k = ffm.captures().get("key").insn().asInteger();
+      final var dec = stringDecryptFinal(enc, k);
+      LOGGER.info("Decrypt {} -> {}", enc, dec);
+      map.put(field.name, dec);
     }
     return map;
   }
 
   @Override
   protected void transform() throws Exception {
-    scopedClasses().forEach(c -> {
-      final var cliOpt = c.findClInit();
-      if (cliOpt.isEmpty()) return;
-      final var clInit = cliOpt.get();
-      for (final var insn : clInit.instructions) {
-        if (!(insn instanceof MethodInsnNode min)) continue;
-        final var methodOpt = context().resolveMethod(min);
-        if (methodOpt.isEmpty()) return;
-        final var method = methodOpt.get();
-        var ms = constantPoolCacheAdditionMatch.findAllMatches(MethodContext.of(c, method));
-        if (ms.isEmpty()) {
-          LOGGER.warn("couldn't find any encrypted constants in {}#{}{}", min.owner, min.name, min.desc);
+    scopedClasses().forEach(this::decryptClass);
+  }
+
+  private void decryptClass(ClassWrapper c) {
+    final var cliOpt = c.findClInit();
+    if (cliOpt.isEmpty()) return;
+    final var clInit = cliOpt.get();
+    for (final var insn : clInit.instructions) {
+      if (!(insn instanceof MethodInsnNode min)) continue;
+      final var methodOpt = context().resolveMethod(min);
+      if (methodOpt.isEmpty()) return;
+      final var method = methodOpt.get();
+      var ms = constantPoolCacheAdditionMatch.findAllMatches(MethodContext.of(c, method));
+      if (ms.isEmpty()) {
+        LOGGER.warn("couldn't find any encrypted constants in {}#{}{}", min.owner, min.name, min.desc);
+        continue;
+      }
+      Map<String, String> classPool = null;
+      for (final var m : ms) {
+        final var caps = m.captures();
+        final var cv = caps.get("constantVar").insn().asFieldInsn();
+        final var idx = caps.get("index").insn().asInteger();
+        final var k1 = caps.get("k1").insn().asLong();
+        final var k2 = caps.get("k2").insn().asInteger();
+        final var dmI = caps.get("decryptMethod").insn().asMethodInsn();
+
+        final var f = context().resolveField(FieldRef.of(cv)).orElseThrow();
+        final var decMethodCls = context().getClassesMap().get(dmI.owner);
+        final var decMethod = decMethodCls.findMethod(dmI).orElseThrow();
+        final var decMethodMatch = initDecMatch.findFirstMatch(MethodContext.of(decMethodCls, decMethod));
+
+        if (decMethodMatch == null) {
+          LOGGER.warn("Failed to find the initial decryption method on {}#{}{}.", dmI.owner, dmI.name, dmI.desc);
           continue;
         }
-        for (final var m : ms) {
-          final var caps = m.captures();
-          final var cv = caps.get("constantVar").insn().asFieldInsn();
-          final var idx = caps.get("index").insn().asInteger();
-          final var k1 = caps.get("k1").insn().asLong();
-          final var k2 = caps.get("k2").insn().asInteger();
-          final var dmI = caps.get("decryptMethod").insn().asMethodInsn();
 
-          final var f = context().resolveField(FieldRef.of(cv)).orElseThrow();
-          final var decMethodCls = context().getClassesMap().get(dmI.owner);
-          final var decMethod = decMethodCls.findMethod(dmI).orElseThrow();
-          final var decMethodMatch = initDecMatch.findFirstMatch(MethodContext.of(decMethodCls, decMethod));
-          if (decMethodMatch == null) {
-            LOGGER.warn("Failed to find the initial decryption method on {}#{}{}.", dmI.owner, dmI.name, dmI.desc);
-            continue;
-          }
+        final var classKey = decMethodMatch.captures().get("k").insn().asInteger();
 
+        if (classPool == null) {
           final var constantPoolClass = context().getClassesMap().get(cv.owner);
-          final var cli = constantPoolClass.findClInit();
-          if (cli.isEmpty()) {
-            LOGGER.warn("Found encrypted constant pool class without a <clinit>.");
-            continue;
-          }
-          final var cl = cli.get();
-
-          final var a = lol.findAllMatches(MethodContext.of(constantPoolClass, cl));
-
-          final var classKey = decMethodMatch.captures().get("k").insn().asInteger();
-
-          final var sdi = strDecInit(((String)f.value).toCharArray(), classKey, k1, k2);
-          LOGGER.info("Initial decryption: {}", sdi);
+          classPool = getConstantPoolFromConstantPoolClass(constantPoolClass);
         }
+
+        final var sdi = strDecInit(classPool.get(cv.name).toCharArray(), classKey, k1, k2);
+        LOGGER.info("Initial decryption: {}", sdi);
       }
-    });
+    }
   }
 }

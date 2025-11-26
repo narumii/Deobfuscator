@@ -95,6 +95,15 @@ public class Context implements ClassProvider {
     ClassWrapper classWrapper = this.getClassesMap().get(m.owner());
     return classWrapper.findMethod(m);
   }
+  public Optional<MethodContext> resolveMethodCtx(MethodInsnNode m) {
+    ClassWrapper cw = this.getClassesMap().get(m.owner);
+    return cw.findMethod(m).map(a -> MethodContext.of(cw, a));
+  }
+
+  public Optional<MethodContext> resolveMethodCtx(MethodRef m) {
+    ClassWrapper classWrapper = this.getClassesMap().get(m.owner());
+    return classWrapper.findMethod(m).map(a -> MethodContext.of(classWrapper, a));
+  }
 
   public Optional<FieldNode> resolveField(FieldRef m) {
     ClassWrapper classWrapper = this.getClassesMap().get(m.owner());
