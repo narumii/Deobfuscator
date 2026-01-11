@@ -37,7 +37,6 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .transformers(StringBuilderTransformer::new)
         .inputClass(InputType.JAVA_CODE, "TestStringBuilderTransformer.class")
         .register();
-    // TODO: Uninitialized static fields should replace with 0?
     test("Inline static fields")
         .transformers(InlineStaticFieldTransformer::new, UselessPopCleanTransformer::new)
         .inputClass(InputType.JAVA_CODE, "TestInlineStaticFields.class")

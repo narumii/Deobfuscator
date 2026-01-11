@@ -2,6 +2,7 @@ package uwu.narumi.deobfuscator.api.transformer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -23,6 +24,9 @@ import java.util.function.Supplier;
 public abstract class Transformer extends AsmHelper implements Opcodes {
   protected static final Logger LOGGER = LogManager.getLogger();
 
+  // ThreadLocal to track transformer nesting depth for log indentation
+  private static final ThreadLocal<Integer> NESTING_DEPTH = ThreadLocal.withInitial(() -> 0);
+
   private Context context = null;
   private ClassWrapper scope = null;
 
@@ -32,6 +36,38 @@ public abstract class Transformer extends AsmHelper implements Opcodes {
 
   // Config
   protected boolean rerunOnChange = false;
+
+  /**
+   * Increases the nesting depth and updates ThreadContext for automatic log indentation
+   */
+  private static void increaseDepth() {
+    int newDepth = NESTING_DEPTH.get() + 1;
+    NESTING_DEPTH.set(newDepth);
+    updateIndentContext(newDepth);
+  }
+
+  /**
+   * Decreases the nesting depth and updates ThreadContext for automatic log indentation
+   */
+  private static void decreaseDepth() {
+    int depth = NESTING_DEPTH.get();
+    if (depth > 0) {
+      int newDepth = depth - 1;
+      NESTING_DEPTH.set(newDepth);
+      updateIndentContext(newDepth);
+    }
+  }
+
+  /**
+   * Updates ThreadContext with the indentation string (2 spaces per level)
+   */
+  private static void updateIndentContext(int depth) {
+    if (depth > 0) {
+      ThreadContext.put("indent", "  ".repeat(depth));
+    } else {
+      ThreadContext.remove("indent");
+    }
+  }
 
   /**
    * Should the transformer rerun if it changed something
@@ -109,14 +145,14 @@ public abstract class Transformer extends AsmHelper implements Opcodes {
    * @return Changes count
    */
   public static int transform(Supplier<@Nullable Transformer> transformerSupplier, @Nullable ClassWrapper scope, Context context) {
-    return transform(transformerSupplier, scope, context, false);
+    return transform(transformerSupplier, scope, context, 0);
   }
 
   private static int transform(
       Supplier<@Nullable Transformer> transformerSupplier,
       @Nullable ClassWrapper scope,
       Context context,
-      boolean reran
+      int rerunsCount
   ) {
     Transformer transformer = transformerSupplier.get();
     if (transformer == null) {
@@ -131,39 +167,46 @@ public abstract class Transformer extends AsmHelper implements Opcodes {
     // Initialize transformer
     transformer.init(context, scope);
 
-    LOGGER.info("-------------------------------------");
-    LOGGER.info("Running {} transformer", transformer.name());
+    LOGGER.info("▶ {} started", transformer.name());
     long start = System.currentTimeMillis();
 
-    // Run the transformer!
+    // Increase nesting depth for automatic log indentation
+    increaseDepth();
+
     try {
-      transformer.transform();
-    } catch (TransformerException e) {
-      LOGGER.error("! {}: {}", transformer.name(), e.getMessage());
-      return 0;
-    } catch (Exception e) {
-      LOGGER.error("Error occurred when transforming {}", transformer.name(), e);
-      if (!context.getOptions().continueOnError()) {
-        throw new RuntimeException(e);
+      // Run the transformer!
+      try {
+        transformer.transform();
+      } catch (TransformerException e) {
+        LOGGER.error("! {}: {}", transformer.name(), e.getMessage());
+        return 0;
+      } catch (Exception e) {
+        LOGGER.error("Error occurred when transforming {}", transformer.name(), e);
+        if (!context.getOptions().continueOnError()) {
+          throw new RuntimeException(e);
+        }
+        return 0;
+      } finally {
+        // Mark transformer that it was already used
+        transformer.hasRan = true;
       }
-      return 0;
+
+      LOGGER.info("Made {} changes", transformer.getChangesCount());
     } finally {
-      // Mark transformer that it was already used
-      transformer.hasRan = true;
+      // Decrease nesting depth when leaving this transformer
+      decreaseDepth();
+      LOGGER.info("◀ {} ended in {} ms", transformer.name(), (System.currentTimeMillis() - start));
     }
 
     int changesCount = transformer.getChangesCount();
 
-    LOGGER.info("Made {} changes", changesCount);
-    LOGGER.info("Ended {} transformer in {} ms", transformer.name(), (System.currentTimeMillis() - start));
-
     if (transformer.isChanged() && transformer.shouldRerunOnChange()) {
-      LOGGER.info("\uD83D\uDD04 Changes detected. Rerunning {} transformer", transformer.name());
-      changesCount += Transformer.transform(transformerSupplier, scope, context, true);
+      LOGGER.info("\uD83D\uDD04 Changes detected. Rerunning {} transformer (rerun {})", transformer.name(), rerunsCount + 1);
+      changesCount += Transformer.transform(transformerSupplier, scope, context, ++rerunsCount);
     }
 
     // Bytecode verification
-    if (context.getOptions().verifyBytecode() && !reran && transformer.isChanged()) {
+    if (context.getOptions().verifyBytecode() && rerunsCount == 0 && transformer.isChanged()) {
       // Verify if bytecode is valid
       try {
         verifyBytecode(scope, context);

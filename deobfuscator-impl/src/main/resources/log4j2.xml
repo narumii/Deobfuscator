@@ -2,10 +2,10 @@
 <Configuration status="WARN">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%highlight{[%d{HH:mm:ss}] [%level]: %msg%n%throwable}{INFO=normal}" disableAnsi="false"/>
+            <PatternLayout pattern="%highlight{[%d{HH:mm:ss}] [%level]: %X{indent}%msg%n%throwable}{INFO=normal}" disableAnsi="false"/>
         </Console>
         <File name="File" fileName="deobfuscator.log" immediateFlush="false" append="false">
-            <PatternLayout pattern="[%d{HH:mm:ss}] [%level]: %msg%n%throwable"/>
+            <PatternLayout pattern="[%d{HH:mm:ss}] [%level]: %X{indent}%msg%n%throwable"/>
         </File>
     </Appenders>
     <Loggers>
