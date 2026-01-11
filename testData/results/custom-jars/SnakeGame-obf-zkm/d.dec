@@ -14,11 +14,10 @@ public class d extends Thread {
     private static final String[] j;
     private static final long[] k;
     private static final Integer[] l;
-    private static final long m;
 
     d(long var1, c var3) {
         this.c = a(20214, 210489315596258668L ^ var1);
-        this.d = m;
+        this.d = 50L;
         this.f = new ArrayList<>();
         this.a = e.a;
         boolean var10000 = h;
@@ -520,7 +519,7 @@ public class d extends Thread {
         // 59: checkcast b
         // 5c: bipush 2
         // 5d: bipush 1
-        // 5e: anewarray 67
+        // 5e: anewarray 66
         // 61: dup_x1
         // 62: swap
         // 63: invokestatic java/lang/Integer.valueOf (I)Ljava/lang/Integer;
@@ -667,7 +666,6 @@ public class d extends Thread {
                                 if (var2 >= var5) {
                                     k = var6;
                                     l = new Integer[5];
-                                    m = 50L;
                                     return;
                                 }
                                 break;

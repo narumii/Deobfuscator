@@ -150,6 +150,11 @@ public class TestDeobfuscation extends TestDeobfuscationBase {
         .inputClass(InputType.CUSTOM_CLASS, "zkm/EnhancedStringEncManyStrings.class")
         .register();
 
+    test("Zelix - Field flow")
+        .transformers(ComposedZelixTransformer::new)
+        .inputClassesDir(InputType.CUSTOM_CLASS, "zkm/field-flow")
+        .register();
+
     // Example HP888 classes
     test("HP888")
         .transformers(() -> new ComposedHP888Transformer(".mc"))
