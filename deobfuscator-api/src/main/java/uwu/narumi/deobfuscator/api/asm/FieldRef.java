@@ -20,6 +20,6 @@ public record FieldRef(String owner, String name, String desc) {
 
   @Override
   public String toString() {
-    return owner + "." + name + desc;
+    return owner + "." + name + " " + desc;
   }
 }
