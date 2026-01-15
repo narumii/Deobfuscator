@@ -1,0 +1,22 @@
+package pack.tests.reflects.annot;
+
+import java.lang.reflect.Method;
+
+public class annot {
+    public String BRANCHLOCK_DOT_NET_DEMO;
+
+    public annot(int var1) {
+    }
+
+    public void run(int var1) {
+        annoe var2 = new annoe(10261);
+
+        for (Method var6 : annoe.class.getDeclaredMethods()) {
+            var6.setAccessible(true);
+            anno var7 = var6.getAnnotation(anno.class);
+            if (var7 != null && var7.val().equals("yes")) {
+                var6.invoke(var2);
+            }
+        }
+    }
+}

@@ -1,0 +1,34 @@
+package pack.tests.reflects.annot;
+
+import java.io.PrintStream;
+import java.lang.reflect.Field;
+
+public class annoe {
+    @anno(
+        val = "PASS"
+    )
+    private static final String fail = "WHAT";
+
+    @anno
+    public void dox() throws Exception {
+        String var3 = "FAIL";
+
+        for (Field var7 : annoe.class.getDeclaredFields()) {
+            var7.setAccessible(true);
+            anno var8 = var7.getAnnotation(anno.class);
+            if (var8 != null) {
+                var3 = var8.val();
+            }
+        }
+
+        PrintStream var15 = System.out;
+        var15.println(var3);
+    }
+
+    @anno(
+        val = "no"
+    )
+    public void dov() {
+        System.out.println("FAIL");
+    }
+}

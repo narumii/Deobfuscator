@@ -1,0 +1,17 @@
+package pack.tests.security;
+
+import java.security.Permission;
+
+public class Sman extends SecurityManager {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public Sman(int var1) {
+    }
+
+    @Override
+    public void checkPermission(Permission var1) {
+        if (var1.getName().contains("exitVM")) {
+            throw new SecurityException("HOOKED");
+        }
+    }
+}

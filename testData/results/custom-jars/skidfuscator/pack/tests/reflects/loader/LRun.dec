@@ -1,0 +1,16 @@
+package pack.tests.reflects.loader;
+
+import java.lang.reflect.Method;
+
+public class LRun {
+    public void run(int var1) throws Exception {
+        Loader var2 = new Loader();
+        Class var5 = var2.findClass("pack.tests.reflects.loader.LTest");
+        Object var6 = var5.newInstance();
+        String var15 = "run";
+        Class[] var17 = new Class[0];
+        Method var12 = var5.getMethod(var15, var17);
+        Object[] var19 = new Object[0];
+        var12.invoke(var6, var19);
+    }
+}

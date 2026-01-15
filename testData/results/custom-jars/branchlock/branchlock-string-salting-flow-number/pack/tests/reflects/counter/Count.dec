@@ -1,0 +1,12 @@
+package pack.tests.reflects.counter;
+
+public class Count {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public Count(int var1) {
+    }
+
+    public void run(int var1) {
+        System.out.println("PASS");
+    }
+}

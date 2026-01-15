@@ -1,0 +1,40 @@
+package pack.tests.security;
+
+import java.lang.reflect.Method;
+
+public class SecTest {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public SecTest(int var1) {
+    }
+
+    public void run(int var1) {
+        System.setSecurityManager(new Sman(31850));
+        System.out.print("FAIL");
+
+        try {
+            Method var2 = SecExec.class.getDeclaredMethod("doShutdown");
+            var2.setAccessible(true);
+            var2.invoke(null);
+        } catch (Throwable var6) {
+            Throwable var4 = var6;
+
+            while (true) {
+                Throwable var3 = var4.getCause();
+                if (var3 == null) {
+                    String var5 = var4.getMessage();
+                    if (var5 == null) {
+                        return;
+                    }
+
+                    if (var5.contains("HOOK")) {
+                        System.out.println("\b\b\b\bPASS");
+                    }
+                    break;
+                }
+
+                var4 = var3;
+            }
+        }
+    }
+}

@@ -1,0 +1,44 @@
+package pack.tests.reflects.field;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
+public class FTest {
+    public void run(int var1) throws Exception {
+        Class[] var36 = new Class[1];
+        Class var5 = int.class;
+        var36[0] = var5;
+        Constructor var6 = FObject.class.getDeclaredConstructor(var36);
+        if (var6.isAccessible()) {
+            System.out.println("FAIL");
+        } else {
+            var6.setAccessible(true);
+            Object[] var40 = new Object[1];
+            Integer var57 = 1;
+            var40[0] = var57;
+            FObject var7 = (FObject)var6.newInstance(var40);
+            String var41 = "add";
+            Method var8 = FObject.class.getDeclaredMethod(var41, null);
+            if (var8.isAccessible()) {
+                System.out.println("FAIL");
+            } else {
+                var8.setAccessible(true);
+                Object[] var54 = new Object[0];
+                var8.invoke(var7, var54);
+                String var45 = "i";
+                Field var9 = FObject.class.getDeclaredField(var45);
+                if (var9.isAccessible()) {
+                    System.out.println("FAIL");
+                } else {
+                    var9.setAccessible(true);
+                    if (var9.getInt(var7) != 4) {
+                        System.out.println("FAIL");
+                    } else {
+                        System.out.println("PASS");
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,59 @@
+package pack.tests.bench;
+
+public class Calc {
+    public static int count = 0;
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public Calc(int var1) {
+    }
+
+    public static void runAll(int var0) {
+        long var1 = System.currentTimeMillis();
+
+        for (int var3 = 0; var3 < 10000; var3++) {
+            call(100, 29033);
+            runAdd(25806);
+            runStr(31991);
+        }
+
+        System.out.println("Calc: " + (System.currentTimeMillis() - var1) + "ms");
+        if (count != 30000) {
+            throw new RuntimeException("[ERROR]: Errors occurred in calc!");
+        }
+    }
+
+    private static void runAdd(int var0) {
+        double var1 = 0.0;
+
+        while (var1 < 100.1) {
+            var1 += 0.99;
+        }
+
+        count++;
+    }
+
+    // $VF: Irreducible bytecode was duplicated to produce valid code
+    private static void runStr(int var0) {
+        String var1 = "";
+
+        while (true) {
+            label19: {
+                if (var1.length() < 101) {
+                    if (var0 >= 0) {
+                        break label19;
+                    }
+                } else {
+                    count++;
+                }
+
+                do {
+                    if (var0 >= 0) {
+                        return;
+                    }
+                } while (var0 < 0);
+            }
+
+            var1 = var1 + "ax";
+        }
+    }
+}

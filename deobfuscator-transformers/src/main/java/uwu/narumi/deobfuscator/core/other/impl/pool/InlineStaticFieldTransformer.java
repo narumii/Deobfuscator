@@ -1,5 +1,6 @@
 package uwu.narumi.deobfuscator.core.other.impl.pool;
 
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.analysis.BasicValue;
@@ -24,7 +25,7 @@ public class InlineStaticFieldTransformer extends Transformer {
   @Override
   protected void transform() throws Exception {
     Set<FieldRef> notConstantFields = new HashSet<>();
-    Map<FieldRef, AbstractInsnNode> staticConstantFields = new HashMap<>();
+    Map<FieldRef, AbstractInsnNode> staticConstantFields = new HashMap<>(); // field -> constant insn
 
     // Find all static constant fields
     scopedClasses().forEach(classWrapper -> findClInit(classWrapper.classNode()).ifPresent(clInit -> {
@@ -61,16 +62,23 @@ public class InlineStaticFieldTransformer extends Transformer {
           });
     }));
 
-    // Also account for FieldNode#value
+    // Also account for FieldNode#value and default field type value
     scopedClasses().forEach(classWrapper -> {
       classWrapper.classNode().fields.forEach(fieldNode -> {
-        if (fieldNode.value != null) {
-          FieldRef fieldRef = FieldRef.of(classWrapper.classNode(), fieldNode);
+        FieldRef fieldRef = FieldRef.of(classWrapper.classNode(), fieldNode);
 
-          if (!staticConstantFields.containsKey(fieldRef)) {
-            // Add it to static constant fields
-            staticConstantFields.put(fieldRef, AsmHelper.toConstantInsn(fieldNode.value));
-          }
+        if (notConstantFields.contains(fieldRef)) return;
+
+        Object value = fieldNode.value;
+        // If value is null, get the default value for type
+        if (value == null) {
+          Type fieldType = Type.getType(fieldNode.desc);
+          value = AsmHelper.getDefaultTypeValue(fieldType);
+        }
+
+        if (!staticConstantFields.containsKey(fieldRef)) {
+          // Add it to static constant fields
+          staticConstantFields.put(fieldRef, AsmHelper.toConstantInsn(value));
         }
       });
     });

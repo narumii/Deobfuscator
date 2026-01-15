@@ -1,0 +1,23 @@
+package pack.tests.basics.accu;
+
+public class Digi {
+    public String BRANCHLOCK_DOT_NET_DEMO;
+
+    public Digi(int var1) {
+    }
+
+    public void run(int var1) {
+        double var2 = 0.0;
+        int var4 = 0;
+
+        do {
+            var2 += 1.0E-18;
+        } while (++var4 <= 100 && (float)var2 != 2.0E-17F);
+
+        if (var4 == 20) {
+            System.out.println("PASS");
+        } else {
+            System.out.println("FAIL");
+        }
+    }
+}

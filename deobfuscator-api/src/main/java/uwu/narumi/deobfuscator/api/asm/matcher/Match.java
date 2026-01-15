@@ -8,6 +8,7 @@ import uwu.narumi.deobfuscator.api.asm.MethodContext;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -70,6 +71,10 @@ public abstract class Match {
   @Nullable
   public MatchContext findFirstMatch(MethodContext methodContext) {
     return this.findAllMatches(methodContext).stream().findFirst().orElse(null);
+  }
+
+  public Optional<MatchContext> findAny(MethodContext methodContext) {
+    return this.findAllMatches(methodContext).stream().findAny();
   }
 
   /**

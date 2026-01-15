@@ -1,0 +1,18 @@
+package pack.tests.basics.inner;
+
+public class Test {
+    public String BRANCHLOCK_DOT_NET_DEMO;
+
+    public void run() {
+        Exec var1 = new Exec();
+        Exec.Inner var2 = var1.new Inner(var1, 3);
+        var2.doAdd();
+        Exec.Inner var3 = var1.new Inner(var1, 100);
+        var3.doAdd();
+        if (var1.fuss == 108) {
+            System.out.println("PASS");
+        } else {
+            System.out.println("ERROR");
+        }
+    }
+}

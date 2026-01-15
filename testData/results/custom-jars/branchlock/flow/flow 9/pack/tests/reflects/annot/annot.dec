@@ -1,0 +1,27 @@
+package pack.tests.reflects.annot;
+
+import java.lang.reflect.Method;
+import pack.tests.reflects.counter.Countee;
+import pack.tests.reflects.retrace.Tracer;
+
+public class annot {
+    public void run() throws Exception {
+        annoe var1 = new annoe();
+
+        for (Method var5 : annoe.class.getDeclaredMethods()) {
+            var5.setAccessible(true);
+            anno var6 = var5.getAnnotation(anno.class);
+            if (var6 != null && var6.val().equals("yes")) {
+                var5.invoke(var1);
+            }
+        }
+    }
+
+    public static Throwable I(Throwable var0) {
+        if (Tracer.I == null) {
+            Countee.I = var0;
+        }
+
+        return var0;
+    }
+}

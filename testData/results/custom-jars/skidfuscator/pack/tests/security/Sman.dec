@@ -1,0 +1,14 @@
+package pack.tests.security;
+
+import java.security.Permission;
+
+public class Sman extends SecurityManager {
+    @Override
+    public void checkPermission(Permission var1) {
+        if (var1.getName().contains("exitVM")) {
+            String var4 = "HOOKED";
+            SecurityException var7 = new SecurityException(var4);
+            throw var7;
+        }
+    }
+}

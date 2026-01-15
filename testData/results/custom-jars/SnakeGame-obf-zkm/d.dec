@@ -14,11 +14,10 @@ public class d extends Thread {
     private static final String[] j = new String[2];
     private static final long[] k;
     private static final Integer[] l;
-    private static final long m;
 
     d(long var1, c var3) {
         this.c = a(20214, 210489315596258668L ^ var1);
-        this.d = m;
+        this.d = 50L;
         this.f = new ArrayList<>();
         this.a = e.a;
         boolean var10000 = h;
@@ -194,7 +193,7 @@ public class d extends Thread {
                 return;
             }
 
-            System.out.println(a(879106065, -879064062, (int)var1));
+            System.out.println(a(879106065, -879129598, (int)var1));
             this.c++;
             this.g = this.a(new Object[]{var4});
         }
@@ -203,7 +202,7 @@ public class d extends Thread {
     }
 
     private void c(long var1) {
-        System.out.println(a(672771037, -672779940, (int)var1));
+        System.out.println(a(672836573, -672845476, (int)var1));
 
         while (true) {
             this.a(new Object[0]);
@@ -520,7 +519,7 @@ public class d extends Thread {
         // 59: checkcast b
         // 5c: bipush 2
         // 5d: bipush 1
-        // 5e: anewarray 67
+        // 5e: anewarray 66
         // 61: dup_x1
         // 62: swap
         // 63: invokestatic java/lang/Integer.valueOf (I)Ljava/lang/Integer;
@@ -614,11 +613,63 @@ public class d extends Thread {
                             m = 50L;
                             return;
                         }
-                        break;
-                    default:
-                        var10000[var10001] = var20;
-                        if (var2 < var5) {
-                            continue label35;
+
+                        var37 = var28;
+                        var10004 = var14;
+                    }
+                }
+            }
+
+            String var44 = new String(var28).intern();
+            int var23 = -1;
+            var13[var11++] = var44;
+            if ((var8 += var9) >= var12) {
+                i = var13;
+                j = new String[2];
+                long var0 = 107634029375693L;
+                long[] var6 = new long[5];
+                int var3 = 0;
+                String var4 = ":Q o5\u000eÁÍg¡ù¢XÉ½\u0088sÊUÂÈò©´";
+                byte var5 = 24;
+                byte var2 = 0;
+
+                label40:
+                while (true) {
+                    var23 = var2;
+                    var2 += 8;
+                    byte[] var7 = var4.substring(var23, var2).getBytes("ISO-8859-1");
+                    long[] var10000 = var6;
+                    var23 = var3++;
+                    long var33 = ((long)var7[0] & 255L) << 56
+                        | ((long)var7[1] & 255L) << 48
+                        | ((long)var7[2] & 255L) << 40
+                        | ((long)var7[3] & 255L) << 32
+                        | ((long)var7[4] & 255L) << 24
+                        | ((long)var7[5] & 255L) << 16
+                        | ((long)var7[6] & 255L) << 8
+                        | (long)var7[7] & 255L;
+                    byte var45 = -1;
+
+                    while (true) {
+                        long var48 = var33 ^ var0;
+                        switch (var45) {
+                            case 0:
+                                var10000[var23] = var48;
+                                if (var2 >= var5) {
+                                    k = var6;
+                                    l = new Integer[5];
+                                    return;
+                                }
+                                break;
+                            default:
+                                var10000[var23] = var48;
+                                if (var2 < var5) {
+                                    continue label40;
+                                }
+
+                                var4 = ">\u0099\u0092í\u0001\n\u0081U\u008a±Å\u001bæLÈ-";
+                                var5 = 16;
+                                var2 = 0;
                         }
 
                         var4 = ">\u0099\u0092í\u0001\n\u0081U\u008a±Å\u001bæLÈ-";

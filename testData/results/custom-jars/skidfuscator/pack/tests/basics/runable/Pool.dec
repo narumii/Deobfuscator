@@ -1,0 +1,16 @@
+package pack.tests.basics.runable;
+
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+public class Pool {
+    public static ThreadPoolExecutor tpe;
+
+    static {
+        TimeUnit var5 = TimeUnit.SECONDS;
+        LinkedBlockingQueue var6 = new LinkedBlockingQueue(1);
+        ThreadPoolExecutor var0 = new ThreadPoolExecutor(0, 1, 1L, var5, var6);
+        tpe = var0;
+    }
+}

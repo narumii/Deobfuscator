@@ -1,0 +1,13 @@
+package pack.tests.basics.sub;
+
+public class Solver {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public Solver(int var1) {
+        if (SolAdd.get(3122) == 3) {
+            System.out.println("PASS");
+        } else {
+            System.out.println("FAIL");
+        }
+    }
+}

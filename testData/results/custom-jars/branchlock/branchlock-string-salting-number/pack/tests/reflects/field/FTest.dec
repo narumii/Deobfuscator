@@ -1,0 +1,40 @@
+package pack.tests.reflects.field;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
+public class FTest {
+    public String BRANCHLOCK_DOT_NET_DEMO;
+
+    public FTest(int var1) {
+    }
+
+    public void run(int var1) {
+        Constructor var2 = FObject.class.getDeclaredConstructor(int.class);
+        if (var2.isAccessible()) {
+            System.out.println("FAIL");
+        } else {
+            var2.setAccessible(true);
+            FObject var3 = (FObject)var2.newInstance(1);
+            Method var4 = FObject.class.getDeclaredMethod("add", null);
+            if (var4.isAccessible()) {
+                System.out.println("FAIL");
+            } else {
+                var4.setAccessible(true);
+                var4.invoke(var3);
+                Field var5 = FObject.class.getDeclaredField("i");
+                if (var5.isAccessible()) {
+                    System.out.println("FAIL");
+                } else {
+                    var5.setAccessible(true);
+                    if (var5.getInt(var3) != 4) {
+                        System.out.println("FAIL");
+                    } else {
+                        System.out.println("PASS");
+                    }
+                }
+            }
+        }
+    }
+}

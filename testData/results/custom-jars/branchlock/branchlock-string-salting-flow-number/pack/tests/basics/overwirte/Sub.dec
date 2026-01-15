@@ -1,0 +1,34 @@
+package pack.tests.basics.overwirte;
+
+public class Sub extends Super {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public Sub(int var1) {
+        super(4305);
+    }
+
+    @Override
+    public void run(int var1) {
+        System.out.println(this.face(1, 6600));
+    }
+
+    @Override
+    public String face(int var1, int var2) {
+        if (var1 == 1) {
+            return "PASS";
+        } else {
+            while (var2 < 0) {
+            }
+
+            return "FAIL";
+        }
+    }
+
+    public static Throwable m(Throwable var0) {
+        if (Super.m == null) {
+            Super.m = var0;
+        }
+
+        return var0;
+    }
+}

@@ -1,0 +1,23 @@
+package pack.tests.basics.cross;
+
+public class Top extends Abst1 implements Inte {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public Top(int var1) {
+        super(var1 ^ var1 ^ 4545);
+    }
+
+    public void run(int var1) {
+        if (this.add(1, var1 ^ 29788, (var1 | var1 ^ 32383) & (var1 ^ 20415)) == (var1 ^ 29789)
+            && this.mul(var1 ^ 29788, var1 ^ 29789, var1 ^ var1 ^ 16549) == (var1 ^ 29784)) {
+            System.out.println(d[var1 ^ 29791]);
+        } else {
+            System.out.println(d[var1 ^ 29790]);
+        }
+    }
+
+    @Override
+    public int add(int var1, int var2, int var3) {
+        return var1 + var2;
+    }
+}

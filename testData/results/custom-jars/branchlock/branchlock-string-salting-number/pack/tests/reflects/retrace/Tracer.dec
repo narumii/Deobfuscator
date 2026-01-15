@@ -1,0 +1,17 @@
+package pack.tests.reflects.retrace;
+
+public class Tracer {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public Tracer(int var1) {
+    }
+
+    public void run(int var1) {
+        new Tracee(5704).toTrace(5);
+        if (Tracee.p == 5) {
+            System.out.println("PASS");
+        } else {
+            System.out.println("FAIL");
+        }
+    }
+}

@@ -320,10 +320,10 @@ public record DeobfuscatorOptions(
       if (this.rtJarPath == null) {
         Path rtJar = findRtJarPath();
         if (rtJar != null) {
-          System.out.println("Auto-detected rt.jar path: " + rtJar);
+          LOGGER.info("Auto-detected rt.jar path: {}", rtJar);
           this.rtJarPath = rtJar;
         } else {
-          LOGGER.warn("Failed to auto-detect rt.jar path. Please provide path to rt.jar from Java 8 binaries, otherwise sandbox will not work.");
+          LOGGER.error("Failed to auto-detect rt.jar path. Perhaps you don't have Java 8 installed?");
         }
       }
 

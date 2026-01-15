@@ -1,0 +1,27 @@
+package pack.tests.basics.ctrl;
+
+public class Ctrl {
+    private String ret = "FAIL";
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public void runt() {
+        if (!"a".equals("b")) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public void runf() {
+        this.runt();
+
+        try {
+            this.runt();
+            this.ret = "FAIL";
+        } catch (Exception var1) {
+        }
+    }
+
+    public void run() {
+        this.runf();
+        System.out.println(this.ret);
+    }
+}

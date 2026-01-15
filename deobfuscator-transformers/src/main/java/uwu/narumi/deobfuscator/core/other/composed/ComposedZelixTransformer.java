@@ -5,7 +5,10 @@ import uwu.narumi.deobfuscator.core.other.composed.general.ComposedPeepholeClean
 import uwu.narumi.deobfuscator.core.other.impl.clean.peephole.JsrInlinerTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.RecoverSyntheticsTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.universal.TryCatchRepairTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.zkm.ZelixFieldFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.zkm.ZelixLongEncryptionMPCTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.zkm.ZelixParametersTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.zkm.ZelixStringTransformer;
@@ -34,6 +37,7 @@ public class ComposedZelixTransformer extends ComposedTransformer {
         RecoverSyntheticsTransformer::new,
 
         // Fixes flow a bit
+        TryCatchRepairTransformer::new,
         ZelixUselessTryCatchRemoverTransformer::new,
 
         // Decompose method parameters
@@ -44,7 +48,10 @@ public class ComposedZelixTransformer extends ComposedTransformer {
         InlineStaticFieldTransformer::new,
         UniversalNumberTransformer::new,
 
-//        ZelixStringTransformer::new,
+        // Remove field flow
+        ZelixFieldFlowTransformer::new,
+        InlineStaticFieldTransformer::new,
+        UniversalFlowTransformer::new,
 
         // Cleanup
         ComposedPeepholeCleanTransformer::new

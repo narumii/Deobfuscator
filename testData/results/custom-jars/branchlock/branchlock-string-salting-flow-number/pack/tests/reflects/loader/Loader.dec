@@ -1,0 +1,27 @@
+package pack.tests.reflects.loader;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
+public class Loader extends ClassLoader {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public Loader(int var1) {
+    }
+
+    public static byte[] readAllBytes(InputStream var0, int var1) {
+        while (true) {
+        }
+    }
+
+    @Override
+    public InputStream getResourceAsStream(String var1) {
+        return (InputStream)(var1.contains("TEST") ? new ByteArrayInputStream("PASS".getBytes()) : super.getResourceAsStream(var1));
+    }
+
+    @Override
+    public Class findClass(String var1) {
+        byte[] var2 = readAllBytes(Loader.class.getClassLoader().getResourceAsStream("pack/tests/reflects/loader/LTest.class"), 20488);
+        return this.defineClass(var1, var2, 0, var2.length);
+    }
+}

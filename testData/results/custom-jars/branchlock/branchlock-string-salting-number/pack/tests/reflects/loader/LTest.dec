@@ -1,0 +1,27 @@
+package pack.tests.reflects.loader;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+
+public class LTest {
+    public int BRANCHLOCK_DOT_NET_DEMO;
+
+    public LTest(int var1) {
+    }
+
+    public static byte[] readAllBytes(InputStream var0, int var1) {
+        ByteArrayOutputStream var2 = new ByteArrayOutputStream();
+        byte[] var3 = new byte[var1 ^ 27268];
+
+        int var4;
+        while ((var4 = var0.read(var3)) != (var1 ^ -28293)) {
+            var2.write(var3, 0, var4);
+        }
+
+        return var2.toByteArray();
+    }
+
+    public void run(int var1) {
+        System.out.println(new String(readAllBytes(LTest.class.getResourceAsStream(d[var1 ^ 12433]), (var1 | var1 ^ 32405) & (var1 ^ 24447))));
+    }
+}

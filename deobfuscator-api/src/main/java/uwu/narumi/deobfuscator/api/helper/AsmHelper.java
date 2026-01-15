@@ -98,6 +98,10 @@ public class AsmHelper implements Opcodes {
     return (access & opcode) != 0;
   }
 
+  public static boolean isAccess(int opcode, int... access) {
+    return Arrays.stream(access).allMatch(access1 -> (access1 & opcode) != 0);
+  }
+
   /**
    * Convert constant value to instruction that represents this constant
    *
@@ -119,6 +123,25 @@ public class AsmHelper implements Opcodes {
     throw new IllegalArgumentException("Not a constant");
   }
 
+  /**
+   * Get default value for the given type (https://docs.oracle.com/javase/specs/jls/se8/html/jls-4.html#jls-4.12.5)
+   *
+   * @param type The type
+   * @return Default value for the type
+   */
+  public static Object getDefaultTypeValue(Type type) {
+    return switch (type.getSort()) {
+      case Type.BOOLEAN -> false;
+      case Type.CHAR -> '\u0000';
+      case Type.BYTE, Type.SHORT, Type.INT -> 0;
+      case Type.LONG -> 0L;
+      case Type.FLOAT -> 0.0f;
+      case Type.DOUBLE -> 0.0d;
+      case Type.ARRAY, Type.OBJECT -> null;
+      default -> throw new IllegalArgumentException("Unsupported type: " + type);
+    };
+  }
+
   public static Type getTypeFromPrimitiveCast(MethodInsnNode insn) {
     if (insn.getOpcode() != INVOKEVIRTUAL) throw new IllegalArgumentException("Instruction is not an INVOKEVIRTUAL");
 
@@ -135,6 +158,26 @@ public class AsmHelper implements Opcodes {
 
   public static AbstractInsnNode toPop(Value value) {
     return value.getSize() == 1 ? new InsnNode(POP) : new InsnNode(POP2);
+  }
+
+  public boolean isInsnInLabelRange(MethodNode method, LabelNode startLabel, AbstractInsnNode insn) {
+    InsnList instructions = method.instructions;
+
+    int startIndex = instructions.indexOf(startLabel);
+    if (startIndex == -1) return false;
+
+    int insnIndex = instructions.indexOf(insn);
+    if (insnIndex == -1) return false;
+
+    int endIndex = instructions.size();
+    for (int i = startIndex + 1; i < instructions.size(); i++) {
+      if (instructions.get(i) instanceof LabelNode) {
+        endIndex = i;
+        break;
+      }
+    }
+
+    return insnIndex > startIndex && insnIndex < endIndex;
   }
 
   /**

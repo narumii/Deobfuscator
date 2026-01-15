@@ -1,0 +1,51 @@
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import mapped.Class290;
+import mapped.Class295;
+import mapped.Class320;
+import mapped.Class616;
+import mapped.Class633;
+
+@Class290
+public class Class951 {
+    private static int field2969;
+    private static Cache<Integer, Class633> field2970 = CacheBuilder.newBuilder().expireAfterWrite(3L, TimeUnit.MINUTES).build();
+    private static final ScheduledExecutorService field2971 = Executors.newScheduledThreadPool(1);
+    private static int field2972 = 325170080;
+    private static long[] field2973;
+
+    @Class295
+    public static synchronized void method3419(Class320 var0) {
+        Runnable var1 = (Runnable)field2970.getIfPresent(var0.field1546);
+        if (var1 != null) {
+            field2970.invalidate(var0.field1546);
+            Class633 var2 = (Class633)var1;
+            var2.field2499 = var0;
+            var2.run();
+        }
+    }
+
+    @Class295
+    public static synchronized void method3420(Class320 var0, Class633 var1) {
+        method3421(var0, var1, null, 3);
+    }
+
+    public static synchronized void method3421(Class320 var0, Class633 var1, Runnable var2, int var3) {
+        field2969++;
+        var0.field1546 = field2969;
+        field2970.put(var0.field1546, var1);
+        Class616.method1994(var0);
+        field2971.schedule(() -> method3422(var0.field1546, var2), (long)var3, TimeUnit.SECONDS);
+    }
+
+    private static synchronized void method3422(Integer var0, Runnable var1) {
+        Class633 var2 = (Class633)field2970.getIfPresent(var0);
+        if (var2 != null) {
+            field2970.invalidate(var0);
+            var1.run();
+        }
+    }
+}

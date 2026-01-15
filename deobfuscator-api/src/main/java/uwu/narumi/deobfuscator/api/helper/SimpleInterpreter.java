@@ -152,6 +152,46 @@ public class SimpleInterpreter {
           return null;
         }
     ));
+    // Long#parseLong or Long#valueOf
+    registerInterpreter(MethodInterpreter.of(
+        MethodMatch.invokeStatic()
+            .owner("java/lang/Long")
+            .name("parseLong", "valueOf")
+            .desc("(Ljava/lang/String;)J"),
+        (insn, stackValues) -> {
+          // Get value from stack
+          OriginalSourceValue sourceValue = stackValues.get(stackValues.size() - 1);
+          if (sourceValue.getConstantValue() != null && sourceValue.getConstantValue().value() instanceof String text) {
+            try {
+              return OriginalSourceValue.ConstantValue.of(Long.parseLong(text));
+            } catch (NumberFormatException e) {
+              return null;
+            }
+          }
+          return null;
+        }
+    ));
+    // Long#parseLong with radix
+    registerInterpreter(MethodInterpreter.of(
+        MethodMatch.invokeStatic()
+            .owner("java/lang/Long")
+            .name("parseLong", "valueOf")
+            .desc("(Ljava/lang/String;I)J"),
+        (insn, stackValues) -> {
+          // Get values from stack
+          OriginalSourceValue firstValue = stackValues.get(stackValues.size() - 2);
+          OriginalSourceValue secondValue = stackValues.get(stackValues.size() - 1);
+          if (firstValue.getConstantValue() != null && firstValue.getConstantValue().value() instanceof String text &&
+              secondValue.getConstantValue() != null && secondValue.getConstantValue().value() instanceof Integer radix) {
+            try {
+              return OriginalSourceValue.ConstantValue.of(Long.parseLong(text, radix));
+            } catch (NumberFormatException e) {
+              return null;
+            }
+          }
+          return null;
+        }
+    ));
     // Double#doubleToLongBits
     registerInterpreter(MethodInterpreter.of(
         MethodMatch.invokeStatic()
