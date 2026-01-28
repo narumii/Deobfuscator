@@ -13,6 +13,7 @@ import uwu.narumi.deobfuscator.core.other.impl.universal.RemapperTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.StringBuilderTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
 import uwu.narumi.deobfuscator.base.TestDeobfuscationBase;
+import uwu.narumi.deobfuscator.core.other.impl.zkm.ZelixStringTransformer;
 import uwu.narumi.deobfuscator.transformer.TestSandboxSecurityTransformer;
 
 import java.util.Map;

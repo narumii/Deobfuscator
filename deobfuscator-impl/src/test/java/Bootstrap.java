@@ -18,6 +18,6 @@ public class Bootstrap {
             .continueOnError()
             .classWriterFlags(ClassWriter.COMPUTE_FRAMES)
             .build()
-        ).start();
+    ).start();
   }
 }
