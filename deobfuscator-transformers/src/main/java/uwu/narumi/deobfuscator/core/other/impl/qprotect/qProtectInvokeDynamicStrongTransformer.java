@@ -32,10 +32,7 @@ public class qProtectInvokeDynamicStrongTransformer extends Transformer {
 
   private static final int XOR_KEY_ARRAY_SIZE = 16;
 
-  private static final Match RESOLVE_HANDLE_MATCH = MethodMatch.invokeSpecial().owner("java/lang/invoke/ConstantCallSite").name("<init>").desc("(Ljava/lang/invoke/MethodHandle;)V")
-      .and(FrameMatch.stack(0, OpcodeMatch.of(CHECKCAST)
-          .and(FrameMatch.stack(0, MethodMatch.invokeStatic().desc("([Ljava/lang/Object;)Ljava/lang/Object;").capture("resolveHandleMethod")))));
-
+  private static final Match RESOLVE_HANDLE_MATCH = MethodMatch.invokeStatic().desc("([Ljava/lang/Object;)Ljava/lang/Object;").capture("resolveHandleMethod");
   private static final Match FIND_METHOD_HANDLE_MATCH = MethodMatch.invokeStatic().desc("(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
 
   private static final Match XOR_KEY_ARRAY_MATCH = OpcodeMatch.of(ASTORE).capture("varStore")
