@@ -1,22 +1,15 @@
 package uwu.narumi.deobfuscator.core.other.composed;
 
 import uwu.narumi.deobfuscator.api.transformer.ComposedTransformer;
+import uwu.narumi.deobfuscator.core.other.composed.general.ComposedGeneralFlowTransformer;
 import uwu.narumi.deobfuscator.core.other.composed.general.ComposedPeepholeCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.clean.LocalVariableNamesCleanTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineLocalVariablesTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.pool.InlineStaticFieldTransformer;
-import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectAESStringEncryptionTransformer;
-import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectFieldFlowTransformer;
-import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectInvokeDynamicStrongTransformer;
-import uwu.narumi.deobfuscator.core.other.impl.universal.SourceFileNameRecoverTransformer;
+import uwu.narumi.deobfuscator.core.other.impl.qprotect.*;
+import uwu.narumi.deobfuscator.core.other.impl.universal.*;
 import uwu.narumi.deobfuscator.core.other.impl.universal.pool.UniversalStringPoolTransformer;
-import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectStringTransformer;
-import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectTryCatchTransformer;
-import uwu.narumi.deobfuscator.core.other.impl.qprotect.qProtectInvokeDynamicTransformer;
 import uwu.narumi.deobfuscator.core.other.impl.universal.pool.UniversalNumberPoolTransformer;
-import uwu.narumi.deobfuscator.core.other.impl.universal.TryCatchRepairTransformer;
-import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalFlowTransformer;
-import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransformer;
 
 /**
  * https://qtechnologies.dev/
@@ -24,6 +17,10 @@ import uwu.narumi.deobfuscator.core.other.impl.universal.UniversalNumberTransfor
 // TODO: Deobfuscate strong string encryption. Sample: qprotect.StringStrongEncryption
 public class Composed_qProtectTransformer extends ComposedTransformer {
   public Composed_qProtectTransformer() {
+    super(false);
+  }
+
+  public Composed_qProtectTransformer(boolean strongStrings) {
     super(
         // This fixes some weird issues where "this" is used as a local variable name.
         LocalVariableNamesCleanTransformer::new,
@@ -33,7 +30,7 @@ public class Composed_qProtectTransformer extends ComposedTransformer {
         InlineStaticFieldTransformer::new,
         InlineLocalVariablesTransformer::new,
 
-        // Inline number pools
+        // Inline number pools, but keep byte arrays for StrongStringEncryption
         UniversalNumberPoolTransformer::new,
         // Decrypt method invocation
         qProtectInvokeDynamicTransformer::new,
@@ -42,11 +39,16 @@ public class Composed_qProtectTransformer extends ComposedTransformer {
         // Fix flow
         UniversalFlowTransformer::new,
 
-        // Decrypt strings
-        qProtectStringTransformer::new,
-        qProtectAESStringEncryptionTransformer::new,
-        // Inline string pools
-        UniversalStringPoolTransformer::new,
+        !strongStrings ? () -> new ComposedTransformer(false,
+            // Strings
+            qProtectStringTransformer::new,
+            qProtectAESStringEncryptionTransformer::new,
+            StringBuilderTransformer::new,
+
+            // Inline string pools
+            UniversalStringPoolTransformer::new,
+            StringBuilderTransformer::new
+        ) : ComposedTransformer::new,
 
         // Inline fields again
         InlineStaticFieldTransformer::new,
@@ -60,7 +62,19 @@ public class Composed_qProtectTransformer extends ComposedTransformer {
         TryCatchRepairTransformer::new,
 
         // Remove field flow after cleaning code from garbage, so we can do pattern matching
-        qProtectFieldFlowTransformer::new
+        qProtectFieldFlowTransformer::new,
+
+        strongStrings ? () -> new ComposedTransformer(false,
+            // Strings
+            qProtectStrongStringTransformer::new,
+            qProtectAESStringEncryptionTransformer::new,
+            StringBuilderTransformer::new,
+
+            // Inline string pools
+            UniversalStringPoolTransformer::new,
+            StringBuilderTransformer::new
+        ) : ComposedTransformer::new
+
     );
   }
 }
