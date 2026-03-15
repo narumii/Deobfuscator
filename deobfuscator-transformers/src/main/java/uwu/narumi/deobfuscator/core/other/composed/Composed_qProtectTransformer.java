@@ -17,7 +17,45 @@ import uwu.narumi.deobfuscator.core.other.impl.universal.pool.UniversalNumberPoo
 // TODO: Deobfuscate strong string encryption. Sample: qprotect.StringStrongEncryption
 public class Composed_qProtectTransformer extends ComposedTransformer {
   public Composed_qProtectTransformer() {
-    super(false);
+    super(
+        // This fixes some weird issues where "this" is used as a local variable name.
+        LocalVariableNamesCleanTransformer::new,
+
+        // Initial cleaning code from garbage
+        UniversalNumberTransformer::new,
+        InlineStaticFieldTransformer::new,
+        InlineLocalVariablesTransformer::new,
+
+        // Inline number pools, but keep byte arrays for StrongStringEncryption
+        UniversalNumberPoolTransformer::new,
+        // Decrypt method invocation
+        qProtectInvokeDynamicTransformer::new,
+        qProtectInvokeDynamicStrongTransformer::new,
+
+        // Fix flow
+        UniversalFlowTransformer::new,
+
+        // Strings
+        qProtectStringTransformer::new,
+        qProtectAESStringEncryptionTransformer::new,
+
+        // Inline string pools
+        UniversalStringPoolTransformer::new,
+
+        // Inline fields again
+        InlineStaticFieldTransformer::new,
+        InlineLocalVariablesTransformer::new,
+
+        // Cleanup
+        ComposedPeepholeCleanTransformer::new,
+
+        // Resolve qProtect flow that uses try-catches
+        qProtectTryCatchTransformer::new,
+        TryCatchRepairTransformer::new,
+
+        // Remove field flow after cleaning code from garbage, so we can do pattern matching
+        qProtectFieldFlowTransformer::new
+    );
   }
 
   public Composed_qProtectTransformer(boolean strongStrings) {
@@ -39,17 +77,6 @@ public class Composed_qProtectTransformer extends ComposedTransformer {
         // Fix flow
         UniversalFlowTransformer::new,
 
-        !strongStrings ? () -> new ComposedTransformer(false,
-            // Strings
-            qProtectStringTransformer::new,
-            qProtectAESStringEncryptionTransformer::new,
-            StringBuilderTransformer::new,
-
-            // Inline string pools
-            UniversalStringPoolTransformer::new,
-            StringBuilderTransformer::new
-        ) : ComposedTransformer::new,
-
         // Inline fields again
         InlineStaticFieldTransformer::new,
         InlineLocalVariablesTransformer::new,
@@ -61,20 +88,17 @@ public class Composed_qProtectTransformer extends ComposedTransformer {
         qProtectTryCatchTransformer::new,
         TryCatchRepairTransformer::new,
 
+        // String Strings
+        qProtectStrongStringTransformer::new,
+        qProtectAESStringEncryptionTransformer::new,
+        StringBuilderTransformer::new,
+
+        // Inline string pools
+        UniversalStringPoolTransformer::new,
+        StringBuilderTransformer::new,
+
         // Remove field flow after cleaning code from garbage, so we can do pattern matching
-        qProtectFieldFlowTransformer::new,
-
-        strongStrings ? () -> new ComposedTransformer(false,
-            // Strings
-            qProtectStrongStringTransformer::new,
-            qProtectAESStringEncryptionTransformer::new,
-            StringBuilderTransformer::new,
-
-            // Inline string pools
-            UniversalStringPoolTransformer::new,
-            StringBuilderTransformer::new
-        ) : ComposedTransformer::new
-
+        qProtectFieldFlowTransformer::new
     );
   }
 }

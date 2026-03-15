@@ -98,8 +98,6 @@ public class UniversalNumberPoolTransformer extends Transformer {
                 .and(FrameMatch.stack(1, FieldMatch.getStatic().fieldRef(fieldRefPool)))));
       }
 
-      AtomicBoolean markAsEntireArrayUse = new AtomicBoolean(false);
-
       // Replace number pool references with actual values
       classWrapper.methods().forEach(methodNode -> {
         MethodContext methodContext = MethodContext.of(classWrapper, methodNode);
@@ -113,27 +111,23 @@ public class UniversalNumberPoolTransformer extends Transformer {
           numberPoolReferenceCtx.removeAll();
           markChange();
         });
-        if (!markAsEntireArrayUse.get())
-          markAsEntireArrayUse.set(SequenceMatch.of(Match.of(ctx -> !ctx.insn().isNumber()), FieldMatch.getStatic().fieldRef(fieldRefPool)).findAny(methodContext).isPresent());
       });
 
       // Cleanup
-      if (!markAsEntireArrayUse.get() || isChanged()) {
-        classWrapper.methods().remove(numberPoolMatchCtx.insnContext().methodNode());
-        classWrapper.fields().removeIf(fieldNode -> fieldNode.name.equals(numberPoolFieldInsn.name) && fieldNode.desc.equals(numberPoolFieldInsn.desc));
-        // Remove number pool initialization from clinit
-        classWrapper.findClInit().ifPresent(clinit -> {
-          for (AbstractInsnNode insn : clinit.instructions.toArray()) {
-            if (insn.getOpcode() == INVOKESTATIC && insn instanceof MethodInsnNode methodInsn &&
-                methodInsn.name.equals(numberPoolMatchCtx.insnContext().methodNode().name) && methodInsn.desc.equals(numberPoolMatchCtx.insnContext().methodNode().desc) &&
-                methodInsn.owner.equals(classWrapper.name())
-            ) {
-              // Remove invocation
-              clinit.instructions.remove(insn);
-            }
+      classWrapper.methods().remove(numberPoolMatchCtx.insnContext().methodNode());
+      classWrapper.fields().removeIf(fieldNode -> fieldNode.name.equals(numberPoolFieldInsn.name) && fieldNode.desc.equals(numberPoolFieldInsn.desc));
+      // Remove number pool initialization from clinit
+      classWrapper.findClInit().ifPresent(clinit -> {
+        for (AbstractInsnNode insn : clinit.instructions.toArray()) {
+          if (insn.getOpcode() == INVOKESTATIC && insn instanceof MethodInsnNode methodInsn &&
+              methodInsn.name.equals(numberPoolMatchCtx.insnContext().methodNode().name) && methodInsn.desc.equals(numberPoolMatchCtx.insnContext().methodNode().desc) &&
+              methodInsn.owner.equals(classWrapper.name())
+          ) {
+            // Remove invocation
+            clinit.instructions.remove(insn);
           }
-        });
-      }
+        }
+      });
     });
   }
 
