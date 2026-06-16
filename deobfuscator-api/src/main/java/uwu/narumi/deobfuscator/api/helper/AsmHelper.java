@@ -318,6 +318,28 @@ public class AsmHelper implements Opcodes {
     return instructions;
   }
 
+  public static AbstractInsnNode previousMeaningful(AbstractInsnNode insn) {
+    AbstractInsnNode current = insn == null ? null : insn.getPrevious();
+    while (current != null && isStructural(current)) {
+      current = current.getPrevious();
+    }
+    return current;
+  }
+
+  public static AbstractInsnNode nextMeaningful(AbstractInsnNode insn) {
+    AbstractInsnNode current = insn == null ? null : insn.getNext();
+    while (current != null && isStructural(current)) {
+      current = current.getNext();
+    }
+    return current;
+  }
+
+  public static boolean isStructural(AbstractInsnNode insn) {
+    return insn instanceof LabelNode
+        || insn.getType() == AbstractInsnNode.FRAME
+        || insn.getType() == AbstractInsnNode.LINE;
+  }
+
   /**
    * Counts variable usages in the method.
    *
