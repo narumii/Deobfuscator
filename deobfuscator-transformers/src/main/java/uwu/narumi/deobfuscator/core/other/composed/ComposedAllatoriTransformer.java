@@ -8,8 +8,10 @@ public class ComposedAllatoriTransformer extends ComposedTransformer {
 
     public ComposedAllatoriTransformer(boolean strongString) {
         super(
-            UniversalNumberTransformer::new,
-            () -> new AllatoriStringTransformer(strongString)
+                UniversalNumberTransformer::new,
+                () -> new AllatoriStringTransformer(strongString),
+                () -> new AllatoriStringTransformer(strongString),
+                () -> new AllatoriStringTransformer(strongString, true)
         );
     }
 }

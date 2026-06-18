@@ -1,9 +1,11 @@
 package uwu.narumi.deobfuscator.core.other.impl.allatori;
 
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.IntInsnNode;
-import org.objectweb.asm.tree.LdcInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.analysis.Analyzer;
+import org.objectweb.asm.tree.analysis.Frame;
+import org.objectweb.asm.tree.analysis.SourceInterpreter;
+import org.objectweb.asm.tree.analysis.SourceValue;
 import uwu.narumi.deobfuscator.api.transformer.Transformer;
 
 import java.util.ArrayList;
@@ -12,15 +14,50 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+class PropagatingSourceInterpreter extends SourceInterpreter {
+    public PropagatingSourceInterpreter() {
+        super(Opcodes.ASM9);
+    }
+
+    @Override
+    public SourceValue copyOperation(AbstractInsnNode insn, SourceValue value) {
+        if (insn.getOpcode() >= Opcodes.DUP && insn.getOpcode() <= Opcodes.DUP2_X2) {
+            return new SourceValue(value.getSize(), value.insns);
+        }
+
+        return super.copyOperation(insn, value);
+    }
+}
+
 public class AllatoriStringTransformer extends Transformer {
 
-    private HashMap<String, DecryptionMethod> decryptors = new HashMap<>();
+    private final HashMap<String, DecryptionMethod> decryptors = new HashMap<>();
 
-    private boolean strong;
+    private final boolean strong;
+    private final boolean leftOver;
 
     public AllatoriStringTransformer(boolean strong) {
         this.strong = strong;
+        this.leftOver = false;
     }
+
+    public AllatoriStringTransformer(boolean strong, boolean leftOver) {
+        this.strong = strong;
+        this.leftOver = leftOver;
+    }
+
+    private Integer getIntValue(AbstractInsnNode node) {
+        int opcode = node.getOpcode();
+        if (opcode >= Opcodes.ICONST_M1 && opcode <= Opcodes.ICONST_5) {
+            return opcode - 3;
+        } else if (node instanceof IntInsnNode) {
+            return ((IntInsnNode) node).operand;
+        } else if (node instanceof LdcInsnNode && ((LdcInsnNode) node).cst instanceof Integer) {
+            return (Integer) ((LdcInsnNode) node).cst;
+        }
+        return null;
+    }
+
 
     /* Written by https://github.com/Lampadina17 | 06/08/2024 */
     /* use UniversalNumberTransformer before this transformer to decrypt keys */
@@ -44,10 +81,13 @@ public class AllatoriStringTransformer extends Transformer {
                 if (isDecryptor.get()) {
                     /* Extract possible keys */
                     List<Integer> possibleKeys = new ArrayList<>();
-                    Arrays.stream(methodNode.instructions.toArray())
-                            .filter(node -> node instanceof IntInsnNode)
-                            .map(IntInsnNode.class::cast)
-                            .forEach(node -> possibleKeys.add(node.operand));
+
+                    for (AbstractInsnNode node : methodNode.instructions.toArray()) {
+                        Integer val = getIntValue(node);
+                        if (val != null) {
+                            possibleKeys.add(val);
+                        }
+                    }
 
                     /* Filter all possible keys */
                     Arrays.stream(methodNode.instructions.toArray())
@@ -64,45 +104,92 @@ public class AllatoriStringTransformer extends Transformer {
             });
         });
 
-        /* Decrypt all strings */
-        scopedClasses().forEach(classWrapper -> {
-            classWrapper.methods().forEach(methodNode -> {
-                Arrays.stream(methodNode.instructions.toArray()).forEach(node -> {
-                    if (node instanceof LdcInsnNode ldc && ldc.cst instanceof String && node.getNext() instanceof MethodInsnNode next && next.getOpcode() == INVOKESTATIC) {
-                        DecryptionMethod dec1 = decryptors.get(next.owner);
-
-                        /* Decrypt and remove double encryption (Strong) */
-                        if (strong && next.getNext() instanceof MethodInsnNode nextnext) {
-                            DecryptionMethod dec2 = decryptors.get(nextnext.owner);
-                            ldc.cst = dec2.v4weak(dec1.v4strong((String) ldc.cst, methodNode.name + classWrapper.name().replace("/", ".")));
-                            methodNode.instructions.remove(nextnext);
-                            methodNode.instructions.remove(next);
-                            this.markChange();
-                            return;
-                        }
-
-                        /* Decrypt and remove encryption (Fast/Strong) */
-                        if (dec1 != null) {
-                            if (strong) {
-                                ldc.cst = dec1.v4strong((String) ldc.cst, methodNode.name + classWrapper.name().replace("/", "."));
-                            } else {
-                                ldc.cst = dec1.v4weak((String) ldc.cst);
+        if (leftOver) {
+            /* WHAT */
+            if (!strong) {
+                scopedClasses().forEach(classWrapper -> {
+                    classWrapper.methods().forEach(methodNode -> {
+                        try {
+                            Analyzer<SourceValue> analyzer = new Analyzer<>(new PropagatingSourceInterpreter());
+                            Frame<SourceValue>[] frames = analyzer.analyze(classWrapper.name(), methodNode);
+                            AbstractInsnNode[] instructions = methodNode.instructions.toArray();
+                            for (int i = 0; i < instructions.length; i++) {
+                                AbstractInsnNode node = instructions[i];
+                                if (node.getOpcode() == INVOKESTATIC) {
+                                    MethodInsnNode min = (MethodInsnNode) node;
+                                    DecryptionMethod dec = decryptors.get(min.owner);
+                                    if (dec != null) {
+                                        boolean flag = false;
+                                        Frame<SourceValue> currentFrame = frames[i];
+                                        if (currentFrame != null && currentFrame.getStackSize() > 0) {
+                                            SourceValue stackTop = currentFrame.getStack(currentFrame.getStackSize() - 1);
+                                            for (AbstractInsnNode sourceInsn : stackTop.insns) {
+                                                if (sourceInsn instanceof LdcInsnNode ldc) {
+                                                    LOGGER.warn("Found tracked string at {} in {}, decrypting...", ldc.cst, classWrapper.name());
+                                                    ldc.cst = dec.v4weak((String) ldc.cst);
+                                                    LOGGER.warn("New value: {}", ldc.cst);
+                                                    super.markChange();
+                                                    flag = true;
+                                                    methodNode.instructions.remove(node);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (!flag) {
+                                            LOGGER.warn("Failed to track string for method {} in {}, skipping...", min.name, classWrapper.name());
+                                        }
+                                    }
+                                }
                             }
-                            /* Remove invoke */
-                            methodNode.instructions.remove(next);
-                            this.markChange();
+                        } catch (Exception e) {
+                            LOGGER.error("Failed to analyze method {}: {}", methodNode.name, e.getMessage());
                         }
-                    }
+                    });
+                });
+            } else {
+                throw new UnsupportedOperationException("Not implemented");
+            }
+        } else {
+            /* Decrypt all strings */
+            scopedClasses().forEach(classWrapper -> {
+                classWrapper.methods().forEach(methodNode -> {
+                    Arrays.stream(methodNode.instructions.toArray()).forEach(node -> {
+                        if (node instanceof LdcInsnNode ldc && ldc.cst instanceof String && node.getNext() instanceof MethodInsnNode next && next.getOpcode() == INVOKESTATIC) {
+                            DecryptionMethod dec1 = decryptors.get(next.owner);
+
+                            /* Decrypt and remove double encryption (Strong) */
+                            if (strong && next.getNext() instanceof MethodInsnNode nextnext) {
+                                DecryptionMethod dec2 = decryptors.get(nextnext.owner);
+                                ldc.cst = dec2.v4weak(dec1.v4strong((String) ldc.cst, methodNode.name + classWrapper.name().replace("/", ".")));
+                                methodNode.instructions.remove(nextnext);
+                                methodNode.instructions.remove(next);
+                                this.markChange();
+                                return;
+                            }
+
+                            /* Decrypt and remove encryption (Fast/Strong) */
+                            if (dec1 != null) {
+                                if (strong) {
+                                    ldc.cst = dec1.v4strong((String) ldc.cst, methodNode.name + classWrapper.name().replace("/", "."));
+                                } else {
+                                    ldc.cst = dec1.v4weak((String) ldc.cst);
+                                }
+                                /* Remove invoke */
+                                methodNode.instructions.remove(next);
+                                this.markChange();
+                            }
+                        }
+                    });
                 });
             });
-        });
+        }
         LOGGER.info("Decrypted {} strings in {} classes", this.getChangesCount(), scopedClasses().size());
     }
 
     public class DecryptionMethod {
 
-        private String owner;
-        private int[] keys;
+        private final String owner;
+        private final int[] keys;
 
         public DecryptionMethod(String owner, int[] keys) {
             this.owner = owner;
